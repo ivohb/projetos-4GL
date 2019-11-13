@@ -1,0 +1,333 @@
+#------------------------------------------------------------------------------#
+# colocar no agendador do windows: taskschd.msc                                #
+#------------------------------------------------------------------------------#
+# PROGRAMA: pol1376                                                            #
+# OBJETIVO: ESTORNAR APTO DE REFUGO E APONTAR SUCATA                           #
+# AUTOR...: IVO H BARBOSA                                                      #
+# DATA....: 30/08/2019                                                         #
+# ALTERADO:                                                                    #
+#------------------------------------------------------------------------------#
+
+GLOBALS
+   DEFINE p_cod_empresa          LIKE empresa.cod_empresa,
+          p_den_empresa          LIKE empresa.den_empresa,
+          p_user                 LIKE usuario.nom_usuario,
+          p_status               SMALLINT,
+          p_ies_impressao        CHAR(001),
+          g_ies_ambiente         CHAR(001),
+          p_nom_arquivo          CHAR(100),
+          p_versao               CHAR(18),
+          comando                CHAR(080),
+          m_comando              CHAR(080),
+          p_caminho              CHAR(150),
+          m_caminho              CHAR(150),
+          g_tipo_sgbd            CHAR(003),
+          g_id_man_apont         INTEGER,
+          g_tem_critica          SMALLINT,
+          g_msg                  CHAR(150)         
+END GLOBALS
+
+DEFINE m_processo           CHAR(30),
+       m_dat_fec_man        DATE,
+       m_seq_reg_mestre     INTEGER, 
+       m_seq_reg_item       INTEGER,
+       m_num_transac        INTEGER,
+       m_qtd_produzida      DECIMAL(10,3),
+       m_qtd_erro           INTEGER,
+       m_tot_erro           INTEGER  
+
+DEFINE mr_erro           ARRAY[100] OF RECORD
+      cod_empresa        CHAR(02),
+      seq_reg_mestre     INTEGER,
+      seq_reg_item       INTEGER,
+      mensagem           CHAR(120)
+END RECORD      
+
+MAIN
+      
+   IF NUM_ARGS() > 0  THEN
+      CALL LOG_connectDatabase("DEFAULT")
+      LET p_cod_empresa = ARG_VAL(1)
+      LET p_status = 0
+      LET p_user = 'admlog'
+      LET m_processo = 'Via bat ou outra aplicação'
+      CALL pol1376_processar() 
+   ELSE
+      CALL log0180_conecta_usuario()
+      CALL log001_acessa_usuario("ESPEC999","") RETURNING p_status, p_cod_empresa, p_user
+      
+      IF p_status = 0  THEN
+         LET m_processo = 'Manualmente pelo menu logix'
+         CALL pol1376_processar()
+         CALL log0030_mensagem(m_msg,'INFO')
+      END IF
+     
+   END IF
+      
+END MAIN       
+
+#------------------------------#
+FUNCTION pol1376_job(l_rotina) #
+#------------------------------#
+
+   DEFINE l_rotina          CHAR(06),
+          l_den_empresa     CHAR(50),
+          l_param1_empresa  CHAR(02),
+          l_param2_user     CHAR(08),
+          l_param3_user     CHAR(08),
+          l_status          SMALLINT
+
+   CALL JOB_get_parametro_gatilho_tarefa(1,0) RETURNING l_status, l_param1_empresa
+   CALL JOB_get_parametro_gatilho_tarefa(2,0) RETURNING l_status, l_param2_user
+   CALL JOB_get_parametro_gatilho_tarefa(2,2) RETURNING l_status, l_param3_user
+   
+   IF l_param1_empresa IS NULL THEN
+      LET l_param1_empresa = '01'
+   END IF
+
+   IF l_param2_user IS NULL THEN
+      LET l_param2_user = 'job0003'
+   END IF
+      
+   LET p_cod_empresa = l_param1_empresa
+   LET p_user = l_param2_user
+   LET m_processo = 'Executando via JOB0003'
+
+   CALL pol1376_processar()
+   
+   RETURN TRUE
+   
+END FUNCTION   
+
+#---------------------------#          
+FUNCTION pol1376_processar()#
+#---------------------------#
+   
+   DEFINE l_dat_proces    CHAR(20)
+   
+   WHENEVER ANY ERROR CONTINUE
+   SET ISOLATION TO DIRTY READ
+   SET LOCK MODE TO WAIT 300
+
+   LET p_versao = "pol1376-12.00.00  "
+   CALL func002_versao_prg(p_versao)
+   LET m_qtd_erro = 0
+   
+   IF NOT log0150_verifica_se_tabela_existe("proces_pol1376") THEN 
+      IF NOT pol1356_cria_proces_pol1376() THEN
+         RETURN 
+      END IF
+   END IF
+
+   LET l_dat_proces = EXTEND(CURRENT, YEAR TO SECOND)
+   
+   LET m_msg = 'Inico do processo'
+   
+   INSERT INTO proces_pol1376 VALUES(p_cod_empresa,l_dat_proces,m_processo, m_msg)
+   
+   LET m_msg = NULL
+   
+   IF pol1376_exec_processo() THEN
+      IF m_qtd_erro = 0 THEN
+         LET m_msg = 'Fim do processo'
+      ELSE
+         LET m_msg = 'Houve erro. Consulte-os no pol1377.'
+      END
+   END IF
+
+   LET l_dat_proces = EXTEND(CURRENT, YEAR TO SECOND)
+
+   INSERT INTO proces_pol1376 VALUES(p_cod_empresa,l_dat_proces,m_processo, m_msg)
+             
+END FUNCTION
+
+#-------------------------------------#
+FUNCTION pol1356_cria_proces_pol1376()#
+#-------------------------------------#
+
+   CREATE TABLE proces_pol1376(
+    id                  SERIAL,
+    cod_empresa         CHAR(02),
+    dat_proces          CHAR(20),
+    processo            CHAR(30),
+    mensagem            CHAR(120));
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro:(',STATUS, ') criando tab proces_pol1376'
+      RETURN FALSE
+   END IF
+
+   CREATE UNIQUE INDEX ix_proces_pol1376
+    ON proces_pol1376(id);
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro:(',STATUS, ') criando index ix_proces_pol1376'
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#-------------------------------#
+FUNCTION pol1376_exec_processo()#
+#-------------------------------#
+               
+   SELECT dat_fecha_ult_man
+     INTO m_dat_fec_man
+     FROM par_estoque
+    WHERE cod_empresa = p_cod_empresa
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro:(',STATUS, ') lendo tab par_estoque'
+      RETURN FALSE
+   END IF
+   
+   LET m_dat_fec_man = m_dat_fec_man + 1
+   
+   DECLARE cq_le_apont CURSOR WITH HOLD FOR
+    SELECT m.seq_reg_mestre, p.seq_registro_item, 
+           p.moviment_estoque, p.qtd_produzida
+      FROM man_apo_mestre m, man_item_produzido p, ordens o
+     WHERE m.empresa = p_cod_empresa
+       AND m.sit_apontamento = 'A'
+       AND m.data_producao >= m_dat_fec_man
+       AND m.empresa = p.empresa
+       AND m.seq_reg_mestre = p.seq_reg_mestre
+       AND p.tip_producao = 'R'
+       AND p.tip_movto = 'N'
+       AND m.empresa = o.cod_empresa
+       AND m.ordem_producao = o.num_ordem
+       AND o.ies_situa = '4'
+
+   FOREACH cq_le_apont INTO 
+      m_seq_reg_mestre, m_seq_reg_item, m_num_transac, m_qtd_produzida
+     
+      IF STATUS <> 0 THEN
+         LET m_msg = 'Erro:(',STATUS, ') lendo apontamentos:cq_le_apont'
+         RETURN FALSE
+      END IF 
+      
+      SELECT 1 FROM man_item_produzido
+       WHERE empresa = p_cod_empresa
+         AND seq_reg_mestre = m_seq_reg_mestre
+         AND seq_reg_normal = m_seq_reg_item
+
+      IF STATUS = 0 THEN
+         CONTINUE FOREACH
+      ELSE
+         IF STATUS <> 100 THEN
+            LET m_msg = 'Erro:(',STATUS, ') lendo tab man_item_produzido:cq_le_apont'
+            RETURN FALSE
+         END IF
+      END IF 
+
+      CALL log085_transacao("BEGIN")
+      
+      IF NOT pol1376_estorna_refugo(lr_param) THEN
+         LET m_qtd_erro = m_qtd_erro + 1
+         CALL pol1376_le_erros() RETURNING p_status
+         CALL log085_transacao("ROLLBACK")
+         IF NOT p_status THEN
+            RETURN FALSE
+         END IF
+         IF NOT pol1376_ins_erros() THEN
+            RETURN FALSE
+         END IF
+      END IF
+
+      {IF NOT pol1376_aponta_sucata() THEN
+         CALL log085_transacao("ROLLBACK")
+         RETURN FALSE
+      END IF}
+      
+      CALL log085_transacao("COMMIT")
+
+   END FOREACH
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1376_estorna_refugo()#
+#--------------------------------#
+
+   DEFINE lr_param                       RECORD
+          empresa                        CHAR(02),
+          usuario                        CHAR(08),
+          seq_mestre                     INTEGER,
+          seq_item                       INTEGER,
+          qtd_estornar                   DECIMAL(10,3),
+          tip_producao                   CHAR(01)
+   END RECORD
+
+   LET lr_param.empresa = p_cod_empresa
+   LET lr_param.usuario = p_user  
+   LET lr_param.seq_mestre = m_seq_reg_mestre
+   LET lr_param.seq_item = m_seq_reg_item
+   LET lr_param.qtd_estornar = m_qtd_produzida
+   LET lr_param.tip_producao = 'R'
+   
+   LET p_status = func020_estorna_apto(lr_param)
+   
+   RETURN p_status
+
+END FUNCTION
+
+#--------------------------#
+FUNCTION pol1376_le_erros()#
+#--------------------------#
+   
+   DEFINE l_ind          INTEGER
+   
+   LET l_ind = 1
+   LET m_tot_erro = 0
+   
+   DECLARE cq_erros CURSOR FOR
+    SELECT * FROM estorno_erro_f020
+   
+   FOREACH cq_erros INTO mr_erro[l_ind].*
+   
+      IF STATUS <> 0 THEN
+         LET m_msg = 'Erro:(',STATUS, ') lendo tab estorno_erro_f020'
+         RETURN FALSE
+      END IF
+      
+      LET l_ind = l_ind + 1
+      
+      IF l_ind > 100 THEN
+         EXIT FOREACH
+      END IF
+      
+   END FOREACH
+   
+   LET m_tot_erro = l_ind - 1
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1376_ins_erros()#
+#---------------------------#
+   
+   DEFINE l_ind         INTEGER
+   
+   FOR l_ind = 1 TO m_tot_erro
+   
+       INSERT INTO estorno_erro_304    
+        VALUES(mr_erro[l_ind].*)
+
+       IF STATUS <> 0 THEN
+          LET m_erro = STATUS
+          LET m_msg = 'Erro ',m_erro CLIPPED, ' inserindo erros na tab estorno_erro_304:2' 
+          RETURN FALSE
+       END IF       
+       
+   END FOR
+   
+   RETURN TRUE
+
+END FUNCTION
+   

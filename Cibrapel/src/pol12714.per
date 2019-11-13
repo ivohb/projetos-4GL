@@ -1,0 +1,37 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+---------------------------------------------------------------------------
+[a ]                         DESCRIÇÃO PARA DANFE E XML       
+
+   Nota:[b        ]   Cliente:[c              ] [d                      ]
+
+      Item                               descrição     
+[k              |l                                                      ]
+[k              |l                                                      ]
+[k              |l                                                      ]
+[k              |l                                                      ]
+[k              |l                                                      ]
+[k              |l                                                      ]
+[k              |l                                                      ]
+[k              |l                                                      ]
+[k              |l                                                      ]
+[k              |l                                                      ]
+
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.num_nff, AUTONEXT;
+   c = FORMONLY.cod_cliente, NOENTRY;
+   d = FORMONLY.nom_reduzido, NOENTRY;
+   k = FORMONLY.cod_item,  NOENTRY --#, OPTIONS="-nolist"; 
+   l = FORMONLY.den_item, UPSHIFT,AUTONEXT, 
+       COMMENTS = 'Descrição p/ o cliente'  --#, OPTIONS="-nolist";
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[10] (cod_item THRU den_item);
+END

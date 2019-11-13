@@ -1,0 +1,77 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a ]                   MANUTENÇÃO ADIANTAMENTOS VIAGEM
+
+                Viagem: [b       ]           Controle: [c                   ]
+
+     Data/hora solicit: [d         ] [d1      ]
+              Viajante: [e1      ] [e2                            ]
+
+     Finalidade viagem: [f1 ] [f2                                           ]
+      Cliente atendido: [g1             ] [g2                              ]
+       Cliente faturar: [h1             ] [h2                              ]
+
+   Valor adiant viagem: [i                ]
+   Forma adiant viagem: [j ]
+                 Banco: [l1  ] [l2                            ]
+               Agência: [m     ]         Conta corrente: [n              ]
+       AD adiantamento: [o     ]        AP adiantamento: [p     ]
+
+}
+END
+
+ATTRIBUTES
+a  = FORMONLY.empresa               ,NOENTRY
+;
+b  = FORMONLY.viagem                TYPE INTEGER, UPSHIFT, AUTONEXT
+--#  , widget="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+c  = FORMONLY.controle              ,NOENTRY, UPSHIFT
+--#  , widget="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+d  = FORMONLY.dat_adto_viagem     ,NOENTRY
+;
+d1 = FORMONLY.hora                  ,NOENTRY, PICTURE = "##:##:##";
+e1 = FORMONLY.viajante              ,NOENTRY
+--#  , widget="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+e2 = FORMONLY.den_viajante          ,NOENTRY
+;
+f1 = FORMONLY.finalidade_viagem     ,NOENTRY
+--#  , widget="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+f2 = FORMONLY.den_finalidade_viagem ,NOENTRY
+;
+g1 = FORMONLY.cliente_atendido      ,NOENTRY
+--#  , widget="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+g2 = FORMONLY.den_cliente_atendido  ,NOENTRY
+;
+h1 = FORMONLY.cliente_fatur         ,NOENTRY
+--#  , widget="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+h2 = FORMONLY.den_cliente_fatur     ,NOENTRY
+;
+i  = FORMONLY.val_adto_viagem       TYPE DECIMAL, AUTONEXT, UPSHIFT
+;
+j  = FORMONLY.forma_adto_viagem     TYPE CHAR, UPSHIFT, AUTONEXT
+--#  , widget="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+l1 = FORMONLY.banco                 TYPE INTEGER, UPSHIFT, AUTONEXT
+--#  , widget="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+l2 = FORMONLY.den_banco             TYPE CHAR, UPSHIFT, AUTONEXT
+;
+m  = FORMONLY.agencia               TYPE CHAR, UPSHIFT, AUTONEXT
+;
+n  = FORMONLY.cta_corrente          TYPE CHAR, UPSHIFT, AUTONEXT
+;
+o = FORMONLY.ad_adiantamento        ,NOENTRY
+;
+p = FORMONLY.ap_adiantamento        ,NOENTRY
+;
+END
+

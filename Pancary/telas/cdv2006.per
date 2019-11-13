@@ -1,0 +1,65 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+------------------------------------------------------------------------------
+                              FINALIDADE X ATIVIDADES
+
+               Finalidade: [e1   ] [e2                            ]
+     Controle obrigatório? [g]
+    Valida período viagem? [h]
+    Valida controle encer? [i]
+ Sempre gerar 'integ_fat'? [a]
+          Serviço interno? [b]
+                Atividade: [f1   ] [f002                                    ]
+                           [f1   ] [f002                                    ]
+                           [f1   ] [f002                                    ]
+
+
+}
+END
+
+ATTRIBUTES
+e1   = formonly.finalidade        TYPE CHAR, AUTONEXT;
+e2   = formonly.des_finalidade,   UPSHIFT, AUTONEXT;
+g    = formonly.eh_controle_obrig TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - sim   N - não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+h    = formonly.eh_periodo_viagem TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - sim   N - não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+i    = formonly.eh_ctr_encerram TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - sim   N - não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+f1   = FORMONLY.atividade         TYPE CHAR, AUTONEXT
+     --#, OPTIONS="-nolist"
+     --#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+f002 = FORMONLY.des_atividade, UPSHIFT, NOENTRY
+     --#, OPTIONS="-nolist"
+;
+
+a    = FORMONLY.gerar_tab_fat TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - sim   N - não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+
+b    = FORMONLY.eh_servico_interno TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - sim   N - não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+END
+
+INSTRUCTIONS
+    SCREEN RECORD sr_ativ[3] (atividade,
+                              des_atividade)
+END
+

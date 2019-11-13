@@ -1,0 +1,80 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [zz]                   ACERTO DESPESA VIAGEM - RESUMO
+          Controle: [a                   ]  Viagem: [b      ]
+
+          Viajante: [c1      ] [c2                            ]
+   Cliente faturar: [d1             ] [d2                                  ]
+    Período viagem: [e1        ] até  [e2        ]      Centro custo: [f   ]
+ Finalidade viagem: [g1   ] [g2                            ]
+
+ Total KM semanal: [h               ]        Quantidade KM: [hh              ]
+ Quantidade horas: [ii              ]
+  Total terceiros: [i               ]  Total adiantamentos: [j               ]
+---------------------------------- DESPESAS ----------------------------------
+         Desp/SOS: [k               ]
+    Quilometragem: [l               ]       Total despesas: [m               ]
+
+                                                            [n               ]
+Saldo transferido: [o               ]      Data dev/transf: [ss        ]
+   Controle receb: [p                   ]     Viagem receb: [q      ]
+}
+END
+
+ATTRIBUTES
+zz  = FORMONLY.empresa TYPE CHAR, UPSHIFT, NOENTRY;
+
+a   = FORMONLY.controle TYPE DECIMAL, UPSHIFT
+;
+
+b   = FORMONLY.viagem TYPE INTEGER
+;
+
+c1 = FORMONLY.viajante TYPE INTEGER, NOENTRY;
+
+c2 = FORMONLY.nom_viajante TYPE CHAR, NOENTRY;
+
+d1 = FORMONLY.cliente_debitar TYPE CHAR, NOENTRY;
+
+d2 = FORMONLY.des_cli_debitar TYPE CHAR, NOENTRY;
+
+e1 = FORMONLY.dat_partida TYPE DATE, FORMAT = "dd/mm/yyyy", NOENTRY;
+
+e2 = FORMONLY.dat_retorno TYPE DATE, FORMAT = "dd/mm/yyyy", NOENTRY;
+
+f = FORMONLY.cc_debitar TYPE INTEGER, NOENTRY;
+
+g1 = FORMONLY.finalidade_viagem TYPE CHAR, NOENTRY;
+
+g2 = FORMONLY.des_fin_viagem TYPE CHAR, NOENTRY;
+
+h = FORMONLY.tot_km_semanal TYPE DECIMAL(17,2), NOENTRY;
+
+hh = formonly.qtd_km_semanal TYPE DECIMAL(17,2), NOENTRY;
+
+ii = formonly.qtd_hor_semanal TYPE DECIMAL(17,2), NOENTRY;
+
+i = FORMONLY.tot_terceiros TYPE DECIMAL(17,2), NOENTRY;
+
+j = FORMONLY.tot_adtos TYPE DECIMAL(17,2), NOENTRY;
+
+k = FORMONLY.tot_desp_urbanas TYPE DECIMAL(17,2), NOENTRY;
+
+l = FORMONLY.tot_desp_km TYPE DECIMAL(17,2), NOENTRY;
+
+m = FORMONLY.tot_despesas TYPE DECIMAL(17,2), NOENTRY;
+
+n = FORMONLY.saldo TYPE DECIMAL(17,2), NOENTRY;
+
+o = FORMONLY.saldo_transf TYPE DECIMAL(17,2), NOENTRY;
+
+p = FORMONLY.controle_receb TYPE DECIMAL, NOENTRY;
+
+q = FORMONLY.viagem_receb TYPE INTEGER, NOENTRY;
+
+ss = formonly.dat_dev_transf TYPE DATE, NOENTRY;
+END
+

@@ -1,0 +1,78 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+----------------------------------------------------------------------------
+ [a0]                      TIPOS DESPESA VIAGEM
+
+        Tipo despesa viagem: [a1   ]
+   Descrição despesa viagem: [b1                            ]
+       Grupo despesa viagem: [c ] [c2                                ]
+                  Atividade: [d1   ] [d2                         ]
+                Reembolsado: [e ]
+    Valorizar quilometragem: [l ]
+             Conta contábil: [f1                     ]
+      Tipo despesa contábil: [i1  ] [i2                               ]
+           Histórico padrão: [g1 ] [g2                                ]
+                       Item: [j1             ]
+                 Item horas: [m1             ]
+     Informar placa veículo? [n]
+             Cobrar despesa? [o]
+
+}
+END
+
+ATTRIBUTES
+a0   = FORMONLY.empresa, NOENTRY;
+a1   = FORMONLY.tip_despesa_viagem;
+b1   = FORMONLY.des_tdesp_viagem, UPSHIFT;
+c   = FORMONLY.grp_despesa_viagem TYPE CHAR,
+     COMMENTS = " Valores aceitos: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 e 12. "
+--#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+c2   = FORMONLY.des_grp_desp_viag, NOENTRY ;
+d1   = FORMONLY.ativ TYPE CHAR, AUTONEXT
+--#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+d2   = FORMONLY.des_ativ, UPSHIFT, NOENTRY;
+e   = FORMONLY.eh_reembolso TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - Sim   N - Não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+l   = FORMONLY.eh_valz_km TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - Sim   N - Não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+f1   = FORMONLY.cctbl_contab_ad, UPSHIFT
+--#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+g1   = FORMONLY.hist_padrao_cap
+--#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+g2   = FORMONLY.des_hist_padrao_cap, NOENTRY;
+
+i1   = FORMONLY.tip_despesa_contab
+--#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+i2   = FORMONLY.des_tip_despesa_contab , NOENTRY;
+j1   = FORMONLY.item TYPE CHAR, UPSHIFT
+--#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+m1   = FORMONLY.item_hor TYPE CHAR, UPSHIFT
+--#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+n   = FORMONLY.informa_placa TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - Sim   N - Não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+
+o   = FORMONLY.cobra_despesa TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - Sim   N - Não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+END
+

@@ -1,0 +1,41 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+-----------------------------------------------
+             PENDÊNCIAS VIAJEM
+
+
+ EMP.  VIAGEM       ACERTO/APROVAÇÃO
+  --   ----------   -------------------------
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+ [a ] [b         ] [c                        ]
+}
+
+END
+
+ATTRIBUTES
+a = FORMONLY.empresa          TYPE CHAR;
+b = FORMONLY.viagem           TYPE DECIMAL;
+c = FORMONLY.acerto_aprovacao TYPE CHAR;
+
+INSTRUCTIONS
+SCREEN RECORD sr_pendencias[15](FORMONLY.empresa,
+                                FORMONLY.viagem,
+                                FORMONLY.acerto_aprovacao);
+DELIMITERS " ";
+END
+

@@ -69,7 +69,8 @@ DEFINE m_num_viagem         LIKE cdv_solic_viag_781.viagem,
        m_seq_terc           INTEGER,
        m_tip_docum          CHAR(01),
        p_index              INTEGER,
-       s_index              INTEGER
+       s_index              INTEGER,
+       p_msg                CHAR(100)
        
 
 DEFINE ma_item           ARRAY[100] OF RECORD
@@ -251,6 +252,7 @@ END RECORD
          ad_terceiro       LIKE cdv_desp_terc_781.ad_terceiro,
          previsao          CHAR(01),
          ap_terceiro       DECIMAL(6,0),
+         num_ar            DECIMAL(6,0),
          sequencia         LIKE cdv_desp_terc_781.seq_desp_terceiro,
          ativ              LIKE cdv_desp_terc_781.ativ,
          des_ativ          LIKE cdv_ativ_781.des_ativ,
@@ -478,7 +480,8 @@ END MAIN
          SHOW OPTION "iNiciar acerto"
          SHOW OPTION "1-apont desp/SOS"
          SHOW OPTION "apont Km/horas"
-         SHOW OPTION "apont Terceiros"
+         SHOW OPTION "apont Desp terceiros"
+         SHOW OPTION "apont NF terceiros"
          SHOW OPTION "Resumo"
          SHOW OPTION "finalizar acertO"
          LET m_inicia_acerto = TRUE
@@ -537,7 +540,8 @@ END MAIN
          SHOW OPTION "iNiciar acerto"
          SHOW OPTION "1-apont desp/SOS"
          SHOW OPTION "apont Km/horas"
-         SHOW OPTION "apont Terceiros"
+         SHOW OPTION "apont Desp terceiros"
+         SHOW OPTION "apont NF terceiros"
          SHOW OPTION "Resumo"
          SHOW OPTION "finalizar acertO"
          CALL cdv2000_consulta()
@@ -549,7 +553,8 @@ END MAIN
       SHOW OPTION "iNiciar acerto"
       SHOW OPTION "1-apont desp/SOS"
       SHOW OPTION "apont Km/horas"
-      SHOW OPTION "apont Terceiros"
+      SHOW OPTION "apont Desp terceiros"
+      SHOW OPTION "apont NF terceiros"
       SHOW OPTION "Resumo"
       SHOW OPTION "finalizar acertO"
       CALL cdv2000_paginacao("SEGUINTE")
@@ -560,7 +565,8 @@ END MAIN
       SHOW OPTION "iNiciar acerto"
       SHOW OPTION "1-apont desp/SOS"
       SHOW OPTION "apont Km/horas"
-      SHOW OPTION "apont Terceiros"
+      SHOW OPTION "apont Desp terceiros"
+      SHOW OPTION "apont NF terceiros"
       SHOW OPTION "Resumo"
       SHOW OPTION "finalizar acertO"
       CALL cdv2000_paginacao("ANTERIOR")
@@ -602,7 +608,8 @@ END MAIN
                   HIDE OPTION "iNiciar acerto"
                   HIDE OPTION "1-apont desp/SOS"
                   HIDE OPTION "apont Km/horas"
-                  HIDE OPTION "apont Terceiros"
+                  HIDE OPTION "apont Desp terceiros"
+                  SHOW OPTION "apont NF terceiros"
                   HIDE OPTION "finalizar acertO"
                END IF
             ELSE
@@ -613,7 +620,8 @@ END MAIN
 			                  HIDE OPTION "iNiciar acerto"
 			                  HIDE OPTION "1-apont desp/SOS"
 			                  HIDE OPTION "apont Km/horas"
-			                  HIDE OPTION "apont Terceiros"
+			                  HIDE OPTION "apont Desp terceiros"
+			                  SHOW OPTION "apont NF terceiros"
 			                  HIDE OPTION "finalizar acertO"
 			               END IF
                ELSE
@@ -8607,7 +8615,8 @@ END FUNCTION
                                      ies_especie,
                                      cfop,
                                      tot_ipi,
-                                     tot_icms)
+                                     tot_icms,
+                                     num_ar)
                              VALUES (p_cod_empresa,
                                      l_viagem,
                                      l_seq_desp_terceiro,
@@ -8627,7 +8636,8 @@ END FUNCTION
                                      mr_desp_terc.ies_especie,
                                      mr_desp_terc.cfop,
                                      mr_desp_terc.tot_ipi,
-                                     mr_desp_terc.tot_icms)
+                                     mr_desp_terc.tot_icms,
+                                     mr_desp_terc.num_ar)
         WHENEVER ERROR STOP
         IF SQLCA.SQLCODE <> 0 THEN
            CALL log003_err_sql('INSERT','cdv_desp_terc_781')
@@ -8706,59 +8716,103 @@ END FUNCTION
 
 END FUNCTION
 
+#----------------------------#
+FUNCTION cdv2000_canc_modif()#
+#----------------------------#
+   
+   CALL log085_transacao("ROLLBACK")
+
+   IF p_msg IS NOT NULL THEN
+      CALL log0030_mensagem(p_msg, 'info')
+   END IF
+   
+   ERROR 'Modificação cancelada.'
+   LET mr_desp_terc.* = mr_desp_tercr.*
+   DISPLAY BY NAME mr_desp_terc.*
+   
+   IF m_tip_docum = 'N' THEN
+      LET p_status = cdv2000_carrega_itens()
+   END IF
+
+END FUNCTION
+
 #----------------------------------------#
  FUNCTION cdv2000_modificacao_desp_terc()
 #----------------------------------------#
-  DEFINE l_work     SMALLINT
+  
+  DEFINE l_work     SMALLINT,
+         l_num_ad   INTEGER,
+         l_num_ap   INTEGER
 
   CALL log006_exibe_teclas("01", p_versao)
   CURRENT WINDOW IS w_cdv20004
-
-  IF mr_desp_terc.tip_docum = 'D' THEN
-     IF NOT cdv2000_exclui_despesa_no_cap(mr_desp_terc.ad_terceiro, mr_desp_terc.ap_terceiro) THEN
-        ERROR "Exclusão AD despesa de terceiros cancelada."
-        RETURN
-     END IF
-  END IF
   
-  INITIALIZE mr_desp_terc.ad_terceiro, mr_desp_terc.previsao, mr_desp_terc.ap_terceiro TO NULL
-
+  LET l_num_ad = mr_desp_terc.ad_terceiro
+  LET l_num_ap = mr_desp_terc.ap_terceiro
+    
   LET mr_desp_tercr.* = mr_desp_terc.*
+  
+  INITIALIZE mr_desp_terc.ad_terceiro, 
+     mr_desp_terc.previsao, mr_desp_terc.ap_terceiro TO NULL
 
   IF NOT cdv2000_entrada_desp_terc('MODIFICACAO') THEN
-     ERROR 'Modificação cancelada.'
-     LET mr_desp_terc.* = mr_desp_tercr.*
-     DISPLAY BY NAME mr_desp_terc.*
-     IF m_tip_docum = 'N' THEN
-        LET p_status = cdv2000_carrega_itens()
-     END IF
+     CALL cdv2000_canc_modif()
      RETURN
   END IF
 
   IF cdv2000_cursor_for_update_desp_terc() THEN
 
-     IF mr_desp_terc.ad_terceiro IS NULL THEN
+     LET m_num_viagem = mr_desp_terc.viagem
+     LET m_seq_terc   = mr_desp_terc.sequencia        
+
+     IF mr_desp_terc.tip_docum = 'D' THEN
+        IF NOT cdv2000_exclui_despesa_no_cap(l_num_ad, l_num_ap) THEN
+           LET p_msg = "Não foi possivel excluir o CAP."
+           CALL cdv2000_canc_modif()
+           RETURN
+        END IF
+
         CALL cdv2000_gera_ad_desp_terc(mr_desp_terc.viagem)
           RETURNING l_work, mr_desp_terc.ad_terceiro, mr_desp_terc.ap_terceiro
-        IF l_work AND m_tip_docum = 'D' THEN
+        
+        IF l_work THEN
            LET mr_desp_terc.previsao = cdv2000_recupera_ind_previsao(mr_desp_terc.ad_terceiro)
-        END IF
-     END IF
-
-     IF l_work THEN
-     
-        DISPLAY BY NAME mr_desp_terc.ad_terceiro, mr_desp_terc.ap_terceiro,
-                        mr_desp_terc.previsao
-     ELSE
-        IF m_tip_docum = 'N' THEN 
-           CALL log085_transacao("ROLLBACK")
-           ERROR 'Modificação cancelada.'
-           LET mr_desp_terc.* = mr_desp_tercr.*
-           DISPLAY BY NAME mr_desp_terc.*
-           LET p_status = cdv2000_carrega_itens()
+        ELSE
+           LET p_msg = "Não foi possivel gerar o CAP."
+           CALL cdv2000_canc_modif()
            RETURN
-        END IF        
+        END IF
+        
+     ELSE
+        IF NOT cdv2000_exclui_nf() THEN
+           LET p_msg = "Não foi possivel escluir a NF no SUP3760."
+           CALL cdv2000_canc_modif()
+           RETURN
+        END IF     
+
+        WHENEVER ERROR CONTINUE
+        DELETE FROM cdv_nf_item_781 
+         WHERE empresa = p_cod_empresa
+           AND viagem = m_num_viagem
+           AND seq_desp_terceiro = m_seq_terc
+        WHENEVER ERROR STOP
+        
+        IF STATUS <> 0 THEN
+           LET p_msg = "Erro ", STATUS, " DELETANDO ITENS DA TABELA CDV_NF_ITEM_781"
+           CALL cdv2000_canc_modif()
+           RETURN
+        END IF
+
+        IF NOT cdv2000_grava_itens() THEN 
+           LET p_msg = 'Problemas gerando NF para a despesa.'
+           CALL cdv2000_canc_modif()
+           RETURN
+        END IF
+           
      END IF
+     
+     DISPLAY BY NAME mr_desp_terc.ad_terceiro, mr_desp_terc.ap_terceiro,
+                     mr_desp_terc.previsao
      
      WHENEVER ERROR CONTINUE
      UPDATE cdv_desp_terc_781
@@ -8776,57 +8830,23 @@ END FUNCTION
              ies_especie       = mr_desp_terc.ies_especie,
              cfop              = mr_desp_terc.cfop,
              tot_ipi           = mr_desp_terc.tot_ipi,
-             tot_icms          = mr_desp_terc.tot_icms
+             tot_icms          = mr_desp_terc.tot_icms,
+             num_ar            = mr_desp_terc.num_ar
           WHERE CURRENT OF cm_desp_terc
         WHENEVER ERROR STOP
      
      IF STATUS <> 0 THEN
-        CALL log003_err_sql('UPDATE','cdv_desp_terc_781')
-        LET p_status = FALSE
-     ELSE
-        LET m_num_viagem =  mr_desp_terc.viagem
-        LET m_seq_terc = mr_desp_terc.sequencia        
-        
-        WHENEVER ERROR CONTINUE
-        DELETE FROM cdv_nf_item_781 
-         WHERE empresa = p_cod_empresa
-           AND viagem = m_num_viagem
-           AND seq_desp_terceiro = m_seq_terc
-        WHENEVER ERROR STOP
-        
-        IF STATUS <> 0 THEN
-           CALL log003_err_sql('UPDATE','cdv_nf_item_781')
-           LET p_status = FALSE
-        ELSE
-           LET p_status = cdv2000_grava_itens()
-        END IF
+        LET p_msg = "Erro ", STATUS, " ATUALIZANDO DADOS DA TABELA CDV_DESP_TERC_781"
+        CALL cdv2000_canc_modif()
+        RETURN
      END IF
         
-     IF p_status THEN
-        CALL log085_transacao("COMMIT")
-        MESSAGE 'Modificação efetuada com sucesso.' ATTRIBUTE(REVERSE)
-        LET m_terc_ativa = FALSE
-        IF mr_desp_terc.ad_terceiro IS NULL THEN
-           CALL cdv2000_manutencao_ads('S')
-        END IF     
-     ELSE        
-        CALL log085_transacao("ROLLBACK")
-        ERROR 'Modificação cancelada.'
-        LET mr_desp_terc.* = mr_desp_tercr.*
-        DISPLAY BY NAME mr_desp_terc.*
-        IF m_tip_docum = 'N' THEN
-           LET p_status = cdv2000_carrega_itens()
-        END IF        
-     END IF
-  ELSE
-     ERROR 'Modificação cancelada.'
-     LET mr_desp_terc.* = mr_desp_tercr.*
-     DISPLAY BY NAME mr_desp_terc.*
-     IF m_tip_docum = 'N' THEN
-        LET p_status = cdv2000_carrega_itens()
-     END IF
-  END IF
-
+     CALL log085_transacao("COMMIT")
+     
+     ERROR 'Modificação efetuada com sucesso.'
+     
+   END IF
+   
 END FUNCTION
 
 #-------------------------------------#
@@ -8840,94 +8860,122 @@ END FUNCTION
   LET p_status = TRUE
   
   IF log0040_confirm(19,34,"Confirma exclusão?") THEN
-
-     IF mr_desp_terc.tip_docum = 'D' THEN
-        IF NOT cdv2000_exclui_despesa_no_cap(mr_desp_terc.ad_terceiro, mr_desp_terc.ap_terceiro) THEN
-           ERROR "Exclusão cancelada."
-           RETURN
-        END IF
-     END IF
-
-     LET l_viagem_de_terc = FALSE
-     IF cdv2000_eh_viagem_terc(mr_desp_terc.viagem) THEN
-        LET l_viagem_de_terc = TRUE
-     END IF
-
-     IF cdv2000_cursor_for_update_desp_terc() THEN
-        WHENEVER ERROR CONTINUE
-         DELETE FROM cdv_desp_terc_781
-          WHERE CURRENT OF cm_desp_terc
-        WHENEVER ERROR STOP
-        IF SQLCA.SQLCODE = 0 THEN
-                      
-           WHENEVER ERROR CONTINUE
-           SELECT empresa
-             FROM cdv_desp_terc_781
-            WHERE empresa = p_cod_empresa
-              AND viagem  = mr_desp_terc.viagem
-           WHENEVER ERROR STOP
-
-           IF sqlca.sqlcode = 100
-              AND l_viagem_de_terc = TRUE THEN      #se a viagem possuir somente um apontamento e ser de terceiro
-                                                 #devera entao excluir toda a viagem de terceiro.
-              WHENEVER ERROR CONTINUE
-              DELETE FROM cdv_solic_viag_781
-               WHERE empresa = p_cod_empresa
-                 AND viagem  = mr_desp_terc.viagem
-              WHENEVER ERROR STOP
-
-              IF sqlca.sqlcode <> 0 THEN
-                 CALL log003_err_sql("DELETE","cdv_solic_viag_781")
-                 LET p_status = FALSE
-              ELSE
-                 WHENEVER ERROR CONTINUE
-                 DELETE FROM cdv_acer_viag_781
-                  WHERE empresa = p_cod_empresa
-                    AND viagem  = mr_desp_terc.viagem
-                 WHENEVER ERROR STOP
-
-                 IF sqlca.sqlcode <> 0 THEN
-                    CALL log003_err_sql("DELETE","cdv_acer_viag_781")
-                    LET p_status = FALSE
-                 END IF
-
-              END IF
-
-           END IF
-           
-           IF p_status THEN
-              WHENEVER ERROR CONTINUE
-              DELETE FROM cdv_nf_item_781
-               WHERE empresa = p_cod_empresa
-                 AND viagem = mr_desp_terc.viagem
-                 AND seq_desp_terceiro = mr_desp_terc.sequencia
-              WHENEVER ERROR STOP
-              IF sqlca.sqlcode <> 0 THEN
-                 CALL log003_err_sql("DELETE","cdv_nf_item_781")
-                 LET p_status = FALSE
-              END IF                 
-           END IF
-           
-           IF p_status THEN
-              CALL log085_transacao("COMMIT")
-              MESSAGE "Exclusão efetuada com sucesso." ATTRIBUTE(REVERSE)
-              CLEAR FORM
-              DISPLAY p_cod_empresa TO empresa
-              INITIALIZE mr_desp_terc.*, ma_item TO NULL
-           ELSE
-              CALL log085_transacao("ROLLBACK")
-              ERROR 'Exclusão cancelada.'
-           END IF     
-        ELSE
-           CALL log085_transacao("ROLLBACK")
-           ERROR 'Exclusão cancelada.'
-        END IF
-     ELSE
-        ERROR 'Exclusão cancelada.'
-     END IF
   ELSE
      ERROR 'Exclusão cancelada.'
+     RETURN
   END IF
+
+  LET l_viagem_de_terc = FALSE
+  
+  IF cdv2000_eh_viagem_terc(mr_desp_terc.viagem) THEN
+     LET l_viagem_de_terc = TRUE
+  END IF
+
+  IF cdv2000_cursor_for_update_desp_terc() THEN
+  ELSE
+     ERROR 'Exclusão cancelada.'
+     RETURN
+  END IF
+
+  LET m_num_viagem = mr_desp_terc.viagem
+  LET m_seq_terc   = mr_desp_terc.sequencia        
+
+  IF mr_desp_terc.tip_docum = 'D' THEN
+  
+     IF NOT cdv2000_exclui_despesa_no_cap(mr_desp_terc.ad_terceiro, mr_desp_terc.ap_terceiro) THEN
+        CALL log085_transacao("ROLLBACK")
+        LET p_msg = "Não foi possivel escluir o CAP."
+        CALL log0030_mensagem(p_msg,'info')
+        ERROR "Exclusão cancelada."
+        RETURN
+     END IF
+     
+  ELSE
+
+     IF NOT cdv2000_exclui_nf() THEN
+        CALL log085_transacao("ROLLBACK")
+        LET p_msg = "Não foi possivel escluir a NF no SUP3760."
+        CALL log0030_mensagem(p_msg,'info')
+        RETURN
+     END IF     
+
+     WHENEVER ERROR CONTINUE
+     DELETE FROM cdv_nf_item_781 
+      WHERE empresa = p_cod_empresa
+        AND viagem = m_num_viagem
+        AND seq_desp_terceiro = m_seq_terc
+     WHENEVER ERROR STOP
+        
+     IF STATUS <> 0 THEN
+        CALL log003_err_sql('DELETANDO','cdv_nf_item_781')
+        CALL log085_transacao("ROLLBACK")
+        RETURN
+     END IF
+      
+  END IF
+       
+  WHENEVER ERROR CONTINUE        
+   DELETE FROM cdv_desp_terc_781       
+    WHERE CURRENT OF cm_desp_terc      
+  WHENEVER ERROR STOP      
+              
+  IF STATUS <> 0 THEN     
+     CALL log003_err_sql('DELETANDO','cdv_desp_terc_781')  
+     CALL log085_transacao("ROLLBACK")
+     ERROR 'Exclusão cancelada.'
+     RETURN
+  END IF
+  
+  LET p_status = TRUE
+  
+  #se a viagem possuir somente um apontamento e ser de terceiro          
+  #devera entao excluir toda a viagem de terceiro.                          
+  
+   WHENEVER ERROR CONTINUE                                
+   SELECT empresa                              
+     FROM cdv_desp_terc_781                    
+    WHERE empresa = p_cod_empresa              
+      AND viagem  = mr_desp_terc.viagem        
+   WHENEVER ERROR STOP                         
+          
+  IF sqlca.sqlcode = 100                                                                                 
+     AND l_viagem_de_terc = TRUE THEN      
+                                           
+     WHENEVER ERROR CONTINUE                                                                                      
+     DELETE FROM cdv_solic_viag_781                                                                               
+      WHERE empresa = p_cod_empresa                                                                               
+        AND viagem  = mr_desp_terc.viagem                                                                         
+     WHENEVER ERROR STOP                                                                                          
+                                                                                                                  
+     IF sqlca.sqlcode <> 0 THEN                                                                          
+        CALL log003_err_sql("DELETE","cdv_solic_viag_781")                                                        
+        LET p_status = FALSE                                                                                      
+     ELSE                                                                                                         
+        WHENEVER ERROR CONTINUE                                                                                   
+        DELETE FROM cdv_acer_viag_781                                                                             
+         WHERE empresa = p_cod_empresa                                                                            
+           AND viagem  = mr_desp_terc.viagem                                                                      
+        WHENEVER ERROR STOP                                                                                       
+                                                                                                                  
+        IF sqlca.sqlcode <> 0 THEN                                                                       
+           CALL log003_err_sql("DELETE","cdv_acer_viag_781")                                                      
+           LET p_status = FALSE                                                                                   
+        END IF                                                                                                    
+                                                                                                                  
+     END IF                                                                                              
+                                                                                                                  
+  END IF                                                                                                 
+                                                                             
+  IF p_status THEN                                                         
+     CALL log085_transacao("COMMIT")                                       
+     CLEAR FORM                                                            
+     DISPLAY p_cod_empresa TO empresa                                      
+     INITIALIZE mr_desp_terc.*, ma_item TO NULL                            
+     CALL log0030_mensagem("Exclusão efetuada com sucesso.",'info')          
+  ELSE                                                                     
+     CALL log085_transacao("ROLLBACK")                                     
+     ERROR 'Exclusão cancelada.'                                           
+  END IF                                                                   
 
 END FUNCTION
 
@@ -8984,7 +9032,7 @@ END FUNCTION
                      " nota_fiscal, serie_nota_fiscal, subserie_nf, ",
                      " fornecedor, dat_inclusao, dat_vencto, ",
                      " val_desp_terceiro, observacao, ad_terceiro, viagem_origem, ",
-                     " tip_docum, ies_especie, cfop, tot_ipi, tot_icms ",
+                     " tip_docum, ies_especie, cfop, tot_ipi, tot_icms, num_ar ",
                      " FROM cdv_desp_terc_781 ",
                      " WHERE empresa = '",p_cod_empresa,"' ",
                      " AND viagem  = ",l_viagem," ",
@@ -8996,7 +9044,8 @@ END FUNCTION
                      " cdv_desp_terc_781.fornecedor, cdv_desp_terc_781.dat_inclusao, cdv_desp_terc_781.dat_vencto, ",
                      " cdv_desp_terc_781.val_desp_terceiro, cdv_desp_terc_781.observacao, cdv_desp_terc_781.ad_terceiro, cdv_desp_terc_781.viagem_origem, ",
                      " cdv_desp_terc_781.tip_docum, cdv_desp_terc_781.ies_especie, cdv_desp_terc_781.cfop, ",
-                     " cdv_desp_terc_781.tot_ipi, cdv_desp_terc_781.tot_icms, cdv_acer_viag_781.controle ",
+                     " cdv_desp_terc_781.tot_ipi, cdv_desp_terc_781.tot_icms,  ",
+                     " cdv_desp_terc_781.num_ar, cdv_acer_viag_781.controle ",
                      " FROM cdv_desp_terc_781, cdv_acer_viag_781 ",
                      " WHERE cdv_desp_terc_781.empresa = '",p_cod_empresa,"' ",
                      " AND cdv_acer_viag_781.empresa = '",p_cod_empresa,"' ",
@@ -9062,6 +9111,7 @@ END FUNCTION
                                    mr_desp_terc.cfop,
                                    mr_desp_terc.tot_ipi,
                                    mr_desp_terc.tot_icms,
+                                   mr_desp_terc.num_ar,
                                    mr_desp_terc.controle
        WHENEVER ERROR STOP
     END WHILE
@@ -9086,6 +9136,7 @@ END FUNCTION
                                    mr_desp_terc.cfop,
                                    mr_desp_terc.tot_ipi,
                                    mr_desp_terc.tot_icms,
+                                   mr_desp_terc.num_ar,
                                    mr_desp_terc.controle
        WHENEVER ERROR STOP
        LET m_ult_viag_terc = mr_desp_terc.viagem
@@ -9168,7 +9219,8 @@ END FUNCTION
                       " ativ, tip_despesa, ",
                       " nota_fiscal, serie_nota_fiscal, subserie_nf, ",
                       " fornecedor, dat_inclusao, dat_vencto, ",
-                      " val_desp_terceiro, observacao, ad_terceiro, viagem_origem ",
+                      " val_desp_terceiro, observacao, ad_terceiro, viagem_origem, ",
+                      " num_ar ",
                       " FROM cdv_desp_terc_781 ",
                       " WHERE empresa = '",p_cod_empresa,"' ",
                       " AND viagem  = ",mr_desp_terc.viagem," "
@@ -9238,7 +9290,8 @@ END FUNCTION
                                    mr_desp_terc.val_desp_terceiro,
                                    mr_desp_terc.observacao,
                                    mr_desp_terc.ad_terceiro,
-                                   mr_desp_terc.viagem_origem
+                                   mr_desp_terc.viagem_origem,
+                                   mr_desp_terc.num_ar
      WHENEVER ERROR STOP
 
      IF SQLCA.SQLCODE = 100
@@ -9318,7 +9371,8 @@ END FUNCTION
                 mr_desp_terc.den_fornecedor, mr_desp_terc.dat_inclusao,
                 mr_desp_terc.dat_vencto,     mr_desp_terc.val_desp_terceiro,
                 mr_desp_terc.observacao,     mr_desp_terc.tot_desp_terceiro,
-                mr_desp_terc.tot_ipi,        mr_desp_terc.tot_icms TO NULL
+                mr_desp_terc.tot_ipi,        mr_desp_terc.tot_icms,
+                mr_desp_terc.ap_terceiro,    mr_desp_terc.num_ar TO NULL
      CLEAR FORM
 
      DISPLAY p_cod_empresa TO empresa
@@ -9579,12 +9633,15 @@ END FUNCTION
                  ELSE
                     NEXT FIELD fornecedor
                  END IF
-
-                 IF NOT cdv2000_valida_documento_existente(mr_desp_terc.nota_fiscal, mr_desp_terc.serie_nota_fiscal,
-                                                           mr_desp_terc.subserie_nf, mr_desp_terc.fornecedor) THEN
-                    LET l_msg = "Numero do documento ", mr_desp_terc.nota_fiscal USING "<<<<<<<", "-",mr_desp_terc.serie_nota_fiscal CLIPPED," ja existente no contas a pagar."
-                    CALL log0030_mensagem(l_msg,"exclamation")
-                    NEXT FIELD fornecedor
+                 
+                 IF l_funcao = 'INCLUSAO' THEN
+                    IF NOT cdv2000_valida_documento_existente(
+                           mr_desp_terc.nota_fiscal, mr_desp_terc.serie_nota_fiscal,
+                           mr_desp_terc.subserie_nf, mr_desp_terc.fornecedor) THEN
+                       LET l_msg = "Numero do documento ", mr_desp_terc.nota_fiscal USING "<<<<<<<", "-",mr_desp_terc.serie_nota_fiscal CLIPPED," ja existente no contas a pagar."
+                       CALL log0030_mensagem(l_msg,"exclamation")
+                       NEXT FIELD fornecedor
+                    END IF
                  END IF
 
               ELSE
@@ -9805,13 +9862,16 @@ END FUNCTION
                  NEXT FIELD fornecedor
               END IF
 
-              IF NOT cdv2000_valida_documento_existente(mr_desp_terc.nota_fiscal, mr_desp_terc.serie_nota_fiscal,
-                                                        mr_desp_terc.subserie_nf, mr_desp_terc.fornecedor) THEN
-                 LET l_msg = "Numero do documento ", mr_desp_terc.nota_fiscal USING "<<<<<<<", "-",mr_desp_terc.serie_nota_fiscal CLIPPED," ja existente no contas a pagar."
-                 CALL log0030_mensagem(l_msg,"exclamation")
-                 NEXT FIELD fornecedor
+              IF l_funcao = 'INCLUSAO' THEN
+                 IF NOT cdv2000_valida_documento_existente(
+                        mr_desp_terc.nota_fiscal, mr_desp_terc.serie_nota_fiscal,
+                        mr_desp_terc.subserie_nf, mr_desp_terc.fornecedor) THEN
+                    LET l_msg = "Numero do documento ", mr_desp_terc.nota_fiscal USING "<<<<<<<", "-",mr_desp_terc.serie_nota_fiscal CLIPPED," ja existente no contas a pagar."
+                    CALL log0030_mensagem(l_msg,"exclamation")
+                    NEXT FIELD fornecedor
+                 END IF
               END IF
-
+              
               IF mr_desp_terc.dat_inclusao IS NOT NULL THEN
                  IF m_origem = 'N' THEN
                     IF NOT cdv2000_verifica_data_viagem(mr_desp_terc.viagem,
@@ -9832,7 +9892,7 @@ END FUNCTION
               END IF
 
               IF mr_desp_terc.val_desp_terceiro IS NOT NULL THEN
-                 IF mr_desp_terc.val_desp_terceiro <= 0 THEN
+                 IF mr_desp_terc.val_desp_terceiro <= 0 AND m_tip_docum = 'D' THEN
                     CALL log0030_mensagem('Valor da despesa deve ser maior que 0 (zero).','exclamation')
                     NEXT FIELD val_desp_terceiro
                  END IF
@@ -10086,13 +10146,25 @@ END FUNCTION
 
   LET mr_desp_terc.controle = cdv2000_recupera_controle(mr_desp_terc.viagem)
 
-  IF mr_desp_terc.ad_terceiro IS NOT NULL THEN
+  IF mr_desp_terc.ad_terceiro IS NULL THEN
      IF m_tip_docum = 'N' THEN
-     ELSE
-        LET mr_desp_terc.previsao = cdv2000_recupera_ind_previsao(mr_desp_terc.ad_terceiro)
-        CALL cdv2000_recupera_primeira_ap(mr_desp_terc.ad_terceiro)
-           RETURNING l_status, mr_desp_terc.ap_terceiro
-     END IF 
+        WHENEVER ERROR CONTINUE
+        SELECT num_ad
+          INTO mr_desp_terc.ad_terceiro
+          FROM ad_mestre
+         WHERE cod_empresa = p_cod_empresa
+           AND num_nf = mr_desp_terc.nota_fiscal
+           AND ser_nf = mr_desp_terc.serie_nota_fiscal
+           AND ssr_nf = mr_desp_terc.subserie_nf           
+           AND cod_fornecedor = mr_desp_terc.fornecedor
+        WHENEVER ERROR STOP
+     END IF
+  END IF
+       
+  IF mr_desp_terc.ad_terceiro IS NOT NULL THEN
+     LET mr_desp_terc.previsao = cdv2000_recupera_ind_previsao(mr_desp_terc.ad_terceiro)
+     CALL cdv2000_recupera_primeira_ap(mr_desp_terc.ad_terceiro)
+        RETURNING l_status, mr_desp_terc.ap_terceiro
   ELSE
      INITIALIZE mr_desp_terc.previsao, mr_desp_terc.ap_terceiro TO NULL
   END IF
@@ -10727,7 +10799,7 @@ END FUNCTION
 #-----------------------------------------------------#
   DEFINE l_ad_terceiro  LIKE ad_mestre.num_ad,
          l_ies_previsao CHAR(01)
-
+    
   WHENEVER ERROR CONTINUE
    SELECT td.ies_previsao
      INTO l_ies_previsao
@@ -10739,7 +10811,7 @@ END FUNCTION
   WHENEVER ERROR STOP
 
   IF SQLCA.SQLCODE <> 0 THEN
-     CALL log003_err_sql('SELECT','td/ad')
+     #CALL log003_err_sql('SELECT','td/ad')
      LET l_ies_previsao = 'N'
   END IF
 
@@ -11871,12 +11943,6 @@ END FUNCTION
   CALL cdv2000_insere_cdv_fat_781() RETURNING l_status
 
   IF NOT l_status THEN
-     CALL log085_transacao("ROLLBACK")
-     CALL log0030_mensagem('Finalização do(s) acerto(s) cancelada.','info')
-     RETURN
-  END IF
-
-  IF NOT cdv2000_gera_nf_desp_terc(mr_input.viagem) THEN
      CALL log085_transacao("ROLLBACK")
      CALL log0030_mensagem('Finalização do(s) acerto(s) cancelada.','info')
      RETURN
@@ -16828,6 +16894,8 @@ END FUNCTION
 FUNCTION cdv2000_grava_itens()#
 #-----------------------------#
    
+   DEFINE l_status    SMALLINT
+   
    FOR p_index = 1 TO ARR_COUNT()
        IF ma_item[p_index].cod_item IS NOT NULL THEN    
           IF NOT cdv2000_ins_itens() THEN
@@ -16835,8 +16903,14 @@ FUNCTION cdv2000_grava_itens()#
           END IF
        END IF              
    END FOR
+
+  WHENEVER ERROR CONTINUE
+
+  LET l_status = cdv2000_gera_nf_desp_terc() 
+  
+  WHENEVER ERROR STOP
    
-   RETURN TRUE
+  RETURN l_status
 
 END FUNCTION
    
@@ -16893,18 +16967,16 @@ FUNCTION cdv2000_excluiu_nf()#
 
 END FUNCTION
 
-#-------------------------------------------#
-FUNCTION cdv2000_gera_nf_desp_terc(l_viagem)#
-#-------------------------------------------#
+#-----------------------------------#
+FUNCTION cdv2000_gera_nf_desp_terc()#
+#-----------------------------------#
 
   DEFINE l_viagem         LIKE cdv_desp_terc_781.viagem,
          l_num_nf         INTEGER,
          l_num_ar         INTEGER,
          l_erro           SMALLINT,
          l_ind            INTEGER
-  
-  DEFINE lr_terc          RECORD LIKE cdv_desp_terc_781.*
-         
+           
    DEFINE lr_nota             RECORD
          cod_empresa       LIKE empresa.cod_empresa,
          tip_despesa       LIKE cdv_desp_terc_781.tip_despesa,
@@ -16925,120 +16997,198 @@ FUNCTION cdv2000_gera_nf_desp_terc(l_viagem)#
          cod_usuario       CHAR(08),
          cc_viajante       INTEGER
    END RECORD
-                      
-   WHENEVER ERROR CONTINUE
-   LET l_erro = FALSE
-   
-   DECLARE cq_nota CURSOR FOR
-    SELECT * FROM cdv_desp_terc_781
-     WHERE empresa = p_cod_empresa
-       AND viagem = l_viagem
-       AND tip_docum = 'N'
-   FOREACH cq_nota INTO lr_terc.*    
+                              
+   LET lr_nota.cod_empresa       = p_cod_empresa                      
+   LET lr_nota.tip_despesa       = mr_desp_terc.tip_despesa              
+   LET lr_nota.nota_fiscal       = mr_desp_terc.nota_fiscal              
+   LET lr_nota.serie_nota_fiscal = mr_desp_terc.serie_nota_fiscal        
+   LET lr_nota.subserie_nf       = mr_desp_terc.subserie_nf              
+   LET lr_nota.ies_especie       = mr_desp_terc.ies_especie              
+   LET lr_nota.dat_inclusao      = mr_desp_terc.dat_inclusao             
+   LET lr_nota.dat_vencto        = mr_desp_terc.dat_vencto               
+   LET lr_nota.fornecedor        = mr_desp_terc.fornecedor               
+   LET lr_nota.val_desp_terceiro = mr_desp_terc.val_desp_terceiro        
+   LET lr_nota.cod_operacao      = mr_desp_terc.cfop                     
+   LET lr_nota.tot_ipi           = mr_desp_terc.tot_ipi                  
+   LET lr_nota.tot_icms          = mr_desp_terc.tot_icms                 
+   LET lr_nota.cnd_pgto          = 1                                 
+   LET lr_nota.nf_com_erro       = 'S'                                   
+   LET lr_nota.den_erro          = 'FALTA CONSISTIR A NF'                
+   LET lr_nota.cod_usuario       = p_user                        
+   LET lr_nota.cc_viajante       = mr_input.cc_viajante                              
+                                                                 
+   LET l_ind = 1                                                 
       
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','cdv_desp_terc_781:cq_nota')          
-         LET l_erro = TRUE
-         EXIT FOREACH
-      END IF
-  
-      LET lr_nota.cod_empresa       = p_cod_empresa                      
-      LET lr_nota.tip_despesa       = lr_terc.tip_despesa           
-      LET lr_nota.nota_fiscal       = lr_terc.nota_fiscal           
-      LET lr_nota.serie_nota_fiscal = lr_terc.serie_nota_fiscal     
-      LET lr_nota.subserie_nf       = lr_terc.subserie_nf           
-      LET lr_nota.ies_especie       = lr_terc.ies_especie           
-      LET lr_nota.dat_inclusao      = lr_terc.dat_inclusao          
-      LET lr_nota.dat_vencto        = lr_terc.dat_vencto            
-      LET lr_nota.fornecedor        = lr_terc.fornecedor            
-      LET lr_nota.val_desp_terceiro = lr_terc.val_desp_terceiro     
-      LET lr_nota.cod_operacao      = lr_terc.cfop                  
-      LET lr_nota.tot_ipi           = lr_terc.tot_ipi               
-      LET lr_nota.tot_icms          = lr_terc.tot_icms              
-      LET lr_nota.cnd_pgto          = 1                              
-      LET lr_nota.nf_com_erro       = 'S'                                
-      LET lr_nota.den_erro          = 'FALTA CONSISTIR A NF'             
-      LET lr_nota.cod_usuario       = p_user  
-      LET lr_nota.cc_viajante       = mr_input.cc_viajante                           
-      
-      LET l_ind = 1
-      
-      DECLARE cq_item CURSOR FOR 
-       SELECT cod_item, qtd_item, pre_unit, qtd_item * pre_unit, pct_ipi
-         FROM cdv_nf_item_781
-        WHERE empresa = p_cod_empresa
-          AND viagem = lr_terc.viagem
-          AND seq_desp_terceiro = lr_terc.seq_desp_terceiro
-      
-      FOREACH cq_item INTO 
-          ma_item[l_ind].cod_item,
-          ma_item[l_ind].qtd_item,
-          ma_item[l_ind].pre_unit,
-          ma_item[l_ind].val_tot,
-          ma_item[l_ind].pct_ipi
-          
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('SELECT','cdv_nf_item_781:cq_item')          
-            LET l_erro = TRUE
-            EXIT FOREACH
-         END IF
-         
-         SELECT den_item INTO ma_item[l_ind].den_item
-           FROM item WHERE cod_empresa = p_cod_empresa
-            AND cod_item = ma_item[l_ind].cod_item
+   DECLARE cq_item CURSOR FOR                                           
+    SELECT cod_item, qtd_item, pre_unit, qtd_item * pre_unit, pct_ipi      
+      FROM cdv_nf_item_781                                                 
+     WHERE empresa = p_cod_empresa                                         
+       AND viagem = m_num_viagem                                         
+       AND seq_desp_terceiro = m_seq_terc                
+                                                                           
+   FOREACH cq_item INTO                                                    
+       ma_item[l_ind].cod_item,                                            
+       ma_item[l_ind].qtd_item,                                            
+       ma_item[l_ind].pre_unit,                                            
+       ma_item[l_ind].val_tot,                                             
+       ma_item[l_ind].pct_ipi                                              
+                                                                           
+      IF STATUS <> 0 THEN                                                  
+         CALL log003_err_sql('SELECT','cdv_nf_item_781:cq_item')                      
+         RETURN FALSE
+      END IF                                                               
+                                                                           
+      SELECT den_item INTO ma_item[l_ind].den_item                         
+        FROM item WHERE cod_empresa = p_cod_empresa                        
+         AND cod_item = ma_item[l_ind].cod_item                            
+                                                                        
+      IF STATUS <> 0 THEN                                                  
+         CALL log003_err_sql('SELECT','item:cq_item')    
+         RETURN FALSE                  
+      END IF                                                               
+                                                                           
+      LET l_ind = l_ind + 1                                                
+                                                                           
+   END FOREACH                                                             
+                                                                                                                                                      
+   CALL cdv2018_gera_nota(lr_nota, ma_item) RETURNING m_msg, l_num_ar      
+                                                                              
+   IF m_msg = 'OK' THEN     
+      LET mr_desp_terc.num_ar =  l_num_ar   
+      DISPLAY BY NAME mr_desp_terc.num_ar                                     
+   ELSE                                                                    
+      CALL log0030_mensagem(m_msg, 'info')    
+   END IF                                                                  
 
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('SELECT','item:cq_item')          
-            LET l_erro = TRUE
-            EXIT FOREACH
-         END IF
-         
-         LET l_ind = l_ind + 1
-         
-      END FOREACH
-      
-      IF l_erro THEN
-         EXIT FOREACH
-      END IF
-                                                    
-      CALL cdv2018_gera_nota(lr_nota, ma_item) RETURNING m_msg, l_num_ar 
-                                                                         
-      IF m_msg = 'OK' THEN    
-         UPDATE cdv_desp_terc_781 SET ad_terceiro = l_num_ar
-          WHERE empresa = p_cod_empresa
-            AND viagem = lr_terc.viagem
-            AND seq_desp_terceiro = lr_terc.seq_desp_terceiro
-            AND tip_docum = 'N'
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('UPDATE','cdv_desp_terc_781:ger_nf')          
-            LET l_erro = TRUE
-            EXIT FOREACH
-         END IF
-      ELSE                                                               
-         CALL log0030_mensagem(m_msg, 'info')                            
-         LET l_erro = TRUE
-         EXIT FOREACH
-      END IF                                                             
+   RETURN TRUE                             
+            
+END FUNCTION  
+
+
+#---------------------------#
+FUNCTION cdv2000_exclui_nf()#
+#---------------------------#
    
-   END FOREACH
+   DEFINE lr_param            RECORD
+          cod_empresa         LIKE empresa.cod_empresa,
+          num_ar              LIKE nf_sup.num_aviso_rec
+   END RECORD
+
+   DEFINE l_ies_incl_cap    CHAR(01)
+      
+   WHENEVER ERROR CONTINUE
+   
+   SELECT ies_incl_cap 
+     INTO l_ies_incl_cap
+     FROM nf_sup 
+    WHERE cod_empresa = p_cod_empresa
+      AND num_aviso_rec = mr_desp_terc.num_ar
    
    WHENEVER ERROR STOP
    
-   IF l_erro THEN
-      RETURN FALSE
-   ELSE
+   IF STATUS = 100 THEN
       RETURN TRUE
    END IF
-      
-END FUNCTION  
 
+   IF l_ies_incl_cap = 'S' THEN
+      IF NOT cdv2000_le_ad_ap() THEN
+         RETURN FALSE
+      END IF
+   END IF
+   
+   WHENEVER ERROR CONTINUE
+   
+   LET lr_param.cod_empresa = p_cod_empresa
+   LET lr_param.num_ar = mr_desp_terc.num_ar
+   CALL cdv2020_exclui_nota(lr_param) RETURNING m_msg    
+    
+   WHENEVER ERROR STOP
+                                                                             
+   IF m_msg = 'OK' THEN     
+      LET mr_desp_terc.num_ar =  null   
+      DISPLAY BY NAME mr_desp_terc.num_ar                                     
+   ELSE                                                                    
+      CALL log0030_mensagem(m_msg, 'info')  
+      RETURN FALSE  
+   END IF                                                                  
+
+   RETURN TRUE                             
+            
+END FUNCTION  
+      
+
+#--------------------------#
+FUNCTION cdv2000_le_ad_ap()#
+#--------------------------#
+   
+   DEFINE l_num_ap, l_num_ad    INTEGER
+   
+   WHENEVER ERROR CONTINUE
+   SELECT num_ad
+     INTO l_num_ad
+     FROM ad_mestre
+    WHERE cod_empresa = p_cod_empresa
+      AND num_nf = mr_desp_terc.nota_fiscal
+      AND ser_nf = mr_desp_terc.serie_nota_fiscal
+      AND ssr_nf = mr_desp_terc.subserie_nf           
+      AND cod_fornecedor = mr_desp_terc.fornecedor
+   
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','ad_mestre')   
+      WHENEVER ERROR STOP 
+      RETURN FALSE                  
+   END IF                                                               
+   
+   DECLARE cq_ad_ap CURSOR FOR
+    SELECT num_ap 
+      FROM ad_ap
+     WHERE cod_empresa = p_cod_empresa
+       AND um_ad = l_num_ad
+   
+   FOREACH cq_ad_ap INTO l_num_ap
+      
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','ad_ap:cq_ad_ap')   
+         WHENEVER ERROR STOP 
+         RETURN FALSE                  
+      END IF                                                               
+      
+      IF NOT cdv2000_exclui_ap(l_num_ap) THEN
+         WHENEVER ERROR STOP 
+         RETURN FALSE                  
+      END IF                                                                        
+      
+   END FOREACH
+
+   IF NOT cdv2000_exclui_ad(l_num_ad) THEN
+      WHENEVER ERROR STOP 
+      RETURN FALSE                  
+   END IF                                                                        
+
+   UPDATE nf_sup 
+      SET ies_incl_cap = 'N'
+    WHERE cod_empresa = p_cod_empresa
+      AND num_aviso_rec = mr_desp_terc.num_ar
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('UPDATE','nf_sup:cq_ad_ap')   
+      WHENEVER ERROR STOP 
+      RETURN FALSE                  
+   END IF                                                               
+
+   RETURN TRUE
+
+END FUNCTION   
+
+#----------------------------------FIM-------------------------------------#
 
 #LOG1700
 #-------------------------------#
  FUNCTION cdv2000_version_info()
 #-------------------------------#
 
- RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/cdv2000.4gl $|$Revision: 23 $|$Date: 15/10/2019 12:00 $|$Modtime: 23/02/2015 11:30 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/cdv2000.4gl $|$Revision: 24 $|$Date: 21/11/2019 16:00 $|$Modtime: 19/010/2019 11:30 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
 
  END FUNCTION
 

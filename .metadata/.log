@@ -7029,3 +7029,173 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.ui 4 4 2019-11-13 08:45:13.608
 !MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+!SESSION 2019-11-14 11:04:07.722 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-14 11:04:16.412
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-14 11:04:16.468
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+!SESSION 2019-11-18 08:21:41.142 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-18 08:21:50.060
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-18 08:21:50.122
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+!SESSION 2019-11-19 08:05:01.872 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-19 08:05:09.804
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-19 08:05:09.859
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+!SESSION 2019-11-21 08:36:03.278 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-21 08:36:11.342
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-21 08:36:11.421
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+!SESSION 2019-11-21 10:55:31.609 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-21 10:55:38.438
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-21 10:55:38.537
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+
+!ENTRY Class_br.com.totvs.tds.sdk.jobs.BuildPatchJob 4 0 2019-11-21 10:59:42.781
+!MESSAGE Erro ao gerar patch. Erro 
+It wasn´t possible to obtain exclusive access to the objects repository
+
+!STACK 0
+br.com.totvs.tds.startup.exception.TdsException: Erro ao gerar patch. Erro 
+It wasn´t possible to obtain exclusive access to the objects repository
+
+	at br.com.totvs.tds.sdk.jobs.BuildPatchJob.generatePatchLocal(BuildPatchJob.java:249)
+	at br.com.totvs.tds.sdk.jobs.BuildPatchJob.doRun(BuildPatchJob.java:144)
+	at br.com.totvs.tds.sdk.jobs.BuildPatchJob.run(BuildPatchJob.java:102)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+
+!ENTRY br.com.totvs.tds.sdk 4 0 2019-11-21 11:00:00.104
+!MESSAGE Erro ao gerar patch. Erro 
+It wasn´t possible to obtain exclusive access to the objects repository
+
+!STACK 0
+br.com.totvs.tds.startup.exception.TdsException: Erro ao gerar patch. Erro 
+It wasn´t possible to obtain exclusive access to the objects repository
+
+	at br.com.totvs.tds.sdk.jobs.BuildPatchJob.generatePatchLocal(BuildPatchJob.java:249)
+	at br.com.totvs.tds.sdk.jobs.BuildPatchJob.doRun(BuildPatchJob.java:144)
+	at br.com.totvs.tds.sdk.jobs.BuildPatchJob.run(BuildPatchJob.java:102)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SESSION 2019-11-22 07:59:53.866 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-22 08:00:08.705
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-22 08:00:08.770
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+!SESSION 2019-11-26 10:26:37.975 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-26 10:26:46.591
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-26 10:26:46.669
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+!SESSION 2019-11-26 16:42:38.780 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-26 16:42:47.951
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-26 16:42:48.034
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+!SESSION 2019-11-27 14:44:40.684 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-27 14:44:56.130
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-27 14:44:56.189
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+!SESSION 2019-11-27 16:01:52.040 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-11-27 16:01:57.663
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-11-27 16:01:57.700
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+!SESSION 2019-12-03 11:30:39.165 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-12-03 11:30:46.742
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-12-03 11:30:46.807
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+!SESSION 2019-12-04 08:14:16.414 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2019-12-04 08:14:29.968
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2019-12-04 08:14:30.026
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}

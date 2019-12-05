@@ -66,7 +66,8 @@ DEFINE    m_msg                  CHAR(255),
           p_ser_nf               CHAR(03),    
           p_ssr_nf               DECIMAL(2,0),    
           p_num_nf               DECIMAL(7,0),
-          m_le_ap                SMALLINT           
+          m_le_ap                SMALLINT,
+          m_val_tol              DECIMAL(12,2)          
 
 DEFINE    m_cod_item             LIKE item.cod_item,
           m_num_nf               LIKE nf_sup.num_nf,
@@ -229,7 +230,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.86  "
+   LET p_versao = "pol1328-12.00.90  "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -637,12 +638,13 @@ END FUNCTION
       END IF
       
       IF m_num_seq = 0 THEN
-         IF mr_nota.ser_nf IS NULL OR mr_nota.ser_nf = ' ' THEN
-            IF NOT pol1328_gera_ser_ssr() THEN
-               RETURN FALSE
-            END IF
-         END IF
+         
          IF mr_nota.ies_gera_nota MATCHES '[AS]' THEN
+            
+            IF mr_nota.ssr_nf IS NULL OR mr_nota.ssr_nf = ' ' THEN
+               LET mr_nota.ssr_nf = 0
+            END IF
+
             SELECT cod_empresa FROM nf_sup
              WHERE cod_empresa = p_cod_empresa
                AND num_nf = mr_nota.num_nf
@@ -659,7 +661,15 @@ END FUNCTION
                   RETURN FALSE
                END IF
             END IF
-         END IF            
+            
+         ELSE      
+            IF mr_nota.ser_nf IS NULL OR mr_nota.ser_nf = ' ' THEN
+               IF NOT pol1328_gera_ser_ssr() THEN
+                  RETURN FALSE
+               END IF
+            END IF         
+         END IF
+         
       END IF
             
       IF m_num_seq > 0 THEN
@@ -806,19 +816,19 @@ END FUNCTION
       END IF   
       
       IF mr_nota.ies_gera_nota MATCHES '[AS]' THEN
+               
          LET m_ies_sup_cap = 'S'
-         LET m_ies_especie_nf = 'NF'
          IF NOT pol1328_gera_nota() THEN
             CALL log085_transacao("ROLLBACK")
             RETURN FALSE
          END IF
-         LET m_num_ad = 0
       ELSE
          LET m_ies_sup_cap = 'O'
          LET m_ies_especie_nf = 'AD'
       END IF     
       
       IF mr_nota.ies_gera_nota = 'A' THEN
+         LET m_num_ad = 0
       ELSE
          IF NOT pol1328_gera_titulo() THEN
             CALL log085_transacao("ROLLBACK")
@@ -985,9 +995,9 @@ FUNCTION pol1328_consiste_ad()#
       IF NOT pol1328_valida_obrigacao() THEN
          RETURN FALSE
       END IF
-      IF NOT pol1328_valida_cnd_pgto() THEN
-         RETURN FALSE
-      END IF
+      #IF NOT pol1328_valida_cnd_pgto() THEN
+      #   RETURN FALSE
+      #END IF
    ELSE
       LET m_cnd_pgto = NULL
    END IF
@@ -1141,9 +1151,13 @@ FUNCTION pol1328_valida_obrigacao()#
 #----------------------------------#
 
    SELECT cod_operacao,
-          cod_item
+          cod_item,
+          especie_nf,
+          cnd_pgto
      INTO m_cfop,
-          m_cod_item
+          m_cod_item,
+          m_ies_especie_nf,
+          m_cnd_pgto
      FROM gi_param_ar_912
     WHERE cod_tipo_obrigacao = mr_nota.cod_tipo_obrigacao
 
@@ -1170,6 +1184,7 @@ FUNCTION pol1328_valida_obrigacao()#
    END IF
    
    CALL pol1328_acerta_cfop()
+   
    
    RETURN TRUE
 
@@ -1202,6 +1217,34 @@ FUNCTION pol1328_valida_cnd_pgto()#
 
 END FUNCTION   
 
+
+#-----------------------------------#
+FUNCTION pol1328_le_val_tolerancia()#
+#-----------------------------------#  
+    
+   SELECT val_valor
+     INTO m_val_tol
+     FROM gi_param_integracao_912
+    WHERE cod_parametro = 'VALOR_TOL_DIF_AD_AP'
+    
+   IF STATUS <> 0 AND STATUS <> 100 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' lendo a tabela gi_param_integracao_912.VALOR_TOL_DIF_AD_AP '
+      RETURN FALSE
+   END IF
+            
+   IF STATUS = 100 THEN
+      LET m_msg = 'Parâmetro VALOR_TOL_DIF_AD_AP não cadastrado no POL1333.'
+      IF NOT pol1328_grava_erro() THEN
+         RETURN FALSE
+      END IF
+      LET m_val_tol = 0
+   END IF
+     
+   RETURN TRUE
+
+END FUNCTION   
 #------------------------------------#
 FUNCTION pol1328_valida_tip_despesa()#
 #------------------------------------#
@@ -1540,10 +1583,16 @@ FUNCTION pol1328_consiste_ap()#
       LET l_difer = l_difer * (-1)
    END IF
    
-   IF l_difer > 0.02 THEN
-      LET m_msg = 'Soma dos valores da AP não bate com o valor da AD'
-      IF NOT pol1328_grava_erro() THEN
-         RETURN FALSE
+   IF NOT pol1328_le_val_tolerancia() THEN 
+      RETURN FALSE
+   END IF
+   
+   IF m_val_tol > 0 THEN
+      IF l_difer > m_val_tol THEN
+         LET m_msg = 'Soma dos valores da AP não bate com o valor da AD'
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
       END IF
    END IF
 
@@ -1878,6 +1927,35 @@ FUNCTION pol1328_ins_nf_sup()#
       RETURN FALSE
    END IF
 
+   INSERT INTO vencimento_nff(
+      cod_empresa,      
+      cod_empresa_estab,          
+      num_nf,                     
+      ser_nf,                     
+      ssr_nf,                     
+      espc_nota_fiscal,           
+      cod_fornecedor,             
+      num_docum,                  
+      val_docum,                  
+      dat_vencto)
+   VALUES(mr_nf_sup.cod_empresa,         
+          mr_nf_sup.cod_empresa_estab,
+          mr_nf_sup.num_nf,           
+          mr_nf_sup.ser_nf,           
+          mr_nf_sup.ssr_nf,           
+          mr_nf_sup.ies_especie_nf,   
+          mr_nf_sup.cod_fornecedor,       
+          mr_nf_sup.num_nf,
+          mr_nf_sup.val_tot_nf_d,
+          m_dat_vencto)       
+
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela vencimento_nff.'
+      RETURN FALSE
+   END IF
+
    {INSERT INTO nf_sup_erro
         VALUES (p_cod_empresa,
                 m_num_prx_ar,
@@ -1893,7 +1971,7 @@ FUNCTION pol1328_ins_nf_sup()#
       LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela nf_sup_erro.'
       RETURN FALSE
    END IF}
-      
+        
    RETURN TRUE
 
 END FUNCTION   

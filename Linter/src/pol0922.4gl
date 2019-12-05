@@ -155,14 +155,20 @@ FUNCTION pol0922()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol0922-12.00.10  "
+   LET p_versao = "pol0922-12.00.12  "
 
    IF NOT log0150_verifica_se_tabela_existe("agrupa_pol0922") THEN
       IF NOT pol0922_cria_agrupa_pol0922() THEN
          RETURN 
       END IF
    END IF
-       
+
+   IF NOT log0150_verifica_se_tabela_existe("param_pol0922") THEN
+      IF NOT pol0922_cria_param_pol0922() THEN
+         RETURN FALSE
+      END IF
+   END IF
+         
    CALL pol0922_menu()
     
 END FUNCTION
@@ -1131,7 +1137,8 @@ FUNCTION pol0922_gera_novas_ordens(lr_man_ordem_drummer_new)
       LET m_cod_roteiro = lr_item_man.cod_roteiro
       LET m_rot_altern = lr_item_man.num_altern_roteiro
    ELSE
-      IF NOT pol0922_le_roteiro() THEN
+      IF NOT pol0922_le_roteiro(lr_ordens.dat_liberac,
+          lr_man_ordem_drummer_new.item) THEN
          RETURN FALSE
       END IF
    END IF
@@ -1437,20 +1444,23 @@ FUNCTION pol0922_inclui_necessidade(lr_ordens)
 
 END FUNCTION
 
-#----------------------------#
-FUNCTION pol0922_le_roteiro()#
-#----------------------------#
-
+#-------------------------------------------------#
+FUNCTION pol0922_le_roteiro(l_dat_liberac, l_item)#
+#-------------------------------------------------#
+   
+   DEFINE l_dat_liberac    DATE,
+          l_item           CHAR(15)
+   
    SELECT DISTINCT roteiro 
      INTO m_cod_roteiro
      FROM man_processo_item
     WHERE empresa         = p_cod_empresa
-      AND item            = lr_man_ordem_drummer_new.item
+      AND item            = l_item
       AND roteiro_alternativo  = m_rot_altern
       AND ((validade_inicial IS NULL AND validade_final IS NULL)
-       OR  (validade_inicial IS NULL AND validade_final >= lr_ordens.dat_liberac)
-       OR  (validade_final IS NULL AND validade_inicial <= lr_ordens.dat_liberac)
-       OR  (lr_ordens.dat_liberac BETWEEN validade_inicial AND validade_final))
+       OR  (validade_inicial IS NULL AND validade_final >= l_dat_liberac)
+       OR  (validade_final IS NULL AND validade_inicial <= l_dat_liberac)
+       OR  (l_dat_liberac BETWEEN validade_inicial AND validade_final))
    
 
    IF STATUS <> 0 THEN

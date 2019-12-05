@@ -21,7 +21,8 @@ DEFINE p_cod_empresa          CHAR(02),
        m_cfop                 CHAR(07),
        m_ind                  INTEGER,
        m_dat_atu              DATE,
-       m_prefixo              CHAR(02)
+       m_prefixo              CHAR(02),
+       m_dat_vencto           DATE
               
        
 DEFINE m_den_item          LIKE aviso_rec.den_item,
@@ -120,7 +121,7 @@ FUNCTION cdv2018_gera_nota(lr_nota,la_item) #
    LET g_tipo_sgbd = LOG_getCurrentDBType()
    
    LET mr_nota.* = lr_nota.*
-   
+   LET m_dat_vencto = mr_nota.dat_vencto
    LET m_cfop = mr_nota.cod_operacao
 
    IF NOT cdv2018_valid_cfop() THEN
@@ -141,7 +142,7 @@ FUNCTION cdv2018_gera_nota(lr_nota,la_item) #
        IF la_item[m_num_seq].cod_item IS NOT NULL THEN
           LET m_cod_item = la_item[m_num_seq].cod_item
           LET m_qtd_item = la_item[m_num_seq].qtd_item
-          LET m_pct_ipi_d = la_item[m_num_seq].qtd_item
+          LET m_pct_ipi_d = la_item[m_num_seq].pct_ipi
           LET m_den_item = la_item[m_num_seq].den_item
           LET m_pre_unit = la_item[m_num_seq].pre_unit
           LET m_val_item = m_qtd_item * m_pre_unit
@@ -362,7 +363,7 @@ FUNCTION cdv2018_ins_nf_sup()#
    LET mr_nf_sup.val_imp_renda       = 0
    LET mr_nf_sup.ies_situa_import    = ' '
    LET mr_nf_sup.val_bc_imp_renda    = 0
-   LET mr_nf_sup.ies_nf_aguard_nfe   = '7'
+   LET mr_nf_sup.ies_nf_aguard_nfe   = '1'
                     
    INSERT INTO nf_sup VALUES(mr_nf_sup.*)
    
@@ -370,6 +371,35 @@ FUNCTION cdv2018_ins_nf_sup()#
       LET m_erro = STATUS USING '<<<<<'
       LET m_msg = 'Erro de status: ',m_erro
       LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela nf_sup.'
+      RETURN FALSE
+   END IF
+
+   INSERT INTO vencimento_nff(
+      cod_empresa,      
+      cod_empresa_estab,          
+      num_nf,                     
+      ser_nf,                     
+      ssr_nf,                     
+      espc_nota_fiscal,           
+      cod_fornecedor,             
+      num_docum,                  
+      val_docum,                  
+      dat_vencto)
+   VALUES(mr_nf_sup.cod_empresa,         
+          mr_nf_sup.cod_empresa_estab,
+          mr_nf_sup.num_nf,           
+          mr_nf_sup.ser_nf,           
+          mr_nf_sup.ssr_nf,           
+          mr_nf_sup.ies_especie_nf,   
+          mr_nf_sup.cod_fornecedor,       
+          mr_nf_sup.num_nf,
+          mr_nf_sup.val_tot_nf_d,
+          m_dat_vencto)       
+
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela vencimento_nff.'
       RETURN FALSE
    END IF
          
@@ -528,14 +558,12 @@ FUNCTION cdv2018_ins_ar_compl()#
      num_aviso_rec,
      cod_fiscal_compl,
      ies_situacao,
-     cod_operacao,
-     filial)
+     cod_operacao)
     VALUES (lr_ar_compl.cod_empresa,      
             lr_ar_compl.num_aviso_rec,   
             lr_ar_compl.cod_fiscal_compl,
             lr_ar_compl.ies_situacao,    
-            lr_ar_compl.cod_operacao,    
-            lr_ar_compl.filial)                                             
+            lr_ar_compl.cod_operacao)   
 
    IF STATUS <> 0 THEN
       LET m_erro = STATUS USING '<<<<<'

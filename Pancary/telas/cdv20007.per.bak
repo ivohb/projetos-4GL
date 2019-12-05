@@ -6,19 +6,19 @@ SCREEN
  [zz]           ACERTO DESPESA VIAGEM - APONT NF DE TERCEIROS
 
     Controle: [a                  ]  Viagem: [b      ]   Viagem orig: [x     ]
-   Sequência: [q     ]                                   AD terceiro: [e     ]
+   Sequência: [q     ]              AD terceiro: [ad    ] AP Terceito:[ap    ]
    Atividade: [f1   ]  [f2                            ]     Previsão: [d]
 Tipo despesa: [g1   ]  [g2                            ]    Tip docum: [t]
- Nota fiscal: [h      ] Série:[i  ] Sub-série:[j ] Espec:[es ] Num AR:[c     ]
+ Nota fiscal: [h      ] Série:[i  ] Sub-série:[j ] Espec:[es ] Num AR:[ar    ]
   Fornecedor: [k1             ]  [k2                            ] CFOP:[cf   ]
 Dat inclusão: [l         ] Dat vencimento: [m         ]  Valor: [n           ]
    Total IPI: [tp        ] Total ICMS: [tc         ]  Tot desp: [p           ]
   Observação: [o                                                             ]
 
- Item               Descrição         Quantidade  Preço unit   Valor item
-[ci             ]  [di                |qi        |pi          |ti          ]
-[ci             ]  [di                |qi        |pi          |ti          ]
-[ci             ]  [di                |qi        |pi          |ti          ]
+ Item               Descrição         Quant   %IPI   Preço unit   Valor item
+[ci             ]  [di                |qi     |ipi  |pi        |ti          ]
+[ci             ]  [di                |qi     |ipi  |pi        |ti          ]
+[ci             ]  [di                |qi     |ipi  |pi        |ti          ]
 }
 END
 
@@ -33,11 +33,12 @@ x   = formonly.viagem_origem TYPE INTEGER, NOENTRY;
 
 t   = FORMONLY.tip_docum, NOENTRY;
 
-c   = FORMONLY.ad_terceiro TYPE DECIMAL(6,0), NOENTRY;
+ad  = FORMONLY.ad_terceiro TYPE DECIMAL(6,0), NOENTRY;
 
 d   = FORMONLY.previsao TYPE CHAR, UPSHIFT, NOENTRY;
 
-e   = FORMONLY.ap_terceiro TYPE DECIMAL(6,0), NOENTRY;
+ap  = FORMONLY.ap_terceiro TYPE DECIMAL(6,0), NOENTRY;
+ar  = FORMONLY.num_ar TYPE DECIMAL(6,0), NOENTRY;
 
 q   = FORMONLY.sequencia TYPE SMALLINT, NOENTRY;
 
@@ -86,6 +87,7 @@ ci  = FORMONLY.cod_item, UPSHIFT, AUTONEXT
       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
 di  = FORMONLY.den_item, UPSHIFT, NOENTRY;
 qi  = FORMONLY.qtd_item, AUTONEXT;
+ipi = FORMONLY.pct_ipi, AUTONEXT;
 pi  = FORMONLY.pre_unit, AUTONEXT;
 ti  = FORMONLY.val_tot, NOENTRY;
 END

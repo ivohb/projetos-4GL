@@ -6,10 +6,10 @@ SCREEN
  [zz]           ACERTO DESPESA VIAGEM - APONT NF DE TERCEIROS
 
     Controle: [a                  ]  Viagem: [b      ]   Viagem orig: [x     ]
-   Sequência: [q     ]                                   AD terceiro: [e     ]
+   Sequência: [q     ]                  AD terceiro: [ad    ] AP Terc:[ap    ]
    Atividade: [f1   ]  [f2                            ]     Previsão: [d]
 Tipo despesa: [g1   ]  [g2                            ]    Tip docum: [t]
- Nota fiscal: [h      ] Série:[i  ] Sub-série:[j ] Espec:[es ] Num AR:[c     ]
+ Nota fiscal: [h      ] Série:[i  ] Sub-série:[j ] Espec:[es ] Num AR:[ar    ]
   Fornecedor: [k1             ]  [k2                            ] CFOP:[cf   ]
 Dat inclusão: [l         ] Dat vencimento: [m         ]  Valor: [n           ]
    Total IPI: [tp        ] Total ICMS: [tc         ]  Tot desp: [p           ]
@@ -33,11 +33,12 @@ x   = formonly.viagem_origem TYPE INTEGER, NOENTRY;
 
 t   = FORMONLY.tip_docum, NOENTRY;
 
-c   = FORMONLY.ad_terceiro TYPE DECIMAL(6,0), NOENTRY;
+ad  = FORMONLY.ad_terceiro TYPE DECIMAL(6,0), NOENTRY;
 
 d   = FORMONLY.previsao TYPE CHAR, UPSHIFT, NOENTRY;
 
-e   = FORMONLY.ap_terceiro TYPE DECIMAL(6,0), NOENTRY;
+ap  = FORMONLY.ap_terceiro TYPE DECIMAL(6,0), NOENTRY;
+ar  = FORMONLY.num_ar TYPE DECIMAL(6,0), NOENTRY;
 
 q   = FORMONLY.sequencia TYPE SMALLINT, NOENTRY;
 

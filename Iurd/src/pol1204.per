@@ -6,7 +6,7 @@ SCREEN
 [a ]                     NOTA FISCAL DE CONTRATO DE SERVIÇOS 
 
      AR:[d       ] Nota:[e      ] Espécie:[f  ] Séire:[g ] Sub séire:[h  ]
-Emissão:[i         ]        Entrada:[j        ]       Valor:[k           ]     
+Emissão:[i         ] Entrada:[j        ] Valor:[k          ] Sdo:[sd         ]   
 Fornec:[l              ][m                             ] Contrato:[n        ]
 
  Contrato  Versão     Etapa      Vencto         valor     Baixar  Num OC
@@ -32,7 +32,8 @@ g = FORMONLY.ser_nf, UPSHIFT, AUTONEXT, NOENTRY;
 h = FORMONLY.ssr_nf, UPSHIFT, AUTONEXT, NOENTRY;
 i = FORMONLY.dat_emis_nf, UPSHIFT, AUTONEXT, NOENTRY; 
 j = FORMONLY.dat_entrada_nf, UPSHIFT, AUTONEXT, NOENTRY; 
-k = FORMONLY.val_tot_nf_d, UPSHIFT, NOENTRY, REVERSE, color = red; 
+k = FORMONLY.val_tot_nf_d, UPSHIFT, NOENTRY; 
+sd= FORMONLY.saldo_da_nf, UPSHIFT, NOENTRY, REVERSE, color = red; 
 l = FORMONLY.cod_fornecedor, UPSHIFT, AUTONEXT, NOENTRY;
 m = FORMONLY.raz_social, UPSHIFT, NOENTRY, REVERSE;   
 n = FORMONLY.num_contrato, UPSHIFT, AUTONEXT;

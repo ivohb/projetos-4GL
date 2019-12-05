@@ -474,7 +474,7 @@ END FUNCTION
       AND a.trans_nota_fiscal = p_trans_nf
       AND b.cod_empresa = a.empresa
       AND b.cod_item = a.item
-      AND b.ies_tip_item IN ('PF')
+      AND b.ies_tip_item IN ('C','F')
 
    FOREACH c_nf_item INTO p_nf_item.pedido,
                           p_nf_item.seq_item_pedido,

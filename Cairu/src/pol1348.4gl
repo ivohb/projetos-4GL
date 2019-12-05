@@ -123,7 +123,7 @@ FUNCTION pol1348()#
 
    LET g_tipo_sgbd = LOG_getCurrentDBType()
 
-   LET p_versao = "pol1348-12.00.01  "
+   LET p_versao = "pol1348-12.00.02  "
    CALL func002_versao_prg(p_versao)
    
    CALL pol1348_menu()
@@ -853,6 +853,7 @@ FUNCTION pol1348_monta_select()#
        " dat_emis, dat_vencto_s_desc, dat_prorrogada, val_saldo, cod_repres_1, ",
        " cod_portador FROM docum WHERE cod_empresa = '",p_cod_empresa,"' ",
        " AND ies_situa_docum NOT IN ('C','E') ",
+       " AND val_saldo > 0 ",
        " AND DATE(dat_vencto_s_desc) >= '",mr_cabec.dat_ini,"' ",
        " AND DATE(dat_vencto_s_desc) <= '",mr_cabec.dat_fim,"' "
     
@@ -1012,4 +1013,4 @@ END REPORT
 
 
 
-    
+   

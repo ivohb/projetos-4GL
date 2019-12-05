@@ -30,7 +30,14 @@ DEFINE m_dialog          VARCHAR(10),
        m_aba_apto        VARCHAR(10),
        m_aba_relacto     VARCHAR(10),
        m_aba_local       VARCHAR(10),
-       m_fpanel          VARCHAR(10)
+       m_fold_local      VARCHAR(10),
+       m_fold_relac      VARCHAR(10),
+       m_fold_linha      VARCHAR(10),
+       m_fold_predio     VARCHAR(10),
+       m_fold_andar      VARCHAR(10),
+       m_fold_apto       VARCHAR(10),
+       m_form_popup      VARCHAR(10),
+       m_brow_popup      VARCHAR(10)
        
 DEFINE m_pan_arq         VARCHAR(10),
        m_item            VARCHAR(10),
@@ -38,7 +45,6 @@ DEFINE m_pan_arq         VARCHAR(10),
        m_construct       VARCHAR(10)
 
 DEFINE m_pan_item         VARCHAR(10),
-       m_pan_local        VARCHAR(10),
        m_pan_relac        VARCHAR(10),
        m_pan_linha        VARCHAR(10),
        m_pan_predio       VARCHAR(10),
@@ -70,7 +76,6 @@ DEFINE m_ies_info        SMALLINT,
        m_excluiu         SMALLINT,
        m_id_registro     INTEGER,
        m_id_registroa    INTEGER,
-       m_cod_item        CHAR(15),
        m_carregando      SMALLINT,
        m_ind             INTEGER,
        m_lin_atu         INTEGER,
@@ -78,7 +83,9 @@ DEFINE m_ies_info        SMALLINT,
        m_and_atu         INTEGER,
        m_apto_atu        INTEGER,
        m_relac_atu       INTEGER,
-       m_cod_relac       CHAR(10)
+       m_cod_relac       CHAR(10),
+       m_index           INTEGER,
+       m_num_relac       CHAR(10)
               
 
 DEFINE mr_linha          RECORD
@@ -136,6 +143,11 @@ DEFINE ma_relac          ARRAY[500] OF RECORD
        filler            CHAR(01)
 END RECORD
 
+DEFINE ma_zoom           ARRAY[500] OF RECORD
+       cod_relac         CHAR(10),   
+       den_relac         CHAR(30)   
+END RECORD
+
 DEFINE m_zoom_item       VARCHAR(10),
        m_lupa_item       VARCHAR(10),
        m_zoom_local      VARCHAR(10),
@@ -151,12 +163,19 @@ DEFINE mr_local          RECORD
 END RECORD
 
 DEFINE ma_local          ARRAY[20] OF RECORD
-       cod_local         LIKE local.cod_local
+       cod_item          LIKE item.cod_item,
+       cod_local         LIKE local.cod_local,
+       num_lote          LIKE estoque_lote.num_lote,
+       qtd_saldo         LIKE estoque_lote.qtd_saldo,
+       ies_situa_qtd     LIKE estoque_lote.ies_situa_qtd,
+       filler            CHAR(01)  
 END RECORD
        
-DEFINE m_info_item       VARCHAR(10),
-       m_info_local      VARCHAR(10)
-       
+DEFINE m_cod_item       VARCHAR(10),
+       m_new_local      VARCHAR(10)
+
+DEFINE m_info_item      SMALLINT
+             
 #-----------------#
 FUNCTION pol1374()#
 #-----------------#
@@ -169,7 +188,7 @@ FUNCTION pol1374()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1374-12.00.01  "
+   LET p_versao = "pol1374-12.00.00  "
    CALL func002_versao_prg(p_versao)
    
    LET m_carregando = TRUE
@@ -203,39 +222,39 @@ FUNCTION pol1374_menu()#
 
     # FOLDER local 
 
-    LET l_fpanel = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
-    CALL _ADVPL_set_property(l_fpanel,"TITLE","Local")
-		CALL pol1374_local(l_fpanel)
+    LET m_fold_local = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
+    CALL _ADVPL_set_property(m_fold_local,"TITLE","Local")
+		CALL pol1374_local(m_fold_local)
     
     # FOLDER relacionamento 
 
-    LET m_fpanel = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
-    CALL _ADVPL_set_property(m_fpanel,"TITLE","Relacionamento")
-    CALL pol1374_relac(m_fpanel)
+    LET m_fold_relac = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
+    CALL _ADVPL_set_property(m_fold_relac,"TITLE","Relacionamento")
+    CALL pol1374_relac(m_fold_relac)
 
     # FOLDER linha 
 
-    LET l_fpanel = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
-    CALL _ADVPL_set_property(l_fpanel,"TITLE","Linha")
-    CALL pol1374_linha(l_fpanel)
+    LET m_fold_linha = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
+    CALL _ADVPL_set_property(m_fold_linha,"TITLE","Linha")
+    CALL pol1374_linha(m_fold_linha)
 
     # FOLDER predio 
 
-    LET l_fpanel = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
-    CALL _ADVPL_set_property(l_fpanel,"TITLE","Prédio")
-    CALL pol1374_predio(l_fpanel)
+    LET m_fold_predio = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
+    CALL _ADVPL_set_property(m_fold_predio,"TITLE","Prédio")
+    CALL pol1374_predio(m_fold_predio)
 
     # FOLDER andar 
 
-    LET l_fpanel = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
-    CALL _ADVPL_set_property(l_fpanel,"TITLE","Andar")
-    CALL pol1374_andar(l_fpanel)
+    LET m_fold_andar = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
+    CALL _ADVPL_set_property(m_fold_andar,"TITLE","Andar")
+    CALL pol1374_andar(m_fold_andar)
 
     # FOLDER apto 
 
-    LET l_fpanel = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
-    CALL _ADVPL_set_property(l_fpanel,"TITLE","Apto.")
-    CALL pol1374_apto(l_fpanel)
+    LET m_fold_apto = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
+    CALL _ADVPL_set_property(m_fold_apto,"TITLE","Apto.")
+    CALL pol1374_apto(m_fold_apto)
 
     CALL _ADVPL_set_property(m_folder,"FOLDER_SELECTED",1)
     CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
@@ -465,6 +484,7 @@ FUNCTION pol1374_lin_inc()#
    CALL pol1374_lin_ativ_desativ(TRUE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_linha.* TO NULL
+   CALL pol1374_desativa_folder("3")
    CALL _ADVPL_set_property(m_cod_linha,"GET_FOCUS")
    
    RETURN TRUE
@@ -477,6 +497,7 @@ FUNCTION pol1374_lin_inc_cancel()#
 
    CALL pol1374_lin_ativ_desativ(FALSE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   CALL pol1374_ativa_folder()
    INITIALIZE mr_linha.* TO NULL
    
    RETURN TRUE
@@ -494,12 +515,13 @@ FUNCTION pol1374_lin_inc_conf()#
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('INSERT','linha_547')
-      RETURN false
+      RETURN FALSE
    END IF   
    
    CALL pol1374_linha_ler()
    CALL pol1374_lin_ativ_desativ(FALSE)
    LET m_lin_atu = 0
+   CALL pol1374_ativa_folder()
    
    RETURN TRUE
 
@@ -811,6 +833,7 @@ FUNCTION pol1374_pred_inc()#
    CALL pol1374_pred_ativ_desativ(TRUE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_predio.* TO NULL
+   CALL pol1374_desativa_folder("4")
    CALL _ADVPL_set_property(m_cod_predio,"GET_FOCUS")
    
    RETURN TRUE
@@ -824,6 +847,7 @@ FUNCTION pol1374_pred_inc_cancel()#
    CALL pol1374_pred_ativ_desativ(FALSE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_predio.* TO NULL
+   CALL pol1374_ativa_folder()
    
    RETURN TRUE
 
@@ -846,7 +870,7 @@ FUNCTION pol1374_pred_inc_conf()#
    CALL pol1374_predio_ler()
    CALL pol1374_pred_ativ_desativ(FALSE)
    LET m_pred_atu = 0
-   
+   CALL pol1374_ativa_folder()
    RETURN TRUE
 
 END FUNCTION
@@ -1158,6 +1182,7 @@ FUNCTION pol1374_and_inc()#
    CALL pol1374_and_ativ_desativ(TRUE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_andar.* TO NULL
+   CALL pol1374_desativa_folder("5")
    CALL _ADVPL_set_property(m_cod_andar,"GET_FOCUS")
    
    RETURN TRUE
@@ -1171,6 +1196,7 @@ FUNCTION pol1374_and_inc_cancel()#
    CALL pol1374_and_ativ_desativ(FALSE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_andar.* TO NULL
+   CALL pol1374_ativa_folder()
    
    RETURN TRUE
 
@@ -1187,12 +1213,13 @@ FUNCTION pol1374_and_inc_conf()#
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('INSERT','andar_547')
-      RETURN false
+      RETURN FALSE
    END IF   
    
    CALL pol1374_andar_ler()
    CALL pol1374_and_ativ_desativ(FALSE)
    LET m_and_atu = 0
+   CALL pol1374_ativa_folder()
    
    RETURN TRUE
 
@@ -1359,7 +1386,7 @@ FUNCTION pol1374_apto_cabec(l_container)#
 
     LET m_cod_apto = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_apto)     
     CALL _ADVPL_set_property(m_cod_apto,"POSITION",80,10) 
-    CALL _ADVPL_set_property(m_cod_apto,"LENGTH",3,0)    
+    CALL _ADVPL_set_property(m_cod_apto,"LENGTH",2,0)    
     CALL _ADVPL_set_property(m_cod_apto,"PICTURE","@!")  
     CALL _ADVPL_set_property(m_cod_apto,"VARIABLE",mr_apto,"cod_apto")
     CALL _ADVPL_set_property(m_cod_apto,"VALID","pol1374_valida_apto")
@@ -1504,6 +1531,7 @@ FUNCTION pol1374_apto_inc()#
    CALL pol1374_apto_ativ_desativ(TRUE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_apto.* TO NULL
+   CALL pol1374_desativa_folder("6")
    CALL _ADVPL_set_property(m_cod_apto,"GET_FOCUS")
    
    RETURN TRUE
@@ -1517,6 +1545,7 @@ FUNCTION pol1374_apto_inc_cancel()#
    CALL pol1374_apto_ativ_desativ(FALSE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_apto.* TO NULL
+   CALL pol1374_ativa_folder()
    
    RETURN TRUE
 
@@ -1539,6 +1568,7 @@ FUNCTION pol1374_apto_inc_conf()#
    CALL pol1374_apto_ler()
    CALL pol1374_apto_ativ_desativ(FALSE)
    LET m_apto_atu = 0
+   CALL pol1374_ativa_folder()
    
    RETURN TRUE
 
@@ -2007,7 +2037,7 @@ FUNCTION pol1374_relac_inc()#
    CALL pol1374_relac_ativ_desativ(TRUE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_relac.* TO NULL
-
+   CALL pol1374_desativa_folder("2")
    CALL pol1374_relac_carrega()
    
    RETURN TRUE
@@ -2021,6 +2051,7 @@ FUNCTION pol1374_relac_inc_cancel()#
    CALL pol1374_relac_ativ_desativ(FALSE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    INITIALIZE mr_relac.* TO NULL
+   CALL pol1374_ativa_folder()
    
    RETURN TRUE
 
@@ -2065,7 +2096,7 @@ FUNCTION pol1374_relac_inc_conf()#
    CALL pol1374_relac_ler()
    CALL pol1374_relac_ativ_desativ(FALSE)
    LET m_relac_atu = 0
-   
+   CALL pol1374_ativa_folder()
    RETURN TRUE
 
 END FUNCTION
@@ -2281,8 +2312,9 @@ FUNCTION pol1374_local(l_fpanel)#
     CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")   
     
     CALL pol1374_local_item(l_panel)
-    #CALL pol1374_new_local(l_panel)
     CALL pol1374_local_grade(l_panel)
+    CALL pol1374_local_ativa_item(FALSE)
+    CALL pol1374_local_ativa_local(FALSE)
     
 END FUNCTION
 
@@ -2295,26 +2327,22 @@ FUNCTION pol1374_local_item(l_container)#
            l_caixa           VARCHAR(10),
            l_panel           VARCHAR(10)
 
-    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",l_container)
-    CALL _ADVPL_set_property(l_panel,"ALIGN","TOP")
-    CALL _ADVPL_set_property(l_panel,"HEIGHT",40)
-           
-    LET m_pan_item = _ADVPL_create_component(NULL,"LPANEL",l_panel)
-    CALL _ADVPL_set_property(m_pan_item,"ALIGN","LEFT")
-    #CALL _ADVPL_set_property(m_pan_item,"WIDTH",600)
-    CALL _ADVPL_set_property(m_pan_item,"ENABLE",FALSE)
-    
+    LET m_pan_item = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(m_pan_item,"ALIGN","TOP")
+    CALL _ADVPL_set_property(m_pan_item,"HEIGHT",40)
+    #CALL _ADVPL_set_property(m_pan_item,"BACKGROUND_COLOR",225,232,232) 
+              
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_item)
     CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
     CALL _ADVPL_set_property(l_label,"POSITION",10,10)  
     CALL _ADVPL_set_property(l_label,"TEXT","Item:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
-    LET m_info_item = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_item)     
-    CALL _ADVPL_set_property(m_info_item,"POSITION",45,10) 
-    CALL _ADVPL_set_property(m_info_item,"LENGTH",15,0)    
-    CALL _ADVPL_set_property(m_info_item,"VARIABLE",mr_local,"cod_item")
-    CALL _ADVPL_set_property(m_info_item,"VALID","pol1374_valid_item")    
+    LET m_cod_item = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_item)     
+    CALL _ADVPL_set_property(m_cod_item,"POSITION",45,10) 
+    CALL _ADVPL_set_property(m_cod_item,"LENGTH",15,0)    
+    CALL _ADVPL_set_property(m_cod_item,"VARIABLE",mr_local,"cod_item")
+    CALL _ADVPL_set_property(m_cod_item,"VALID","pol1374_valid_item")    
 
     LET m_lupa_item = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pan_item)
     CALL _ADVPL_set_property(m_lupa_item,"IMAGE","BTPESQ")
@@ -2330,86 +2358,44 @@ FUNCTION pol1374_local_item(l_container)#
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_item)
     CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
-    CALL _ADVPL_set_property(l_label,"POSITION",550,10)  
+    CALL _ADVPL_set_property(l_label,"POSITION",500,10)  
     CALL _ADVPL_set_property(l_label,"TEXT","Local:")    
     #CALL _ADVPL_set_property(l_label,"FONT",NULL,10,TRUE,TRUE) 
     #CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE) 
 
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_item)     
-    CALL _ADVPL_set_property(l_caixa,"POSITION",585,10) 
+    CALL _ADVPL_set_property(l_caixa,"POSITION",535,10) 
     CALL _ADVPL_set_property(l_caixa,"LENGTH",10,0)    
     CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_local,"cod_local")
 
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_item)     
-    CALL _ADVPL_set_property(l_caixa,"POSITION",690,10) 
+    CALL _ADVPL_set_property(l_caixa,"POSITION",640,10) 
     CALL _ADVPL_set_property(l_caixa,"LENGTH",30,0)    
     CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_local,"den_local")
 
-    LET m_pan_local = _ADVPL_create_component(NULL,"LPANEL",l_container)
-    CALL _ADVPL_set_property(m_pan_local,"ALIGN","CENTER")
-    CALL _ADVPL_set_property(m_pan_local,"ENABLE",FALSE)
-
-    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_local)
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_item)
     CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
-    CALL _ADVPL_set_property(l_label,"POSITION",30,10)  
+    CALL _ADVPL_set_property(l_label,"POSITION",900,10)  
     CALL _ADVPL_set_property(l_label,"TEXT","Novo local:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE) 
 
-    LET m_info_local = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_local)     
-    CALL _ADVPL_set_property(m_info_local,"POSITION",90,10) 
-    CALL _ADVPL_set_property(m_info_local,"LENGTH",10,0)    
-    CALL _ADVPL_set_property(m_info_local,"VARIABLE",mr_local,"new_local")
-    CALL _ADVPL_set_property(m_info_local,"VALID","pol1374_valid_local")    
+    LET m_new_local = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_item)     
+    CALL _ADVPL_set_property(m_new_local,"POSITION",970,10) 
+    CALL _ADVPL_set_property(m_new_local,"LENGTH",10,0)    
+    CALL _ADVPL_set_property(m_new_local,"VARIABLE",mr_local,"new_local")
+    CALL _ADVPL_set_property(m_new_local,"VALID","pol1374_valid_local")    
 
-    LET m_lupa_local = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pan_local)
+    LET m_lupa_local = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pan_item)
     CALL _ADVPL_set_property(m_lupa_local,"IMAGE","BTPESQ")
-    CALL _ADVPL_set_property(m_lupa_local,"POSITION",180,10)     
+    CALL _ADVPL_set_property(m_lupa_local,"POSITION",1060,10)     
     CALL _ADVPL_set_property(m_lupa_local,"SIZE",24,20)
     CALL _ADVPL_set_property(m_lupa_local,"CLICK_EVENT","pol1374_zoom_local")
 
-    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_local)     
-    CALL _ADVPL_set_property(l_caixa,"POSITION",220,10) 
-    CALL _ADVPL_set_property(l_caixa,"LENGTH",30,0)    
-    CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
-    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_local,"new_desc")
-
-END FUNCTION
-
-#--------------------------------------#
-FUNCTION pol1374_new_local(l_container)#
-#--------------------------------------#
-
-    DEFINE l_container       VARCHAR(10),
-           l_label           VARCHAR(10),
-           l_caixa           VARCHAR(10)
-           
-    LET m_pan_local = _ADVPL_create_component(NULL,"LPANEL",l_container)
-    CALL _ADVPL_set_property(m_pan_local,"ALIGN","CENTER")
-    CALL _ADVPL_set_property(m_pan_local,"ENABLE",FALSE)
-
-    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_local)
-    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
-    CALL _ADVPL_set_property(l_label,"POSITION",30,10)  
-    CALL _ADVPL_set_property(l_label,"TEXT","Novo local:")    
-    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE) 
-
-    LET m_info_local = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_local)     
-    CALL _ADVPL_set_property(m_info_local,"POSITION",90,10) 
-    CALL _ADVPL_set_property(m_info_local,"LENGTH",10,0)    
-    CALL _ADVPL_set_property(m_info_local,"VARIABLE",mr_local,"new_local")
-    CALL _ADVPL_set_property(m_info_local,"VALID","pol1374_valid_local")    
-
-    LET m_lupa_local = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pan_local)
-    CALL _ADVPL_set_property(m_lupa_local,"IMAGE","BTPESQ")
-    CALL _ADVPL_set_property(m_lupa_local,"POSITION",180,10)     
-    CALL _ADVPL_set_property(m_lupa_local,"SIZE",24,20)
-    CALL _ADVPL_set_property(m_lupa_local,"CLICK_EVENT","pol1374_zoom_local")
-
-    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_local)     
-    CALL _ADVPL_set_property(l_caixa,"POSITION",220,10) 
-    CALL _ADVPL_set_property(l_caixa,"LENGTH",30,0)    
+    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_item)     
+    CALL _ADVPL_set_property(l_caixa,"POSITION",1090,10) 
+    CALL _ADVPL_set_property(l_caixa,"LENGTH",25,0)    
     CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_local,"new_desc")
 
@@ -2433,6 +2419,12 @@ FUNCTION pol1374_local_grade(l_container)#
    
     LET m_brz_local = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
     CALL _ADVPL_set_property(m_brz_local,"ALIGN","CENTER")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_local)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Item")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_item")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
     
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_local)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Local")
@@ -2440,10 +2432,59 @@ FUNCTION pol1374_local_grade(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_local")
     CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
 
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_local)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Lote")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","num_lote")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_local)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Saldo")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","LENGTH",10,3)  
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","PICTURE","@E #######.###")  
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","qtd_saldo")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_local)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Status")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","ies_situa_qtd")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_local)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","filler")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
     CALL _ADVPL_set_property(m_brz_local,"SET_ROWS",ma_local,1)
     CALL _ADVPL_set_property(m_brz_local,"EDITABLE",TRUE)
     CALL _ADVPL_set_property(m_brz_local,"CAN_REMOVE_ROW",FALSE)
    
+END FUNCTION
+
+#------------------------------------------#
+FUNCTION pol1374_local_ativa_item(l_status)#
+#------------------------------------------#
+   
+   DEFINE l_status     SMALLINT
+   
+   CALL _ADVPL_set_property(m_cod_item,"ENABLE",l_status)
+   CALL _ADVPL_set_property(m_lupa_item,"ENABLE",l_status)
+      
+END FUNCTION
+
+#-------------------------------------------#
+FUNCTION pol1374_local_ativa_local(l_status)#
+#-------------------------------------------#
+   
+   DEFINE l_status     SMALLINT
+   
+   CALL _ADVPL_set_property(m_new_local,"ENABLE",l_status)
+   CALL _ADVPL_set_property(m_lupa_local,"ENABLE",l_status)
+      
 END FUNCTION
 
 #---------------------------#
@@ -2548,7 +2589,10 @@ FUNCTION pol1374_info_item()#
 
    CALL _ADVPL_set_property(m_pan_item,"ENABLE",TRUE)
    INITIALIZE mr_local.* TO NULL
-   CALL _ADVPL_set_property(m_info_item,"GET_FOCUS")
+   CALL pol1374_local_ativa_item(TRUE)
+   LET m_info_item = FALSE   
+   CALL pol1374_desativa_folder("1")
+   CALL _ADVPL_set_property(m_cod_item,"GET_FOCUS")
    
    RETURN TRUE
 
@@ -2560,6 +2604,8 @@ FUNCTION pol1374_info_item_canc()#
 
    CALL _ADVPL_set_property(m_pan_item,"ENABLE",FALSE)
    INITIALIZE mr_local.* TO NULL
+   CALL pol1374_local_ativa_item(FALSE)
+   CALL pol1374_ativa_folder()
    
    RETURN TRUE
 
@@ -2569,11 +2615,65 @@ END FUNCTION
 FUNCTION pol1374_info_item_conf()#
 #--------------------------------#
 
-   CALL _ADVPL_set_property(m_pan_item,"ENABLE",FALSE)
+   CALL pol1374_local_ativa_item(FALSE)
+   LET m_info_item = TRUE
+
+   IF NOT pol1374_le_estoq() THEN
+      RETURN FALSE
+   END IF
+      
+   CALL pol1374_ativa_folder()      
    
    RETURN TRUE
 
 END FUNCTION
+
+#--------------------------#
+FUNCTION pol1374_le_estoq()#
+#--------------------------#
+   
+   DEFINE l_ind    INTEGER
+   
+   INITIALIZE ma_local TO NULL
+   LET l_ind = 1
+   
+   DECLARE cq_estoq CURSOR FOR
+    SELECT cod_item,
+           cod_local,
+           num_lote,
+           qtd_saldo,
+           ies_situa_qtd
+      FROM estoque_lote
+     WHERE cod_empresa = p_cod_empresa
+       AND cod_item = mr_local.cod_item
+       AND qtd_saldo > 0
+
+   FOREACH cq_estoq INTO 
+      ma_local[l_ind].cod_item,
+      ma_local[l_ind].cod_local,
+      ma_local[l_ind].num_lote,
+      ma_local[l_ind].qtd_saldo,
+      ma_local[l_ind].ies_situa_qtd
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH','estoque_lote:cq_estoq')
+         RETURN FALSE
+      END IF
+      
+      LET l_ind = l_ind + 1
+   
+   END FOREACH
+   
+   LET l_ind = l_ind - 1
+   
+   CALL _ADVPL_set_property(m_brz_local,"SET_ROWS",ma_local,l_ind)
+    
+   RETURN TRUE
+
+END FUNCTION   
+ 
+    
+      
 
 #-----------------------------#
 FUNCTION pol1374_valid_local()#
@@ -2581,13 +2681,16 @@ FUNCTION pol1374_valid_local()#
 
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
    
-   IF mr_local.cod_local IS NULL THEN
+   IF mr_local.new_local IS NULL THEN
       LET m_msg = 'Informe o novo local.'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
    END IF
    
-   IF NOT pol1374_le_relacto() THEN
+   LET m_msg = pol1374_le_relacto()
+   
+   IF m_msg IS NOT NULL THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
    END IF
    
@@ -2601,15 +2704,16 @@ FUNCTION pol1374_le_relacto()#
    
    DEFINE l_msg       CHAR(80)
    
-   SELECT cod_relac
+   SELECT den_relac
+     INTO mr_local.new_desc
      FROM relacto_547
     WHERE cod_empresa = p_cod_empresa
-      AND cod_relac = mr_relac.cod_relac
+      AND cod_relac = mr_local.new_local
    
-   IF STATUS = 0 THEN
-      LET l_msg = 'Relacionamento já cadastrado.'
+   IF STATUS = 100 THEN
+      LET l_msg = 'Relacionamento não cadastrado cadastrado.'
    ELSE
-      IF STATUS <> 100 THEN
+      IF STATUS <> 0 THEN
          LET l_msg = 'Erro ',STATUS, ' lendo tabela relacto_547.'
       END IF
    END IF
@@ -2621,10 +2725,18 @@ END FUNCTION
 #------------------------#
 FUNCTION pol1372_update()#
 #------------------------#   
-
-   CALL _ADVPL_set_property(m_pan_local,"ENABLE",TRUE)
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF NOT m_info_item THEN
+      LET m_msg = 'Informe o item previamente.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+      
    INITIALIZE mr_local.new_local, mr_local.new_desc TO NULL
-   CALL _ADVPL_set_property(m_info_local,"GET_FOCUS")
+   CALL pol1374_local_ativa_local(TRUE)
+   CALL _ADVPL_set_property(m_new_local,"GET_FOCUS")
    
    RETURN TRUE
 
@@ -2634,8 +2746,8 @@ END FUNCTION
 FUNCTION pol1372_update_canc()#
 #-----------------------------#   
 
-   CALL _ADVPL_set_property(m_pan_local,"ENABLE",FALSE)
    INITIALIZE mr_local.new_local, mr_local.new_desc TO NULL
+   CALL pol1374_local_ativa_local(FALSE)
    
    RETURN TRUE
 
@@ -2645,8 +2757,362 @@ END FUNCTION
 FUNCTION pol1372_update_conf()#
 #-----------------------------#   
 
-   CALL _ADVPL_set_property(m_pan_local,"ENABLE",FALSE)
+   CALL pol1374_local_ativa_local(FALSE)
+   
+   CALL LOG_transaction_begin()
+   
+   IF NOT pol1374_grava_local() THEN
+      CALL  LOG_transaction_rollback()
+      RETURN FALSE
+   END IF
+   
+   CALL LOG_transaction_commit()
    
    RETURN TRUE
 
 END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1374_grava_local()#
+#-----------------------------#
+   
+   UPDATE item 
+      SET cod_local_estoq = mr_local.new_local
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item = mr_local.cod_item
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','local')
+      RETURN FALSE
+   END IF
+      
+   SELECT 1 FROM local
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_local = mr_local.new_local
+   
+   IF STATUS = 0 THEN
+   ELSE
+      IF STATUS = 100 THEN
+         IF NOT pol1374_ins_local() THEN
+            RETURN FALSE
+         END IF
+      ELSE
+         CALL log003_err_sql('SELECT','local')
+         RETURN FALSE
+      END IF
+   END IF   
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1374_ins_local()#
+#---------------------------#
+
+   INSERT INTO local
+    VALUES(p_cod_empresa,
+           mr_local.new_local,
+           mr_local.new_desc,0)
+           
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','local')
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION   
+           
+#-----------------------------------------#
+FUNCTION pol1374_desativa_folder(l_folder)#
+#-----------------------------------------#
+
+   DEFINE l_folder             CHAR(01)
+             
+   CASE l_folder
+        WHEN '1' 
+           CALL _ADVPL_set_property(m_fold_andar,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_apto,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_linha,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_predio,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_relac,"ENABLE",FALSE)        
+        WHEN '2' 
+           CALL _ADVPL_set_property(m_fold_andar,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_apto,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_linha,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_predio,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_local,"ENABLE",FALSE)        
+        WHEN '3' 
+           CALL _ADVPL_set_property(m_fold_andar,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_apto,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_local,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_predio,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_relac,"ENABLE",FALSE)        
+        WHEN '4' 
+           CALL _ADVPL_set_property(m_fold_local,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_apto,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_linha,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_andar,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_relac,"ENABLE",FALSE)        
+        WHEN '5' 
+           CALL _ADVPL_set_property(m_fold_apto,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_local,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_linha,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_predio,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_relac,"ENABLE",FALSE)        
+        WHEN '6' 
+           CALL _ADVPL_set_property(m_fold_andar,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_local,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_linha,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_predio,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_relac,"ENABLE",FALSE)        
+   END CASE
+   
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1374_ativa_folder()#
+#------------------------------#
+
+   CALL _ADVPL_set_property(m_fold_andar,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_fold_apto,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_fold_linha,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_fold_local,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_fold_predio,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_fold_relac,"ENABLE",TRUE)
+
+END FUNCTION
+
+
+
+
+
+
+
+#----------------------------#
+FUNCTION pol1374_zoom_local()#
+#----------------------------#
+
+    DEFINE l_status SMALLINT
+
+    DEFINE l_where_clause CHAR(800)
+    DEFINE l_order_by     CHAR(200)
+    
+    IF m_construct IS NULL THEN
+       LET m_construct = _ADVPL_create_component(NULL,"LCONSTRUCT")
+       CALL _ADVPL_set_property(m_construct,"CONSTRUCT_NAME","ZOOM LOCAL")
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_TABLE","relacto_547","local")
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","relacto_547","cod_relac","Relac",1 {CHAR},10,0)
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","relacto_547","cod_linha","Linha",1 {CHAR},2,0)
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","relacto_547","cod_predio","Prédio",1 {CHAR},2,0)
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","relacto_547","cod_andar","Andar",1 {CHAR},2,0)
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","relacto_547","cod_apto","Apto",1 {CHAR},2,0)
+    END IF
+
+    LET l_status = _ADVPL_get_property(m_construct,"INIT_CONSTRUCT")
+
+    IF  l_status THEN
+        LET l_where_clause = _ADVPL_get_property(m_construct,"WHERE_CLAUSE")
+        LET l_order_by = _ADVPL_get_property(m_construct,"ORDER_BY")
+        CALL pol1374_cria_cursor(l_where_clause,l_order_by)
+    ELSE
+        CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","Pesquisa cancelada.")
+    END IF
+    
+    CALL _ADVPL_set_property(m_new_local,"GET_FOCUS")
+    
+END FUNCTION
+
+#------------------------------------------------------#
+FUNCTION pol1374_cria_cursor(l_where_clause,l_order_by)#
+#------------------------------------------------------#
+ 
+   DEFINE l_where_clause CHAR(800)
+   DEFINE l_order_by     CHAR(200)
+
+   DEFINE l_sql_stmt     CHAR(2000),
+          l_ind          INTEGER,
+          l_ano          CHAR(04),
+          l_mes          CHAR(02)
+
+   IF  l_order_by IS NULL THEN
+       LET l_order_by = "cod_relac"
+   END IF
+
+   INITIALIZE ma_rateio TO NULL
+   LET l_ind = 1
+   
+   LET l_sql_stmt = "SELECT cod_relac,den_relac ",
+                     " FROM relacto_547 ",
+                    " WHERE ", l_where_clause CLIPPED,
+                    "   AND cod_empresa = '",p_cod_empresa,"' ",
+                    " ORDER BY ", l_order_by
+
+   PREPARE var_pesquisa FROM l_sql_stmt
+    
+   IF  Status <> 0 THEN
+       CALL log003_err_sql("PREPARE SQL","var_pesquisa")
+       RETURN 
+   END IF
+
+   DECLARE cq_cons SCROLL CURSOR FOR var_pesquisa
+
+   IF  Status <> 0 THEN
+       CALL log003_err_sql("DECLARE CURSOR","cq_cons")
+       RETURN 
+   END IF
+   
+   INITIALIZE ma_zoom TO NULL
+   
+   FOREACH cq_cons INTO 
+      ma_zoom[l_ind].cod_relac, 
+      ma_zoom[l_ind].den_relac
+            
+      IF  STATUS <> 0 THEN
+          CALL log003_err_sql("FOREACH","cq_cons")
+          RETURN 
+      END IF
+
+      LET l_ind = l_ind + 1
+
+      IF l_ind > 500 THEN
+         LET m_msg = 'Limite de linhas da grade ultrapassou'
+         CALL log0030_mensagem(m_msg,'info')
+         EXIT FOREACH
+      END IF
+   
+   END FOREACH
+   
+   IF l_ind = 1 THEN
+      LET m_msg = 'Não há dados, para os argumentos informados.'
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN
+   END IF
+   
+   LET m_index = l_ind - 1
+   
+   CALL pol1374_tela_zoom()
+   
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1374_tela_zoom()#
+#---------------------------#
+
+   DEFINE l_menubar     VARCHAR(10),
+          l_panel       VARCHAR(10),
+          l_select      VARCHAR(10),
+          l_cancel      VARCHAR(10)
+
+    LET m_form_popup = _ADVPL_create_component(NULL,"LDIALOG")
+    CALL _ADVPL_set_property(m_form_popup,"SIZE",800,450)
+    CALL _ADVPL_set_property(m_form_popup,"TITLE","SELECÇÃO DE LOCAL")
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_form_popup)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+
+    CALL pol1374_exibe_rateio(l_panel)
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_form_popup)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","BOTTOM")
+    CALL _ADVPL_set_property(l_panel,"BACKGROUND_COLOR",225,232,232) #vermelho,verde,azul
+    CALL _ADVPL_set_property(l_panel,"HEIGHT",60)
+
+    LET l_menubar = _ADVPL_create_component(NULL,"LMENUBAR",l_panel)
+    CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
+
+   #FIND_EX / QUIT_EX / CONFIRM_EX / UPDATE_EX / RUN_EX / NEW_EX
+   #CANCEL_EX / DELETE_EX / LANCAMENTOS_EX / ESTORNO_EX / SAVEPROFILE
+   LET l_select = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
+   CALL _ADVPL_set_property(l_select,"IMAGE","CONFIRM_EX")
+   CALL _ADVPL_set_property(l_select,"TYPE","NO_CONFIRM")     
+   CALL _ADVPL_set_property(l_select,"EVENT","pol1374_select")     
+
+   LET l_cancel = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
+   CALL _ADVPL_set_property(l_cancel,"IMAGE","CANCEL_EX")     
+   CALL _ADVPL_set_property(l_cancel,"TYPE","NO_CONFIRM")     
+   CALL _ADVPL_set_property(l_cancel,"EVENT","pol1374_cancel")     
+
+   CALL _ADVPL_set_property(m_form_popup,"ACTIVATE",TRUE)
+
+
+END FUNCTION
+
+#-----------------------------------------#
+FUNCTION pol1374_exibe_rateio(l_container)#
+#-----------------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_panel           VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_label           VARCHAR(10),
+           l_tabcolumn       VARCHAR(10)
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+    CALL _ADVPL_set_property(l_panel,"BACKGROUND_COLOR",200,190,230)
+  
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",l_panel)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",1) #número de colunas
+    CALL _ADVPL_set_property(l_layout,"EXPANSIBLE",TRUE) 
+
+    LET m_brow_popup = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
+    CALL _ADVPL_set_property(m_brow_popup,"ALIGN","CENTER")    
+    CALL _ADVPL_set_property(m_brow_popup,"BEFORE_ROW_EVENT","pol1374_row_popup")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brow_popup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Local")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",FALSE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_relac")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brow_popup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",FALSE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",300)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_relac")
+   
+    CALL _ADVPL_set_property(m_brow_popup,"SET_ROWS",ma_zoom,m_index)
+    CALL _ADVPL_set_property(m_brow_popup,"CAN_ADD_ROW",FALSE)
+    
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1374_row_popup()#
+#---------------------------#
+
+   DEFINE l_lin_atu       SMALLINT
+      
+   LET l_lin_atu = _ADVPL_get_property(m_brow_popup,"ROW_SELECTED")
+   
+   IF l_lin_atu > 0 THEN
+      LET m_num_relac = ma_zoom[l_lin_atu].cod_relac
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------#
+FUNCTION pol1374_select()#
+#------------------------#
+
+   CALL _ADVPL_set_property(m_form_popup,"ACTIVATE",FALSE)
+   LET mr_local.new_local = m_num_relac
+
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------#
+FUNCTION pol1374_cancel()#
+#------------------------#
+
+   CALL _ADVPL_set_property(m_form_popup,"ACTIVATE",FALSE)
+
+   RETURN TRUE
+
+END FUNCTION
+          

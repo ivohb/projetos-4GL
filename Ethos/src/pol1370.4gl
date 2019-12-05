@@ -54,6 +54,7 @@ DEFINE m_caminho         CHAR(80),
        m_id_pe1          INTEGER,
        m_linha           CHAR(300),
        m_qtd_item        INTEGER,
+       m_ind_canc        INTEGER,
        m_qtd_prog        INTEGER,
        m_lin_atu         INTEGER,
        m_situacao        CHAR(01),
@@ -64,7 +65,11 @@ DEFINE m_caminho         CHAR(80),
        m_clik_cab        SMALLINT,
        m_lin_ped         INTEGER,
        m_seq_prog        INTEGER,
-       m_progres         SMALLINT
+       m_progres         SMALLINT,
+       m_qtd_itens_edi   INTEGER,
+       m_qtd_operacao    DECIMAL(10,3),
+       m_ind_print       INTEGER,
+       m_page_length     INTEGER
 
 DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
@@ -72,9 +77,10 @@ DEFINE m_dialog          VARCHAR(10),
        m_panel_item      VARCHAR(10),
        m_panel_prog      VARCHAR(10),
        m_brz_pedido      VARCHAR(10),
-       m_brz_prog        VARCHAR(10)
+       m_brz_prog        VARCHAR(10),
+       m_form_print      VARCHAR(10),
+       m_cli_imp         VARCHAR(10)
        
-
 DEFINE m_ies_info        SMALLINT,
        m_count           INTEGER,
        m_msg             VARCHAR(150),
@@ -265,7 +271,28 @@ DEFINE mr_audit           RECORD
        prz_entrega        DATE,   
        mensagem           CHAR(50),
        usuario            CHAR(08),
-       dat_operacao       DATE   
+       dat_operacao       DATE,
+       cod_cliente        CHAR(15),
+       qtd_operacao       DECIMAL(10,3)
+END RECORD
+
+DEFINE mr_print           RECORD
+       cod_cliente        CHAR(15),
+       num_pedido         DECIMAL(6,0),
+       dat_operacao       DATE
+END RECORD
+
+DEFINE mr_relat          RECORD
+      cod_cliente        CHAR(15),
+      nom_cliente        CHAR(36),
+      num_pedido         DECIMAL(6,0),
+      cod_item           CHAR(15),
+      den_item_reduz     CHAR(18),
+      prz_entrega        DATE,
+      dat_operacao       DATE,
+      qtd_operacao       DECIMAL(10,3),
+      mensagem           CHAR(30),
+      usuario            CHAR(08)
 END RECORD
 
 #-----------------#
@@ -282,7 +309,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.11  "
+   LET p_versao = "POL1370-12.00.13  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
    CALL pol1370_menu()
@@ -305,7 +332,8 @@ FUNCTION pol1370_menu()#
            l_next         VARCHAR(80),
            l_last         VARCHAR(80),
            l_delete       VARCHAR(80),
-           l_proc_all     VARCHAR(80)
+           l_proc_all     VARCHAR(80),
+           l_print        VARCHAR(80)
     
     LET l_titulo = 'CARGA E PROCESSAMENTO DO EDI - ', p_versao
     
@@ -358,16 +386,19 @@ FUNCTION pol1370_menu()#
     CALL _ADVPL_set_property(l_consist,"EVENT","pol1370_consistir")
 
     LET l_proces = _ADVPL_create_component(NULL,"LPROCESSBUTTON",l_menubar)
-    CALL _ADVPL_set_property(l_proces,"TOOLTIP","Atualiza carteira de pedidos")
+    CALL _ADVPL_set_property(l_proces,"TOOLTIP","Processa itens selecionados")
     CALL _ADVPL_set_property(l_proces,"EVENT","pol1370_processar")
 
     LET l_proc_all = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_proc_all,"IMAGE","PROC_ALL")     
     CALL _ADVPL_set_property(l_proc_all,"TYPE","CONFIRM")     
-    CALL _ADVPL_set_property(l_proc_all,"TOOLTIP","Processa a atualiza dos pedidos")
+    CALL _ADVPL_set_property(l_proc_all,"TOOLTIP","Processa todos os itens")
     CALL _ADVPL_set_property(l_proc_all,"EVENT","pol1370_proc_all")
     CALL _ADVPL_set_property(l_proc_all,"CONFIRM_EVENT","pol1370_proc_all_conf")
     CALL _ADVPL_set_property(l_proc_all,"CANCEL_EVENT","pol1370_proc_all_canc")
+
+    LET l_print = _ADVPL_create_component(NULL,"LPRINTBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_print,"EVENT","pol1370_tela_print")
 
     CALL _ADVPL_create_component(NULL,"LQUITBUTTON",l_menubar)
 
@@ -517,7 +548,7 @@ FUNCTION pol1370_parametros(l_container)#
     CALL _ADVPL_set_property(m_programacao,"VARIABLE",mr_arquivo,"programacao")    
     CALL _ADVPL_set_property(m_programacao,"EDITABLE",FALSE)     
     CALL _ADVPL_set_property(m_programacao,"FONT",NULL,11,TRUE,FALSE)
-    CALL _ADVPL_set_property(m_programacao,"CAN_GOT_FOCUS",FALSE)
+    #CALL _ADVPL_set_property(m_programacao,"CAN_GOT_FOCUS",FALSE)
 
     CALL pol1370_ativa_desativa(FALSE)
     
@@ -697,7 +728,8 @@ FUNCTION pol1370_marca_desmarca()#
    
    FOR l_ind = 1 TO m_qtd_prog
        IF ma_prog[l_ind].mensagem = 'INCLUIR' OR 
-            ma_prog[l_ind].mensagem = 'ATUALIZAR' THEN
+            ma_prog[l_ind].mensagem = 'ATUALIZAR' OR
+            ma_prog[l_ind].mensagem = 'CANCELAR' THEN
           CALL _ADVPL_set_property(m_brz_prog,"COLUMN_VALUE","ies_select",l_ind,l_sel)
        ELSE
           CALL _ADVPL_set_property(m_brz_prog,"COLUMN_VALUE","ies_select",l_ind,'N')
@@ -2802,13 +2834,15 @@ FUNCTION pol1370_monta_grades()#
       END IF
       
    END FOREACH
-
+   
+   LET m_qtd_itens_edi = m_ind - 1
    LET ma_pedido[m_ind].mensagem = 'ITENS SÓ NA CARTEIRA DE PEDIDOS'
    CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,255,0,0)
 
    LET m_ind = m_ind + 1
    CALL pol1370_le_carteira() 
-      
+   
+   LET m_ind_canc = m_ind
    LET m_qtd_item = m_ind - 1
    CALL _ADVPL_set_property(m_brz_pedido,"ITEM_COUNT", m_qtd_item)
    LET m_id_pe1 = ma_pedido[2].id_pe1
@@ -3685,7 +3719,7 @@ FUNCTION pol1370_processar()#
 
    IF ma_pedido[m_lin_ped].num_pedido IS NULL OR
       ma_pedido[m_lin_ped].num_pedido = 0 THEN
-      LET m_msg = 'Selecione uma inha com pedido'
+      LET m_msg = 'Selecione uma linha com pedido'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
    END IF   
@@ -3790,11 +3824,13 @@ FUNCTION pol1370_proc_edi()#
                 RETURN FALSE
              END IF
              LET mr_audit.mensagem = 'CANCELOU SALDO DA PROGRAMAÇÃO '
+             LET m_qtd_operacao = m_qtd_saldo
              IF NOT pol1370_ins_audit() THEN
                 RETURN FALSE
              END IF
           ELSE
              IF m_qtd_nova <> m_qtd_saldo THEN
+                LET m_qtd_operacao = m_qtd_nova
                 IF NOT pol1370_grv_programacao() THEN
                    RETURN FALSE
                 END IF
@@ -3897,6 +3933,8 @@ FUNCTION pol1370_ins_audit()#
    LET mr_audit.prz_entrega = m_prz_entrega
    LET mr_audit.usuario = p_user
    LET mr_audit.dat_operacao = TODAY
+   LET mr_audit.cod_cliente = mr_arquivo.cod_cliente
+   LET mr_audit.qtd_operacao = m_qtd_operacao
    
    INSERT INTO edi_audit_547
     VALUES(mr_audit.*)
@@ -3952,11 +3990,14 @@ FUNCTION pol1370_atu_prog(l_op)#
          IF m_qtd_nova > l_qtd_saldo THEN
             LET m_qtd_solic = m_qtd_solic + m_qtd_nova - l_qtd_saldo
             LET l_qtd_canc = 0
+            LET m_qtd_operacao = m_qtd_nova - l_qtd_saldo
          ELSE
             LET l_qtd_canc = l_qtd_saldo - m_qtd_nova
+            LET m_qtd_operacao = l_qtd_canc
          END IF
       ELSE
          LET l_qtd_canc = l_qtd_saldo
+         LET m_qtd_operacao = l_qtd_canc
       END IF
             
       UPDATE ped_itens 
@@ -4052,6 +4093,8 @@ FUNCTION pol1370_add_prog()#
       CALL log003_err_sql('INSERT','ped_itens')
       RETURN FALSE
    END IF
+   
+   LET m_qtd_operacao = m_qtd_nova
    
    RETURN TRUE           
 
@@ -4208,7 +4251,11 @@ FUNCTION pol1370_proc_todos()#
    
    CALL LOG_progresspopup_set_total("PROCESS",l_qtd_pe1)
    
-   FOR m_ind = 1 TO l_qtd_pe1
+   LET m_msg = 'Itens edi ',m_qtd_itens_edi, ' Itens carteira ', m_qtd_item, ' Itens canc ', m_ind_canc
+   
+   CALL log0030_mensagem(m_msg,'info')
+   
+   FOR m_ind = 1 TO m_qtd_itens_edi
    
        LET l_progres = LOG_progresspopup_increment("PROCESS")
        
@@ -4221,13 +4268,24 @@ FUNCTION pol1370_proc_todos()#
           IF NOT pol1370_atu_pe1() THEN
              RETURN FALSE
           END IF
-       END IF
+       END IF       
    END FOR
 
    IF NOT pol1370_atu_arq_edi() THEN
       RETURN FALSE
    END IF
+
+   FOR m_ind = m_ind_canc TO m_qtd_item
    
+       LET m_num_pedido = ma_pedido[m_ind].num_pedido
+       LET m_cod_item = ma_pedido[m_ind].cod_item
+       
+       IF NOT pol1370_canc_all() THEN
+          RETURN FALSE
+       END IF     
+         
+   END FOR
+      
    RETURN TRUE
    
 END FUNCTION
@@ -4281,6 +4339,8 @@ FUNCTION pol1370_atu_carteira()#
          CONTINUE FOREACH
       END IF
       
+      LET m_qtd_operacao = m_qtd_nova
+      
       IF NOT pol1370_grv_programacao() THEN
          RETURN FALSE
       END IF
@@ -4290,6 +4350,54 @@ FUNCTION pol1370_atu_carteira()#
    RETURN TRUE
 
 END FUNCTION   
+
+#--------------------------#
+FUNCTION pol1370_canc_all()#
+#--------------------------#
+
+  DECLARE cq_canc_all CURSOR FOR 
+   SELECT num_sequencia,
+          prz_entrega,
+          (qtd_pecas_solic - qtd_pecas_cancel)       
+      FROM ped_itens 
+     WHERE cod_empresa = p_cod_empresa 
+       AND num_pedido = m_num_pedido
+       AND cod_item  = m_cod_item
+       AND qtd_pecas_atend = 0
+       AND qtd_pecas_romaneio = 0
+  
+  FOREACH cq_pos_atu INTO m_num_seq, m_prz_entrega, m_qtd_saldo
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','ped_itens:cq_canc_all')
+         RETURN FALSE
+      END IF
+      
+      IF m_qtd_saldo <= 0 THEN
+         CONTINUE FOREACH
+      END IF
+
+      UPDATE ped_itens 
+         SET qtd_pecas_cancel = qtd_pecas_cancel + m_qtd_saldo
+       WHERE cod_empresa = p_cod_empresa
+         AND num_pedido = m_num_pedido
+         AND num_sequencia  = m_num_seq
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('UPDATE','ped_itens:cq_canc_all')
+         RETURN FALSE
+      END IF
+             
+      LET mr_audit.mensagem = 'CANCELOU SALDO DA PROGRAMAÇÃO '
+      LET m_qtd_operacao = m_qtd_saldo
+      
+      IF NOT pol1370_ins_audit() THEN
+         RETURN FALSE
+      END IF
+  
+   END FOREACH
+
+END FUNCTION
 
 #-------------------------------#
 FUNCTION pol1370_compara_itens()#
@@ -4349,5 +4457,314 @@ FUNCTION pol1370_compara_itens()#
    RETURN TRUE
 
 END FUNCTION
+
+#----------------------------#
+FUNCTION pol1370_tela_print()#
+#----------------------------#
+
+   DEFINE l_menubar     VARCHAR(10),
+          l_panel       VARCHAR(10),
+          l_select      VARCHAR(10),
+          l_cancel      VARCHAR(10)
+
+    LET m_form_print = _ADVPL_create_component(NULL,"LDIALOG")
+    CALL _ADVPL_set_property(m_form_print,"SIZE",800,450)
+    CALL _ADVPL_set_property(m_form_print,"TITLE","IMPRESSÃO DE AUDITORIA")
+    CALL _ADVPL_set_property(m_form_print,"INIT_EVENT","pol1370_init_print")
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_form_print)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+    CALL pol1370_par_print(l_panel)
+    
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_form_print)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","BOTTOM")
+    CALL _ADVPL_set_property(l_panel,"BACKGROUND_COLOR",225,232,232) #vermelho,verde,azul
+    CALL _ADVPL_set_property(l_panel,"HEIGHT",60)
+
+    LET l_menubar = _ADVPL_create_component(NULL,"LMENUBAR",l_panel)
+    CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
+
+   LET l_select = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
+   CALL _ADVPL_set_property(l_select,"IMAGE","CONFIRM_EX")
+   CALL _ADVPL_set_property(l_select,"TYPE","NO_CONFIRM")     
+   CALL _ADVPL_set_property(l_select,"EVENT","pol1370_conf_imp")     
+
+   LET l_cancel = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
+   CALL _ADVPL_set_property(l_cancel,"IMAGE","CANCEL_EX")     
+   CALL _ADVPL_set_property(l_cancel,"TYPE","NO_CONFIRM")     
+   CALL _ADVPL_set_property(l_cancel,"EVENT","pol1370_cancel")     
+
+   CALL _ADVPL_set_property(m_form_print,"ACTIVATE",TRUE)
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1370_init_print()#
+#----------------------------#
+
+   CALL _ADVPL_set_property(m_cli_imp,"GET_FOCUS")
+
+END FUNCTION    
+
+#--------------------------------------#
+FUNCTION pol1370_par_print(l_container)#
+#--------------------------------------#
+
+   DEFINE l_container       VARCHAR(10),
+          l_layout          VARCHAR(10),
+          l_label           VARCHAR(10),
+          l_caixa           VARCHAR(10)
    
-  
+   INITIALIZE mr_print.* TO NULL
+   
+   LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",l_container)
+   CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",2)
+
+   #CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_ROW") 
+   #CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")
+
+   LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+   CALL _ADVPL_set_property(l_label,"TEXT","Cliente:")    
+   LET m_cli_imp = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+   CALL _ADVPL_set_property(m_cli_imp,"LENGTH",15)
+   CALL _ADVPL_set_property(m_cli_imp,"VARIABLE",mr_print,"cod_cliente")
+   CALL _ADVPL_set_property(m_cli_imp,"PICTURE","@E!")
+           
+   LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+   CALL _ADVPL_set_property(l_label,"TEXT","Pedido:")    
+   LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+   CALL _ADVPL_set_property(l_caixa,"LENGTH",10)
+   CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_print,"num_pedido")
+   CALL _ADVPL_set_property(l_caixa,"PICTURE","######")
+
+   LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+   CALL _ADVPL_set_property(l_label,"TEXT","Dat proces:")    
+   LET l_caixa = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
+   CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_print,"dat_operacao")
+
+END FUNCTION
+              
+#------------------------#   
+FUNCTION pol1370_cancel()#
+#------------------------#
+
+   CALL _ADVPL_set_property(m_form_print,"ACTIVATE",FALSE)
+
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------#  
+FUNCTION pol1370_conf_imp()#
+#--------------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   LET p_status = LOG_progresspopup_start(
+       "Carregando arquivo...","pol1370_le_audit","PROCESS")  
+
+   CALL _ADVPL_set_property(m_form_print,"ACTIVATE",FALSE)
+
+   IF NOT p_status THEN
+      LET m_msg = "Impressão cancelada."
+   ELSE
+   
+   END IF
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", m_msg)
+      
+   RETURN TRUE
+
+END FUNCTION
+      
+#--------------------------#
+FUNCTION pol1370_le_audit()#
+#--------------------------#
+   
+   DEFINE l_status SMALLINT
+
+    SELECT COUNT(*) INTO m_count
+      FROM edi_audit_547
+     WHERE cod_empresa = p_cod_empresa
+       AND ((cod_cliente = mr_print.cod_cliente AND mr_print.cod_cliente IS NOT NULL) OR
+           (1=1 AND mr_print.cod_cliente IS NULL)) 
+       AND ((num_pedido = mr_print.num_pedido AND mr_print.num_pedido IS NOT NULL) OR
+           (1=1 AND mr_print.num_pedido IS NULL)) 
+       AND ((dat_operacao = mr_print.dat_operacao AND mr_print.dat_operacao IS NOT NULL) OR
+           (1=1 AND mr_print.dat_operacao IS NULL)) 
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','edi_audit_547:pont01')
+      RETURN FALSE
+   END IF
+   
+   IF m_count = 0 THEN
+      CALL log0030_mensagem('Não há dados para os parâmetros informados', 'info')
+      RETURN FALSE
+   END IF
+   
+   LET m_msg = 'Serão impressos ', m_count USING '<<<<<<<<<<'
+   LET m_msg = m_msg CLIPPED, ' Confirma a impressão ?'
+
+   IF  NOT LOG_question(m_msg) THEN
+       RETURN FALSE
+   END IF
+
+
+   LET l_status = StartReport(
+       "pol1370_relatorio","pol1370","RESUMO DO PROCESSAMENTO DE PROGRAMACAO",114,TRUE,TRUE)
+   
+   RETURN l_status
+
+END FUNCTION
+
+#-----------------------------------#
+FUNCTION pol1370_relatorio(l_report)#
+#-----------------------------------#
+   
+   DEFINE l_report    CHAR(300),
+          l_progres   SMALLINT,
+          l_cod_cli   CHAR(15),
+          l_status    SMALLINT
+   
+   LET l_status = TRUE   
+   LET m_page_length = ReportPageLength("pol1370")
+       
+   START REPORT pol1370_relat TO l_report
+
+   CALL pol1370_le_den_empresa() RETURNING l_progres
+   
+   CALL LOG_progresspopup_set_total("PROCESS",m_count)
+   LET m_ind_print = 1
+   
+   DECLARE cq_imp CURSOR FOR
+    SELECT cod_cliente, num_pedido, cod_item, prz_entrega, 
+           dat_operacao, qtd_operacao, mensagem, usuario
+      FROM edi_audit_547
+     WHERE cod_empresa = p_cod_empresa
+       AND ((cod_cliente = mr_print.cod_cliente AND mr_print.cod_cliente IS NOT NULL) OR
+           (1=1 AND mr_print.cod_cliente IS NULL)) 
+       AND ((num_pedido = mr_print.num_pedido AND mr_print.num_pedido IS NOT NULL) OR
+           (1=1 AND mr_print.num_pedido IS NULL)) 
+       AND ((dat_operacao = mr_print.dat_operacao AND mr_print.dat_operacao IS NOT NULL) OR
+           (1=1 AND mr_print.dat_operacao IS NULL)) 
+
+   FOREACH cq_imp INTO
+      mr_relat.cod_cliente,
+      mr_relat.num_pedido,
+      mr_relat.cod_item,
+      mr_relat.prz_entrega,
+      mr_relat.dat_operacao,
+      mr_relat.qtd_operacao,
+      mr_relat.mensagem,
+      mr_relat.usuario
+         
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','edi_audit_547:pont02')
+         LET l_status = FALSE
+         EXIT FOREACH
+      END IF
+      
+      LET l_progres = LOG_progresspopup_increment("PROCESS") 
+      
+      LET l_cod_cli = mr_relat.cod_cliente
+      
+      SELECT nom_cliente 
+        INTO mr_relat.nom_cliente
+        FROM clientes
+       WHERE cod_cliente = l_cod_cli
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','clientes:cq_imp')
+         LET l_status = FALSE
+         EXIT FOREACH
+      END IF
+
+      SELECT den_item_reduz
+        INTO mr_relat.den_item_reduz
+        FROM item
+       WHERE cod_empresa = p_cod_empresa
+         AND cod_item = mr_relat.cod_item
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','item:cq_imp')
+         LET l_status = FALSE
+         EXIT FOREACH
+      END IF
+               
+      OUTPUT TO REPORT pol1370_relat(l_cod_cli)
+
+   END FOREACH
+
+   FINISH REPORT pol1370_relat
+
+   CALL FinishReport("pol1370")
+   
+   RETURN l_status
+   
+END FUNCTION
+
+#--------------------------------#
+ FUNCTION pol1370_le_den_empresa()
+#--------------------------------#
+
+   SELECT den_empresa
+     INTO p_den_empresa
+     FROM empresa
+    WHERE cod_empresa = p_cod_empresa
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('Lendo','empresa')
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+   
+END FUNCTION
+   
+#----------------------------------#
+REPORT pol1370_relat(l_cod_cliente)#
+#----------------------------------#
+
+   DEFINE l_cod_cliente   CHAR(15)
+   
+    OUTPUT
+        TOP    MARGIN 0
+        LEFT   MARGIN 0
+        RIGHT  MARGIN 0
+        BOTTOM MARGIN 0
+        PAGE   LENGTH m_page_length
+   
+    ORDER EXTERNAL BY l_cod_cliente
+
+    FORMAT
+
+    PAGE HEADER
+
+      CALL ReportPageHeader("pol1370")
+
+      SKIP 1 LINE
+           
+   BEFORE GROUP OF l_cod_cliente
+      #SKIP TO TOP OF PAGE
+      SKIP 1 LINE
+      PRINT COLUMN 001, l_cod_cliente CLIPPED, ' - ', mr_relat.nom_cliente
+      PRINT 
+      PRINT COLUMN 001, 'PEDIDO ITEM            DESCRICAO          PRZ ENTREGA DAT PROCES QTD PROCES MENSAGEM                       USUARIO'
+      PRINT COLUMN 001, '------ --------------- ------------------ ----------- ---------- ---------- ------------------------------ --------'
+            
+    ON EVERY ROW
+        PRINT COLUMN 001, mr_relat.num_pedido USING '######',
+              COLUMN 008, mr_relat.cod_item,
+              COLUMN 024, mr_relat.den_item_reduz,
+              COLUMN 043, mr_relat.prz_entrega,
+              COLUMN 055, mr_relat.dat_operacao,
+              COLUMN 066, mr_relat.qtd_operacao USING '######.###',
+              COLUMN 077, mr_relat.mensagem,
+              COLUMN 108, mr_relat.usuario
+
+END REPORT
+
+
+   
+   

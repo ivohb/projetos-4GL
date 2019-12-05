@@ -83,7 +83,8 @@ DEFINE p_tela              RECORD
    val_tot_nf_d            DECIMAL(12,2),
    cod_fornecedor          CHAR(15),
    raz_social              CHAR(40),
-   num_contrato            INTEGER
+   num_contrato            INTEGER,
+   saldo_da_nf             DECIMAL(12,2)
 END RECORD
 
 DEFINE parametro     RECORD
@@ -100,7 +101,7 @@ MAIN
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
    
-   LET p_versao = "pol1204-10.02.18"
+   LET p_versao = "pol1204-10.02.20"
    
    OPTIONS 
       NEXT KEY control-f,
@@ -296,7 +297,16 @@ END FUNCTION
           n.val_tot_nf_d,  
           n.cod_fornecedor,
           f.raz_social
-     INTO p_tela.*
+     INTO p_tela.num_aviso_rec,   
+          p_tela.num_nf,          
+          p_tela.ies_especie_nf,  
+          p_tela.ser_nf,          
+          p_tela.ssr_nf,          
+          p_tela.dat_emis_nf,     
+          p_tela.dat_entrada_nf,  
+          p_tela.val_tot_nf_d,    
+          p_tela.cod_fornecedor,  
+          p_tela.raz_social                
      FROM nf_sup n, fornecedor f
     WHERE n.cod_empresa = p_cod_empresa
       AND n.num_aviso_rec = p_tela.num_aviso_rec
@@ -323,7 +333,7 @@ END FUNCTION
    
    LET p_val_pago = 0
       
-   {SELECT SUM(val_pago)
+   SELECT SUM(val_pagar)
      INTO p_val_pago
      FROM cos_pagto_etapa p, cos_contr_servico c
     WHERE p.empresa = p_cod_empresa
@@ -339,14 +349,13 @@ END FUNCTION
       LET p_val_pago = 0
    END IF
    
-   LET p_tela.val_tot_nf_d = p_tela.val_tot_nf_d - p_val_pago
+   LET p_tela.saldo_da_nf = p_tela.val_tot_nf_d - p_val_pago
 
-
-   IF p_tela.val_tot_nf_d <= 0 THEN
+   IF p_tela.saldo_da_nf <= 0 THEN
       LET p_msg = 'Nota fiscal sem saldo, para\n baixar estapas de contrato'
       CALL log0030_mensagem(p_msg,'excla')
       RETURN FALSE
-   END IF}
+   END IF
 
    DISPLAY BY NAME p_tela.*            
 
@@ -407,7 +416,7 @@ END FUNCTION
            cos_contr_servico c,
            cos_oc_etapa f
      WHERE e.empresa = p_cod_empresa
-       AND e.sit_etapa = 'A'
+       AND e.sit_etapa = 'L'
        AND c.empresa = e.empresa
        AND c.contrato_servico = e.contrato_servico
        AND c.versao_contrato = e.versao_contrato
@@ -500,7 +509,7 @@ END FUNCTION
          FROM cos_etapa_contrato e,                             
               cos_oc_contrato c
         WHERE e.empresa = p_cod_empresa                         
-          AND e.sit_etapa = 'A'                                 
+          AND e.sit_etapa = 'L'                                 
           AND c.empresa = e.empresa                             
           AND c.contrato_servico = e.contrato_servico           
           AND c.versao_contrato = e.versao_contrato             
@@ -562,7 +571,7 @@ END FUNCTION
            cos_contr_servico c,
            cos_oc_etapa f
      WHERE e.empresa = p_cod_empresa
-       AND e.sit_etapa = 'A'
+       AND e.sit_etapa = 'L'
        AND c.empresa = e.empresa
        AND c.contrato_servico = e.contrato_servico
        AND c.versao_contrato = e.versao_contrato
@@ -638,7 +647,7 @@ FUNCTION pol1204_processar()#
       
          IF NOT INT_FLAG THEN
             CALL pol1204_val_baixar()
-            IF p_val_baixar > p_tela.val_tot_nf_d THEN
+            IF p_val_baixar > p_tela.saldo_da_nf THEN
                LET p_msg = 'Valor da baixa não pode ser\n',
                            'maior que o valor da nota.'
                CALL log0030_mensagem(p_msg,'excla')
@@ -814,7 +823,7 @@ FUNCTION pol1204_grava_tabs()#
       RETURN FALSE
    END IF
    
-   UPDATE cos_etapa_contrato 
+   {UPDATE cos_etapa_contrato 
       SET sit_etapa = 'L' 
     WHERE empresa = p_cod_empresa
       AND contrato_servico = p_num_contr 
@@ -823,7 +832,7 @@ FUNCTION pol1204_grava_tabs()#
    IF STATUS <> 0 THEN
       CALL log003_err_sql('UPDATE', 'cos_etapa_contrato')
       RETURN FALSE
-   END IF
+   END IF}
    
    LET parametro.texto = 'PAGAMENTO DA ETAPA ', p_num_etapa, ' DO CONTRATO ', p_num_contr
    CALL pol1161_grava_auadit(parametro) RETURNING p_status
@@ -1004,7 +1013,7 @@ FUNCTION pol1204_est_baixas()#
       
       LET l_ies_baixa = TRUE
       
-      UPDATE cos_etapa_contrato 
+      {UPDATE cos_etapa_contrato 
          SET sit_etapa = 'A'
        WHERE empresa = p_cod_empresa
          AND contrato_servico = p_cos_pagto.contrato_servico  
@@ -1014,7 +1023,7 @@ FUNCTION pol1204_est_baixas()#
       IF STATUS <> 0 THEN
          CALL log003_err_sql('UPDATE', 'cos_etapa_contrato')
          RETURN FALSE
-      END IF
+      END IF}
       
       SELECT ordem_compra
         INTO l_num_oc

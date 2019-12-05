@@ -154,7 +154,7 @@ DEFINE p_nf_item RECORD LIKE fat_nf_item.*
 DEFINE p_fat_nf_item_fisc RECORD LIKE fat_nf_item_fisc.*
 
 MAIN
-   LET p_versao = "ESP0197-10.02.15"
+   LET p_versao = "ESP0197-10.02.16"
    CALL log0180_conecta_usuario()
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
@@ -474,7 +474,7 @@ END FUNCTION
       AND a.trans_nota_fiscal = p_trans_nf
       AND b.cod_empresa = a.empresa
       AND b.cod_item = a.item
-      AND b.ies_tip_item IN ('CF')
+      AND b.ies_tip_item IN ('C','F')
 
    FOREACH c_nf_item INTO p_nf_item.pedido,
                           p_nf_item.seq_item_pedido,

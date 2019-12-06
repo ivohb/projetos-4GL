@@ -69,7 +69,9 @@ DEFINE m_caminho         CHAR(80),
        m_qtd_itens_edi   INTEGER,
        m_qtd_operacao    DECIMAL(10,3),
        m_ind_print       INTEGER,
-       m_page_length     INTEGER
+       m_page_length     INTEGER,
+       p_num_pedido      INTEGER,
+       p_cod_item        CHAR(15)
 
 DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
@@ -309,7 +311,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.13  "
+   LET p_versao = "POL1370-12.00.16  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
    CALL pol1370_menu()
@@ -2842,7 +2844,6 @@ FUNCTION pol1370_monta_grades()#
    LET m_ind = m_ind + 1
    CALL pol1370_le_carteira() 
    
-   LET m_ind_canc = m_ind
    LET m_qtd_item = m_ind - 1
    CALL _ADVPL_set_property(m_brz_pedido,"ITEM_COUNT", m_qtd_item)
    LET m_id_pe1 = ma_pedido[2].id_pe1
@@ -3871,8 +3872,7 @@ FUNCTION pol1370_grv_programacao()#
             RETURN FALSE                      
          END IF         
          LET mr_audit.mensagem = 'INCLUIU A PROGRAMA플O '                     
-      ELSE                       
-         LET mr_audit.mensagem = 'ALTEROU SALDO DA PROGRAMA플O '
+      ELSE                                
          IF NOT pol1370_atu_prog('A') THEN    
             RETURN FALSE                      
          END IF                               
@@ -3991,9 +3991,11 @@ FUNCTION pol1370_atu_prog(l_op)#
             LET m_qtd_solic = m_qtd_solic + m_qtd_nova - l_qtd_saldo
             LET l_qtd_canc = 0
             LET m_qtd_operacao = m_qtd_nova - l_qtd_saldo
+            LET mr_audit.mensagem = 'ALTEROU SALDO DA PROGRAMA플O '
          ELSE
             LET l_qtd_canc = l_qtd_saldo - m_qtd_nova
             LET m_qtd_operacao = l_qtd_canc
+            LET mr_audit.mensagem = 'CANCELOU PARCIALMENTE SALDO'
          END IF
       ELSE
          LET l_qtd_canc = l_qtd_saldo
@@ -4251,17 +4253,15 @@ FUNCTION pol1370_proc_todos()#
    
    CALL LOG_progresspopup_set_total("PROCESS",l_qtd_pe1)
    
-   LET m_msg = 'Itens edi ',m_qtd_itens_edi, ' Itens carteira ', m_qtd_item, ' Itens canc ', m_ind_canc
-   
-   CALL log0030_mensagem(m_msg,'info')
-   
    FOR m_ind = 1 TO m_qtd_itens_edi
    
        LET l_progres = LOG_progresspopup_increment("PROCESS")
        
-       IF ma_pedido[m_ind].situacao = 'C' THEN
+       IF ma_pedido[m_ind].situacao = 'C' OR ma_pedido[m_ind].situacao = ' ' THEN
        ELSE
           LET m_id_pe1 = ma_pedido[m_ind].id_pe1
+          LET p_num_pedido = ma_pedido[m_ind].num_pedido
+          LET p_cod_item = ma_pedido[m_ind].cod_item
           IF NOT pol1370_atu_carteira() THEN
              RETURN FALSE
           END IF
@@ -4274,16 +4274,20 @@ FUNCTION pol1370_proc_todos()#
    IF NOT pol1370_atu_arq_edi() THEN
       RETURN FALSE
    END IF
+   
+   LET m_ind_canc = m_qtd_itens_edi + 2
 
    FOR m_ind = m_ind_canc TO m_qtd_item
    
        LET m_num_pedido = ma_pedido[m_ind].num_pedido
        LET m_cod_item = ma_pedido[m_ind].cod_item
-       
-       IF NOT pol1370_canc_all() THEN
-          RETURN FALSE
-       END IF     
-         
+
+       IF m_cod_item IS NOT NULL THEN
+          IF NOT pol1370_canc_all() THEN
+             RETURN FALSE
+          END IF     
+      END IF
+      
    END FOR
       
    RETURN TRUE
@@ -4346,7 +4350,37 @@ FUNCTION pol1370_atu_carteira()#
       END IF
                
    END FOREACH
-   
+
+   DECLARE cq_canc_prog CURSOR FOR
+    SELECT num_sequencia, 
+           prz_entrega,
+          (qtd_pecas_solic - qtd_pecas_cancel)         
+      FROM ped_itens
+     WHERE cod_empresa = p_cod_empresa
+       AND num_pedido = p_num_pedido
+       AND cod_item = p_cod_item
+       AND qtd_pecas_atend = 0
+       AND qtd_pecas_romaneio = 0
+       AND (qtd_pecas_solic - qtd_pecas_cancel) > 0
+       AND prz_entrega NOT IN (
+           SELECT ped_itens_edi_547.prz_entrega 
+             FROM ped_itens_edi_547
+            WHERE ped_itens_edi_547.cod_empresa = p_cod_empresa
+              AND ped_itens_edi_547.id_pe1 = m_id_pe1)   
+
+   FOREACH cq_canc_prog INTO m_num_seq, m_prz_entrega, m_qtd_saldo
+      
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','ped_itens:cq_canc_prog')
+         RETURN FALSE
+      END IF
+      
+      IF NOT pol1370_canc_prog() THEN
+         RETURN FALSE
+      END IF
+      
+   END FOREACH
+
    RETURN TRUE
 
 END FUNCTION   
@@ -4366,37 +4400,75 @@ FUNCTION pol1370_canc_all()#
        AND qtd_pecas_atend = 0
        AND qtd_pecas_romaneio = 0
   
-  FOREACH cq_pos_atu INTO m_num_seq, m_prz_entrega, m_qtd_saldo
+  FOREACH cq_canc_all INTO m_num_seq, m_prz_entrega, m_qtd_saldo
 
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','ped_itens:cq_canc_all')
          RETURN FALSE
       END IF
-      
+            
       IF m_qtd_saldo <= 0 THEN
          CONTINUE FOREACH
       END IF
 
-      UPDATE ped_itens 
-         SET qtd_pecas_cancel = qtd_pecas_cancel + m_qtd_saldo
-       WHERE cod_empresa = p_cod_empresa
-         AND num_pedido = m_num_pedido
-         AND num_sequencia  = m_num_seq
-
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('UPDATE','ped_itens:cq_canc_all')
+      IF NOT pol1370_canc_prog() THEN
          RETURN FALSE
       END IF
-             
-      LET mr_audit.mensagem = 'CANCELOU SALDO DA PROGRAMA플O '
-      LET m_qtd_operacao = m_qtd_saldo
       
-      IF NOT pol1370_ins_audit() THEN
-         RETURN FALSE
-      END IF
-  
    END FOREACH
+   
+   RETURN TRUE
+   
+END FUNCTION
 
+#---------------------------#
+FUNCTION pol1370_canc_prog()#
+#---------------------------#
+   
+   DEFINE l_qtd_dias   INTEGER,
+          l_dias_param INTEGER
+      
+   SELECT parametro_numerico 
+     INTO l_dias_param
+     FROM min_par_modulo
+    WHERE empresa = p_cod_empresa 
+      AND parametro = 'DIAS_PARA_CANC_PROG'
+
+   IF STATUS <> 0 THEN                                        
+      CALL log003_err_sql('SELECT','min_par_modulo')   
+      RETURN FALSE                                            
+   END IF                                                     
+   
+   LET l_qtd_dias = 0
+   
+   IF m_prz_entrega > TODAY THEN
+      LET l_qtd_dias = m_prz_entrega - TODAY
+   END IF
+      
+   IF l_qtd_dias <= l_dias_param THEN
+      RETURN TRUE
+   END IF
+
+   UPDATE ped_itens                                        
+      SET qtd_pecas_cancel = qtd_pecas_cancel + m_qtd_saldo   
+    WHERE cod_empresa = p_cod_empresa                         
+      AND num_pedido = m_num_pedido                           
+      AND num_sequencia  = m_num_seq                          
+                                                           
+   IF STATUS <> 0 THEN                                        
+      CALL log003_err_sql('UPDATE','ped_itens:cq_canc_all')   
+      RETURN FALSE                                            
+   END IF                                                     
+                                                              
+   LET mr_audit.mensagem = 'CANCELOU SALDO DA PROGRAMA플O '   
+   LET m_qtd_operacao = m_qtd_saldo                           
+                                                              
+   IF NOT pol1370_ins_audit() THEN                            
+      RETURN FALSE                                            
+   END IF                                                     
+   
+   RETURN TRUE
+   
 END FUNCTION
 
 #-------------------------------#

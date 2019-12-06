@@ -475,6 +475,17 @@ FUNCTION pol1328_processa()#
    
    }
 
+   UPDATE gi_ad_912 SET cod_situacao = 'E'   
+    WHERE ies_gera_nota IN ('A', 'S') 
+      AND id_ad IN 
+          (SELECT a.id_ad FROM gi_ad_912  a                
+            WHERE num_ar NOT IN 
+               (SELECT b.num_aviso_rec FROM nf_sup b
+                 WHERE a.cod_empresa = b.cod_empresa                        
+                   AND   a.num_ar = b.num_aviso_rec)                          
+          AND   a.cod_situacao = 'S'                                 
+          AND   a.num_ar > 0)                                        
+
    UPDATE gi_ap_912
       SET gi_ap_912.dt_pagamento =
          (SELECT ap.dat_pgto FROM ap
@@ -490,12 +501,12 @@ FUNCTION pol1328_processa()#
              
    UPDATE gi_ad_912 SET gi_ad_912.cod_situacao = 'E'
     WHERE gi_ad_912.cod_situacao = 'S'
+       AND ies_gera_nota not IN ('A', 'S') 
        AND gi_ad_912.num_ad IS NOT NULL
        AND gi_ad_912.num_ad > 0
        AND gi_ad_912.num_ad NOT IN
         (SELECT ad_mestre.num_ad FROM ad_mestre
-          WHERE ad_mestre.cod_empresa = gi_ad_912.cod_empresa)
-      
+          WHERE ad_mestre.cod_empresa = gi_ad_912.cod_empresa)      
    
    CLOSE WINDOW w_pol1328
            
@@ -650,13 +661,11 @@ END FUNCTION
                AND num_nf = mr_nota.num_nf
                AND ser_nf = mr_nota.ser_nf
                AND ssr_nf = mr_nota.ssr_nf
-               AND ies_especie_nf = 'NF'
+               AND ies_especie_nf = m_ies_especie_nf
                AND cod_fornecedor = mr_nota.cod_fornecedor
             
             IF STATUS = 0 THEN
-               LET m_msg = 'Já existe uma NF de numero ', mr_nota.num_nf
-               LET m_msg = m_msg CLIPPED, ' serie ', mr_nota.ser_nf, ' sub serie ', mr_nota.ssr_nf
-                LET m_msg = m_msg CLIPPED, ' fornecedor ', mr_nota.cod_fornecedor CLIPPED
+               LET m_msg = 'Já existe no SUP3760 uma NF com essas caracteristicas'
                IF NOT pol1328_grava_erro() THEN
                   RETURN FALSE
                END IF

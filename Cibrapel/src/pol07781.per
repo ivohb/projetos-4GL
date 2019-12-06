@@ -1,0 +1,54 @@
+DATABASE FORMONLY 
+SCREEN
+{
+----------------------------------------------------------------------------
+[a ]               NOTAS DE SAIDA X NOTA DE SERVIÇO/CONHECIMENTO
+
+ NF:[b     ] Emis:[e       ] Forn:[c              ][d                 ]%[x ]
+Ser:[f ] Ssr:[g ] Esp:[h  ] V Frete:[i          ] ICMS:[j         ] Efet:[k]
+
+ Num NF Val Frete NF Compl  Total    Peso       Cliente          Destino
+[m     |n       |o       |p       |q        |r              |s             ]
+[m     |n       |o       |p       |q        |r              |s             ]
+[m     |n       |o       |p       |q        |r              |s             ]
+[m     |n       |o       |p       |q        |r              |s             ]
+[m     |n       |o       |p       |q        |r              |s             ]
+[m     |n       |o       |p       |q        |r              |s             ]
+[m     |n       |o       |p       |q        |r              |s             ]
+[m     |n       |o       |p       |q        |r              |s             ]
+[m     |n       |o       |p       |q        |r              |s             ]
+Total:[t        |u        |v        ] Soma NF:[w        ] Devido:[z        ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,    NOENTRY;
+ b = FORMONLY.num_nfe,        AUTONEXT;
+ c = FORMONLY.cod_for,        AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
+ d = FORMONLY.nom_for,        NOENTRY, REVERSE;
+ x = FORMONLY.pct_desc,       NOENTRY, REVERSE;
+ e = FORMONLY.dat_nfe,        NOENTRY, REVERSE, FORMAT = 'dd/mm/yy';
+ f = FORMONLY.ser_nfe,        NOENTRY, REVERSE;
+ g = FORMONLY.ssr_nfe,        NOENTRY, REVERSE;
+ h = FORMONLY.esp_nfe,        NOENTRY, REVERSE;
+ i = FORMONLY.val_nfe,        NOENTRY, REVERSE;
+ j = FORMONLY.val_icm,        NOENTRY, REVERSE;
+ k = FORMONLY.ies_validado,   NOENTRY, REVERSE;
+ m = FORMONLY.num_nff,        NOENTRY, REVERSE;
+ n = FORMONLY.val_frete_rod,  NOENTRY, REVERSE;
+ o = FORMONLY.val_frete_ger,  AUTONEXT;
+ p = FORMONLY.val_frete_tot,  NOENTRY, REVERSE;
+ q = FORMONLY.pes_tot_bruto,  NOENTRY, REVERSE;
+ r = FORMONLY.nom_reduzido,   NOENTRY, REVERSE;
+ s = FORMONLY.den_cidade,     NOENTRY, REVERSE;
+ t = FORMONLY.tot_frete_rod,  NOENTRY, REVERSE;
+ u = FORMONLY.tot_frete_ger,  NOENTRY, REVERSE;
+ v = FORMONLY.tot_frete_tot,  NOENTRY, REVERSE;
+ w = FORMONLY.soma_nfs,       NOENTRY, REVERSE;
+ z = FORMONLY.val_devido,     NOENTRY, REVERSE;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_nota[09] (num_nff THRU den_cidade);
+END

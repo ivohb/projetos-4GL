@@ -1,0 +1,53 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-----------------------------------------------------------------------------
+[a ]                 DADOS DE FRETE ENVIADOS PELO TRIM
+
+Romaneio:[b         ] Dt Carga:[c         ] Despachante:[d                 ]
+  Transp:[e              ][f              ] Plac:[g      ] Veic:[h      ][i]
+Peso Balança:[j           ]   Peso Carregado:[k           ]   Tipo Frete:[l]
+ Valor Frete:[m           ]%[n    ] Cidade Base:[o    ][p                  ]
+
+   Pedido Sq      Item       Cidade Destino                     Peso Bruto
+  [u     |v |w              |x    |y                           |z         ]
+  [u     |v |w              |x    |y                           |z         ]
+  [u     |v |w              |x    |y                           |z         ]
+  [u     |v |w              |x    |y                           |z         ]
+  [u     |v |w              |x    |y                           |z         ]
+  [u     |v |w              |x    |y                           |z         ]
+  [u     |v |w              |x    |y                           |z         ]
+  [u     |v |w              |x    |y                           |z         ]
+  [u     |v |w              |x    |y                           |z         ]
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,    NOENTRY;
+ b = FORMONLY.numromaneio,    AUTONEXT;
+ c = FORMONLY.datcadastro,    NOENTRY, REVERSE;
+ d = FORMONLY.despachante,    NOENTRY, REVERSE;
+ e = FORMONLY.coderptranspor, NOENTRY, REVERSE;
+ f = FORMONLY.nomreduzido,    NOENTRY, REVERSE;
+ g = FORMONLY.placaveiculo,   NOENTRY, REVERSE;
+ h = FORMONLY.codveiculo,     NOENTRY, REVERSE;
+ i = FORMONLY.codtipcarga,    NOENTRY, REVERSE;
+ j = FORMONLY.pesobalanca,    NOENTRY, REVERSE;
+ k = FORMONLY.pesocarregado,  NOENTRY, REVERSE;
+ l = FORMONLY.codtipfrete,    NOENTRY, REVERSE;
+ m = FORMONLY.valfrete,       NOENTRY, REVERSE;
+ n = FORMONLY.pctdesc,        AUTONEXT;
+ o = FORMONLY.cidadebase,     NOENTRY, REVERSE;
+ p = FORMONLY.nomcidade,      NOENTRY, REVERSE;
+ u = FORMONLY.numpedido,      NOENTRY, REVERSE;
+ v = FORMONLY.numseqitem,     NOENTRY, REVERSE;
+ w = FORMONLY.coditem,        NOENTRY, REVERSE;
+ x = FORMONLY.codciddest,     NOENTRY, REVERSE;
+ y = FORMONLY.cidadedestino,  NOENTRY, REVERSE;
+ z = FORMONLY.pesobrutoitem,  NOENTRY, REVERSE;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_itens[09] (numpedido THRU pesobrutoitem);
+END

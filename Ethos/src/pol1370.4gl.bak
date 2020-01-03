@@ -311,7 +311,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.18  "
+   LET p_versao = "POL1370-12.00.17  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
    CALL pol1370_menu()
@@ -4325,7 +4325,7 @@ FUNCTION pol1370_atu_carteira()#
          RETURN FALSE
       END IF
 
-      IF m_qtd_nova = m_qtd_saldo THEN
+      IF m_qtd_nova = m_qtd_solic THEN
          CONTINUE FOREACH
       END IF
       

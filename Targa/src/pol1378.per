@@ -1,0 +1,42 @@
+DATABASE FORMONLY 
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                  CARGA DE ARQUIVOS COM APONTAMENTOES
+              
+  Arquivo: [b                                                            ]     
+  Data de: [c         ]       Data até: [d         ]
+  Hora de: [e       ]         Hora até: [f       ]         
+  
+ Arquivo         Data       Hota     Reg              Mensagem
+[k              |l         |m       |n    |o                                 ]
+[k              |l         |m       |n    |o                                 ]
+[k              |l         |m       |n    |o                                 ]
+[k              |l         |m       |n    |o                                 ]
+[k              |l         |m       |n    |o                                 ]
+[k              |l         |m       |n    |o                                 ]
+[k              |l         |m       |n    |o                                 ]
+[k              |l         |m       |n    |o                                 ]
+[k              |l         |m       |n    |o                                 ]  
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa;
+ b = FORMONLY.nom_arquivo;
+ c = FORMONLY.dat_de;
+ d = FORMONLY.dat_ate;
+ e = FORMONLY.hor_de;
+ f = FORMONLY.hor_ate;
+ 
+ k = FORMONLY.arquivo;
+ l = FORMONLY.data;
+ m = FORMONLY.hora;
+ n = FORMONLY.reg;
+ o = FORMONLY.mensagem;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_itens[9](arquivo THRU mensagem);
+END 
+

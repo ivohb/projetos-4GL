@@ -230,7 +230,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.90  "
+   LET p_versao = "pol1328-12.00.91  "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -501,7 +501,7 @@ FUNCTION pol1328_processa()#
              
    UPDATE gi_ad_912 SET gi_ad_912.cod_situacao = 'E'
     WHERE gi_ad_912.cod_situacao = 'S'
-       AND ies_gera_nota not IN ('A', 'S') 
+       AND ies_gera_nota NOT IN ('A', 'S') 
        AND gi_ad_912.num_ad IS NOT NULL
        AND gi_ad_912.num_ad > 0
        AND gi_ad_912.num_ad NOT IN

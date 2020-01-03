@@ -1,0 +1,34 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+                    SISTEMA GERADOR
+
+ Sistema                Descrição              Marcar?
+ ---------------------- ---------------------- -------
+ [a1                  ] [a2                  ]   [a]
+ [a1                  ] [a2                  ]   [a]
+ [a1                  ] [a2                  ]   [a]
+ [a1                  ] [a2                  ]   [a]
+ [a1                  ] [a2                  ]   [a]
+ [a1                  ] [a2                  ]   [a]
+
+}
+END
+
+ATTRIBUTES
+ a1  = FORMONLY.sistema,     NOENTRY
+ --#, OPTIONS = "-nolist"
+ ;
+ a2  = FORMONLY.des_sistema, NOENTRY
+ --#, OPTIONS = "-nolist"
+ ;
+ a   = FORMONLY.sit_sistema TYPE CHAR, UPSHIFT, INCLUDE = ("S","N"), AUTONEXT,
+       COMMENTS = "Sim (Marcado) Nao (Desmarcado). "
+ --#, WIDGET = "CHECK", CONFIG = "S N {}", OPTIONS = "-nolist"
+ ;
+END
+
+INSTRUCTIONS
+ SCREEN RECORD sr_sistema[06] (FORMONLY.sistema THRU FORMONLY.sit_sistema)
+END

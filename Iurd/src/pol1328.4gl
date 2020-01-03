@@ -324,7 +324,7 @@ FUNCTION pol1328_check_proces()#
 END FUNCTION   
          
 #-------------------------------#
-FUNCTION pol1356_cria_controle()#
+FUNCTION pol1328_cria_controle()#
 #-------------------------------#
 
    CREATE TABLE control_proces_912 (
@@ -408,7 +408,7 @@ FUNCTION pol1328_processa()#
    CALL LOG_refresh_display()
 
    IF NOT log0150_verifica_se_tabela_existe("control_proces_912") THEN 
-      IF NOT pol1356_cria_controle() THEN
+      IF NOT pol1328_cria_controle() THEN
          RETURN FALSE
       END IF
    END IF

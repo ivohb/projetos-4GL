@@ -391,7 +391,7 @@ MAIN
 
   CALL log0180_conecta_usuario()
 
-  LET p_versao = "CDV2000-10.02.00p"
+  LET p_versao = "CDV2000-10.02.26"
 
   WHENEVER ERROR CONTINUE
    CALL log1400_isolation()
@@ -1139,12 +1139,16 @@ END FUNCTION
      FROM cdv_desp_terc_781
     WHERE empresa = mr_input.empresa
       AND viagem  = mr_input.viagem
+      AND tip_docum <> 'N'
+      
  WHENEVER ERROR STOP
  IF SQLCA.SQLCODE <> 0 THEN
     CALL log003_err_sql('DECLARE','cq_desp_terc_ex')
     RETURN FALSE
  END IF
 
+ # Verifica as AD's de despesa de terceiro.
+ 
  WHENEVER ERROR CONTINUE
   FOREACH cq_desp_terc_ex INTO l_ad_terceiro, l_tip_docum
  WHENEVER ERROR STOP
@@ -1152,11 +1156,7 @@ END FUNCTION
        CALL log003_err_sql('FOREACH','cq_desp_terc_ex')
        EXIT FOREACH
     END IF
-    
-    IF l_tip_docum = 'N' THEN
-       CONTINUE FOREACH
-    END IF
-    
+        
     IF cdv2000_verifica_ad_ap_paga(l_ad_terceiro, 1) THEN
        LET l_msg = "Viagem faturada ou em processo de pagamento, não é permitida manutenção."  #"A AD ", l_ad_terceiro, " de terceiros já possui pagamento(s) efetivado(s)."
        CALL log0030_mensagem(l_msg,"exclamation")
@@ -1166,6 +1166,7 @@ END FUNCTION
  END FOREACH
 
  # Verifica as AD's de km semanal.
+ 
  WHENEVER ERROR CONTINUE
   DECLARE cq_km_semanal_ex CURSOR FOR
    SELECT apropr_desp_km
@@ -1214,6 +1215,7 @@ END FUNCTION
  END IF
 
  RETURN TRUE
+ 
  END FUNCTION
 
 #---------------------------#
@@ -1230,7 +1232,8 @@ END FUNCTION
          l_viagem_receb        LIKE cdv_dev_transf_781.viagem_receb,
          l_viagem_orig         LIKE cdv_dev_transf_781.viagem_receb,
          l_ad_acer_viag_orig   LIKE ad_mestre.num_ad,
-         l_msg                 CHAR(100)
+         l_msg                 CHAR(100),
+         l_tip_docum           CHAR(01)
 
   IF mr_input.des_status = 'ACERTO VIAGEM PENDENTE' THEN
      CALL log0030_mensagem("Não existe acerto de despesa para esta viagem.",'exclamation')
@@ -1257,9 +1260,11 @@ END FUNCTION
   END IF
 
   # Excluir AD's terceiro.
+  
   WHENEVER ERROR CONTINUE
-   FOREACH cq_desp_terc_ex INTO l_ad_terceiro
+   FOREACH cq_desp_terc_ex INTO l_ad_terceiro, l_tip_docum
   WHENEVER ERROR STOP
+  
      IF SQLCA.SQLCODE <> 0 THEN
         CALL log003_err_sql('FOREACH','cq_desp_terc_ex')
         EXIT FOREACH
@@ -1272,7 +1277,16 @@ END FUNCTION
         ERROR "Exclusão cancelada."
         RETURN
      END IF
+     
   END FOREACH
+
+ # Excluir NF's de terceiro.
+ 
+ IF NOT cdv2000_ve_nf_terc() THEN
+    ERROR "Exclusão cancelada."
+    RETURN
+ END IF
+    
 
   # Excluir AD's km semanal.
   WHENEVER ERROR CONTINUE
@@ -17014,7 +17028,7 @@ FUNCTION cdv2000_gera_nf_desp_terc()#
    LET lr_nota.cnd_pgto          = 1                                 
    LET lr_nota.nf_com_erro       = 'S'                                   
    LET lr_nota.den_erro          = 'FALTA CONSISTIR A NF'                
-   LET lr_nota.cod_usuario       = p_user                        
+   LET lr_nota.cod_usuario       = "cdv2000"                        
    LET lr_nota.cc_viajante       = mr_input.cc_viajante                              
                                                                  
    LET l_ind = 1                                                 
@@ -17064,7 +17078,44 @@ FUNCTION cdv2000_gera_nf_desp_terc()#
             
 END FUNCTION  
 
+#----------------------------#
+FUNCTION cdv2000_ve_nf_terc()#
+#----------------------------#
 
+ WHENEVER ERROR CONTINUE
+  DECLARE cq_nf_terc_ex CURSOR FOR
+   SELECT num_ar, nota_fiscal, serie_nota_fiscal, subserie_nf, fornecedor
+     FROM cdv_desp_terc_781
+    WHERE empresa = mr_input.empresa
+      AND viagem  = mr_input.viagem
+      AND tip_docum = 'N'      
+ WHENEVER ERROR STOP
+ 
+ IF SQLCA.SQLCODE <> 0 THEN
+    CALL log003_err_sql('DECLARE','cq_nf_terc_ex:1')
+    RETURN FALSE
+ END IF
+ 
+ FOREACH cq_nf_terc_ex INTO 
+    mr_desp_terc.num_ar,
+    mr_desp_terc.nota_fiscal,          
+    mr_desp_terc.serie_nota_fiscal,                   
+    mr_desp_terc.subserie_nf,                          
+    mr_desp_terc.fornecedor                   
+                    
+    IF SQLCA.SQLCODE <> 0 THEN
+       CALL log003_err_sql('FOREACH','cq_nf_terc_ex:2')
+       RETURN FALSE
+    END IF
+
+    IF NOT cdv2000_exclui_nf() THEN
+       LET p_msg = "Não foi possivel escluir a NF no SUP3760."
+       CALL log0030_mensagem(p_msg,'info')
+       RETURN FALSE
+    END IF     
+
+ END FOREACH
+ 
 #---------------------------#
 FUNCTION cdv2000_exclui_nf()#
 #---------------------------#
@@ -17188,7 +17239,7 @@ END FUNCTION
  FUNCTION cdv2000_version_info()
 #-------------------------------#
 
- RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/cdv2000.4gl $|$Revision: 24 $|$Date: 21/11/2019 16:00 $|$Modtime: 19/010/2019 11:30 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/cdv2000.4gl $|$Revision: 26 $|$Date: 26/12/2019 16:45 $|$Modtime: 18/12/2019 19:12 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
 
  END FUNCTION
 

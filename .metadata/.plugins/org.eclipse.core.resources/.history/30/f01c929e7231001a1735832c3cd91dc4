@@ -517,7 +517,11 @@ FUNCTION pol1332_carga_grade()#
    IF m_ind > 1 THEN
       LET m_ind = m_ind - 1      
       CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_cfop,m_ind)
+   ELSE
+      CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_cfop,1)
    END IF
+   
+   CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
    
    RETURN TRUE
    

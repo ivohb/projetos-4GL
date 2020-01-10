@@ -31,7 +31,7 @@ DEFINE m_ies_info        SMALLINT,
        m_opcao           CHAR(01),
        m_den_empresa     CHAR(36)
 
-DEFINE m_despesa       VARCHAR(10),
+DEFINE m_despesa         VARCHAR(10),
        m_descricao       VARCHAR(10),
        m_especie         VARCHAR(10),
        m_operacao        VARCHAR(10),
@@ -46,14 +46,13 @@ DEFINE m_lupa_operacao   VARCHAR(10),
        m_zoom_despesa    VARCHAR(10),
        m_lupa_cnd        VARCHAR(10),
        m_zoom_cnd        VARCHAR(10),
-       m_construct       VARCHAR(10)
+       m_construct       VARCHAR(10),
+       m_browse          VARCHAR(10)
        
 DEFINE mr_campos         RECORD
    tip_obrigacao         INTEGER,       
    den_parametro         VARCHAR(100),
    especie_nf            CHAR(03),
-   cod_operacao          CHAR(07),  
-   den_operacao          CHAR(40),    
    cod_item              CHAR(15),
    den_item              CHAR(76),
    cnd_pgto              DECIMAL(4,0),
@@ -62,6 +61,11 @@ END RECORD
 
 DEFINE m_tipo_obrigacao   INTEGER,
        m_tipo_obrigacaoa  INTEGER
+
+DEFINE ma_cfop            ARRAY[100] OF RECORD
+       cod_cfop           CHAR(05),
+       den_cfop           VARCHAR(40)
+END RECORD
        
 #-----------------#
 FUNCTION pol1332()#
@@ -77,7 +81,7 @@ FUNCTION pol1332()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 11
 
-   LET p_versao = "pol1332-12.00.06  "
+   LET p_versao = "pol1332-12.00.07  "
    CALL func002_versao_prg(p_versao)
    
    CALL pol1332_menu()
@@ -149,20 +153,26 @@ FUNCTION pol1332_menu()#
     CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
 
     CALL pol1332_cria_campos(l_panel)
+    CALL pol1332_cria_grade(l_panel)
 
     CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
 
 END FUNCTION
 
-#------------------------------------#
-FUNCTION pol1332_cria_campos(l_panel)#
-#------------------------------------#
+#----------------------------------------#
+FUNCTION pol1332_cria_campos(l_container)#
+#----------------------------------------#
     
-   DEFINE l_panel         VARCHAR(10),
+   DEFINE l_container     VARCHAR(10),
+          l_panel         VARCHAR(10),
           l_label         VARCHAR(10),
-          l_den_operacao  VARCHAR(10),
           l_den_item      VARCHAR(10),
           l_den_cnd       VARCHAR(10)
+
+   LET l_panel = _ADVPL_create_component(NULL,"LPANEL",l_container)
+   CALL _ADVPL_set_property(l_panel,"ALIGN","TOP")
+   CALL _ADVPL_set_property(l_panel,"HEIGHT",180)
+   CALL _ADVPL_set_property(l_panel,"BACKGROUND_COLOR",231,237,237)
     
    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
    CALL _ADVPL_set_property(l_label,"POSITION",30,20)
@@ -202,38 +212,12 @@ FUNCTION pol1332_cria_campos(l_panel)#
    CALL _ADVPL_set_property(m_especie,"PICTURE","@E!")
 
    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
-   CALL _ADVPL_set_property(l_label,"POSITION",30,110)
-   CALL _ADVPL_set_property(l_label,"TEXT","Cód CFOP:")    
-   CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
-
-   LET m_operacao = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-   CALL _ADVPL_set_property(m_operacao,"POSITION",110,100)
-   CALL _ADVPL_set_property(m_operacao,"LENGTH",15)
-   CALL _ADVPL_set_property(m_operacao,"EDITABLE",TRUE) 
-   CALL _ADVPL_set_property(m_operacao,"VARIABLE",mr_campos,"cod_operacao")
-   CALL _ADVPL_set_property(m_operacao,"PICTURE","#.###")
-   CALL _ADVPL_set_property(m_operacao,"VALID","pol1332_valida_operacao")
-
-   LET m_lupa_operacao = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_panel)
-   CALL _ADVPL_set_property(m_lupa_operacao,"POSITION",250,110)
-   CALL _ADVPL_set_property(m_lupa_operacao,"IMAGE","BTPESQ")
-   CALL _ADVPL_set_property(m_lupa_operacao,"SIZE",24,20)
-   CALL _ADVPL_set_property(m_lupa_operacao,"CLICK_EVENT","pol1332_zoom_operacao")
-
-   LET l_den_operacao = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-   CALL _ADVPL_set_property(l_den_operacao,"POSITION",280,110)
-   CALL _ADVPL_set_property(l_den_operacao,"LENGTH",40)
-   CALL _ADVPL_set_property(l_den_operacao,"EDITABLE",FALSE) 
-   CALL _ADVPL_set_property(l_den_operacao,"CAN_GOT_FOCUS",FALSE)
-   CALL _ADVPL_set_property(l_den_operacao,"VARIABLE",mr_campos,"den_operacao")
-
-   LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
-   CALL _ADVPL_set_property(l_label,"POSITION",35,140)
+   CALL _ADVPL_set_property(l_label,"POSITION",35,110)
    CALL _ADVPL_set_property(l_label,"TEXT","Produto:")    
    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
    LET m_produto = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-   CALL _ADVPL_set_property(m_produto,"POSITION",110,140)
+   CALL _ADVPL_set_property(m_produto,"POSITION",110,110)
    CALL _ADVPL_set_property(m_produto,"LENGTH",15)
    CALL _ADVPL_set_property(m_produto,"EDITABLE",TRUE) 
    CALL _ADVPL_set_property(m_produto,"VARIABLE",mr_campos,"cod_item")
@@ -241,25 +225,25 @@ FUNCTION pol1332_cria_campos(l_panel)#
    CALL _ADVPL_set_property(m_produto,"VALID","pol1332_valida_item")
 
    LET m_lupa_produto = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_panel)
-   CALL _ADVPL_set_property(m_lupa_produto,"POSITION",250,140)
+   CALL _ADVPL_set_property(m_lupa_produto,"POSITION",250,110)
    CALL _ADVPL_set_property(m_lupa_produto,"IMAGE","BTPESQ")
    CALL _ADVPL_set_property(m_lupa_produto,"SIZE",24,20)
    CALL _ADVPL_set_property(m_lupa_produto,"CLICK_EVENT","pol1332_zoom_item")
 
    LET l_den_item = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-   CALL _ADVPL_set_property(l_den_item,"POSITION",280,140)
+   CALL _ADVPL_set_property(l_den_item,"POSITION",280,110)
    CALL _ADVPL_set_property(l_den_item,"LENGTH",60)
    CALL _ADVPL_set_property(l_den_item,"EDITABLE",FALSE) 
    CALL _ADVPL_set_property(l_den_item,"CAN_GOT_FOCUS",FALSE)   
    CALL _ADVPL_set_property(l_den_item,"VARIABLE",mr_campos,"den_item")
 
    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
-   CALL _ADVPL_set_property(l_label,"POSITION",35,170)
+   CALL _ADVPL_set_property(l_label,"POSITION",35,140)
    CALL _ADVPL_set_property(l_label,"TEXT","Cnd. pgto:")    
    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
    LET m_cnd_pgto = _ADVPL_create_component(NULL,"LNUMERICFIELD",l_panel)
-   CALL _ADVPL_set_property(m_cnd_pgto,"POSITION",110,170)
+   CALL _ADVPL_set_property(m_cnd_pgto,"POSITION",110,140)
    CALL _ADVPL_set_property(m_cnd_pgto,"LENGTH",15)
    CALL _ADVPL_set_property(m_cnd_pgto,"EDITABLE",TRUE) 
    CALL _ADVPL_set_property(m_cnd_pgto,"VARIABLE",mr_campos,"cnd_pgto")
@@ -267,13 +251,13 @@ FUNCTION pol1332_cria_campos(l_panel)#
    CALL _ADVPL_set_property(m_cnd_pgto,"VALID","pol1332_valida_cnd_pgto")
 
    LET m_lupa_cnd = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_panel)
-   CALL _ADVPL_set_property(m_lupa_cnd,"POSITION",250,170)
+   CALL _ADVPL_set_property(m_lupa_cnd,"POSITION",250,140)
    CALL _ADVPL_set_property(m_lupa_cnd,"IMAGE","BTPESQ")
    CALL _ADVPL_set_property(m_lupa_cnd,"SIZE",24,20)
    CALL _ADVPL_set_property(m_lupa_cnd,"CLICK_EVENT","pol1332_zoom_cnd_pgto")
 
    LET l_den_cnd = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-   CALL _ADVPL_set_property(l_den_cnd,"POSITION",280,170)
+   CALL _ADVPL_set_property(l_den_cnd,"POSITION",280,140)
    CALL _ADVPL_set_property(l_den_cnd,"LENGTH",60)
    CALL _ADVPL_set_property(l_den_cnd,"EDITABLE",FALSE) 
    CALL _ADVPL_set_property(l_den_cnd,"CAN_GOT_FOCUS",FALSE)   
@@ -283,6 +267,55 @@ FUNCTION pol1332_cria_campos(l_panel)#
 
 END FUNCTION
 
+#---------------------------------------#
+FUNCTION pol1332_cria_grade(l_container)#
+#---------------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_panel           VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_tabcolumn       VARCHAR(10)
+
+    LET l_panel= _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+    
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",l_panel)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",1) 
+    CALL _ADVPL_set_property(l_layout,"EXPANSIBLE",TRUE) 
+   
+    LET m_browse = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
+    CALL _ADVPL_set_property(m_browse,"ALIGN","CENTER")
+    
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","CFOP")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_cfop")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LTEXTFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","LENGTH",5)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","PICTURE","@!")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","VALID","pol1332_valida_operacao")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER"," ")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",20)
+    CALL _ADVPL_set_property(l_tabcolumn,"NO_VARIABLE")
+    CALL _ADVPL_set_property(l_tabcolumn,"IMAGE_RENDERER","BTPESQ")
+    CALL _ADVPL_set_property(l_tabcolumn,"BEFORE_EDIT_EVENT","pol1332_zoom_operacao")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",FALSE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",270)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_cfop")
+
+    CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_cfop,1)
+    CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
+
+END FUNCTION
+
+    
 #----------------------------------------#
 FUNCTION pol1332_ativa_desativa(l_status)#
 #----------------------------------------#
@@ -296,12 +329,11 @@ FUNCTION pol1332_ativa_desativa(l_status)#
    END IF
    
    CALL _ADVPL_set_property(m_descricao,"EDITABLE",l_status)
-   CALL _ADVPL_set_property(m_operacao,"EDITABLE",l_status)
-   CALL _ADVPL_set_property(m_lupa_operacao,"EDITABLE",l_status)
    CALL _ADVPL_set_property(m_produto,"EDITABLE",l_status)
    CALL _ADVPL_set_property(m_lupa_produto,"EDITABLE",l_status)
    CALL _ADVPL_set_property(m_cnd_pgto,"EDITABLE",l_status)
    CALL _ADVPL_set_property(m_lupa_cnd,"EDITABLE",l_status)
+   CALL _ADVPL_set_property(m_especie,"EDITABLE",l_status)
    
 
 END FUNCTION
@@ -430,13 +462,11 @@ FUNCTION pol1332_exibe_dados()#
 
    SELECT cod_tipo_obrigacao,
           den_parametro,     
-          cod_operacao,      
           cod_item,          
           especie_nf,        
           cnd_pgto          
      INTO mr_campos.tip_obrigacao,
           mr_campos.den_parametro,
-          mr_campos.cod_operacao,
           mr_campos.cod_item,
           mr_campos.especie_nf,
           mr_campos.cnd_pgto
@@ -447,44 +477,56 @@ FUNCTION pol1332_exibe_dados()#
       CALL log0030_processa_err_sql('SELECT','gi_param_ar_912:ED',0)
       RETURN FALSE 
    END IF
-   
-   LET mr_campos.den_operacao = ''
-   
-   IF mr_campos.cod_operacao IS NOT NULL THEN
-      CALL pol1332_le_operacao(mr_campos.cod_operacao) RETURNING p_status
-   END IF
-   
+         
    CALL pol1332_le_item(mr_campos.cod_item) RETURNING p_status
 
    CALL pol1332_le_cond(mr_campos.cnd_pgto) RETURNING p_status
-      
+   
+   LET p_status = pol1332_carga_grade()
+   
    RETURN p_status
 
 END FUNCTION
 
-#---------------------------------#
-FUNCTION pol1332_valida_operacao()#
-#---------------------------------#
+#-----------------------------#
+FUNCTION pol1332_carga_grade()#
+#-----------------------------#
+   
+   INITIALIZE ma_cfop TO NULL
+   CALL _ADVPL_set_property(m_browse,"CLEAR")    
+   
+   LET m_ind = 1
+   
+   DECLARE cq_grade CURSOR FOR
+    SELECT a.cod_operacao, b.den_cod_fiscal
+      FROM gi_param_cfop_912 a, cod_fiscal_sup b
+     WHERE a.cod_tipo_obrigacao = m_tipo_obrigacao
+       AND b.cod_fiscal = a.cod_operacao
 
-   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
+   FOREACH cq_grade INTO ma_cfop[m_ind].*
    
-   LET mr_campos.cod_operacao = mr_campos.cod_operacao CLIPPED
-   
-   IF mr_campos.cod_operacao[1] = ' ' THEN
-      LET mr_campos.cod_operacao = NULL
-   END IF
-      
-   IF mr_campos.cod_operacao IS NOT NULL THEN
-      IF NOT pol1332_le_operacao(mr_campos.cod_operacao) THEN
-         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-         RETURN FALSE
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH','gi_param_cfop_912:cq_grade')
+         EXIT FOREACH
       END IF
+      
+      LET m_ind = m_ind + 1
+      
+   END FOREACH
+   
+   IF m_ind > 1 THEN
+      LET m_ind = m_ind - 1      
+      CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_cfop,m_ind)
+   ELSE
+      CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_cfop,1)
    END IF
+   
+   CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
    
    RETURN TRUE
-
-END FUNCTION   
-
+   
+END FUNCTION
+    
 #-----------------------------#
 FUNCTION pol1332_valida_item()#
 #-----------------------------#
@@ -518,34 +560,6 @@ FUNCTION pol1332_valida_cnd_pgto()#
    RETURN TRUE
 
 END FUNCTION   
-
-#-------------------------------------#
-FUNCTION pol1332_le_operacao(l_codigo)#
-#-------------------------------------#
-
-   DEFINE l_codigo LIKE cod_fiscal_sup.cod_fiscal 
-   
-   LET m_msg = ''
-   LET mr_campos.den_operacao = ''
-   
-   SELECT den_cod_fiscal
-     INTO mr_campos.den_operacao
-     FROM cod_fiscal_sup
-    WHERE cod_fiscal = l_codigo
-
-   IF STATUS = 0 THEN
-      RETURN TRUE
-   ELSE
-      IF STATUS = 100 THEN
-         LET m_msg = 'Operação inexistente no Logix.'    
-      ELSE
-         CALL log0030_processa_err_sql('SELECT','cod_fiscal_sup',0)
-      END IF
-   END IF
-   
-   RETURN FALSE
-
-END FUNCTION
 
 #-------------------------------------#
 FUNCTION pol1332_le_item(l_codigo)#
@@ -618,7 +632,11 @@ FUNCTION pol1332_create()
     
     LET m_opcao = 'I'    
     INITIALIZE mr_campos.* TO NULL
+    INITIALIZE ma_cfop TO NULL
     CALL pol1332_ativa_desativa(TRUE)
+    CALL _ADVPL_set_property(m_browse,"CLEAR")
+    CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_cfop,1)
+    CALL _ADVPL_set_property(m_browse,"EDITABLE",TRUE)
     LET m_ies_inc = FALSE
     CALL _ADVPL_set_property(m_despesa,"GET_FOCUS")
     
@@ -642,7 +660,11 @@ END FUNCTION
 FUNCTION pol1332_create_yes()#
 #----------------------------#
    
-    IF NOT pol1332_valida_regisro() THEN
+    IF NOT pol1332_valida_campos() THEN
+       RETURN FALSE
+    END IF
+
+    IF NOT pol1332_valida_itens() THEN
        RETURN FALSE
     END IF
             
@@ -659,9 +681,9 @@ FUNCTION pol1332_create_yes()#
 
 END FUNCTION
 
-#--------------------------------#
-FUNCTION pol1332_valida_regisro()#
-#--------------------------------#
+#-------------------------------#
+FUNCTION pol1332_valida_campos()#
+#-------------------------------#
 
    DEFINE l_par_ies     CHAR(01)
    
@@ -685,42 +707,7 @@ FUNCTION pol1332_valida_regisro()#
       CALL _ADVPL_set_property(m_especie,"GET_FOCUS")
       RETURN FALSE
    END IF
-   
-   IF mr_campos.cod_operacao[1] = ' ' THEN
-      LET mr_campos.cod_operacao = NULL
-   END IF
-   
-   IF mr_campos.cod_operacao IS NULL THEN
-      
-      IF mr_campos.especie_nf <> 'NFS' THEN
-         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",
-            "Informe o código da operação")
-         CALL _ADVPL_set_property(m_operacao,"GET_FOCUS")
-         RETURN FALSE
-      END IF
-   
-      SELECT par_ies 
-        INTO l_par_ies
-        FROM par_sup_pad
-       WHERE cod_empresa = p_cod_empresa
-         AND cod_parametro = 'cfop_nfs'
-      
-      IF STATUS = 0 THEN
-         IF l_par_ies = 'S' THEN
-            CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",
-               "Informe o código da operação")
-            CALL _ADVPL_set_property(m_operacao,"GET_FOCUS")
-            RETURN FALSE
-         END IF
-      END IF
-   ELSE
-      IF NOT pol1332_le_operacao(mr_campos.cod_operacao)  THEN
-         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-         CALL _ADVPL_set_property(m_operacao,"GET_FOCUS")
-         RETURN FALSE
-      END IF
-   END IF
-   
+         
    IF mr_campos.cod_item IS NULL THEN
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",
          "Informe o código do produto")
@@ -747,23 +734,64 @@ FUNCTION pol1332_valida_regisro()#
 END FUNCTION
 
 #------------------------------#
-FUNCTION pol1332_ins_registro()#
+FUNCTION pol1332_valida_itens()#
 #------------------------------#
    
-   IF mr_campos.cod_operacao IS NULL THEN
-      LET mr_campos.cod_operacao = ' '
+   DEFINE l_ok           SMALLINT,
+          l_par_ies      CHAR(01)
+   
+   LET l_ok = FALSE
+   
+   LET m_count = _ADVPL_get_property(m_browse,"ITEM_COUNT")
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
+
+   FOR m_ind = 1 TO m_count
+       
+       IF ma_cfop[m_ind].cod_cfop IS NOT NULL THEN
+          LET l_ok = TRUE
+          EXIT FOR
+       END IF
+       
+   END FOR
+   
+   IF NOT l_ok THEN
+      IF mr_campos.especie_nf <> 'NFS' THEN   
+         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","Informe pelo menos 1 CFOP")
+         RETURN FALSE
+      END IF
+
+      SELECT par_ies 
+        INTO l_par_ies
+        FROM par_sup_pad
+       WHERE cod_empresa = p_cod_empresa
+         AND cod_parametro = 'cfop_nfs'
+      IF STATUS = 0 THEN
+         IF l_par_ies = 'S' THEN
+            CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","Informe pelo menos 1 CFOP")
+            RETURN FALSE
+         END IF
+      END IF      
    END IF
    
+   RETURN TRUE
+
+END FUNCTION
+   
+#------------------------------#
+FUNCTION pol1332_ins_registro()#
+#------------------------------#
+      
    INSERT INTO gi_param_ar_912(
       cod_tipo_obrigacao,
       den_parametro,     
-      cod_operacao,      
+      cod_operacao,
       cod_item,          
       especie_nf,        
       cnd_pgto)             
     VALUES(mr_campos.tip_obrigacao,
            mr_campos.den_parametro,
-           mr_campos.cod_operacao, 
+           ' ',
            mr_campos.cod_item,
            mr_campos.especie_nf,
            mr_campos.cnd_pgto)     
@@ -772,11 +800,60 @@ FUNCTION pol1332_ins_registro()#
       CALL log0030_processa_err_sql('INSERT','gi_param_ar_912',0)
       RETURN FALSE
    END IF
-    
+   
+   IF NOT pol1332_ins_itens() THEN
+      RETURN FALSE
+   END IF
+   
    RETURN TRUE
 
 END FUNCTION
 
+#---------------------------#
+FUNCTION pol1332_ins_itens()#
+#---------------------------#
+
+   LET m_count = _ADVPL_get_property(m_browse,"ITEM_COUNT")
+
+   FOR m_ind = 1 TO m_count
+       IF ma_cfop[m_ind].cod_cfop IS NOT NULL THEN
+         IF NOT pol1332_ins_cfop() THEN
+            RETURN FALSE
+         END IF
+       END IF
+   END FOR
+
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------#
+FUNCTION pol1332_ins_cfop()#
+#--------------------------#
+   
+   SELECT 1 FROM gi_param_cfop_912
+    WHERE cod_tipo_obrigacao = mr_campos.tip_obrigacao 
+      AND cod_operacao = ma_cfop[m_ind].cod_cfop 
+   
+   IF STATUS = 100 THEN
+      INSERT INTO gi_param_cfop_912
+       VALUES(mr_campos.tip_obrigacao,
+              ma_cfop[m_ind].cod_cfop)
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('INSERT','gi_param_cfop_912')
+         RETURN FALSE
+      END IF
+   ELSE
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','gi_param_cfop_912')
+         RETURN FALSE
+      END IF      
+   END IF
+   
+   RETURN TRUE
+   
+END FUNCTION
+                 
 #-----------------------------------#
 FUNCTION pol1332_le_obrigacao(l_Cod)#
 #-----------------------------------#
@@ -818,34 +895,6 @@ FUNCTION pol1332_valida_obrigacao()#
    RETURN TRUE
 
 END FUNCTION    
-
-#-------------------------------#
-FUNCTION pol1332_zoom_operacao()#
-#-------------------------------#
-    
-   DEFINE l_codi            LIKE cod_fiscal_sup.cod_fiscal,
-          l_desc            LIKE cod_fiscal_sup.den_cod_fiscal,
-          l_where_clause    CHAR(300)
-          
-   IF m_zoom_operacao IS NULL THEN
-      LET m_zoom_operacao = _ADVPL_create_component(NULL,"LZOOMMETADATA")
-      CALL _ADVPL_set_property(m_zoom_operacao,"ZOOM","zoom_cod_fiscal_sup")
-   END IF
-
-   LET l_where_clause = " cod_fiscal_sup.cod_fiscal >= '5' "
-   CALL LOG_zoom_set_where_clause(l_where_clause CLIPPED)
-
-   CALL _ADVPL_get_property(m_zoom_operacao,"ACTIVATE")
-
-   LET l_codi = _ADVPL_get_property(m_zoom_operacao,"RETURN_BY_TABLE_COLUMN","cod_fiscal_sup","cod_fiscal")
-   LET l_desc = _ADVPL_get_property(m_zoom_operacao,"RETURN_BY_TABLE_COLUMN","cod_fiscal_sup","den_cod_fiscal")
-
-   IF l_codi IS NOT NULL THEN
-      LET mr_campos.cod_operacao = l_codi
-      LET mr_campos.den_operacao = l_desc
-   END IF
-    
-END FUNCTION
 
 #---------------------------#
 FUNCTION pol1332_zoom_item()#
@@ -893,6 +942,98 @@ FUNCTION pol1332_zoom_cnd_pgto()#
       LET mr_campos.den_cnd_pgto = l_desc
    END IF
     
+END FUNCTION
+
+#-------------------------------#
+FUNCTION pol1332_zoom_operacao()#
+#-------------------------------#
+    
+   DEFINE l_codi            LIKE cod_fiscal_sup.cod_fiscal,
+          l_desc            LIKE cod_fiscal_sup.den_cod_fiscal,
+          l_where_clause    CHAR(300),
+          l_lin_atu         SMALLINT
+
+          
+   IF m_zoom_operacao IS NULL THEN
+      LET m_zoom_operacao = _ADVPL_create_component(NULL,"LZOOMMETADATA")
+      CALL _ADVPL_set_property(m_zoom_operacao,"ZOOM","zoom_cod_fiscal_sup")
+   END IF
+
+   LET l_where_clause = " cod_fiscal_sup.cod_fiscal >= '5' "
+   CALL LOG_zoom_set_where_clause(l_where_clause CLIPPED)
+
+   CALL _ADVPL_get_property(m_zoom_operacao,"ACTIVATE")
+
+   LET l_codi = _ADVPL_get_property(m_zoom_operacao,"RETURN_BY_TABLE_COLUMN","cod_fiscal_sup","cod_fiscal")
+   LET l_desc = _ADVPL_get_property(m_zoom_operacao,"RETURN_BY_TABLE_COLUMN","cod_fiscal_sup","den_cod_fiscal")
+
+   IF l_codi IS NOT NULL THEN
+      LET l_lin_atu = _ADVPL_get_property(m_browse,"ROW_SELECTED")
+      IF l_lin_atu > 0 THEN
+         LET ma_cfop[l_lin_atu].cod_cfop = l_codi
+         CALL pol1332_le_operacao(l_codi, l_lin_atu) RETURN p_status
+      END IF
+   END IF
+    
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1332_valida_operacao()#
+#---------------------------------#
+   
+   DEFINE l_lin_atu         SMALLINT,
+          l_cfop            CHAR(05)
+
+   LET l_lin_atu = _ADVPL_get_property(m_browse,"ROW_SELECTED")
+  
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
+   
+   LET l_cfop = ma_cfop[l_lin_atu].cod_cfop CLIPPED
+   
+   IF l_cfop[1] = ' ' THEN
+      LET l_cfop = NULL
+   END IF
+   
+   LET ma_cfop[l_lin_atu].cod_cfop = l_cfop
+      
+   IF l_cfop IS NOT NULL THEN
+      IF NOT pol1332_le_operacao(l_cfop, l_lin_atu) THEN
+         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+         RETURN FALSE
+      END IF
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION   
+
+#------------------------------------------------#
+FUNCTION pol1332_le_operacao(l_codigo, l_lin_atu)#
+#------------------------------------------------#
+
+   DEFINE l_codigo LIKE cod_fiscal_sup.cod_fiscal,
+          l_lin_atu       INTEGER
+   
+   LET m_msg = ''
+   LET ma_cfop[l_lin_atu].den_cfop = ''
+   
+   SELECT den_cod_fiscal
+     INTO ma_cfop[l_lin_atu].den_cfop
+     FROM cod_fiscal_sup
+    WHERE cod_fiscal = l_codigo
+
+   IF STATUS = 0 THEN
+      RETURN TRUE
+   ELSE
+      IF STATUS = 100 THEN
+         LET m_msg = 'Operação inexistente no Logix.'    
+      ELSE
+         CALL log0030_processa_err_sql('SELECT','cod_fiscal_sup',0)
+      END IF
+   END IF
+   
+   RETURN FALSE
+
 END FUNCTION
 
 #--------------------------#
@@ -1074,6 +1215,7 @@ FUNCTION pol1332_update()#
    LET m_opcao = 'M'    
 
    CALL pol1332_ativa_desativa(TRUE)
+   CALL _ADVPL_set_property(m_browse,"EDITABLE",TRUE)
    CALL _ADVPL_set_property(m_descricao,"GET_FOCUS")
    
    RETURN TRUE
@@ -1084,29 +1226,16 @@ END FUNCTION
 FUNCTION pol1332_update_yes()#
 #----------------------------#
 
-    IF NOT pol1332_valida_regisro() THEN
+    IF NOT pol1332_valida_campos() THEN
        RETURN FALSE
     END IF
 
-   IF mr_campos.cod_operacao IS NULL THEN
-      LET mr_campos.cod_operacao = ' '
-   END IF
-   
-   UPDATE gi_param_ar_912
-      SET den_parametro = mr_campos.den_parametro,
-          cod_operacao = mr_campos.cod_operacao,
-          cod_item = mr_campos.cod_item,
-          especie_nf = mr_campos.especie_nf,
-          cnd_pgto =  mr_campos.cnd_pgto
-    WHERE cod_tipo_obrigacao = m_tipo_obrigacao
-   
-   IF STATUS <> 0 THEN
-      CALL log0030_processa_err_sql('UPDATE','gi_param_ar_912',0)
+   IF NOT pol1332_atu_tabs() THEN
       CALL LOG_transaction_rollback()
       CLOSE cq_prende
       RETURN FALSE
    END IF
-   
+            
    CALL LOG_transaction_commit()
    
    CLOSE cq_prende
@@ -1117,6 +1246,38 @@ FUNCTION pol1332_update_yes()#
    
    RETURN TRUE
    
+END FUNCTION
+
+#--------------------------#
+FUNCTION pol1332_atu_tabs()#
+#--------------------------#
+
+   UPDATE gi_param_ar_912
+      SET den_parametro = mr_campos.den_parametro,
+          cod_item = mr_campos.cod_item,
+          especie_nf = mr_campos.especie_nf,
+          cnd_pgto =  mr_campos.cnd_pgto
+    WHERE cod_tipo_obrigacao = m_tipo_obrigacao
+   
+   IF STATUS <> 0 THEN
+      CALL log0030_processa_err_sql('UPDATE','gi_param_ar_912',0)
+      RETURN FALSE
+   END IF
+   
+   DELETE FROM gi_param_cfop_912
+    WHERE cod_tipo_obrigacao = m_tipo_obrigacao
+
+   IF STATUS <> 0 THEN
+      CALL log0030_processa_err_sql('DELETE','gi_param_cfop_912',0)
+      RETURN FALSE
+   END IF
+   
+   IF NOT pol1332_ins_itens() THEN
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
 END FUNCTION
 
 #---------------------------#
@@ -1172,11 +1333,23 @@ FUNCTION pol1332_delete()#
       CLOSE cq_prende
       RETURN FALSE
    END IF
+
+   DELETE FROM gi_param_cfop_912
+    WHERE cod_tipo_obrigacao = m_tipo_obrigacao
+
+   IF STATUS <> 0 THEN
+      CALL log0030_processa_err_sql('DELETE','gi_param_cfop_912',0)
+      CALL LOG_transaction_rollback()
+      CLOSE cq_prende
+      RETURN FALSE
+   END IF
    
    CALL LOG_transaction_commit()
       
    LET m_excluiu = TRUE
    INITIALIZE mr_campos.* TO NULL
+   INITIALIZE ma_cfop TO NULL
+   CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_cfop,1)
          
    CLOSE cq_prende
    

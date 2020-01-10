@@ -132,7 +132,8 @@ DEFINE mr_nota                      RECORD
        cod_usuario                  VARCHAR(255),  
        dt_emissao                   DATE,
        num_nf_dig                   decimal(9,0),
-       cod_tipo_obrigacao           INTEGER
+       cod_tipo_obrigacao           INTEGER,
+       cod_operacao                 CHAR(05)
 END RECORD
 
 DEFINE mr_gi_aen                   RECORD
@@ -230,7 +231,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.91  "
+   LET p_versao = "pol1328-12.00.92  "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -1159,11 +1160,11 @@ END FUNCTION
 FUNCTION pol1328_valida_obrigacao()#
 #----------------------------------#
 
-   SELECT cod_operacao,
+   SELECT 
           cod_item,
           especie_nf,
           cnd_pgto
-     INTO m_cfop,
+     INTO 
           m_cod_item,
           m_ies_especie_nf,
           m_cnd_pgto
@@ -1191,6 +1192,8 @@ FUNCTION pol1328_valida_obrigacao()#
          RETURN FALSE
       END IF
    END IF
+   
+   LET m_cfop = mr_nota.cod_operacao
    
    CALL pol1328_acerta_cfop()
    

@@ -132,7 +132,8 @@ DEFINE mr_nota                      RECORD
        cod_usuario                  VARCHAR(255),  
        dt_emissao                   DATE,
        num_nf_dig                   decimal(9,0),
-       cod_tipo_obrigacao           INTEGER
+       cod_tipo_obrigacao           INTEGER,
+       cod_operacao                 CHAR(05)
 END RECORD
 
 DEFINE mr_gi_aen                   RECORD
@@ -324,7 +325,7 @@ FUNCTION pol1328_check_proces()#
 END FUNCTION   
          
 #-------------------------------#
-FUNCTION pol1356_cria_controle()#
+FUNCTION pol1328_cria_controle()#
 #-------------------------------#
 
    CREATE TABLE control_proces_912 (
@@ -408,7 +409,7 @@ FUNCTION pol1328_processa()#
    CALL LOG_refresh_display()
 
    IF NOT log0150_verifica_se_tabela_existe("control_proces_912") THEN 
-      IF NOT pol1356_cria_controle() THEN
+      IF NOT pol1328_cria_controle() THEN
          RETURN FALSE
       END IF
    END IF
@@ -1159,11 +1160,11 @@ END FUNCTION
 FUNCTION pol1328_valida_obrigacao()#
 #----------------------------------#
 
-   SELECT cod_operacao,
+   SELECT 
           cod_item,
           especie_nf,
           cnd_pgto
-     INTO m_cfop,
+     INTO 
           m_cod_item,
           m_ies_especie_nf,
           m_cnd_pgto
@@ -1191,6 +1192,8 @@ FUNCTION pol1328_valida_obrigacao()#
          RETURN FALSE
       END IF
    END IF
+   
+   LET m_cfop = mr_nota.cod_operacao
    
    CALL pol1328_acerta_cfop()
    

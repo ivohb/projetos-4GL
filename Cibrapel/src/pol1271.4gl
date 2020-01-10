@@ -7152,7 +7152,7 @@ END FUNCTION
  FUNCTION pol1271_version_info()
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1271.4gl $|$Revision: 62 $|$Date: 10/12/2019 07:40 $|$Modtime: 22/05/11 14:00 $" 
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1271.4gl $|$Revision: 63 $|$Date: 03/01/2020 14:07 $|$Modtime: 10/12/2019 07:40 $" 
 
  END FUNCTION
 

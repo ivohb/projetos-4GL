@@ -43,7 +43,7 @@ s = FORMONLY.versao_contrato, UPSHIFT,  NOENTRY;
 t = FORMONLY.num_etapa, UPSHIFT,  NOENTRY;
 u = FORMONLY.dat_vencto_etapa, UPSHIFT,  NOENTRY;
 v = FORMONLY.val_etapa, UPSHIFT,  NOENTRY;
-q = FORMONLY.val_etapa, UPSHIFT,  NOENTRY;
+q = FORMONLY.val_oc, UPSHIFT,  NOENTRY;
 w = FORMONLY.ies_baixar, UPSHIFT, INCLUDE=('S','N'), 
      COMMENTS='Sim=Marcado Não=Não Marcado'
      --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';

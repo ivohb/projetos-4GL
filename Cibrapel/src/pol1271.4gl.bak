@@ -369,7 +369,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
-   LET p_versao = "pol1271-12.02.62  "
+   LET p_versao = "pol1271-12.02.63  "
    CALL func002_versao_prg(p_versao)
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol1271.iem") RETURNING p_nom_help

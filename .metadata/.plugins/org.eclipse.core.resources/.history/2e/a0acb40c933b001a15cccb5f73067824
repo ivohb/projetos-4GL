@@ -1,0 +1,268 @@
+#-------------------------------------------------------------------#
+# SISTEMA.: LOGIX                                                   #
+# PROGRAMA: pol1381                                                 #
+# OBJETIVO: ESTRUTURA - APURAÇÃO DAS NECESSIDADES                   #
+# AUTOR...: IVO                                                     #
+# DATA....: 19/03/19                                                #
+#-------------------------------------------------------------------#
+
+DATABASE logix
+
+GLOBALS
+    DEFINE p_cod_empresa   LIKE empresa.cod_empresa,
+           p_user          LIKE usuarios.cod_usuario,
+           p_status        SMALLINT,
+           p_den_empresa   VARCHAR(36),
+           p_versao        CHAR(18),
+           p_cod_cliente    CHAR(05),
+           p_cod_clientea   CHAR(05)
+END GLOBALS
+
+DEFINE m_cod_empresa_plano   LIKE empresa.cod_empresa
+
+DEFINE m_dialog          VARCHAR(10),
+       m_statusbar       VARCHAR(10),
+       m_cod_cliente     VARCHAR(10),
+       m_nom_cliente     VARCHAR(10),
+       m_zoom_cliente    VARCHAR(10),
+       m_lupa_cliente    VARCHAR(10),
+       m_cod_item        VARCHAR(10),
+       m_den_item        VARCHAR(10),
+       m_zoom_item       VARCHAR(10),
+       m_lupa_item       VARCHAR(10),
+       m_construct       VARCHAR(10),
+       m_cod_compon      VARCHAR(10),
+       m_den_compon      VARCHAR(10),
+       m_zoom_compon     VARCHAR(10),
+       m_lupa_compon     VARCHAR(10),
+       m_browse          VARCHAR(10)
+
+DEFINE m_ies_info        SMALLINT,
+       m_count           INTEGER,
+       m_msg             VARCHAR(150),
+       m_ies_cons        SMALLINT,
+       m_opcao           CHAR(01),
+       m_excluiu         SMALLINT,
+       m_carregando      SMALLINT
+       
+DEFINE mr_campos         RECORD
+       cod_cliente       LIKE clientes.cod_cliente,
+       nom_cliente       LIKE clientes.nom_cliente,
+       cod_item          LIKE item.cod_item,
+       den_item          LIKE item.den_item
+END RECORD
+
+DEFINE ma_compon         ARRAY[100] OF RECORD
+       cod_compon        LIKE item.cod_item,
+       den_compon        LIKE item.den_item       
+END RECORD
+
+DEFINE m_codigo          LIKE item.cod_item,
+       m_lin_atu         INTEGER,
+       m_id_embal        INTEGER,
+       m_id_embala       INTEGER
+       
+#-----------------#
+FUNCTION pol1381()#
+#-----------------#
+          
+   IF LOG_initApp("PADRAO") <> 0 THEN
+      RETURN
+   END IF
+
+   #CALL LOG_connectDatabase("DEFAULT")
+
+   WHENEVER ANY ERROR CONTINUE
+
+   LET p_versao = "pol1381-12.00.01  "
+   CALL func002_versao_prg(p_versao)
+    
+   CALL pol1381_menu()
+    
+END FUNCTION
+
+#----------------------#
+FUNCTION pol1381_menu()#
+#----------------------#
+
+    DEFINE l_menubar,
+           l_panel,
+           l_inform,
+           l_titulo           VARCHAR(80)
+    
+    LET l_titulo = "ESTRUTURA - APURAÇÃO DAS NECESSIDADES - ",p_versao
+    
+    LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
+    CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)
+    CALL _ADVPL_set_property(m_dialog,"TITLE",l_titulo)
+    CALL _ADVPL_set_property(m_dialog,"FORM_NAME",p_versao)
+    CALL _ADVPL_set_property(m_dialog,"ENABLE_ESC_CLOSE",FALSE)
+
+    LET m_statusbar = _ADVPL_create_component(NULL,"LSTATUSBAR",m_dialog)
+
+    LET l_menubar = _ADVPL_create_component(NULL,"LMENUBAR",m_dialog)
+    CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
+
+    LET l_inform = _ADVPL_create_component(NULL,"LINFORMBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_inform,"EVENT","pol1381_informar")
+    CALL _ADVPL_set_property(l_inform,"CONFIRM_EVENT","pol1381_confirmar")
+    CALL _ADVPL_set_property(l_inform,"CANCEL_EVENT","pol1381_cancelar")
+
+    CALL _ADVPL_create_component(NULL,"LQUITBUTTON",l_menubar)
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_dialog)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+
+    CALL pol1381_cria_campos(l_panel)
+    #CALL pol1381_cria_grade(l_panel)
+
+    CALL pol1381_ativa_desativa(FALSE)
+
+    CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
+
+END FUNCTION
+
+#----------------------------------------#
+FUNCTION pol1381_cria_campos(l_container)#
+#----------------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_panel           VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_label           VARCHAR(10)
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","TOP")
+    CALL _ADVPL_set_property(l_panel,"HEIGHT",60)
+    #CALL _ADVPL_set_property(l_panel,"BACKGROUND_COLOR",231,237,237)
+    
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",l_panel)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",4)
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+    CALL _ADVPL_set_property(l_label,"TEXT","Cod cliente:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET m_cod_cliente = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+    CALL _ADVPL_set_property(m_cod_cliente,"LENGTH",15)
+    CALL _ADVPL_set_property(m_cod_cliente,"VARIABLE",mr_campos,"cod_cliente")
+    CALL _ADVPL_set_property(m_cod_cliente,"PICTURE","@!")
+    CALL _ADVPL_set_property(m_cod_cliente,"VALID","pol1381_valida_cliente")
+
+    LET m_lupa_cliente = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_layout)
+    CALL _ADVPL_set_property(m_lupa_cliente,"IMAGE","BTPESQ")
+    CALL _ADVPL_set_property(m_lupa_cliente,"SIZE",24,20)
+    CALL _ADVPL_set_property(m_lupa_cliente,"CLICK_EVENT","pol1381_zoom_cliente")
+
+    LET m_nom_cliente = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+    CALL _ADVPL_set_property(m_nom_cliente,"LENGTH",50) 
+    CALL _ADVPL_set_property(m_nom_cliente,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(m_nom_cliente,"VARIABLE",mr_campos,"nom_cliente")
+    CALL _ADVPL_set_property(m_nom_cliente,"CAN_GOT_FOCUS",FALSE)
+
+    CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_ROW")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+    CALL _ADVPL_set_property(l_label,"TEXT","Embalagem padrão:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET m_cod_item = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+    CALL _ADVPL_set_property(m_cod_item,"LENGTH",15)
+    CALL _ADVPL_set_property(m_cod_item,"VARIABLE",mr_campos,"cod_item")
+    CALL _ADVPL_set_property(m_cod_item,"PICTURE","@!")
+    CALL _ADVPL_set_property(m_cod_item,"VALID","pol1381_valida_item")
+
+    LET m_lupa_item = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_layout)
+    CALL _ADVPL_set_property(m_lupa_item,"IMAGE","BTPESQ")
+    CALL _ADVPL_set_property(m_lupa_item,"SIZE",24,20)
+    CALL _ADVPL_set_property(m_lupa_item,"CLICK_EVENT","pol1381_zoom_embal")
+
+    LET m_den_item = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+    CALL _ADVPL_set_property(m_den_item,"LENGTH",50) 
+    CALL _ADVPL_set_property(m_den_item,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(m_den_item,"VARIABLE",mr_campos,"den_item")
+    CALL _ADVPL_set_property(m_den_item,"CAN_GOT_FOCUS",FALSE)
+
+    CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_ROW")
+
+END FUNCTION
+
+#---------------------------------------#
+FUNCTION pol1381_cria_grade(l_container)#
+#---------------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_panel           VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_tabcolumn       VARCHAR(10)
+
+    LET l_panel= _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+    
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",l_panel)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",1) 
+    CALL _ADVPL_set_property(l_layout,"EXPANSIBLE",TRUE) 
+   
+    LET m_browse = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
+    CALL _ADVPL_set_property(m_browse,"ALIGN","CENTER")
+    #CALL _ADVPL_set_property(m_browse,"BEFORE_ADD_ROW_EVENT","pol1381_before_add_row")
+    CALL _ADVPL_set_property(m_browse,"AFTER_ROW_EVENT","pol1381_after_compon")
+    
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Componenete")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_compon")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LTEXTFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","LENGTH",15)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","PICTURE","@!")
+    #CALL _ADVPL_set_property(l_tabcolumn,"VALID","pol1381_valida_compon")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER"," ")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",20)
+    CALL _ADVPL_set_property(l_tabcolumn,"NO_VARIABLE")
+    CALL _ADVPL_set_property(l_tabcolumn,"IMAGE_RENDERER","BTPESQ")
+    CALL _ADVPL_set_property(l_tabcolumn,"BEFORE_EDIT_EVENT","pol1381_zoom_compon")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",FALSE)
+    #CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",270)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_compon")
+
+    CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_compon,1)
+    CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
+
+END FUNCTION
+
+#----------------------------------------#
+FUNCTION pol1381_ativa_desativa(l_status)#
+#----------------------------------------#
+{
+   DEFINE l_status SMALLINT
+   
+   IF m_opcao = 'M' THEN
+      CALL _ADVPL_set_property(m_cod_cliente,"EDITABLE",FALSE)
+      CALL _ADVPL_set_property(m_lupa_cliente,"EDITABLE",FALSE)
+   ELSE
+      CALL _ADVPL_set_property(m_cod_cliente,"EDITABLE",l_status)
+      CALL _ADVPL_set_property(m_lupa_cliente,"EDITABLE",l_status)
+   END IF
+   
+   CALL _ADVPL_set_property(m_cod_item,"EDITABLE",l_status)
+   CALL _ADVPL_set_property(m_lupa_item,"EDITABLE",l_status)
+}
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1381_limpa_campos()
+#-----------------------------#
+{
+   INITIALIZE mr_campos.* TO NULL
+   INITIALIZE ma_compon TO NULL
+   CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_compon,1)
+   CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
+}      
+END FUNCTION

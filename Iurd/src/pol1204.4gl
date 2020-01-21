@@ -103,7 +103,7 @@ MAIN
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
    
-   LET p_versao = "pol1204-10.02.22"
+   LET p_versao = "pol1204-10.02.24"
    
    OPTIONS 
       NEXT KEY control-f,
@@ -249,14 +249,13 @@ END FUNCTION
          
          IF NOT INT_FLAG THEN
             IF p_tela.num_contrato IS NULL THEN
-               IF NOT pol1204_busca_contrato() THEN
-                  NEXT FIELD num_aviso_rec
-               END IF
-            ELSE
                IF NOT pol1204_le_contrato() THEN
                   NEXT FIELD num_contrato
                END IF
             END IF            
+            IF NOT pol1204_busca_contrato() THEN
+               NEXT FIELD num_aviso_rec
+            END IF
          END IF
          
    END INPUT 
@@ -408,11 +407,14 @@ END FUNCTION
    LET p_ind = 1
 
    DECLARE cq_contr CURSOR FOR
-    SELECT e.contrato_servico,
+    SELECT DISTINCT
+           e.contrato_servico,
            e.versao_contrato,
            e.num_etapa,
            e.dat_vencto_etapa,
-           e.val_etapa, f.val_oc_etapa, 'N',
+           e.val_etapa, 
+           f.val_oc_etapa, 
+           'N',
            f.ordem_compra
       FROM cos_etapa_contrato e,
            cos_contr_servico c,
@@ -427,8 +429,10 @@ END FUNCTION
        AND f.contrato_servico = e.contrato_servico
        AND f.versao_contrato = e.versao_contrato
        AND f.num_etapa = e.num_etapa
-       #AND c.dat_ini_contrato <= p_dat_proces       
-       #AND c.dat_fim_contrato >= p_dat_proces 
+       
+       AND ( (c.contrato_servico = p_tela.num_contrato AND p_tela.num_contrato IS NOT NULL) OR
+             (1 = 1 AND p_tela.num_contrato IS NULL))
+       
      ORDER BY e.contrato_servico, e.dat_vencto_etapa
      
    FOREACH cq_contr INTO pr_etapa[p_ind].*
@@ -502,7 +506,8 @@ END FUNCTION
       END IF      
         
       DECLARE cq_cos CURSOR FOR                               
-       SELECT e.contrato_servico,                               
+       SELECT DISTINCT
+              e.contrato_servico,                               
               e.versao_contrato,                                
               e.num_etapa,                                      
               e.dat_vencto_etapa,                               
@@ -577,27 +582,29 @@ END FUNCTION
    LET p_ind = 1
 
    DECLARE cq_etapas CURSOR FOR
-    SELECT e.contrato_servico,
+    SELECT DISTINCT 
+           e.contrato_servico,
            e.versao_contrato,
            e.num_etapa,
            e.dat_vencto_etapa,
-           e.val_etapa, 'N',
+           e.val_etapa, 
+           f.val_oc_etapa,
+           'N',
            f.ordem_compra
-      FROM cos_etapa_contrato e,
-           cos_contr_servico c,
-           cos_oc_etapa f
-     WHERE e.empresa = p_cod_empresa
-       AND e.sit_etapa = 'I'
-       AND c.empresa = e.empresa
-       AND c.contrato_servico = e.contrato_servico
-       AND c.versao_contrato = e.versao_contrato
-       AND c.contrato_servico = p_tela.num_contrato
-       AND f.empresa = e.empresa
-       AND f.contrato_servico = e.contrato_servico
-       AND f.versao_contrato = e.versao_contrato
-       AND f.num_etapa = e.num_etapa
-
-     ORDER BY e.contrato_servico, e.dat_vencto_etapa
+      FROM cos_etapa_contrato e,                             
+           cos_contr_servico c,                              
+           cos_oc_etapa f                                    
+     WHERE e.empresa = p_cod_empresa                         
+       AND e.sit_etapa = 'I'                                 
+       AND c.empresa = e.empresa                             
+       AND c.contrato_servico = e.contrato_servico           
+       AND c.versao_contrato = e.versao_contrato          
+       AND c.contrato_servico = p_tela.num_contrato       
+       AND f.empresa = e.empresa                             
+       AND f.contrato_servico = e.contrato_servico           
+       AND f.versao_contrato = e.versao_contrato             
+       AND f.num_etapa = e.num_etapa                         
+     ORDER BY e.contrato_servico, e.dat_vencto_etapa         
      
    FOREACH cq_etapas INTO pr_etapa[p_ind].*
    
@@ -622,13 +629,14 @@ END FUNCTION
       RETURN FALSE
    END IF
    
-   CALL SET_COUNT(p_ind - 1)
+   {CALL SET_COUNT(p_ind - 1)
    
    INPUT ARRAY pr_etapa
       WITHOUT DEFAULTS FROM sr_etapa.*
          BEFORE INPUT
             EXIT INPUT
    END INPUT
+   }
 
    RETURN TRUE
    
@@ -698,7 +706,7 @@ FUNCTION pol1204_val_baixar()#
    
    FOR p_index = 1 to ARR_COUNT()
        IF pr_etapa[p_index].ies_baixar = 'S' THEN
-          LET p_val_baixar = p_val_baixar + pr_etapa[p_index].val_etapa
+          LET p_val_baixar = p_val_baixar + pr_etapa[p_index].val_oc_etapa
        END IF
    END FOR
 
@@ -859,7 +867,7 @@ FUNCTION pol1204_grava_tabs()#
       RETURN FALSE
    END IF
    
-   {UPDATE cos_etapa_contrato 
+   UPDATE cos_etapa_contrato 
       SET sit_etapa = 'L' 
     WHERE empresa = p_cod_empresa
       AND contrato_servico = p_num_contr 
@@ -868,7 +876,7 @@ FUNCTION pol1204_grava_tabs()#
    IF STATUS <> 0 THEN
       CALL log003_err_sql('UPDATE', 'cos_etapa_contrato')
       RETURN FALSE
-   END IF}
+   END IF
    
    LET parametro.texto = 'PAGAMENTO DA ETAPA ', p_num_etapa, ' DO CONTRATO ', p_num_contr
    CALL pol1161_grava_auadit(parametro) RETURNING p_status

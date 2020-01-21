@@ -13,13 +13,13 @@
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
 			<item value="versao"/>
+			<item value="log003_me"/>
 			<item value="min_par"/>
 			<item value="update g"/>
 			<item value="ersao"/>
 			<item value="valida_re"/>
 			<item value="VERSAO"/>
 			<item value="grava_"/>
-			<item value="grava_t"/>
 		</list>
 		<list key="replacehistory">
 		</list>

@@ -2355,6 +2355,13 @@ FUNCTION pol1351_carrega_lista()#
     
 END FUNCTION
 
+{
+Para mais detalhes veja:
+    LOG_file_getListCount
+    LOG_file_getFromList
+http://tdn.totvs.com/display/public/FRAMJOI/LOG_file_getListCount
+#http://tdn.totvs.com/pages/releaseview.action?pageId=5264894}
+
 #---------------------------------#
 FUNCTION pol1351_carrega_arquivo()#
 #---------------------------------#     

@@ -103,7 +103,7 @@ MAIN
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
    
-   LET p_versao = "pol1204-10.02.24"
+   LET p_versao = "pol1204-10.02.27"
    
    OPTIONS 
       NEXT KEY control-f,
@@ -213,7 +213,8 @@ END FUNCTION
 #---------------------------#
    
    LET INT_FLAG = FALSE
-   INITIALIZE p_tela TO NULL
+   INITIALIZE p_tela, pr_etapa TO NULL
+   CALL pol1204_limpa_tela()
    
    INPUT BY NAME p_tela.* WITHOUT DEFAULTS
             
@@ -248,13 +249,14 @@ END FUNCTION
          END IF
          
          IF NOT INT_FLAG THEN
-            IF p_tela.num_contrato IS NULL THEN
+            IF p_tela.num_contrato IS NOT NULL THEN
                IF NOT pol1204_le_contrato() THEN
                   NEXT FIELD num_contrato
                END IF
-            END IF            
-            IF NOT pol1204_busca_contrato() THEN
-               NEXT FIELD num_aviso_rec
+            ELSE          
+               IF NOT pol1204_busca_contrato() THEN
+                  NEXT FIELD num_aviso_rec
+               END IF
             END IF
          END IF
          
@@ -429,10 +431,6 @@ END FUNCTION
        AND f.contrato_servico = e.contrato_servico
        AND f.versao_contrato = e.versao_contrato
        AND f.num_etapa = e.num_etapa
-       
-       AND ( (c.contrato_servico = p_tela.num_contrato AND p_tela.num_contrato IS NOT NULL) OR
-             (1 = 1 AND p_tela.num_contrato IS NULL))
-       
      ORDER BY e.contrato_servico, e.dat_vencto_etapa
      
    FOREACH cq_contr INTO pr_etapa[p_ind].*
@@ -629,14 +627,13 @@ END FUNCTION
       RETURN FALSE
    END IF
    
-   {CALL SET_COUNT(p_ind - 1)
+   CALL SET_COUNT(p_ind - 1)
    
    INPUT ARRAY pr_etapa
       WITHOUT DEFAULTS FROM sr_etapa.*
          BEFORE INPUT
             EXIT INPUT
-   END INPUT
-   }
+   END INPUT   
 
    RETURN TRUE
    
@@ -661,8 +658,8 @@ FUNCTION pol1204_processar()#
         IF FGL_LASTKEY() = 27 OR FGL_LASTKEY() = 2000 OR FGL_LASTKEY() = 4010
              OR FGL_LASTKEY() = 2016 OR FGL_LASTKEY() = 2 THEN
         ELSE
-           IF pr_etapa[p_ind+1].contrato_servico IS NULL THEN
-              CALL pol1204_val_baixar()
+           CALL pol1204_val_baixar()
+           IF pr_etapa[p_ind+1].contrato_servico IS NULL THEN              
               NEXT FIELD ies_baixar
            END IF
         END IF
@@ -710,7 +707,7 @@ FUNCTION pol1204_val_baixar()#
        END IF
    END FOR
 
-   DISPLAY p_val_baixar to val_baixar
+   DISPLAY p_val_baixar TO val_baixar
     
 END FUNCTION       
 

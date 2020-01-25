@@ -350,7 +350,7 @@ FUNCTION pol1379_create_confirm()
    END IF
    
    CALL LOG_transaction_commit()
-   CALL pol1379_ativa_desativa(TRUE)
+   CALL pol1379_ativa_desativa(FALSE)
    CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
    
    RETURN TRUE

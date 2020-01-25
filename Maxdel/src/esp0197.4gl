@@ -154,7 +154,7 @@ DEFINE p_nf_item RECORD LIKE fat_nf_item.*
 DEFINE p_fat_nf_item_fisc RECORD LIKE fat_nf_item_fisc.*
 
 MAIN
-   LET p_versao = "ESP0197-10.02.16"
+   LET p_versao = "ESP0197-10.02.17"
    CALL log0180_conecta_usuario()
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ

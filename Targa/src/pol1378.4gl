@@ -132,7 +132,7 @@ END FUNCTION
 FUNCTION pol1378_menu()#
 #----------------------#
 
-   LET p_versao = "pol1378-12.00.00  "
+   LET p_versao = "pol1378-12.00.01  "
    CALL func002_versao_prg(p_versao)
 
    MENU "OPCAO"
@@ -413,11 +413,18 @@ FUNCTION pol1378_exec_carga()#
       RETURN FALSE
    END IF
 
-   IF NOT pol1378_carrega_lista() THEN
+   IF NOT pol1378_dirExist() THEN
       RETURN FALSE
    END IF
 
-   
+   {IF NOT pol1378_fileExist() THEN
+      RETURN FALSE
+   END IF}
+
+   IF NOT pol1378_carrega_lista() THEN
+      RETURN FALSE
+   END IF
+      
    RETURN TRUE
    
 END FUNCTION
@@ -443,6 +450,8 @@ FUNCTION pol1378_le_caminho()#
          LET m_msg = 'Erro ', STATUS USING '<<<<<', ' lendo tab path_logix_v2'
       END IF
    END IF
+   
+   CALL LOG_consoleMessage("Caminho dos arquivos: "||m_caminho)
    
    CALL pol1378_ins_erro() RETURN p_status
 
@@ -470,19 +479,80 @@ FUNCTION pol1378_ins_erro()#
    RETURN TRUE
 
 END FUNCTION
+
+#---------------------------#
+ FUNCTION pol1378_dirExist()#
+#---------------------------#
+
+  DEFINE l_dir  CHAR(250),
+         l_msg  CHAR(250)
+ 
+  LET l_dir = m_caminho CLIPPED
+ 
+  IF LOG_dir_exist(l_dir,0) THEN
+  ELSE
+     
+     CALL LOG_consoleMessage("FALHA. Motivo: "||log0030_mensagem_get_texto())
+     LET l_msg = "FALHA. Motivo: ", log0030_mensagem_get_texto()
+     CALL log0030_mensagem(l_msg,'info')
+     
+     IF LOG_dir_exist(l_dir,1) THEN
+     ELSE
+        CALL LOG_consoleMessage("FALHA. Motivo: "||log0030_mensagem_get_texto())
+        LET l_msg = "FALHA. Motivo: ", log0030_mensagem_get_texto()
+        CALL log0030_mensagem(l_msg,'info')
+        RETURN FALSE
+     END IF
+     
+  END IF
+  
+  RETURN TRUE
    
+END FUNCTION
+
+#----------------------------#
+ FUNCTION pol1378_fileExist()#
+#----------------------------#
+
+  DEFINE l_file  CHAR(250),
+         l_msg   CHAR(100)
+ 
+  
+ 
+  LET l_file = "c:\\temp\\ivo.txt"
+ 
+ {
+  IF LOG_file_exist(l_file,0) THEN
+     LET l_msg = "Arquivo existe no servidor"
+  ELSE
+     #CALL conout("Arquivo não existe no servidor")
+     LET l_msg = "Arquivo existe não no servidor"
+  END IF
+ }
+  CALL log0030_mensagem(l_msg, 'info')
+ 
+  IF NOT LOG_file_exist(l_file,1) THEN
+     #CALL conout("Arquivo não existe no client")
+     LET l_msg = 'Arquivo não existe no client'
+  ELSE
+     #CALL conout("Arquivo existe no client")
+     LET l_msg = 'Arquivo existe no client'
+  END IF
+  
+END FUNCTION
+  
 #-------------------------------#
 FUNCTION pol1378_carrega_lista()#
 #-------------------------------#     
 
    DEFINE l_ind     INTEGER,
-          t_ind     CHAR(03)
+          t_ind     CHAR(03),
+          l_caminho CHAR(150)
           
-
    #LET m_caminho = m_caminho CLIPPED,'\\'
-   
+     
    LET m_posi_arq = LENGTH(m_caminho) + 1
-   LET m_qtd_arq = LOG_file_getListCount(m_caminho,"*.unl",FALSE,FALSE,TRUE)
+   LET m_qtd_arq = LOG_file_getListCount(m_caminho,"*.unl",FALSE,FALSE,FALSE)
    
    IF m_qtd_arq = 0 THEN
       LET m_msg = 'Nenhum arquivo foi encontrado '

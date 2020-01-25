@@ -103,7 +103,7 @@ MAIN
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
    
-   LET p_versao = "pol1204-10.02.23"
+   LET p_versao = "pol1204-10.02.26"
    
    OPTIONS 
       NEXT KEY control-f,
@@ -213,7 +213,8 @@ END FUNCTION
 #---------------------------#
    
    LET INT_FLAG = FALSE
-   INITIALIZE p_tela TO NULL
+   INITIALIZE p_tela, pr_etapa TO NULL
+   CALL pol1204_limpa_tela()
    
    INPUT BY NAME p_tela.* WITHOUT DEFAULTS
             
@@ -248,7 +249,7 @@ END FUNCTION
          END IF
          
          IF NOT INT_FLAG THEN
-            IF p_tela.num_contrato IS NULL THEN
+            IF p_tela.num_contrato IS NOT NULL THEN
                IF NOT pol1204_le_contrato() THEN
                   NEXT FIELD num_contrato
                END IF
@@ -661,8 +662,8 @@ FUNCTION pol1204_processar()#
         IF FGL_LASTKEY() = 27 OR FGL_LASTKEY() = 2000 OR FGL_LASTKEY() = 4010
              OR FGL_LASTKEY() = 2016 OR FGL_LASTKEY() = 2 THEN
         ELSE
-           IF pr_etapa[p_ind+1].contrato_servico IS NULL THEN
-              CALL pol1204_val_baixar()
+           CALL pol1204_val_baixar()
+           IF pr_etapa[p_ind+1].contrato_servico IS NULL THEN              
               NEXT FIELD ies_baixar
            END IF
         END IF
@@ -710,7 +711,7 @@ FUNCTION pol1204_val_baixar()#
        END IF
    END FOR
 
-   DISPLAY p_val_baixar to val_baixar
+   DISPLAY p_val_baixar TO val_baixar
     
 END FUNCTION       
 
@@ -867,7 +868,7 @@ FUNCTION pol1204_grava_tabs()#
       RETURN FALSE
    END IF
    
-   {UPDATE cos_etapa_contrato 
+   UPDATE cos_etapa_contrato 
       SET sit_etapa = 'L' 
     WHERE empresa = p_cod_empresa
       AND contrato_servico = p_num_contr 
@@ -876,7 +877,7 @@ FUNCTION pol1204_grava_tabs()#
    IF STATUS <> 0 THEN
       CALL log003_err_sql('UPDATE', 'cos_etapa_contrato')
       RETURN FALSE
-   END IF}
+   END IF
    
    LET parametro.texto = 'PAGAMENTO DA ETAPA ', p_num_etapa, ' DO CONTRATO ', p_num_contr
    CALL pol1161_grava_auadit(parametro) RETURNING p_status

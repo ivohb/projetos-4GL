@@ -27,7 +27,7 @@ DEFINE m_dialog          VARCHAR(10),
        m_zoom_cliente    VARCHAR(10),
        m_lupa_cliente    VARCHAR(10),
        m_cod_item        VARCHAR(10),
-       m_den_item        VARCHAR(10),
+       m_den_embal       VARCHAR(10),
        m_zoom_item       VARCHAR(10),
        m_lupa_item       VARCHAR(10),
        m_construct       VARCHAR(10),
@@ -43,18 +43,20 @@ DEFINE m_ies_info        SMALLINT,
        m_ies_cons        SMALLINT,
        m_opcao           CHAR(01),
        m_excluiu         SMALLINT,
-       m_carregando      SMALLINT
+       m_carregando      SMALLINT,
+       m_den_item        VARCHAR(76)
        
 DEFINE mr_campos         RECORD
        cod_cliente       LIKE clientes.cod_cliente,
        nom_cliente       LIKE clientes.nom_cliente,
        cod_item          LIKE item.cod_item,
-       den_item          LIKE item.den_item
+       den_item_embal    VARCHAR(50)
 END RECORD
 
 DEFINE ma_compon         ARRAY[100] OF RECORD
        cod_compon        LIKE item.cod_item,
-       den_compon        LIKE item.den_item       
+       den_compon        LIKE item.den_item,
+       excluir           CHAR(01)      
 END RECORD
 
 DEFINE m_codigo          LIKE item.cod_item,
@@ -213,17 +215,13 @@ FUNCTION pol1379_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_cod_item,"VARIABLE",mr_campos,"cod_item")
     CALL _ADVPL_set_property(m_cod_item,"PICTURE","@!")
     CALL _ADVPL_set_property(m_cod_item,"VALID","pol1379_valida_item")
-
-    LET m_lupa_item = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_layout)
-    CALL _ADVPL_set_property(m_lupa_item,"IMAGE","BTPESQ")
-    CALL _ADVPL_set_property(m_lupa_item,"SIZE",24,20)
-    CALL _ADVPL_set_property(m_lupa_item,"CLICK_EVENT","pol1379_zoom_embal")
-
-    LET m_den_item = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
-    CALL _ADVPL_set_property(m_den_item,"LENGTH",50) 
-    CALL _ADVPL_set_property(m_den_item,"EDITABLE",FALSE) 
-    CALL _ADVPL_set_property(m_den_item,"VARIABLE",mr_campos,"den_item")
-    CALL _ADVPL_set_property(m_den_item,"CAN_GOT_FOCUS",FALSE)
+    
+    CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")
+    
+    LET m_den_embal = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+    CALL _ADVPL_set_property(m_den_embal,"LENGTH",50) 
+    CALL _ADVPL_set_property(m_den_embal,"VARIABLE",mr_campos,"den_item_embal")
+    CALL _ADVPL_set_property(m_den_embal,"PICTURE","@!")
 
     CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_ROW")
 
@@ -249,6 +247,17 @@ FUNCTION pol1379_cria_grade(l_container)#
     CALL _ADVPL_set_property(m_browse,"ALIGN","CENTER")
     #CALL _ADVPL_set_property(m_browse,"BEFORE_ADD_ROW_EVENT","pol1379_before_add_row")
     CALL _ADVPL_set_property(m_browse,"AFTER_ROW_EVENT","pol1379_after_compon")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"IMAGE_HEADER","CANCEL_EX")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Excluir")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",40)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","excluir")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LCHECKBOX")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","VALUE_CHECKED",'S')
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","VALUE_NCHECKED",'N')
+    CALL _ADVPL_set_property(l_tabcolumn,"AFTER_EDIT_EVENT","pol1379_exc_compon")
     
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Componenete")
@@ -288,13 +297,14 @@ FUNCTION pol1379_ativa_desativa(l_status)#
    IF m_opcao = 'M' THEN
       CALL _ADVPL_set_property(m_cod_cliente,"EDITABLE",FALSE)
       CALL _ADVPL_set_property(m_lupa_cliente,"EDITABLE",FALSE)
+      CALL _ADVPL_set_property(m_cod_item,"EDITABLE",FALSE)
    ELSE
       CALL _ADVPL_set_property(m_cod_cliente,"EDITABLE",l_status)
       CALL _ADVPL_set_property(m_lupa_cliente,"EDITABLE",l_status)
+      CALL _ADVPL_set_property(m_cod_item,"EDITABLE",l_status)
    END IF
    
-   CALL _ADVPL_set_property(m_cod_item,"EDITABLE",l_status)
-   CALL _ADVPL_set_property(m_lupa_item,"EDITABLE",l_status)
+   CALL _ADVPL_set_property(m_den_embal,"EDITABLE",l_status)
 
 END FUNCTION
 
@@ -308,6 +318,7 @@ FUNCTION pol1379_create()
     CALL pol1379_ativa_desativa(TRUE)
     
     LET m_ies_cons = FALSE
+    LET ma_compon[1].excluir = 'N'
     
     CALL _ADVPL_set_property(m_browse,"EDITABLE",TRUE)
     CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
@@ -319,24 +330,10 @@ END FUNCTION
 #-------------------------------#
 FUNCTION pol1379_create_confirm()
 #-------------------------------#
-   
-   DEFINE l_compon, l_ind  SMALLINT
-   
+      
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
-   LET m_count =_ADVPL_get_property(m_browse,"ITEM_COUNT")
-   LET l_compon = FALSE
    
-   FOR l_ind = 1 TO  m_count
-      IF ma_compon[l_ind].cod_compon IS NULL OR ma_compon[l_ind].cod_compon = ' '  THEN
-      ELSE
-         LET l_compon = TRUE
-         EXIT FOR
-      END IF
-   END FOR
-
-   IF NOT l_compon THEN
-      LET m_msg = 'Informe os componentes da embalagem.'
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
+   IF NOT pol1379_valid_itens() THEN
       RETURN FALSE
    END IF
    
@@ -360,6 +357,44 @@ FUNCTION pol1379_create_confirm()
 
 END FUNCTION
 
+#-----------------------------#
+FUNCTION pol1379_valid_itens()#
+#-----------------------------#
+   
+   DEFINE l_compon     SMALLINT,
+          l_ind        SMALLINT
+
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
+
+   IF  mr_campos.den_item_embal IS NULL THEN
+       LET m_msg = "Informe a descrição da embalagem padrão"
+       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+       CALL _ADVPL_set_property(m_den_embal,"GET_FOCUS")
+       RETURN FALSE
+   END IF
+
+   LET m_count =_ADVPL_get_property(m_browse,"ITEM_COUNT")
+   LET l_compon = FALSE
+
+   FOR l_ind = 1 TO  m_count
+      IF ma_compon[l_ind].cod_compon IS NULL OR ma_compon[l_ind].cod_compon = ' '  THEN
+      ELSE
+         LET l_compon = TRUE
+         EXIT FOR
+      END IF
+   END FOR
+
+   IF NOT l_compon THEN
+      LET m_msg = 'Informe os componentes da embalagem.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION
+   
 #-------------------------------#
 FUNCTION pol1379_ins_embalagem()#
 #-------------------------------#
@@ -379,8 +414,8 @@ FUNCTION pol1379_ins_embalagem()#
    LET m_id_embal = m_id_embal + 1
    
    INSERT INTO emabalagem_padrao_405(
-      id_embal, cod_cliente, cod_item_embal)
-   VALUES(m_id_embal, mr_campos.cod_cliente, mr_campos.cod_item)
+      id_embal, cod_cliente, cod_item_embal, den_item_embal)
+   VALUES(m_id_embal, mr_campos.cod_cliente, mr_campos.cod_item,  mr_campos.den_item_embal)
     
    IF STATUS <> 0 THEN
       CALL log003_err_sql('INSERT','emabalagem_padrao_405')
@@ -510,17 +545,6 @@ FUNCTION pol1379_le_clientes(l_cod)#
 END FUNCTION
 
 #---------------------------#
-FUNCTION pol1379_zoom_embal()#
-#---------------------------#
-   
-   IF pol1379_zoom_item() THEN
-      LET mr_campos.cod_item = m_codigo
-      LET mr_campos.den_item = m_den_item
-   END IF
-   
-END FUNCTION
-
-#---------------------------#
 FUNCTION pol1379_zoom_item()#
 #---------------------------#
 
@@ -560,13 +584,6 @@ FUNCTION pol1379_valida_item()#
        CALL _ADVPL_set_property(m_cod_item,"GET_FOCUS")
        RETURN FALSE
    END IF
-
-   IF NOT pol1379_le_item(mr_campos.cod_item) THEN
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-      RETURN FALSE
-   END IF
-   
-   LET mr_campos.den_item = m_den_item
    
    IF pol1379_cli_item_existe() THEN
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
@@ -655,6 +672,8 @@ END FUNCTION
 FUNCTION pol1379_after_compon()#
 #------------------------------#
       
+   DEFINE l_ind    SMALLINT
+   
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
       
    IF m_carregando  THEN
@@ -662,11 +681,26 @@ FUNCTION pol1379_after_compon()#
    END IF
    
    LET m_lin_atu = _ADVPL_get_property(m_browse,"ROW_SELECTED")
+   LET m_count = _ADVPL_get_property(m_browse,"ITEM_COUNT")
+   
+   FOR l_ind = 1 TO m_count
+      IF ma_compon[l_ind].cod_compon IS NULL OR ma_compon[l_ind].cod_compon = ' ' THEN
+         CALL _ADVPL_set_property(m_browse,"REMOVE_ROW",l_ind)
+      END IF
+   END FOR
+   
+   #CALL _ADVPL_get_property(m_browse,"REMOVE_EMPTY_ROWS")
    
    IF  ma_compon[m_lin_atu].cod_compon IS NULL OR ma_compon[m_lin_atu].cod_compon = '' THEN
        RETURN TRUE
    END IF
-
+   
+   IF ma_compon[m_lin_atu].cod_compon = mr_campos.cod_item THEN
+      LET m_msg = 'Item não pode estar na estrutura dele mesmo'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+      
    IF NOT pol1379_le_item(ma_compon[m_lin_atu].cod_compon) THEN     
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
@@ -683,7 +717,9 @@ FUNCTION pol1379_le_item(l_cod)#
 #------------------------------#
    
    DEFINE l_cod              LIKE item.cod_item,
-          l_ies_ctr_estoque  LIKE item.ies_ctr_estoque
+          l_ies_ctr_estoque  LIKE item.ies_ctr_estoque,
+          l_tipo             LIKE item.ies_tip_item,
+          l_pes_unit         LIKE item.pes_unit
    
    IF l_cod IS NULL THEN
       RETURN TRUE
@@ -692,9 +728,13 @@ FUNCTION pol1379_le_item(l_cod)#
    LET m_msg = ''
       
    SELECT den_item,
-          ies_ctr_estoque
+          ies_ctr_estoque,
+          ies_tip_item,
+          pes_unit
      INTO m_den_item,
-          l_ies_ctr_estoque
+          l_ies_ctr_estoque,
+          l_tipo,
+          l_pes_unit
      FROM item
     WHERE cod_empresa =  p_cod_empresa
       AND cod_item = l_cod
@@ -715,7 +755,47 @@ FUNCTION pol1379_le_item(l_cod)#
       LET m_msg = 'Item não controla estoque.'
       RETURN FALSE
    END IF
+
+   IF l_tipo <> 'C' THEN
+      LET m_msg = 'O item componente deve ser do tipo comprado (C)'
+      RETURN FALSE
+   END IF
+
+   IF l_pes_unit <= 0 THEN
+      LET m_msg = 'O peso unitário do item no MAN10021 não é válido.'
+      RETURN FALSE
+   END IF
+   
+   SELECT COUNT(*) INTO m_count FROM cliente_item
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_cliente_matriz = mr_campos.cod_cliente
+      AND cod_item = l_cod
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','cliente_item')
+      RETURN FALSE
+   END IF
+   
+   IF m_count = 0 THEN
+      LET m_msg = 'O item não está cadastrado como um item do cliente.'
+      RETURN FALSE
+   END IF
       
+   RETURN TRUE
+
+END FUNCTION
+
+#----------------------------#   
+FUNCTION pol1379_exc_compon()#
+#----------------------------#
+
+   DEFINE l_lin_atu       INTEGER,
+          l_ind           INTEGER
+      
+   LET l_lin_atu = _ADVPL_get_property(m_browse,"ROW_SELECTED")
+   
+   CALL _ADVPL_set_property(m_browse,"REMOVE_ROW",l_lin_atu)
+            
    RETURN TRUE
 
 END FUNCTION
@@ -820,9 +900,11 @@ FUNCTION pol1379_exibe_dados()#
    LET m_excluiu = FALSE
    
    SELECT cod_cliente,
-          cod_item_embal
+          cod_item_embal,
+          den_item_embal
      INTO mr_campos.cod_cliente,
-          mr_campos.cod_item
+          mr_campos.cod_item,
+          mr_campos.den_item_embal
      FROM emabalagem_padrao_405
     WHERE id_embal = m_id_embal
 
@@ -834,13 +916,7 @@ FUNCTION pol1379_exibe_dados()#
    IF NOT pol1379_le_clientes(mr_campos.cod_cliente) THEN
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
    END IF
-   
-   IF NOT pol1379_le_item(mr_campos.cod_item) THEN
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-   ELSE
-      LET mr_campos.den_item = m_den_item
-   END IF
-   
+      
    IF NOT pol1379_load_itens() THEN
       RETURN FALSE
    END IF
@@ -877,6 +953,7 @@ FUNCTION pol1379_load_itens()#
          LET ma_compon[l_ind].den_compon = m_den_item
       END IF
       
+      LET ma_compon[l_ind].excluir = 'N'
       LET l_ind = l_ind + 1
       
       IF l_ind > 100 THEN
@@ -1074,6 +1151,10 @@ FUNCTION pol1379_update()#
    
    LET m_opcao = 'M'    
    
+   CALL pol1379_ativa_desativa(TRUE)
+   CALL _ADVPL_set_property(m_browse,"EDITABLE",TRUE)
+   CALL _ADVPL_set_property(m_den_embal,"GET_FOCUS")
+
    RETURN TRUE
 
 END FUNCTION
@@ -1084,13 +1165,26 @@ FUNCTION pol1379_update_confirm()#
    
    DEFINE l_ret   SMALLINT
 
-   LET l_ret = pol1379_ins_compon() 
+   IF NOT pol1379_valid_itens() THEN
+      RETURN FALSE
+   END IF
+
+   UPDATE emabalagem_padrao_405
+      SET den_item_embal = mr_campos.den_item_embal
+    WHERE id_embal = m_id_embal
+   
+   IF STATUS = 0 THEN
+      LET l_ret = pol1379_ins_compon() 
+   ELSE
+      CALL log003_err_sql('UPDATE','emabalagem_padrao_405')
+      LET l_ret = FALSE
+   END IF
    
    IF l_ret THEN
       CALL log085_transacao("COMMIT")
       CALL pol1379_ativa_desativa(FALSE)
    ELSE
-      CALL log085_transacao("ROLLBACK")      
+      CALL log085_transacao("ROLLBACK")  
    END IF
    
    CLOSE cq_prende
@@ -1108,6 +1202,7 @@ FUNCTION pol1379_update_cancel()
     LET p_cod_cliente = p_cod_clientea
     CALL pol1379_exibe_dados()
     CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
+    CALL pol1379_ativa_desativa(FALSE)
 
     RETURN TRUE
 

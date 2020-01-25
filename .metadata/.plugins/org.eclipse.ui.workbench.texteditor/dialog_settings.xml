@@ -13,15 +13,16 @@
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
 			<item value="versao"/>
+			<item value="pol1349"/>
 			<item value="log003_me"/>
 			<item value="min_par"/>
 			<item value="update g"/>
 			<item value="ersao"/>
 			<item value="valida_re"/>
 			<item value="VERSAO"/>
-			<item value="grava_"/>
 		</list>
 		<list key="replacehistory">
+			<item value="pol1381"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

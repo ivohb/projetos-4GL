@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------#
 # SISTEMA.: LOGIX                                                   #
 # PROGRAMA: pol1380                                                 #
-# OBJETIVO: CADASTRO DE embal SUCATA POR item                    #
+# OBJETIVO: EMBALAGEM PADRÃO DO ITEM                                #
 # AUTOR...: IVO                                                     #
-# DATA....: 19/03/19                                                #
+# DATA....: 16/01/2020                                              #
 #-------------------------------------------------------------------#
 
 DATABASE logix
@@ -22,16 +22,17 @@ DEFINE m_cod_empresa_plano   LIKE empresa.cod_empresa
 
 DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
-       m_cod_item      VARCHAR(10),
-       m_den_item      VARCHAR(10),
-       m_zoom_item     VARCHAR(10),
-       m_lupa_item     VARCHAR(10),
-       m_cod_embal        VARCHAR(10),
-       m_den_item_embal        VARCHAR(10),
-       m_zoom_embal       VARCHAR(10),
-       m_lupa_embal       VARCHAR(10),
+       m_cod_item        VARCHAR(10),
+       m_den_item        VARCHAR(10),
+       m_zoom_item       VARCHAR(10),
+       m_lupa_item       VARCHAR(10),
+       m_cod_embal       VARCHAR(10),
+       m_den_item_embal  VARCHAR(10),
+       m_zoom_embal      VARCHAR(10),
+       m_lupa_embal      VARCHAR(10),
        m_construct       VARCHAR(10),
        m_qtd_item        VARCHAR(10),
+       m_cod_cliente     VARCHAR(10),
        m_nom_cliente     VARCHAR(10),
        m_zoom_cliente    VARCHAR(10),
        m_lupa_cliente    VARCHAR(10),
@@ -49,18 +50,13 @@ DEFINE m_ies_info        SMALLINT,
        m_id_registroa    INTEGER
        
 DEFINE mr_campos         RECORD
-       cod_cliente       LIKE cliente.cod_cliente,
-       nom_cliente       LIKE cliente.nom_cliente
+       cod_cliente       LIKE clientes.cod_cliente,
+       nom_cliente       LIKE clientes.nom_cliente,
        cod_item          LIKE item.cod_item,
        den_item          LIKE item.den_item,
        cod_item_embal    LIKE item.cod_item,
        den_item_embal    LIKE item.den_item,
        qtd_item_embal    DECIMAL(10,3)
-END RECORD
-
-DEFINE mr_email          RECORD
- emitente                CHAR(50),
- receptor                CHAR(150)
 END RECORD
 
 #-----------------#
@@ -95,14 +91,16 @@ FUNCTION pol1380_menu()#
            l_previous,
            l_next,
            l_last,
-           l_delete, l_email  VARCHAR(10)
-
+           l_delete  VARCHAR(10),
+           l_titulo  VARCHAR(80)
+    
+    LET l_titulo = 'EMBALAGEM PADRÃO DO ITEM - ', p_versao
     
     CALL pol1380_limpa_campos()
 
     LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
     CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)
-    CALL _ADVPL_set_property(m_dialog,"TITLE","embal SUCATA POR item")
+    CALL _ADVPL_set_property(m_dialog,"TITLE",l_titulo)
     CALL _ADVPL_set_property(m_dialog,"FORM_NAME",p_versao)
     CALL _ADVPL_set_property(m_dialog,"ENABLE_ESC_CLOSE",FALSE)
 
@@ -139,12 +137,6 @@ FUNCTION pol1380_menu()#
 
     LET l_delete = _ADVPL_create_component(NULL,"LDELETEBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_delete,"EVENT","pol1380_delete")
-
-    LET l_email = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)
-    CALL _ADVPL_set_property(l_email,"IMAGE","EMAIL_EX") 
-    CALL _ADVPL_set_property(l_email,"TYPE","NO_CONFIRM")    
-    CALL _ADVPL_set_property(l_email,"EVENT","pol1380_email")
-    CALL _ADVPL_set_property(l_email,"TOOLTIP","Cadastro de email")
 
     CALL _ADVPL_create_component(NULL,"LQUITBUTTON",l_menubar)
 
@@ -195,10 +187,10 @@ FUNCTION pol1380_cria_campos(l_container)#
     CALL _ADVPL_set_property(l_label,"TEXT","Código do cliente:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
-    LET m_cod_cliente = _ADVPL_create_component(NULL,"LNUMERICFIELD",l_layout)
-    CALL _ADVPL_set_property(m_cod_cliente,"LENGTH",4)
+    LET m_cod_cliente = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+    CALL _ADVPL_set_property(m_cod_cliente,"LENGTH",15)
     CALL _ADVPL_set_property(m_cod_cliente,"VARIABLE",mr_campos,"cod_cliente")
-    CALL _ADVPL_set_property(m_cod_cliente,"PICTURE","@E ####")
+    CALL _ADVPL_set_property(m_cod_cliente,"PICTURE","@E!")
     CALL _ADVPL_set_property(m_cod_cliente,"VALID","pol1380_valida_cliente")
 
     LET m_lupa_cliente = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_layout)
@@ -215,11 +207,11 @@ FUNCTION pol1380_cria_campos(l_container)#
     CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_ROW")
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
-    CALL _ADVPL_set_property(l_label,"TEXT","Código do item:"
+    CALL _ADVPL_set_property(l_label,"TEXT","Código do item:")
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_cod_item = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
-    CALL _ADVPL_set_property(m_cod_item,"LENGTH",6)
+    CALL _ADVPL_set_property(m_cod_item,"LENGTH",15)
     CALL _ADVPL_set_property(m_cod_item,"VARIABLE",mr_campos,"cod_item")
     CALL _ADVPL_set_property(m_cod_item,"PICTURE","@!")
     CALL _ADVPL_set_property(m_cod_item,"VALID","pol1380_valida_item")
@@ -265,9 +257,9 @@ FUNCTION pol1380_cria_campos(l_container)#
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_qtd_item = _ADVPL_create_component(NULL,"LNUMERICFIELD",l_layout)
-    CALL _ADVPL_set_property(m_cod_embal,"LENGTH",12)
-    CALL _ADVPL_set_property(m_cod_embal,"VARIABLE",mr_campos,"qtd_item_embal")
-    CALL _ADVPL_set_property(m_cod_embal,"PICTURE","@E #######.###")
+    CALL _ADVPL_set_property(m_qtd_item,"LENGTH",12)
+    CALL _ADVPL_set_property(m_qtd_item,"VARIABLE",mr_campos,"qtd_item_embal")
+    CALL _ADVPL_set_property(m_qtd_item,"PICTURE","@E #######.###")
 
 END FUNCTION
 
@@ -337,6 +329,22 @@ FUNCTION pol1380_valida_cliente()#
       RETURN FALSE
    END IF
    
+   LET mr_campos.nom_cliente = m_nom_cliente  
+   
+   SELECT COUNT(*) INTO m_count
+     FROM emabalagem_padrao_405
+    WHERE cod_cliente = mr_campos.cod_cliente
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','emabalagem_padrao_405')
+      RETURN FALSE
+   END IF
+   
+   IF m_count = 0 THEN
+      LET m_msg = 'Cliente não cadastrados no POL1379'
+      RETURN FALSE
+   END IF
+     
    RETURN TRUE
 
 END FUNCTION
@@ -345,15 +353,14 @@ END FUNCTION
 FUNCTION pol1380_le_cliente(l_cod)#
 #----------------------------------#
    
-   DEFINE l_cod LIKE cliente.cod_cliente
+   DEFINE l_cod LIKE clientes.cod_cliente
    
    LET m_msg = ''
       
    SELECT nom_cliente
      INTO m_nom_cliente
-     FROM cliente
-    WHERE cod_empresa =  p_cod_empresa
-      AND cod_cliente = l_cod
+     FROM clientes
+    WHERE cod_cliente = l_cod
    
    IF STATUS <> 0 THEN
       CALL log003_err_sql('SELECT','cliente')    
@@ -386,7 +393,7 @@ FUNCTION pol1380_zoom_item()#
     LET l_codigo = _ADVPL_get_property(m_zoom_item,"RETURN_BY_TABLE_COLUMN","item","cod_item")
     
     IF l_codigo IS NOT NULL THEN
-       IF pol1380_le_item(m_codigo) THEN
+       IF pol1380_le_item(l_codigo) THEN
           LET mr_campos.cod_item = l_codigo
           LET mr_campos.den_item = m_den_item
        END IF
@@ -396,21 +403,42 @@ FUNCTION pol1380_zoom_item()#
 
 END FUNCTION
 
-#---------------------------------#
+#-----------------------------#
 FUNCTION pol1380_valida_item()#
-#---------------------------------#
+#-----------------------------#
     
-    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
-    
-   IF mr_campos.cod_item IS NOT NULL THEN
-
-      IF NOT pol1380_le_item(mr_campos.cod_item) THEN
-         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-         RETURN FALSE
-      END IF
-
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
+ 
+    LET m_den_item = NULL
+       
+   IF mr_campos.cod_item IS NULL THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", 'Informe o item.')
+      CALL _ADVPL_set_property(m_cod_item,"GET_FOCUS")
+      RETURN FALSE
    END IF
    
+   IF NOT pol1380_le_item(mr_campos.cod_item) THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   LET mr_campos.den_item = m_den_item
+
+   SELECT 1
+     FROM item_embal_405
+    WHERE cod_cliente = mr_campos.cod_cliente
+      AND cod_item = mr_campos.cod_item
+
+   IF STATUS = 0 THEN
+      LET m_msg = 'Cliente/item já cadastrados no POL1380'
+      RETURN FALSE
+   ELSE
+      IF STATUS <> 100 THEN
+         CALL log003_err_sql('SELECT','item_embal_405')
+         RETURN FALSE
+      END IF
+   END IF
+         
    RETURN TRUE
 
 END FUNCTION
@@ -440,13 +468,6 @@ FUNCTION pol1380_le_item(l_cod)#
 
 END FUNCTION
 
-#---------------------------#
-FUNCTION pol1380_zoom_embal()#
-#---------------------------#
-
-
-END FUNCTION
-
 #-----------------------------#
 FUNCTION pol1380_valida_embal()#
 #-----------------------------#
@@ -458,6 +479,10 @@ FUNCTION pol1380_valida_embal()#
          CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
          RETURN FALSE
       END IF
+   ELSE
+      LET m_msg = 'Informe a embalagem padrão do item.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", m_msg)
+      RETURN FALSE
    END IF
    
    RETURN TRUE
@@ -471,30 +496,33 @@ FUNCTION pol1380_le_embal(l_cod)#
    DEFINE l_cod CHAR(15)
    
    LET m_msg = ''
-      
-   SELECT 1
+   LET mr_campos.den_item_embal = NULL
+   
+   SELECT den_item_embal
+     INTO m_den_item
      FROM emabalagem_padrao_405
     WHERE cod_cliente = mr_campos.cod_cliente
       AND cod_item_embal = l_cod
+
+   IF STATUS = 100 THEN
+      LET m_msg = 'Cliente/embalagem não cadastrados no POL1379'
+      RETURN FALSE
+   END IF
    
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('SELECT','emabalagem_padrao_405')
+      CALL log003_err_sql('SELECT','emabalagem_padrao_405:cliente/embalagem')
       RETURN FALSE
    END IF
-   
-   IF NOT pol1380_le_item(l_cod) THEN
-      RETURN FALSE
-   END IF
-   
+      
    LET mr_campos.den_item_embal = m_den_item
    
    RETURN TRUE
 
 END FUNCTION
 
-#------------------------------#
-FUNCTION pol1380_valid_insert()#
-#------------------------------#
+#---------------------------#
+FUNCTION pol1380_validitem()#
+#---------------------------#
 
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
    
@@ -505,8 +533,35 @@ FUNCTION pol1380_valid_insert()#
       RETURN FALSE
    END IF
 
+   IF pol1380_item_existe() THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1380_validembal() THEN
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1380_validembal()#
+#----------------------------#  
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
+   
    IF mr_campos.cod_item_embal IS NULL THEN
       LET m_msg = 'Informe o item embalagem'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_cod_embal,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   IF mr_campos.cod_item_embal = mr_campos.cod_item THEN
+      LET m_msg = 'Item e item embalagem não podem ser iguais'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       CALL _ADVPL_set_property(m_cod_embal,"GET_FOCUS")
       RETURN FALSE
@@ -516,12 +571,6 @@ FUNCTION pol1380_valid_insert()#
       LET m_msg = 'Informe quantidade do item por embalagem'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       CALL _ADVPL_set_property(m_qtd_item,"GET_FOCUS")
-      RETURN FALSE
-   END IF
-
-   IF pol1380_item_existe() THEN
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-      CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
       RETURN FALSE
    END IF
 
@@ -603,7 +652,7 @@ END FUNCTION
 FUNCTION pol1380_create_confirm()
 #-------------------------------#
    
-   IF NOT pol1380_valid_insert() THEN
+   IF NOT pol1380_validitem() THEN
       RETURN FALSE
    END IF
 
@@ -669,7 +718,7 @@ FUNCTION pol1380_find()#
        CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_TABLE","item_embal_405","embal")
        CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","item_embal_405","cod_cliente","item",1 {CHAR},15,0,"zoom_clientes")
        CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","item_embal_405","cod_item","item",1 {CHAR},15,0,"zoom_item")
-       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","item_embal_405","cod_item_embal","embal",1 {CHAR},15,0,"pol1380_zoom_embal")
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","item_embal_405","cod_item_embal","embal",1 {CHAR},15,0)
     END IF
 
     LET l_status = _ADVPL_get_property(m_construct,"INIT_CONSTRUCT")
@@ -684,7 +733,6 @@ FUNCTION pol1380_find()#
     
 END FUNCTION
 
-{
 #-----------------------------------------------#
 FUNCTION pol1380_create_cursor(l_where, l_order)#
 #-----------------------------------------------#
@@ -694,15 +742,14 @@ FUNCTION pol1380_create_cursor(l_where, l_order)#
     DEFINE l_sql_stmt CHAR(2000)
 
     IF l_order IS NULL THEN
-       LET l_order = " cod_item "
+       LET l_order = " cod_cliente, cod_item "
     END IF
     
     LET m_ies_cons = FALSE
 
-    LET l_sql_stmt = "SELECT cod_item, cod_item_embal, cod_cliente ",
+    LET l_sql_stmt = "SELECT id_registro ",
                       " FROM item_embal_405",
                      " WHERE ",l_where CLIPPED,
-                       " AND cod_empresa = '",p_cod_empresa,"' ",
                      " ORDER BY ",l_order
 
     PREPARE var_cons FROM l_sql_stmt
@@ -727,7 +774,7 @@ FUNCTION pol1380_create_cursor(l_where, l_order)#
        RETURN FALSE
     END IF
 
-    FETCH cq_cons INTO p_cod_item
+    FETCH cq_cons INTO m_id_registro
 
     IF STATUS <> 0 THEN
        IF sqlca.sqlcode <> NOTFOUND THEN
@@ -735,14 +782,13 @@ FUNCTION pol1380_create_cursor(l_where, l_order)#
        ELSE
           CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","Argumentos de pesquisa não encontrados.")
        END IF
-       CALL pol1380_limpa_campos()
        RETURN FALSE
     END IF
     
     CALL pol1380_exibe_dados() 
     
     LET m_ies_cons = TRUE
-    LET p_cod_itema = p_cod_item
+    LET m_id_registroa = m_id_registro
     
     RETURN TRUE
     
@@ -754,33 +800,38 @@ FUNCTION pol1380_exibe_dados()#
    
    LET m_excluiu = FALSE
    
-   SELECT cod_item,
+   SELECT cod_cliente,
+          cod_item,
           cod_item_embal,
-          cod_cliente
-     INTO mr_campos.cod_item,
+          qtd_item_embal         
+     INTO mr_campos.cod_cliente,
+          mr_campos.cod_item,
           mr_campos.cod_item_embal,
-          mr_campos.cod_cliente
+          mr_campos.qtd_item_embal
      FROM item_embal_405
-    WHERE cod_empresa = p_cod_empresa
-      AND cod_item = p_cod_item
+    WHERE id_registro = m_id_registro
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('SELECT','item_embal_405:ed')
       RETURN
    END IF
-   
-   IF NOT pol1380_le_item(mr_campos.cod_item) THEN
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-   END IF
-   
-   IF NOT pol1380_le_embal(mr_campos.cod_item_embal) THEN
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-   END IF
 
    IF NOT pol1380_le_cliente(mr_campos.cod_cliente) THEN
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
    END IF
-        
+   
+   LET mr_campos.nom_cliente = m_nom_cliente  
+   
+   IF NOT pol1380_le_item(mr_campos.cod_item) THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+   END IF   
+   
+   LET mr_campos.den_item = m_den_item
+   
+   IF NOT pol1380_le_embal(mr_campos.cod_item_embal) THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+   END IF
+           
 END FUNCTION
 
 #--------------------------#
@@ -809,21 +860,21 @@ FUNCTION pol1380_paginacao(l_opcao)#
    END IF
    
    LET l_achou = FALSE
-   LET p_cod_itema = p_cod_item
+   LET m_id_registroa = m_id_registro
 
    WHILE TRUE
    
       CASE l_opcao
          WHEN 'F' 
-            FETCH FIRST cq_cons INTO p_cod_item
+            FETCH FIRST cq_cons INTO m_id_registro
             LET l_opcao = 'N'
          WHEN 'L' 
-            FETCH LAST cq_cons INTO p_cod_item
+            FETCH LAST cq_cons INTO m_id_registro
             LET l_opcao = 'P'
          WHEN 'N' 
-            FETCH NEXT cq_cons INTO p_cod_item
+            FETCH NEXT cq_cons INTO m_id_registro
          WHEN 'P' 
-            FETCH PREVIOUS cq_cons INTO p_cod_item
+            FETCH PREVIOUS cq_cons INTO m_id_registro
       END CASE
        
       IF STATUS <> 0 THEN
@@ -833,13 +884,12 @@ FUNCTION pol1380_paginacao(l_opcao)#
             CALL _ADVPL_set_property(m_statusbar,
                "ERROR_TEXT","Não existem mais registros nesta direção.")
          END IF
-         LET p_cod_item = p_cod_itema
+         LET m_id_registro = m_id_registroa
          EXIT WHILE
       ELSE
          SELECT 1
            FROM item_embal_405
-          WHERE cod_empresa =  p_cod_empresa
-            AND cod_item = p_cod_item
+          WHERE id_registro = m_id_registro
          IF STATUS = 100 THEN
          ELSE
             IF STATUS = 0 THEN
@@ -916,8 +966,8 @@ END FUNCTION
    DECLARE cq_prende CURSOR FOR
     SELECT 1
       FROM item_embal_405
-     WHERE cod_empresa =  p_cod_empresa
-       AND cod_item = mr_campos.cod_item
+     WHERE id_registro = m_id_registro
+     
      FOR UPDATE 
     
     OPEN cq_prende
@@ -975,11 +1025,14 @@ FUNCTION pol1380_update_confirm()#
    
    DEFINE l_ret   SMALLINT
    
+   IF NOT pol1380_validembal() THEN
+      RETURN FALSE
+   END IF
+   
    UPDATE item_embal_405
       SET cod_item_embal = mr_campos.cod_item_embal,
-          cod_cliente = mr_campos.cod_cliente
-    WHERE cod_empresa = p_cod_empresa
-      AND cod_item = mr_campos.cod_item
+          qtd_item_embal = mr_campos.qtd_item_embal
+    WHERE id_registro = m_id_registro
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('UPDATE','item_embal_405')
@@ -1005,7 +1058,7 @@ END FUNCTION
 FUNCTION pol1380_update_cancel()
 #------------------------------#
     
-    LET p_cod_item = p_cod_itema
+    LET m_id_registro = m_id_registroa
     CALL pol1380_exibe_dados()
     CALL pol1380_ativa_desativa(FALSE)
 
@@ -1040,8 +1093,7 @@ FUNCTION pol1380_delete()#
    END IF
 
    DELETE FROM item_embal_405
-    WHERE cod_empresa = p_cod_empresa
-      AND cod_item = mr_campos.cod_item
+    WHERE id_registro = m_id_registro
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('DELETE','item_embal_405')
@@ -1064,9 +1116,10 @@ FUNCTION pol1380_delete()#
         
 END FUNCTION
 
-#-----------------------#
-FUNCTION pol1380_email()#
-#-----------------------#
+{
+#----------------------------#
+FUNCTION pol1380_zoom_embal()#
+#----------------------------#
 
     DEFINE l_menubar     VARCHAR(10),
            l_panel       VARCHAR(10),

@@ -329,6 +329,8 @@ FUNCTION pol1380_valida_cliente()#
       RETURN FALSE
    END IF
    
+   LET mr_campos.nom_cliente = m_nom_cliente  
+   
    SELECT COUNT(*) INTO m_count
      FROM emabalagem_padrao_405
     WHERE cod_cliente = mr_campos.cod_cliente
@@ -340,7 +342,7 @@ FUNCTION pol1380_valida_cliente()#
    
    IF m_count = 0 THEN
       LET m_msg = 'Cliente não cadastrados no POL1379'
-      RETURN TRUE
+      RETURN FALSE
    END IF
      
    RETURN TRUE
@@ -401,23 +403,42 @@ FUNCTION pol1380_zoom_item()#
 
 END FUNCTION
 
-#---------------------------------#
+#-----------------------------#
 FUNCTION pol1380_valida_item()#
-#---------------------------------#
+#-----------------------------#
     
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
  
     LET m_den_item = NULL
        
-   IF mr_campos.cod_item IS NOT NULL THEN
-      IF NOT pol1380_le_item(mr_campos.cod_item) THEN
-         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-         RETURN FALSE
-      END IF
+   IF mr_campos.cod_item IS NULL THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", 'Informe o item.')
+      CALL _ADVPL_set_property(m_cod_item,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+   
+   IF NOT pol1380_le_item(mr_campos.cod_item) THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
    END IF
    
    LET mr_campos.den_item = m_den_item
-   
+
+   SELECT 1
+     FROM item_embal_405
+    WHERE cod_cliente = mr_campos.cod_cliente
+      AND cod_item = mr_campos.cod_item
+
+   IF STATUS = 0 THEN
+      LET m_msg = 'Cliente/item já cadastrados no POL1380'
+      RETURN FALSE
+   ELSE
+      IF STATUS <> 100 THEN
+         CALL log003_err_sql('SELECT','item_embal_405')
+         RETURN FALSE
+      END IF
+   END IF
+         
    RETURN TRUE
 
 END FUNCTION
@@ -458,6 +479,10 @@ FUNCTION pol1380_valida_embal()#
          CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
          RETURN FALSE
       END IF
+   ELSE
+      LET m_msg = 'Informe a embalagem padrão do item.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", m_msg)
+      RETURN FALSE
    END IF
    
    RETURN TRUE
@@ -471,8 +496,10 @@ FUNCTION pol1380_le_embal(l_cod)#
    DEFINE l_cod CHAR(15)
    
    LET m_msg = ''
-      
-   SELECT 1
+   LET mr_campos.den_item_embal = NULL
+   
+   SELECT den_item_embal
+     INTO m_den_item
      FROM emabalagem_padrao_405
     WHERE cod_cliente = mr_campos.cod_cliente
       AND cod_item_embal = l_cod
@@ -486,11 +513,7 @@ FUNCTION pol1380_le_embal(l_cod)#
       CALL log003_err_sql('SELECT','emabalagem_padrao_405:cliente/embalagem')
       RETURN FALSE
    END IF
-   
-   IF NOT pol1380_le_item(l_cod) THEN
-      RETURN FALSE
-   END IF
-   
+      
    LET mr_campos.den_item_embal = m_den_item
    
    RETURN TRUE
@@ -550,13 +573,6 @@ FUNCTION pol1380_validembal()#
       CALL _ADVPL_set_property(m_qtd_item,"GET_FOCUS")
       RETURN FALSE
    END IF
-
-   IF pol1380_embal_existe() THEN
-      LET m_msg = 'Cliente/item/embal já cadastrados no pol1380'
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-      CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
-      RETURN FALSE
-   END IF
       
    RETURN TRUE
 
@@ -573,30 +589,6 @@ FUNCTION pol1380_item_existe()#
    
    IF STATUS = 0 THEN
       LET m_msg = 'Cliente/item já cadastrados no pol1380'
-      RETURN TRUE
-   END IF
-   
-   IF STATUS <> 100 THEN
-      LET m_msg = 'ERRO ',STATUS, 'LENDO TABELA item_embal_405' 
-      RETURN TRUE  
-   END IF
-   
-   RETURN FALSE
-
-END FUNCTION
-
-#------------------------------#
-FUNCTION pol1380_embal_existe()#
-#------------------------------#
-         
-   SELECT 1
-     FROM item_embal_405
-    WHERE cod_cliente = mr_campos.cod_cliente
-      AND cod_item = mr_campos.cod_item
-      AND cod_item_embal = mr_campos.cod_item_embal
-   
-   IF STATUS = 0 THEN
-      LET m_msg = 'Cliente/item/embal já cadastrados no pol1380'
       RETURN TRUE
    END IF
    
@@ -805,12 +797,10 @@ FUNCTION pol1380_exibe_dados()#
    
    LET mr_campos.den_item = m_den_item
    
-   IF NOT pol1380_le_item(mr_campos.cod_item_embal) THEN
+   IF NOT pol1380_le_embal(mr_campos.cod_item_embal) THEN
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
    END IF
-   
-   LET mr_campos.den_item_embal = m_den_item
-        
+           
 END FUNCTION
 
 #--------------------------#

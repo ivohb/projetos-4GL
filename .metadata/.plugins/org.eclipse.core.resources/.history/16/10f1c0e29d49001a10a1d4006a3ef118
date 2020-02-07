@@ -161,7 +161,7 @@ FUNCTION pol1381()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1381-12.00.00  "
+   LET p_versao = "pol1381-12.00.01  "
    CALL func002_versao_prg(p_versao)
 
    IF NOT pol1381_cria_tabs() THEN

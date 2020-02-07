@@ -132,7 +132,7 @@ END FUNCTION
 FUNCTION pol1378_menu()#
 #----------------------#
 
-   LET p_versao = "pol1378-12.00.01  "
+   LET p_versao = "pol1378-12.00.03  "
    CALL func002_versao_prg(p_versao)
 
    MENU "OPCAO"
@@ -432,27 +432,39 @@ END FUNCTION
 #----------------------------#
 FUNCTION pol1378_le_caminho()#
 #----------------------------#
+   
+   DEFINE l_achou      SMALLINT
+   
+   LET l_achou = FALSE
+   LET m_msg = NULL
+   
+   DECLARE cq_caminho CURSOR FOR
+    SELECT nom_caminho, ies_ambiente
+      FROM path_logix_v2
+     WHERE cod_empresa = p_cod_empresa 
+       AND cod_sistema = "TRG"
+   
+   FOREACH cq_caminho
+      INTO m_caminho, m_ies_ambiente
 
-   SELECT nom_caminho, ies_ambiente
-     INTO m_caminho, m_ies_ambiente
-   FROM path_logix_v2
-   WHERE cod_empresa = p_cod_empresa 
-     AND cod_sistema = "TRG"
+      IF STATUS <> 0 THEN
+         LET m_msg = 'Erro ', STATUS USING '<<<<<', ' lendo tab path_logix_v2'
+         CALL pol1378_ins_erro() RETURN p_status
+         RETURN FALSE
+      END IF      
+      
+      LET l_achou = TRUE
+      EXIT FOREACH
 
-   IF STATUS = 0 THEN
+   END FOREACH
+         
+   IF l_achou THEN
+      CALL LOG_consoleMessage("Caminho dos arquivos: "||m_caminho)
       RETURN TRUE
    END IF
    
-   IF STATUS = 100 THEN
-      LET m_msg = 'Caminho do sistema TRG não cadastrado'
-   ELSE
-      IF STATUS <> 0 THEN
-         LET m_msg = 'Erro ', STATUS USING '<<<<<', ' lendo tab path_logix_v2'
-      END IF
-   END IF
-   
-   CALL LOG_consoleMessage("Caminho dos arquivos: "||m_caminho)
-   
+   LET m_msg = 'Caminho do sistema TRG não cadastrado'
+      
    CALL pol1378_ins_erro() RETURN p_status
 
    RETURN FALSE
@@ -490,16 +502,11 @@ END FUNCTION
   LET l_dir = m_caminho CLIPPED
  
   IF LOG_dir_exist(l_dir,0) THEN
-  ELSE
-     
-     CALL LOG_consoleMessage("FALHA. Motivo: "||log0030_mensagem_get_texto())
-     LET l_msg = "FALHA. Motivo: ", log0030_mensagem_get_texto()
-     CALL log0030_mensagem(l_msg,'info')
-     
+  ELSE          
      IF LOG_dir_exist(l_dir,1) THEN
      ELSE
         CALL LOG_consoleMessage("FALHA. Motivo: "||log0030_mensagem_get_texto())
-        LET l_msg = "FALHA. Motivo: ", log0030_mensagem_get_texto()
+        LET l_msg = "Diretório : ",l_dir CLIPPED, ' não exite \n', log0030_mensagem_get_texto()
         CALL log0030_mensagem(l_msg,'info')
         RETURN FALSE
      END IF
@@ -548,9 +555,7 @@ FUNCTION pol1378_carrega_lista()#
    DEFINE l_ind     INTEGER,
           t_ind     CHAR(03),
           l_caminho CHAR(150)
-          
-   #LET m_caminho = m_caminho CLIPPED,'\\'
-     
+               
    LET m_posi_arq = LENGTH(m_caminho) + 1
    LET m_qtd_arq = LOG_file_getListCount(m_caminho,"*.unl",FALSE,FALSE,FALSE)
    

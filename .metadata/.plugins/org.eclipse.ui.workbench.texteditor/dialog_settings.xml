@@ -13,13 +13,13 @@
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
 			<item value="versao"/>
+			<item value="l_pre_min"/>
 			<item value="pol1349"/>
 			<item value="log003_me"/>
 			<item value="min_par"/>
 			<item value="update g"/>
 			<item value="ersao"/>
 			<item value="valida_re"/>
-			<item value="VERSAO"/>
 		</list>
 		<list key="replacehistory">
 			<item value="pol1381"/>

@@ -155,7 +155,7 @@ FUNCTION pol0922()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol0922-12.00.12  "
+   LET p_versao = "pol0922-12.00.13  "
 
    IF NOT log0150_verifica_se_tabela_existe("agrupa_pol0922") THEN
       IF NOT pol0922_cria_agrupa_pol0922() THEN
@@ -710,9 +710,9 @@ FUNCTION pol0922_proc_importacao()
          RETURN FALSE
       END IF
    
-      LET p_msg = 'Toda a Programação Atual\n',
-                  'Será Sobreposta.\n\n',
-	                'Confirma o porcessamento ?' 
+      LET p_msg = 'Toda as ordens com status 2/3\n',
+                  'Serão excluídas. Confirma o\n\n',
+	                'porcessamento ?' 
 	 
 	    IF log0040_confirm(20,25,p_msg) THEN
 	    ELSE
@@ -908,10 +908,10 @@ FUNCTION pol0922_del_ordens()#
         "  WHERE ordens.cod_empresa = '",p_cod_empresa,"'",
         "    AND ordens.ies_situa in ('2','3') ",
         "    AND item.cod_empresa = ordens.cod_empresa ",
-        "    AND item.cod_item = ordens.cod_item ",
-        "    AND ordens.num_ordem IN ",
-        " (SELECT ordem_orig_912.num_ordem FROM ordem_orig_912 ",
-        "   WHERE ordem_orig_912.cod_empresa = '",p_cod_empresa,"' ) "
+        "    AND item.cod_item = ordens.cod_item "
+        #"    AND ordens.num_ordem IN ",
+        #" (SELECT ordem_orig_912.num_ordem FROM ordem_orig_912 ",
+        #"   WHERE ordem_orig_912.cod_empresa = '",p_cod_empresa,"' ) "
 
    # Verifica se foi informada alguma família
    

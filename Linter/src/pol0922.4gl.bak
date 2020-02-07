@@ -155,7 +155,7 @@ FUNCTION pol0922()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol0922-12.00.11  "
+   LET p_versao = "pol0922-12.00.12  "
 
    IF NOT log0150_verifica_se_tabela_existe("agrupa_pol0922") THEN
       IF NOT pol0922_cria_agrupa_pol0922() THEN

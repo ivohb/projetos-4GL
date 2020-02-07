@@ -3412,6 +3412,30 @@ FUNCTION pol1328_insere_cap()#
    DEFINE l_nom_tabela   LIKE cap_par_compl.nom_tabela
    
    LET l_nom_tabela = mr_ad_mestre.num_ad
+
+   DELETE FROM cap_par_compl
+    WHERE nom_tabela = l_nom_tabela
+      AND empresa = mr_ad_mestre.cod_empresa
+      AND parametro = 'ies_sup_cap_aprov'     
+
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' deletando dados da tabela cap_par_compl:1'
+      RETURN FALSE
+   END IF
+
+   DELETE FROM cap_par_compl
+    WHERE nom_tabela = l_nom_tabela
+      AND empresa = mr_ad_mestre.cod_empresa
+      AND parametro = 'ies_especie_nf_ad'   
+
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' deletando dados da tabela cap_par_compl:2'
+      RETURN FALSE
+   END IF
    
    INSERT INTO cap_par_compl 
      (nom_tabela, 

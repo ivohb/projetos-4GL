@@ -5,10 +5,6 @@
 # DATA....: 22/08/2011                                              #
 # POR.....: IVO H BARBOSA                                           #
 #-------------------------------------------------------------------#
-# Ver parâmetros de exibição de tela e item sucata na LOG00087      #
-# Recriar tabela man_apo_logix_405                                  #
-# alter table man_apo_nest_405 id_registro serial                   #
-#-------------------------------------------------------------------#
 
 DATABASE logix
 

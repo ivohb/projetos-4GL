@@ -232,7 +232,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.93  "
+   LET p_versao = "pol1328-12.00.92  "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     

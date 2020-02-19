@@ -303,6 +303,12 @@ FUNCTION pol1186_proces_apto(l_u, l_e, l_p)#
           l_e       CHAR(02),
           l_p       CHAR(08)
 
+   WHENEVER ANY ERROR CONTINUE
+   SET ISOLATION TO DIRTY READ
+   SET LOCK MODE TO WAIT 300
+   LET p_versao = "pol1186-12.00.05  "
+   CALL func002_versao_prg(p_versao)
+   
    LET m_houve_erro = FALSE
    LET m_qtd_critica = 0
 
@@ -313,22 +319,6 @@ FUNCTION pol1186_proces_apto(l_u, l_e, l_p)#
       LET m_processo = 'Executando via ',l_p
    END IF
 
-   WHENEVER ANY ERROR CONTINUE
-   SET ISOLATION TO DIRTY READ
-   SET LOCK MODE TO WAIT 300
-   LET p_versao = "pol1186-12.00.05  "
-   CALL func002_versao_prg(p_versao)
-
-   CALL log006_exibe_teclas("01",p_versao)
-   INITIALIZE m_nom_tela TO NULL
-   CALL log130_procura_caminho("pol1186") RETURNING m_nom_tela
-   LET  m_nom_tela = m_nom_tela CLIPPED 
-   OPEN WINDOW w_pol1186 AT 10,20 WITH FORM m_nom_tela 
-      ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST, FORM LINE FIRST)
-
-   DISPLAY p_cod_empresa TO cod_empresa
-   #lds CALL LOG_refresh_display()
-   
    LET m_tipo_sgbd = LOG_getCurrentDBType()
    LET p_msg = m_processo
 
@@ -352,8 +342,6 @@ FUNCTION pol1186_proces_apto(l_u, l_e, l_p)#
       END IF
    END IF
    
-   CLOSE WINDOW w_pol1186
-   
    RETURN m_qtd_critica
    
 END FUNCTION   
@@ -361,6 +349,16 @@ END FUNCTION
 #-----------------------------#
 FUNCTION pol1186_inicia_proc()#
 #_----------------------------#
+
+   CALL log006_exibe_teclas("01",p_versao)
+   INITIALIZE m_nom_tela TO NULL
+   CALL log130_procura_caminho("pol1186") RETURNING m_nom_tela
+   LET  m_nom_tela = m_nom_tela CLIPPED 
+   OPEN WINDOW w_pol1186 AT 10,20 WITH FORM m_nom_tela 
+      ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST, FORM LINE FIRST)
+
+   DISPLAY p_cod_empresa TO cod_empresa
+   #lds CALL LOG_refresh_display()
    
    LET p_tem_critica = FALSE
    
@@ -520,15 +518,13 @@ FUNCTION pol1186_exec_proces()#
 #-----------------------------#
 
    CALL man8246_cria_temp_fifo()
-   
-   CALL log0030_mensagem(p_cod_empresa,'info')
-   
+
    DECLARE cq_programa CURSOR WITH HOLD FOR
     SELECT DISTINCT num_programa
       FROM man_apo_nest_405
      WHERE tip_registro IN ('P','C')
        AND cod_empresa = p_cod_empresa
-       AND num_programa = '148003' 
+       and num_programa = '148003' 
 
    FOREACH cq_programa INTO m_num_programa
 
@@ -537,9 +533,7 @@ FUNCTION pol1186_exec_proces()#
          LET p_msg = 'ERRO AO LER PROXIMO PROGRAMA DA TAB MAN_APO_NEST_405'
          RETURN FALSE
       END IF
-      
-      CALL log0030_mensagem(m_num_programa,'info')
-      
+   
       LET p_criticou = FALSE
       
       CALL log085_transacao("BEGIN")

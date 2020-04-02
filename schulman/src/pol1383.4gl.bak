@@ -26,7 +26,10 @@ DEFINE m_dialog          VARCHAR(10),
 
 DEFINE m_ies_info        SMALLINT,
        m_count           INTEGER,
-       m_msg             VARCHAR(150)
+       m_msg             VARCHAR(150),
+       m_cod_moeda       INTEGER,
+       m_cod_empresa     CHAR(02),
+       m_num_lista       INTEGER
 
 DEFINE mr_cabec          RECORD
        cod_empresa       CHAR(02),
@@ -56,7 +59,8 @@ DEFINE ma_files ARRAY[50] OF CHAR(100)
 
 DEFINE ma_itens ARRAY[5000] OF RECORD
        cod_empresa	          char(02),   
-       num_Lista	            integer,    
+       num_Lista	            integer,   
+       den_lista         VARCHAR(40), 
        dat_val_ini	          date,       
        dat_val_fim	          date,       
        bloqueia_pedido	      char(01),   
@@ -67,8 +71,9 @@ DEFINE ma_itens ARRAY[5000] OF RECORD
        area_e_linha	        char(08),     
        cod_item	            char(15),     
        preco_unit	          char(20),     
-       preco_ant             char(20),    
-       preco_minimo          char(20)            
+       preco_minimo          char(20),
+       mensagem             VARCHAR(40),
+       ies_lista            char(01)           
 END RECORD
 
 
@@ -85,7 +90,7 @@ FUNCTION pol1383()#
    WHENEVER ANY ERROR CONTINUE
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1383-12.00.02  "
+   LET p_versao = "pol1383-12.00.09  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1383_menu()
@@ -162,7 +167,7 @@ FUNCTION pol1383_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_arquivo,"ADD_ITEM","0","Select    ")
     CALL _ADVPL_set_property(m_arquivo,"VARIABLE",mr_cabec,"nom_arquivo")
 
-    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_info)
+    {LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_info)
     CALL _ADVPL_set_property(l_label,"POSITION",650,10) 
     CALL _ADVPL_set_property(l_label,"TEXT","Lista:")    
 
@@ -176,7 +181,7 @@ FUNCTION pol1383_cria_campos(l_container)#
     CALL _ADVPL_set_property(l_caixa,"POSITION",800,10)     
     CALL _ADVPL_set_property(l_caixa,"LENGTH",30) 
     CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE) 
-    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_cabec,"mensagem")
+    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_cabec,"mensagem")}
 
 END FUNCTION
 
@@ -210,6 +215,11 @@ FUNCTION pol1383_cria_grade(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","num_Lista")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_Lista")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Valid ini")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","dat_val_ini")
@@ -220,13 +230,13 @@ FUNCTION pol1383_cria_grade(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","dat_val_fim")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Bloq ped")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","B. ped")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",50)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","bloqueia_pedido")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Bloq fat")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","B. fat")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",50)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","bloqueia_faturamento")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
@@ -236,17 +246,17 @@ FUNCTION pol1383_cria_grade(l_container)#
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","U Med")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",50)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","unid_medida")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Cliente")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_cliente")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Area/linha")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",90)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","AEN")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",70)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","area_e_linha")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
@@ -255,9 +265,18 @@ FUNCTION pol1383_cria_grade(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_item")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Preço Uunit")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Pre Unit")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","preco_unit")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Pre mínimo")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","preco_minimo")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Mensagem")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","mensagem")
 
     CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_itens,1)
     CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
@@ -545,6 +564,9 @@ END FUNCTION
 FUNCTION pol1383_load_arq()#
 #--------------------------#
    
+   DEFINE l_lista, l_moeda INTEGER,
+          l_empresa        CHAR(02)
+   
    IF NOT pol1383_cria_temp() THEN
       RETURN FALSE
    END IF
@@ -554,7 +576,7 @@ FUNCTION pol1383_load_arq()#
    LOAD FROM m_arq_arigem INSERT INTO lista_temp_schulman
    
    IF STATUS <> 0 THEN 
-      LET m_msg = 'Erro: ', STATUS USING '<<<<<', ' na carga do ', m_nom_arquivo
+      CALL log003_err_sql('SELECT','lista_temp_schulman:LOAD')
       CALL LOG_transaction_rollback()
       RETURN FALSE
    END IF
@@ -576,6 +598,21 @@ FUNCTION pol1383_load_arq()#
       RETURN FALSE
    END IF
    
+   DECLARE cq_count CURSOR FOR
+   SELECT  empresa, num_lista, count(DISTINCT parametro_val) 
+     FROM vdp_pre_mst_compl where empresa = p_cod_empresa
+    GROUP BY  empresa, num_lista
+    HAVING  count(distinct parametro_val)  > 1
+   
+   OPEN cq_count
+   FETCH cq_count INTO l_empresa, l_lista, l_moeda
+
+   IF STATUS = 0 THEN
+      LET m_msg = 'Lista ', l_lista, ' contém mais de um tipo de moeda'
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN FALSE
+   END IF
+
    IF NOT pol1383_exibe_dados() THEN
       RETURN FALSE
    END IF
@@ -604,7 +641,6 @@ FUNCTION pol1383_cria_temp()#
       area_e_linha	        char(08),     
       cod_item	            char(15),     
       preco_unit	          char(20),     
-      preco_ant             char(20),     
       preco_minimo          char(20)
    )
    
@@ -629,59 +665,63 @@ END FUNCTION
 FUNCTION pol1383_exibe_dados()#
 #-----------------------------#
 
-   DEFINE l_ind      INTEGER,
-          l_progres  SMALLINT
-   
-   SELECT DISTINCT 
-          cod_empresa,
-          num_Lista, 
-          den_lista,
-          dat_val_ini,
-          dat_val_fim,
-          bloqueia_pedido,
-          bloqueia_faturamento
-     INTO mr_cabec.cod_empresa,
-          mr_cabec.num_Lista,
-          mr_cabec.den_lista,
-          mr_cabec.dat_val_ini,	   
-          mr_cabec.dat_val_fim,	   
-          mr_cabec.bloqueia_pedido, 
-          mr_cabec.bloqueia_fatur  
-     FROM lista_temp_schulman
-   
-   IF STATUS <> 0 THEN
-      LET m_msg = "FALHA. Motivo: ", log0030_mensagem_get_texto()
-      CALL log0030_mensagem(m_msg,'info')
-      RETURN FALSE
-   END IF
-   
-   LET m_ies_lista = FALSE
-   
-   SELECT 1 FROM desc_preco_mest
-    WHERE cod_empresa = mr_cabec.cod_empresa
-      AND num_list_preco = mr_cabec.num_Lista
-
-   IF STATUS = 0 THEN
-      LET mr_cabec.mensagem = 'Lista já existe no Logix.'
-      LET m_ies_lista = TRUE
-   ELSE
-      IF STATUS = 100 THEN
-         LET mr_cabec.mensagem = NULL
-      ELSE
-         CALL log003_err_sql('SELECT','desc_preco_mest')
-         RETURN FALSE
-      END IF
-   END IF
-   
    INITIALIZE ma_itens TO NULL
    CALL _ADVPL_set_property(m_browse,"CLEAR")
-   LET l_ind = 1
-      
+   LET m_ind = 1
+   LET m_ies_lista = FALSE
+         
    CALL LOG_progresspopup_set_total("PROCESS",m_count)
+   
+   DECLARE cq_lista CURSOR FOR
+   SELECT DISTINCT 
+          cod_empresa,
+          num_Lista 
+     FROM lista_temp_schulman
+    ORDER BY cod_empresa, num_Lista
+   
+   FOREACH cq_lista INTO 
+           mr_cabec.cod_empresa,
+           mr_cabec.num_Lista
+   
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','lista_temp_schulman:cq_lista')
+         RETURN FALSE
+      END IF
+      
+      SELECT 1 FROM desc_preco_mest
+       WHERE cod_empresa = mr_cabec.cod_empresa
+         AND num_list_preco = mr_cabec.num_Lista
+
+      IF STATUS = 0 THEN
+         LET mr_cabec.mensagem = 'Lista já existe no Logix.'
+         LET m_ies_lista = TRUE
+      ELSE
+         IF STATUS = 100 THEN
+            LET mr_cabec.mensagem = NULL
+         ELSE
+            CALL log003_err_sql('SELECT','desc_preco_mest')
+            RETURN FALSE
+         END  IF
+      END IF
+      
+      IF NOT pol1383_exibe_itens() THEN
+         RETURN FALSE
+      END IF
+      
+   END FOREACH
+
+   RETURN TRUE
+
+END FUNCTION      
+
+#_----------------------------#
+FUNCTION pol1383_exibe_itens()#
+#_----------------------------#
    
    DECLARE cq_exib CURSOR FOR
     SELECT cod_empresa,	        
-           num_Lista,	          
+           num_Lista,	   
+           den_lista,      
            dat_val_ini,	        
            dat_val_fim,	        
            bloqueia_pedido,	    
@@ -694,32 +734,43 @@ FUNCTION pol1383_exibe_dados()#
            preco_unit,
            preco_minimo
       FROM lista_temp_schulman
-   
+     WHERE cod_empresa = mr_cabec.cod_empresa
+       AND num_Lista = mr_cabec.num_lista
+       
    FOREACH cq_exib INTO 
-      ma_itens[l_ind].cod_empresa,	         
-      ma_itens[l_ind].num_Lista,	           
-      ma_itens[l_ind].dat_val_ini,	         
-      ma_itens[l_ind].dat_val_fim,	         
-      ma_itens[l_ind].bloqueia_pedido,	     
-      ma_itens[l_ind].bloqueia_faturamento, 
-      ma_itens[l_ind].cod_moeda,	           
-      ma_itens[l_ind].unid_medida,	         
-      ma_itens[l_ind].cod_cliente,	         
-      ma_itens[l_ind].area_e_linha,	       
-      ma_itens[l_ind].cod_item,	           
-      ma_itens[l_ind].preco_unit,
-      ma_itens[l_ind].preco_minimo
+      ma_itens[m_ind].cod_empresa,	         
+      ma_itens[m_ind].num_Lista,	           
+      ma_itens[m_ind].den_Lista,	           
+      ma_itens[m_ind].dat_val_ini,	         
+      ma_itens[m_ind].dat_val_fim,	         
+      ma_itens[m_ind].bloqueia_pedido,	     
+      ma_itens[m_ind].bloqueia_faturamento, 
+      ma_itens[m_ind].cod_moeda,	           
+      ma_itens[m_ind].unid_medida,	         
+      ma_itens[m_ind].cod_cliente,	         
+      ma_itens[m_ind].area_e_linha,	       
+      ma_itens[m_ind].cod_item,	           
+      ma_itens[m_ind].preco_unit,
+      ma_itens[m_ind].preco_minimo
       
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','lista_temp_schulman:cq_exib')
          RETURN FALSE
       END IF
                
-      LET l_progres = LOG_progresspopup_increment("PROCESS") 
+      LET m_progres = LOG_progresspopup_increment("PROCESS") 
       
-      LET l_ind = l_ind + 1
+      LET ma_itens[m_ind].mensagem = mr_cabec.mensagem
+      
+      IF m_ies_lista THEN
+         LET ma_itens[m_ind].ies_lista = 'S'
+      ELSE
+         LET ma_itens[m_ind].ies_lista = 'N'
+      END IF
+      
+      LET m_ind = m_ind + 1
 
-      IF l_ind > 5000 THEN
+      IF m_ind > 5000 THEN
          LET m_msg = 'Limite de linhas da grade ultrapasou'
          CALL log0030_mensagem(m_msg,'info')
          RETURN FALSE
@@ -727,7 +778,7 @@ FUNCTION pol1383_exibe_dados()#
       
    END FOREACH
    
-   LET m_qtd_item = l_ind - 1
+   LET m_qtd_item = m_ind - 1
    CALL _ADVPL_set_property(m_browse,"ITEM_COUNT",m_qtd_item)
    
    RETURN TRUE
@@ -747,8 +798,8 @@ FUNCTION pol1383_processar()#
    END IF
 
    IF m_ies_lista THEN
-      LET m_msg = 'A lista exibida na tela já existe no Logix.\n',
-                  'Excluí-la do Logix e gerar novamente ?'
+      LET m_msg = 'Uma ou mais listas já existem no Logix.\n',
+                  'Excluí-las do Logix e gerar novamente ?'
       IF NOT LOG_question(m_msg) THEN
          RETURN FALSE
       END IF
@@ -783,27 +834,18 @@ FUNCTION pol1383_gera_lista()#
    DEFINE l_ind      INTEGER,
           l_progres  SMALLINT
    
+   LET m_cod_empresa = '00'
+   LET m_num_lista = 0
    
    CALL LOG_progresspopup_set_total("PROCESS",m_qtd_item)
-   
-   IF m_ies_lista THEN
-      IF NOT pol1383_del_lista() THEN
-         RETURN FALSE
-      END IF
-      LET l_progres = LOG_progresspopup_increment("PROCESS") 
-   END IF
-   
+      
    FOR m_ind = 1 TO m_qtd_item
       LET l_progres = LOG_progresspopup_increment("PROCESS") 
       IF NOT pol1383_ins_item() THEN
          RETURN FALSE
       END IF
    END FOR
-   
-   IF NOT pol1383_ins_mest() THEN
-      RETURN FALSE
-   END IF
-
+      
    IF NOT pol1383_ins_arquivo() THEN
       RETURN FALSE
    END IF
@@ -846,6 +888,16 @@ FUNCTION pol1383_del_lista()#
       CALL log003_err_sql('DELETE','lista_schulman')
       RETURN FALSE
    END IF
+
+   DELETE FROM vdp_pre_mst_compl
+    WHERE empresa = mr_cabec.cod_empresa
+      AND num_lista = mr_cabec.num_Lista
+      AND campo = 'COD_MOEDA'
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE','vdp_pre_mst_compl')
+      RETURN FALSE
+   END IF
    
    RETURN TRUE
 
@@ -859,7 +911,29 @@ FUNCTION pol1383_ins_item()#
    DEFINE l_campo          VARCHAR(30),
           l_num_trans      INTEGER,
           l_pre_min        LIKE desc_preco_item.pre_unit
-                      
+   
+
+   LET mr_cabec.cod_empresa      = ma_itens[m_ind].cod_empresa           
+   LET mr_cabec.num_Lista        = ma_itens[m_ind].num_Lista             
+   LET mr_cabec.den_lista        = ma_itens[m_ind].den_Lista             
+   LET mr_cabec.dat_val_ini      = ma_itens[m_ind].dat_val_ini           
+   LET mr_cabec.dat_val_fim      = ma_itens[m_ind].dat_val_fim           
+   LET mr_cabec.bloqueia_pedido  = ma_itens[m_ind].bloqueia_pedido       
+   LET mr_cabec.bloqueia_fatur   = ma_itens[m_ind].bloqueia_faturamento  
+   LET m_cod_moeda = ma_itens[m_ind].cod_moeda                                                                   
+   
+   IF m_cod_empresa <> mr_cabec.cod_empresa OR
+       m_num_lista <> mr_cabec.num_Lista THEN
+      IF NOT pol1383_ins_mest() THEN
+         RETURN FALSE
+      END IF 
+      IF NOT pol1383_ins_moeda() THEN
+         RETURN FALSE
+      END IF
+      LET m_cod_empresa = mr_cabec.cod_empresa
+      LET m_num_lista = mr_cabec.num_Lista
+   END IF
+   
    LET lr_lista_item.cod_empresa       = mr_cabec.cod_empresa
    LET lr_lista_item.num_list_preco    = ma_itens[m_ind].num_Lista
    LET lr_lista_item.cod_uni_feder     = ma_itens[m_ind].unid_medida
@@ -981,8 +1055,8 @@ FUNCTION pol1383_ins_item()#
          lr_lista_item.cod_item,
          l_num_trans,
          l_campo,
-         l_pre_min, 
-         0)
+         0, 
+         l_pre_min)
          
    IF STATUS <> 0 THEN
       CALL log003_err_sql('INSERT','vdp_pre_item_compl')
@@ -998,6 +1072,12 @@ FUNCTION pol1383_ins_mest()#
 #--------------------------#
 
    DEFINE lr_lista_mest    RECORD LIKE desc_preco_mest.*
+
+   IF ma_itens[m_ind].ies_lista = 'S' THEN  
+      IF NOT pol1383_del_lista() THEN
+         RETURN FALSE
+      END IF
+   END IF
    
    LET lr_lista_mest.cod_empresa    = mr_cabec.cod_empresa
    LET lr_lista_mest.num_list_preco = mr_cabec.num_Lista
@@ -1014,6 +1094,32 @@ FUNCTION pol1383_ins_mest()#
       RETURN FALSE
    END IF
 
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1383_ins_moeda()#
+#---------------------------#
+
+   DELETE FROM vdp_pre_mst_compl
+    WHERE empresa = mr_cabec.cod_empresa
+      AND num_lista = mr_cabec.num_Lista
+      AND campo = 'COD_MOEDA'
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE','vdp_pre_mst_compl')
+      RETURN FALSE
+   END IF
+   
+   INSERT INTO vdp_pre_mst_compl(empresa, num_lista, campo, parametro_val)
+     VALUES(mr_cabec.cod_empresa, mr_cabec.num_Lista, 'COD_MOEDA', m_cod_moeda)
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','vdp_pre_mst_compl')
+      RETURN FALSE
+   END IF
+   
    RETURN TRUE
 
 END FUNCTION
@@ -1040,7 +1146,6 @@ FUNCTION pol1383_ins_arquivo()#
      area_e_linha,	        
      cod_item,	            
      preco_unit,	          
-     preco_ant,            
      preco_minimo,
      nom_arquivo) SELECT
      cod_empresa,	        
@@ -1056,7 +1161,6 @@ FUNCTION pol1383_ins_arquivo()#
      area_e_linha,	        
      cod_item,	            
      preco_unit,	          
-     preco_ant,            
      preco_minimo, 'XXY' FROM lista_temp_schulman     
 
    IF STATUS <> 0 THEN
@@ -1110,3 +1214,4 @@ FUNCTION pol1383_move_arquivo()#
    RETURN TRUE
 
 END FUNCTION   
+   

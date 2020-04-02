@@ -1,0 +1,27 @@
+DATABASE FORMONLY
+SCREEN
+{
+                OPERAÇÕES
+----------------------------------------
+ Código  Descrição
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+}
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_operac, NOENTRY;
+  b = FORMONLY.den_operac, NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_operac[10](cod_operac THRU den_operac);
+END 

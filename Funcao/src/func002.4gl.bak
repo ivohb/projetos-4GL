@@ -908,8 +908,7 @@ END FUNCTION
    END FOR
    
    FOR l_pos_fim = LENGTH(l_texto) TO 1 STEP -1
-      IF l_texto[l_pos_fim] IS NULL OR l_texto[l_pos_fim] = ' ' THEN
-      ELSE
+      IF l_texto[l_pos_fim] IS NOT NULL THEN
          EXIT FOR
       END IF
    END FOR

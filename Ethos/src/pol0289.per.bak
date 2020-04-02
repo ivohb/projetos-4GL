@@ -1,0 +1,58 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a0]                    RELATORIO PEDIDO DE VENDAS
+
+                       
+COD CLIENTE  :[a1             ]  [a2                            ]
+              [c1             ]  [c2                            ]
+              [d1             ]  [d2                            ]
+              [e1             ]  [e2                            ]
+
+DATA ENTREGA :[a3        ] ATE [a4        ]
+
+PRODUTO      :[a5             ]              IMPRIME TEXTOS : [s]
+
+TIPO DE ITEM :[a6            ]    ORDENAR RELATÓRIO POR: [a7              ]
+
+
+
+
+} 
+END
+TABLES
+pedidos
+END
+ATTRIBUTES
+a0 = pedidos.cod_empresa, NOENTRY;
+a1 = pedidos.cod_cliente, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Codigo do Cliente" 
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a2 = FORMONLY.nom_cliente TYPE CHAR, NOENTRY;
+c1 = FORMONLY.cod_cli1, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Codigo do Cliente"
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c2 = FORMONLY.nom_cli1 TYPE CHAR, NOENTRY;
+d1 = FORMONLY.cod_cli2, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Codigo do Cliente"
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+d2 = FORMONLY.nom_cli2 TYPE CHAR, NOENTRY;
+e1 = FORMONLY.cod_cli3, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Codigo do Cliente"
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+e2 = FORMONLY.nom_cli3 TYPE CHAR, NOENTRY;
+a3 = FORMONLY.dat_ini TYPE DATE, AUTONEXT,
+     COMMENTS = "Digite a Data de Entrega Inicial";
+a4 = FORMONLY.dat_fim TYPE DATE, AUTONEXT,
+     COMMENTS = "Digite a Data de Entrega Final";
+a5 = FORMONLY.cod_item TYPE CHAR, AUTONEXT,
+     COMMENTS = "Produto se nao informado listara todos"
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+s  = FORMONLY.ies_txt TYPE CHAR, AUTONEXT, UPSHIFT,
+     COMMENTS = "IMPRIME TEXTOS DE REVISAO E ACABAMENTO? (S) OU (N)";
+a6 = FORMONLY.tipo_item TYPE CHAR, INCLUDE=('K','N','T')
+--#, widget='RADIO', config='K Kanban-Volvo N S/Kanban-Volvo T Todos'; 
+a7 = FORMONLY.ordenar_por TYPE CHAR, INCLUDE=('P','I','D')
+--#, widget='RADIO', config='P Pedido I Item D Data-entrega'; 
+END

@@ -83,6 +83,7 @@ DEFINE    m_cod_item             LIKE item.cod_item,
           m_num_conta_banco      LIKE fornecedor.num_conta_banco,
           m_cod_nivel_autor      LIKE aprov_grade.cod_nivel_autor,
           m_cod_uni_funcio       LIKE usu_nivel_aut_cap.cod_uni_funcio,
+          m_uni_funcio           LIKE usu_nivel_aut_cap.cod_uni_funcio,
           m_cod_user             LIKE usuarios.cod_usuario,
           m_nom_user             LIKE usuarios.nom_funcionario,
           m_email_user           LIKE usuarios.e_mail,
@@ -232,7 +233,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.92  "
+   LET p_versao = "pol1328-12.00.99  "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -355,6 +356,35 @@ FUNCTION pol1328_cria_controle()#
    RETURN TRUE      
    
 END FUNCTION
+
+#----------------------------#
+FUNCTION pol1328_cria_ad_ap()#
+#----------------------------#
+
+   CREATE TABLE gi_ad_ap_912 (
+      cod_empresa       CHAR(02),
+      id_ad             INTEGER,
+      cod_obrigacao     INTEGER,
+      cod_fatura        INTEGER,
+      num_ad            INTEGER,
+      num_ap            INTEGER,
+      dat_gravacao      CHAR(19)
+   );
+
+   IF STATUS <> 0 THEN
+      RETURN FALSE
+   END IF
+
+   CREATE INDEX ix_gi_ad_ap_912
+    ON gi_ad_ap_912(cod_empresa, id_ad, cod_obrigacao);
+
+   IF STATUS <> 0 THEN
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE      
+   
+END FUNCTION
    
 #--------------------------------#
 FUNCTION pol1356_cria_banco_912()#
@@ -411,6 +441,12 @@ FUNCTION pol1328_processa()#
 
    IF NOT log0150_verifica_se_tabela_existe("control_proces_912") THEN 
       IF NOT pol1328_cria_controle() THEN
+         RETURN FALSE
+      END IF
+   END IF
+
+   IF NOT log0150_verifica_se_tabela_existe("gi_ad_ap_912") THEN 
+      IF NOT pol1328_cria_ad_ap() THEN
          RETURN FALSE
       END IF
    END IF
@@ -556,7 +592,9 @@ END FUNCTION
           l_mes          INTEGER,
           l_ano          INTEGER,
           l_qtd_ap       INTEGER
-         				
+   
+   LET l_dat_proces = EXTEND(CURRENT, YEAR TO DAY
+            				
    DECLARE cq_nota CURSOR WITH HOLD FOR
     SELECT * FROM gi_ad_912
      WHERE cod_situacao = 'N' OR cod_situacao = 'C'
@@ -658,6 +696,24 @@ END FUNCTION
          END IF
          
       END IF
+
+      SELECT cod_uni_funcio
+        INTO m_uni_funcio
+        FROM gi_desp_uni_funcio_912
+       WHERE cod_tip_despesa = mr_nota.cod_tip_despesa
+
+      IF STATUS <> 0 AND STATUS <> 100 THEN
+         LET m_erro = STATUS USING '<<<<<'
+         LET m_msg = 'Erro de status: ',m_erro
+         LET m_msg = m_msg CLIPPED, ' lendo a tabela gi_desp_uni_funcio_912. '
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
+      ELSE
+         IF STATUS = 100 THEN
+            LET m_uni_funcio = NULL
+         END IF
+      END IF   
             
       IF m_num_seq > 0 THEN
          UPDATE gi_ad_912 SET cod_situacao = 'C'
@@ -767,7 +823,7 @@ END FUNCTION
          LET m_msg = 'Erro de status: ',m_erro
          LET m_msg = m_msg CLIPPED, ' lendo tabela gi_ad_erro_912.'
          LET m_num_seq = 0
-         EXIT FOREACH
+         RETURN FALSE
       END IF
 
       IF l_count > 0 OR m_num_seq > 0 THEN
@@ -784,6 +840,10 @@ END FUNCTION
       END IF
       
       COMMIT WORK
+      
+      IF m_uni_funcio IS NOT NULL THEN
+         LET m_cod_uni_funcio = m_uni_funcio
+      END IF
       
       CALL log085_transacao("BEGIN")
                  
@@ -806,21 +866,63 @@ END FUNCTION
       IF mr_nota.ies_gera_nota = 'A' THEN
          LET m_num_ad = 0
       ELSE
-         LET m_sem_ap = FALSE
          IF NOT pol1328_gera_titulo() THEN
             CALL log085_transacao("ROLLBACK")
-            IF m_sem_ap THEN
-               IF NOT pol1328_grava_erro() THEN
-                  RETURN FALSE
-               END IF
-               UPDATE gi_ad_912 SET cod_situacao = 'C'
-                WHERE id_ad = mr_nota.id_ad
-               CONTINUE FOREACH
-            END IF               
             RETURN FALSE
          END IF
-      END IF
+         
+         LET m_sem_ap = TRUE
+
+         DECLARE cq_ad_ap_912 CURSOR FOR
+         SELECT num_ap
+           FROM ad_ap
+          WHERE cod_empresa = mr_ad_mestre.cod_empresa
+            AND num_ad = mr_ad_mestre.num_ad
+         FOREACH cq_ad_ap_912 INTO m_num_ap
+
+            IF STATUS <> 0 THEN 
+               LET m_erro = STATUS USING '<<<<<'
+               LET m_msg = 'Erro de status: ',m_erro
+               LET m_msg = m_msg CLIPPED, ' lendo tabela ad_ap.cq_ad_ap_912'
+               LET m_num_seq = 0
+               CALL log085_transacao("ROLLBACK")
+               RETURN FALSE
+            END IF
+            
+            LET m_sem_ap = FALSE            
+            
+            INSERT INTO gi_ad_ap_912
+             VALUES(mr_ad_mestre.cod_empresa, 
+                    mr_nota.id_ad,
+                    mr_nota.cod_obrigacao,
+                    mr_nota.cod_fatura,
+                    mr_ad_mestre.num_ad,
+                    m_num_ap,
+                    l_dat_proces)
+
+            IF STATUS <> 0 THEN 
+               LET m_erro = STATUS USING '<<<<<'
+               LET m_msg = 'Erro de status: ',m_erro
+               LET m_msg = m_msg CLIPPED, ' inserindo dados na tab gi_ad_ap_912'
+               LET m_num_seq = 0
+               RETURN FALSE
+            END IF
+
+         END FOREACH
+         
+         IF m_sem_ap THEN
+            CALL log085_transacao("ROLLBACK")
+            LET m_msg = 'Não foi possivel gerar AP para AD ', mr_ad_mestre.num_ad             
+            IF NOT pol1328_grava_erro() THEN
+               RETURN FALSE
+            END IF
+            UPDATE gi_ad_912 SET cod_situacao = 'C'
+             WHERE id_ad = mr_nota.id_ad
+            CONTINUE FOREACH
+         END IF
       
+      END IF   
+           
       IF NOT pol1328_atu_gi_ad() THEN
          CALL log085_transacao("ROLLBACK")
          RETURN FALSE
@@ -984,7 +1086,6 @@ FUNCTION pol1328_consiste_ad()#
    ELSE
       LET m_cnd_pgto = NULL
    END IF
-   
    
    IF mr_nota.num_nf = 0 THEN
       LET m_msg = 'O número da nota do campo gi_ad_912.num_nf está com zero.'
@@ -1165,11 +1266,48 @@ FUNCTION pol1328_valida_obrigacao()#
          RETURN FALSE
       END IF
    END IF
+
+   IF mr_nota.ies_gera_nota = 'S' THEN
+      IF mr_nota.num_nf_dig IS NULL THEN                
+         LET m_msg = 'Campo obrigatório NUM_NF_DIG não foi preenchido.'
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
+      END IF
+
+      IF mr_nota.cod_operacao IS NULL THEN                
+         LET m_msg = 'Campo obrigatório COD_OPERACAO não foi preenchido.'
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
+      END IF
+
+      IF mr_nota.ser_nf IS NULL THEN                
+         LET m_msg = 'Campo obrigatório SER_NF não foi preenchido.'
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
+      END IF
+
+      IF mr_nota.ssr_nf IS NULL THEN                
+         LET m_msg = 'Campo obrigatório SSR_NF não foi preenchido.'
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
+      END IF
+
+      IF mr_nota.dt_emissao IS NULL THEN                
+         LET m_msg = 'Campo obrigatório DT_EMISSAO não foi preenchido.'
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
+      END IF
+
+   END IF
    
    LET m_cfop = mr_nota.cod_operacao
    
-   CALL pol1328_acerta_cfop()
-   
+   CALL pol1328_acerta_cfop()   
    
    RETURN TRUE
 
@@ -3092,18 +3230,6 @@ FUNCTION pol1328_gera_titulo()#
    IF NOT pol1328_insere_aps() THEN
       RETURN FALSE
    END IF
-
-   SELECT COUNT(num_ap)
-     INTO l_count
-     FROM ad_ap
-    WHERE cod_empresa = mr_ad_mestre.cod_empresa
-      AND num_ad = mr_ad_mestre.num_ad
-      
-   IF l_count = 0 THEN
-      LET m_sem_ap = TRUE
-      LET m_msg = 'Não foi possivel gerar AP para AD ', mr_ad_mestre.num_ad             
-      RETURN FALSE
-   END IF
       
    RETURN TRUE
 
@@ -3189,6 +3315,10 @@ FUNCTION pol1328_le_par_ad()#
       LET m_msg = 'Erro de status: ',m_erro
       LET m_msg = m_msg CLIPPED, ' atualizando dados na tabela par_ad.'
       RETURN FALSE
+   END IF
+   
+   IF m_uni_funcio IS NOT NULL THEN
+      RETURN TRUE
    END IF
    
    LET m_cod_uni_funcio = NULL
@@ -3662,7 +3792,7 @@ FUNCTION pol1328_ins_ctbl_cap(l_seq)#
     LET lr_cap.empresa_origem = mr_ad_mestre.cod_empresa_orig
     LET lr_cap.num_ad_ap = mr_ad_mestre.num_ad    
     LET lr_cap.eh_ad_ap = '1'
-    LET lr_cap.seql_lanc_cap = m_seql_lanc_cap
+    LET lr_cap.seql_lanc_cap = m_seql_lanc_cap * 1000
     LET lr_cap.tip_despesa_val = mr_nota.cod_tip_despesa
     LET lr_cap.eh_despesa_val  = 'D'
     LET lr_cap.eh_manual_autom = 'A'
@@ -4013,6 +4143,7 @@ FUNCTION pol1328_le_par_ap()#
       SELECT num_ap FROM ap  
        WHERE cod_empresa = p_cod_empresa 
          AND num_ap = m_num_ap
+         AND ies_versao_atual = 'S'
 
       IF STATUS = 100 THEN
          
@@ -4644,7 +4775,7 @@ FUNCTION pol1328_gera_grade()#
          LET m_erro = STATUS USING '<<<<<'
          LET m_msg = 'Erro de status: ',m_erro
          LET m_msg = m_msg CLIPPED, ' lendo registros da tabela grade_aprov_cap.'
-         EXIT FOREACH
+         RETURN FALSE
       END IF
       
       DECLARE cq_aprov_grade CURSOR FOR
@@ -4660,7 +4791,7 @@ FUNCTION pol1328_gera_grade()#
             LET m_erro = STATUS USING '<<<<<'
             LET m_msg = 'Erro de status: ',m_erro
             LET m_msg = m_msg CLIPPED, ' lendo registros da tabela aprov_grade.'
-            EXIT FOREACH
+            RETURN FALSE
          END IF
          
          DECLARE ci_busca_usuario CURSOR FOR
@@ -4678,7 +4809,7 @@ FUNCTION pol1328_gera_grade()#
                LET m_erro = STATUS USING '<<<<<'
                LET m_msg = 'Erro de status: ',m_erro
                LET m_msg = m_msg CLIPPED, ' lendo registros da tabela usu_nivel_aut_cap.'
-               EXIT FOREACH
+               RETURN FALSE
             END IF
 
             SELECT nom_funcionario, 
@@ -4692,7 +4823,7 @@ FUNCTION pol1328_gera_grade()#
                LET m_erro = STATUS USING '<<<<<'
                LET m_msg = 'Erro de status: ',m_erro
                LET m_msg = m_msg CLIPPED, ' lendo registros da tabela usuarios.'
-               EXIT FOREACH
+               RETURN FALSE
             END IF
             
             INSERT INTO w_usuario_912
@@ -4702,14 +4833,10 @@ FUNCTION pol1328_gera_grade()#
                LET m_erro = STATUS USING '<<<<<'
                LET m_msg = 'Erro de status: ',m_erro
                LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela w_usuario_912.'
-               EXIT FOREACH
+               RETURN FALSE
             END IF
          
          END FOREACH
-
-         IF m_erro IS NOT NULL THEN
-            RETURN FALSE
-         END IF
          
          DELETE FROM aprov_necessaria  
           WHERE cod_empresa = mr_grade_aprov_cap.cod_empresa
@@ -4720,7 +4847,7 @@ FUNCTION pol1328_gera_grade()#
             LET m_erro = STATUS USING '<<<<<'
             LET m_msg = 'Erro de status: ',m_erro
             LET m_msg = m_msg CLIPPED, ' deletando registro da tabela aprov_necessaria.'
-            EXIT FOREACH
+            RETURN FALSE
          END IF
          
          INSERT INTO aprov_necessaria (
@@ -4743,23 +4870,15 @@ FUNCTION pol1328_gera_grade()#
             LET m_erro = STATUS USING '<<<<<'
             LET m_msg = 'Erro de status: ',m_erro
             LET m_msg = m_msg CLIPPED, ' inserindo registro da tabela aprov_necessaria.'
-            EXIT FOREACH
+            RETURN FALSE
          END IF
          
          LET m_ies_aprov = TRUE
          
       END FOREACH
-      
-      IF m_erro IS NOT NULL THEN
-         RETURN FALSE
-      END IF
-   
+         
    END FOREACH
-   
-   IF m_erro IS NOT NULL THEN
-      RETURN FALSE
-   END IF
-   
+      
    RETURN TRUE
 
 END FUNCTION

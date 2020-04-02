@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Renomear recurso &quot;Ethos/resources&quot; a &quot;Ant&quot;" description="Renomear recurso &quot;resources&quot;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="resources" name="Ant" stamp="1582717880177" updateReferences="true"/>
+</session>

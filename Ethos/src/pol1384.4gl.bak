@@ -521,8 +521,7 @@ END FUNCTION
 FUNCTION pol1384_load_itens()#
 #----------------------------#
    
-   DEFINE l_ind    INTEGER,
-          l_op     INTEGER
+   DEFINE l_ind    INTEGER
    
    INITIALIZE ma_itens TO NULL
    CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_itens,1)
@@ -590,12 +589,11 @@ FUNCTION pol1384_load_itens()#
          AND num_pedido = m_num_pedido
          AND num_sequencia = ma_itens[l_ind].num_seq
       
-      FOREACH cq_ordem INTO l_op
+      FOREACH cq_ordem INTO ma_itens[l_ind].num_ordem
          IF STATUS <> 0 THEN
             CALL log003_err_sql('SELECT','ord_ped_item_547:cq_le_it')
             RETURN FALSE
          END IF
-         LET ma_itens[l_ind].num_ordem = l_op
          EXIT FOREACH
       END FOREACH
             

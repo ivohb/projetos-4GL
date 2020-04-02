@@ -50,7 +50,6 @@ DEFINE m_caminho         CHAR(80),
        m_qtd_nova        DECIMAL(10,3),
        m_qtd_atend       DECIMAL(10,3),
        m_qtd_saldo       DECIMAL(10,3),
-       m_qtd_romaneio    DECIMAL(10,3),
        m_num_pedido      INTEGER,
        m_id_pe1          INTEGER,
        m_linha           CHAR(300),
@@ -80,12 +79,7 @@ DEFINE m_caminho         CHAR(80),
        m_cod_sistem      CHAR(05),
        m_it_cliente      CHAR(30),
        m_cod_it_cli      CHAR(30),
-       m_id_imp          INTEGER,
-       m_ies_situa       CHAR(01),
-       m_ies_carga       SMALLINT,
-       m_tip_prog        CHAR(20),
-       m_ies_processado  SMALLINT,
-       m_ies_status      CHAR(01)
+       m_id_imp          INTEGER
 
 DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
@@ -97,9 +91,7 @@ DEFINE m_dialog          VARCHAR(10),
        m_form_print      VARCHAR(10),
        m_cli_imp         VARCHAR(10),
        m_arq_imp         VARCHAR(10),
-       m_ped_imp         VARCHAR(10),
-       m_dat_de          VARCHAR(10),
-       m_dat_ate         VARCHAR(10)
+       m_ped_imp         VARCHAR(10)
        
 DEFINE m_ies_info        SMALLINT,
        m_count           INTEGER,
@@ -281,43 +273,33 @@ DEFINE m_den_arquivo      VARCHAR(10),
        m_zoom_cliente     VARCHAR(10),
        m_processado       VARCHAR(10),
        m_programacao      VARCHAR(10),
-       m_tip_edi          VARCHAR(10),
-       m_tip_proces       VARCHAR(10)
+       m_tip_edi          VARCHAR(10)
 
 DEFINE m_num_lista        LIKE pedidos.num_list_preco,
        m_pre_unit         LIKE ped_itens.pre_unit
 
-DEFINE mr_audit  RECORD
-   id_registro   SERIAL,    
-   cod_empresa   CHAR(02),
-   num_pedido    INTEGER,
-   cod_item      CHAR(15),
-   prz_entrega   DATE,
-   qtd_solic     DECIMAL(10,3),
-   mensagem      CHAR(50),
-   usuario       CHAR(08),
-   dat_operacao  DATE,
-   cod_cliente   CHAR(15),
-   qtd_operacao  DECIMAL(10,3),
-   item_cliente  CHAR(30),
-   qtd_antes     DECIMAL(10,3),
-   id_arquivo    INTEGER,
-   id_pe1        INTEGER,
-   situacao      CHAR(01),
-   programacao   CHAR(11),
-   qtd_atual     DECIMAL(10,3),
-   operacao      char(20)
+DEFINE mr_audit           RECORD
+       cod_empresa        CHAR(02),   
+       num_pedido         INTEGER,    
+       cod_item           CHAR(15),   
+       prz_entrega        DATE,   
+       mensagem           CHAR(50),
+       usuario            CHAR(08),
+       dat_operacao       DATE,
+       cod_cliente        CHAR(15),
+       qtd_operacao       DECIMAL(10,3),
+       item_cliente       CHAR(08),
+       qtd_antes          DECIMAL(10,3),
+       id_arquivo         INTEGER
 END RECORD
 
 DEFINE mr_print           RECORD
        cod_cliente        CHAR(15),
-       nom_cliente        CHAR(50),
+       nom_arquivo        CHAR(50),
        num_pedido         DECIMAL(6,0),
-       dat_de             DATE,
-       dat_ate            DATE,
-       tip_proces         CHAR(01)
+       dat_operacao       DATE
 END RECORD
-       
+
 DEFINE mr_relat          RECORD
       cod_cliente        CHAR(15),
       nom_cliente        CHAR(36),
@@ -326,16 +308,11 @@ DEFINE mr_relat          RECORD
       den_item_reduz     CHAR(18),
       prz_entrega        DATE,
       dat_operacao       DATE,
-      qtd_operacao       DECIMAL(7,0),
-      mensagem           CHAR(11),
+      qtd_operacao       DECIMAL(10,3),
+      mensagem           CHAR(30),
       usuario            CHAR(08),
       item_cliente       CHAR(30),
-      qtd_antes          DECIMAL(7,0),
-      qtd_atual          DECIMAL(7,0),
-      operacao           CHAR(20),
-      programacao        CHAR(11),
-      variacao           DECIMAL(7,0),
-      sinal              CHAR(01)
+      qtd_antes          DECIMAL(10,3)
 END RECORD
 
 #-----------------#
@@ -352,14 +329,13 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.27  "
+   LET p_versao = "POL1370-12.00.26  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
-
    CALL pol1370_menu()
     
 END FUNCTION
-   
+
 #----------------------#
 FUNCTION pol1370_menu()#
 #----------------------#
@@ -436,7 +412,6 @@ FUNCTION pol1370_menu()#
     LET l_proc_all = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_proc_all,"IMAGE","PROC_ALL")     
     CALL _ADVPL_set_property(l_proc_all,"TYPE","CONFIRM")     
-    CALL _ADVPL_set_property(l_proc_all,"ENABLE",FALSE) 
     CALL _ADVPL_set_property(l_proc_all,"TOOLTIP","Processa todos os itens")
     CALL _ADVPL_set_property(l_proc_all,"EVENT","pol1370_proc_all")
     CALL _ADVPL_set_property(l_proc_all,"CONFIRM_EVENT","pol1370_proc_all_conf")
@@ -520,17 +495,19 @@ FUNCTION pol1370_parametros(l_container)#
 
     LET m_dat_carga = _ADVPL_create_component(NULL,"LDATEFIELD",m_panel_cabec)     
     CALL _ADVPL_set_property(m_dat_carga,"POSITION",780,10)     
-    CALL _ADVPL_set_property(m_dat_carga,"ENABLE",FALSE)     
     CALL _ADVPL_set_property(m_dat_carga,"VARIABLE",mr_arquivo,"dat_carga")
-    CALL _ADVPL_set_property(m_dat_carga,"FONT",NULL,NULL,TRUE,FALSE)
+    #CALL _ADVPL_set_property(m_dat_carga,"LENGTH",10) 
+    CALL _ADVPL_set_property(m_dat_carga,"EDITABLE",FALSE)     
+    CALL _ADVPL_set_property(m_dat_carga,"FONT",NULL,11,TRUE,FALSE)
+    CALL _ADVPL_set_property(m_dat_carga,"EDITABLE",FALSE)     
+    CALL _ADVPL_set_property(m_dat_carga,"CAN_GOT_FOCUS",FALSE)
 
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_panel_cabec)     
     CALL _ADVPL_set_property(l_caixa,"POSITION",900,10)     
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_arquivo,"hor_carga")
     CALL _ADVPL_set_property(l_caixa,"LENGTH",10) 
-    CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)     
+    CALL _ADVPL_set_property(l_caixa,"EDITABLE",FALSE)     
     CALL _ADVPL_set_property(l_caixa,"FONT",NULL,11,TRUE,FALSE)
-    CALL _ADVPL_set_property(l_caixa,"CAN_GOT_FOCUS",FALSE)
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_panel_cabec)
     CALL _ADVPL_set_property(l_label,"POSITION",1020,10)     
@@ -797,8 +774,7 @@ FUNCTION pol1370_checa_prog()#
 
    IF ma_prog[l_lin_atu].mensagem = 'INCLUIR' OR 
         ma_prog[l_lin_atu].mensagem = 'ATUALIZAR' OR
-        ma_prog[l_lin_atu].mensagem = 'CANCELAR' OR
-        ma_prog[l_lin_atu].mensagem = 'C/FATURAMENTO' THEN
+        ma_prog[l_lin_atu].mensagem = 'CANCELAR' THEN
    ELSE
       CALL _ADVPL_set_property(m_brz_prog,"COLUMN_VALUE","ies_select",l_lin_atu,'N')
       LET m_msg = 'Operação não disponível para Programação vencida, processada ou descartada.' 
@@ -814,14 +790,7 @@ FUNCTION pol1370_marca_desmarca()#
 #--------------------------------#
    
    DEFINE l_ind       INTEGER,
-          l_sel       CHAR(01),
-          l_lin_ped   integer
-   
-   #LET l_lin_ped = _ADVPL_get_property(m_brz_pedido,"ROW_SELECTED")
-   
-   #IF ma_pedido[l_lin_ped].situacao = 'P' THEN
-   #   RETURN TRUE
-   #END IF
+          l_sel       CHAR(01)
    
    LET m_clik_cab = NOT m_clik_cab
    
@@ -877,9 +846,6 @@ FUNCTION pol1370_ped_before_row()#
    LET m_lin_atu = _ADVPL_get_property(m_brz_pedido,"ROW_SELECTED")
    #CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_lin_atu,197,16,26)
    LET m_id_pe1 = ma_pedido[m_lin_atu].id_pe1
-   LET m_num_pedido = ma_pedido[m_lin_atu].num_pedido
-   LET m_cod_item = ma_pedido[m_lin_atu].cod_item
-   LET m_ies_status = ma_pedido[m_lin_atu].situacao
    
    CALL pol1370_le_programacao() 
    
@@ -921,7 +887,6 @@ FUNCTION pol1370_zoom_cliente(l_op)#
           LET mr_arquivo.nom_cliente = l_descri
        ELSE
           LET mr_print.cod_cliente = l_codigo
-          LET mr_print.nom_cliente = l_descri
        END IF
     END IF        
     
@@ -1069,9 +1034,12 @@ FUNCTION pol1370_carga_info_conf()#
    END IF
    
    CALL LOG_transaction_commit()
+
+   LET m_msg = 'Operação efetuada com sucesso.'
+
+   CALL log0030_mensagem(m_msg,'info')
    
    LET m_carregando = TRUE
-   LET m_ies_carga = TRUE
 
    LET p_status = LOG_progresspopup_start(
        "Lendo dados...","pol1370_monta_grades","PROCESS")  
@@ -2606,18 +2574,17 @@ FUNCTION pol1370_le_ped_itens()#
   LET l_achou = FALSE
   
   DECLARE cq_pos_atu CURSOR FOR 
-   SELECT (qtd_pecas_solic - qtd_pecas_atend - 
-           qtd_pecas_cancel - qtd_pecas_romaneio ), 
+   SELECT (qtd_pecas_solic - 
+           qtd_pecas_atend - qtd_pecas_cancel), 
            qtd_pecas_atend,
-           qtd_pecas_solic,
-           qtd_pecas_romaneio
+           qtd_pecas_solic
       FROM ped_itens 
      WHERE cod_empresa = p_cod_empresa 
        AND num_pedido = m_num_pedido
        AND cod_item  = m_cod_item
        AND prz_entrega =  m_prz_entrega
   
-  FOREACH cq_pos_atu INTO m_qtd_saldo, m_qtd_atend, m_qtd_solic, m_qtd_romaneio
+  FOREACH cq_pos_atu INTO m_qtd_saldo, m_qtd_atend, m_qtd_solic
 
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','ped_itens:cq_pos_atu')
@@ -2633,7 +2600,6 @@ FUNCTION pol1370_le_ped_itens()#
       LET m_qtd_solic = 0
       LET m_qtd_atend = 0
       LET m_qtd_saldo = 0
-      LET m_qtd_romaneio = 0
    END IF
    
    RETURN TRUE
@@ -2708,11 +2674,7 @@ FUNCTION pol1370_ve_prazo(l_data)#
    
    IF m_qtd_solic > 0 THEN
       IF m_qtd_saldo <> m_qtd_entrega THEN
-         IF m_qtd_atend > 0 OR m_qtd_romaneio > 0 THEN
-            LET m_critica = 'C/FATURAMENTO'
-         ELSE
-            LET m_critica = "ATUALIZAR"
-         END IF
+         LET m_critica = "ATUALIZAR"
       ELSE
          LET m_critica = "DESCARTAR"
       END IF      
@@ -2722,8 +2684,8 @@ FUNCTION pol1370_ve_prazo(l_data)#
       ELSE
          LET m_critica = "DESCARTAR"
       END IF
-   END IF      
-   
+   END IF
+
 END FUNCTION
 
 #---------------------------#
@@ -2750,6 +2712,7 @@ FUNCTION pol1370_set_param(l_status)#
    DEFINE l_status         SMALLINT
    
    CALL _ADVPL_set_property(m_panel_cabec,"EDITABLE",l_status)
+   CALL _ADVPL_set_property(m_dat_carga,"EDITABLE",l_status)
    CALL _ADVPL_set_property(m_processado,"EDITABLE",FALSE)   
    CALL _ADVPL_set_property(m_cliente,"EDITABLE",l_status)
    CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",l_status)
@@ -2772,8 +2735,7 @@ END FUNCTION
 FUNCTION pol1370_pesq_conf()#
 #---------------------------#
 
-   DEFINE l_query     CHAR(1500),
-          l_cod_cli   CHAR(15)
+   DEFINE l_query     CHAR(800)
    
    LET m_id_arquivoa = m_id_arquivo
    
@@ -2782,19 +2744,11 @@ FUNCTION pol1370_pesq_conf()#
    END IF
 
    LET l_query = 
-         " SELECT cod_cliente, max(id_arquivo) FROM arquivo_edi_547 ",
-         " WHERE cod_empresa = '",p_cod_empresa,"' "
-
-   #IF mr_arquivo.dat_carga IS NOT NULL THEN
-   #   LET l_query = l_query CLIPPED, " AND dat_carga = '",mr_arquivo.dat_carga,"' "
-   #END IF
-   
-   IF mr_arquivo.cod_cliente IS NOT NULL THEN
-      LET l_query = l_query CLIPPED, " AND cod_cliente = '",mr_arquivo.cod_cliente,"' "
-   END IF
-
-   LET l_query = l_query CLIPPED, " GROUP BY cod_cliente "
-   
+         " SELECT max(id_arquivo) FROM arquivo_edi_547 ",
+         " WHERE cod_empresa = '",p_cod_empresa,"' ",
+         "  AND cod_cliente LIKE '","%",mr_arquivo.cod_cliente CLIPPED,"%","' ",
+         " GROUP BY cod_cliente "
+               
    PREPARE var_pesq FROM l_query
    
    IF STATUS <> 0 THEN 
@@ -2811,7 +2765,7 @@ FUNCTION pol1370_pesq_conf()#
     
    OPEN cq_pesq
     
-   FETCH cq_pesq INTO l_cod_cli, m_id_arquivo
+   FETCH cq_pesq INTO m_id_arquivo
     
    IF STATUS = 100 THEN
       LET m_msg = 'Não há registros p/ o parêmtros informados.'
@@ -2845,7 +2799,6 @@ FUNCTION pol1370_pesq_exibe()#
 
    LET m_carregando = TRUE
    LET m_excluiu = FALSE
-   LET m_ies_carga = FALSE
    
    SELECT dat_carga, hor_carga, 
           nom_arquivo, cod_cliente, 
@@ -2940,9 +2893,8 @@ END FUNCTION
 FUNCTION pol1370_pesq_pagina(l_opcao)#
 #------------------------------------#
    
-   DEFINE l_opcao    CHAR(01),
-          l_achou    SMALLINT,
-          l_cod_cli  CHAR(15)
+   DEFINE l_opcao CHAR(01),
+          l_achou SMALLINT
 
    IF NOT pol1370_pesq_informou() THEN
       RETURN FALSE
@@ -2955,15 +2907,15 @@ FUNCTION pol1370_pesq_pagina(l_opcao)#
    
       CASE l_opcao
          WHEN 'F' 
-            FETCH FIRST cq_pesq INTO l_cod_cli, m_id_arquivo
+            FETCH FIRST cq_pesq INTO m_id_arquivo
             LET l_opcao = 'N'
          WHEN 'L' 
-            FETCH LAST cq_pesq INTO l_cod_cli, m_id_arquivo
+            FETCH LAST cq_pesq INTO m_id_arquivo
             LET l_opcao = 'P'
          WHEN 'N' 
-            FETCH NEXT cq_pesq INTO l_cod_cli, m_id_arquivo
+            FETCH NEXT cq_pesq INTO m_id_arquivo
          WHEN 'P' 
-            FETCH PREVIOUS cq_pesq INTO l_cod_cli, m_id_arquivo
+            FETCH PREVIOUS cq_pesq INTO m_id_arquivo
       END CASE
        
       IF STATUS <> 0 THEN
@@ -3039,11 +2991,11 @@ FUNCTION pol1370_monta_grades()#
    LET m_count = m_count + 10
    
    LET m_ind = 1
-   #LET ma_pedido[m_ind].mensagem = 'ITENS DO ARQUIVO EDI'
+   LET ma_pedido[m_ind].mensagem = 'ITENS DO ARQUIVO EDI'
    
-   #CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,63,72,204)
+   CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,63,72,204)
    
-   #LET m_ind = 2
+   LET m_ind = 2
    LET m_qtd_erro = 0
    
    CALL LOG_progresspopup_set_total("PROCESS",m_count)
@@ -3076,20 +3028,11 @@ FUNCTION pol1370_monta_grades()#
       
       LET m_progres = LOG_progresspopup_increment("PROCESS")
 
-      IF m_ies_carga THEN
-         LET m_id_pe1 = ma_pedido[m_ind].id_pe1
-         LET m_item_cliente = ma_pedido[m_ind].item_cliente
-         LET m_ies_situa = 'E' #vindo do EDI
-         LET m_num_pedido = ma_pedido[m_ind].num_pedido
-         LET m_cod_item = ma_pedido[m_ind].cod_item
-         CALL pol1370_grava_cenario()  
-      END IF
-         
       IF ma_pedido[m_ind].mensagem IS NOT NULL THEN
          LET m_qtd_erro = m_qtd_erro + 1
       END IF
 
-      CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,0,0,0)                  
+      CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,0,0,0)
       
       LET m_ind = m_ind + 1
       
@@ -3102,18 +3045,15 @@ FUNCTION pol1370_monta_grades()#
    END FOREACH
    
    LET m_qtd_itens_edi = m_ind - 1
-   #LET ma_pedido[m_ind].mensagem = 'PEDIDOS/ITENS NÃO ENVIADOS NO EDI'
-   #CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,255,0,0)
+   LET ma_pedido[m_ind].mensagem = 'ITENS SÓ NA CARTEIRA DE PEDIDOS'
+   CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,255,0,0)
 
-   #LET m_ind = m_ind + 1
+   LET m_ind = m_ind + 1
    CALL pol1370_le_carteira() 
    
    LET m_qtd_item = m_ind - 1
    CALL _ADVPL_set_property(m_brz_pedido,"ITEM_COUNT", m_qtd_item)
-   LET m_id_pe1 = ma_pedido[1].id_pe1
-   LET m_num_pedido = ma_pedido[1].num_pedido
-   LET m_cod_item = ma_pedido[1].cod_item
-   LET m_ies_status = ma_pedido[1].situacao
+   LET m_id_pe1 = ma_pedido[2].id_pe1
    CALL pol1370_le_programacao()
    
    RETURN TRUE
@@ -3125,10 +3065,7 @@ FUNCTION pol1370_le_carteira()#
 #-----------------------------#
    
    DEFINE l_id_pe1      INTEGER,
-          l_item_cli    CHAR(30),
-          l_dat_proces  DATE
-
-   LET l_dat_proces = TODAY
+          l_item_cli    CHAR(30)
    
    SELECT MAX(id_pe1) INTO l_id_pe1 
      FROM edi_pe1_547  
@@ -3147,7 +3084,7 @@ FUNCTION pol1370_le_carteira()#
    LET m_num_id = l_id_pe1
    
    DECLARE cq_carteira CURSOR FOR
-    SELECT DISTINCT
+    SELECT distinct
            p.num_pedido, 
            i.cod_item, 
            p.num_pedido_cli, 
@@ -3160,14 +3097,11 @@ FUNCTION pol1370_le_carteira()#
        AND i.num_pedido = p.num_pedido
        AND i.qtd_pecas_atend = 0 
        AND i.qtd_pecas_romaneio = 0 
-       AND (i.qtd_pecas_solic - i.qtd_pecas_atend - i.qtd_pecas_cancel - i.qtd_pecas_romaneio) > 0
-       AND p.num_pedido NOT IN
-             (SELECT e.num_pedido FROM edi_pe1_547 e
-               WHERE e.cod_empresa = p_cod_empresa 
-                 AND e.id_arquivo = m_id_arquivo)
+       AND (i.qtd_pecas_solic - i.qtd_pecas_cancel) > 0
      ORDER BY p.num_pedido, i.cod_item
 
    FOREACH cq_carteira INTO
+
       ma_pedido[m_ind].num_pedido,        
       ma_pedido[m_ind].cod_item,          
       ma_pedido[m_ind].num_pc, 
@@ -3180,7 +3114,16 @@ FUNCTION pol1370_le_carteira()#
       END IF
       
       LET m_progres = LOG_progresspopup_increment("PROCESS")
-                   
+       
+      SELECT cod_item FROM edi_pe1_547 
+       WHERE cod_empresa = p_cod_empresa 
+         AND id_arquivo = m_id_arquivo
+         AND cod_item = ma_pedido[m_ind].cod_item
+      
+      IF STATUS = 0 THEN
+         CONTINUE FOREACH
+      END IF
+            
       LET l_id_pe1 = l_id_pe1 + 1
       LET  ma_pedido[m_ind].id_pe1 = l_id_pe1
       
@@ -3199,21 +3142,11 @@ FUNCTION pol1370_le_carteira()#
          END IF
       
          LET ma_pedido[m_ind].item_cliente = l_item_cli
-         EXIT FOREACH
-         
+      
       END FOREACH 
 
-      CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,255,0,0)
-
-      IF m_ies_carga THEN
-         LET m_id_pe1 = ma_pedido[m_ind].id_pe1
-         LET m_item_cliente = ma_pedido[m_ind].item_cliente
-         LET m_num_pedido = ma_pedido[m_ind].num_pedido
-         LET m_cod_item = ma_pedido[m_ind].cod_item
-         LET m_ies_situa = 'L' #pedidos da carteira Logi
-         CALL pol1370_prog_da_carteira()
-      END IF
-               
+      CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,0,0,0)
+      
       LET m_ind = m_ind + 1
       
       IF m_ind > 2000 THEN
@@ -3235,9 +3168,7 @@ FUNCTION pol1370_le_programacao()#
           l_situacao      CHAR(01),
           l_num_pedido    INTEGER,
           l_cod_item      CHAR(15)
-   
-   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
-   
+
    DROP TABLE w_progs_edi;
    
    CREATE TABLE w_progs_edi (
@@ -3270,114 +3201,121 @@ FUNCTION pol1370_le_programacao()#
    IF m_id_pe1 IS NULL OR m_id_pe1 = 0 THEN
       RETURN 
    END IF
-
-   IF m_num_pedido IS NULL OR m_num_pedido = 0 THEN
-      RETURN 
-   END IF
-
-   IF m_cod_item IS NULL THEN
-      RETURN 
-   END IF
       
    LET m_ind = 1
    LET m_clik_cab = FALSE
-   LET l_num_pedido = m_num_pedido
-   LET l_cod_item = m_cod_item
 
    IF m_id_pe1 > m_num_id THEN
+      LET l_num_pedido = ma_pedido[m_lin_atu].num_pedido
+      LET l_cod_item = ma_pedido[m_lin_atu].cod_item
       LET l_situacao = 'N'      
    ELSE   
-      SELECT situacao INTO l_situacao                        
-        FROM edi_pe1_547                                     
-        WHERE cod_empresa = p_cod_empresa                    
-          AND id_pe1 = m_id_pe1                              
-                                                             
-      IF STATUS <> 0 THEN                                    
-         CALL log003_err_sql('SELECT','edi_pe1_547:situacao')
-         LET l_situacao = 'C'                                
-      END IF                                                 
+    SELECT situacao INTO l_situacao
+      FROM edi_pe1_547
+      WHERE cod_empresa = p_cod_empresa
+        AND id_pe1 = m_id_pe1
+
+    IF STATUS <> 0 THEN
+       CALL log003_err_sql('SELECT','edi_pe1_547:situacao')
+       LET l_situacao = 'C'
+    END IF
    
-      DECLARE cq_le_prog CURSOR FOR                                               
-      SELECT ped_itens_edi_547.prz_entrega,                                       
-             ped_itens_edi_547.num_pedido,                                        
-             ped_itens_edi_547.qtd_solic,                                         
-             ped_itens_edi_547.qtd_saldo,                                         
-             ped_itens_edi_547.qtd_solic_nova,                                    
-             ped_itens_edi_547.mensagem,                                          
-             ped_itens_edi_547.num_sequencia,                                     
-             ped_itens_edi_pe5_547.ies_programacao,                               
-             ped_itens_edi_pe5_547.dat_abertura,                                  
-             ped_itens_edi_pe5_547.cod_item                                       
-        FROM ped_itens_edi_547, ped_itens_edi_pe5_547, edi_pe1_547                
-       WHERE edi_pe1_547.cod_empresa = p_cod_empresa                              
-         AND edi_pe1_547.id_arquivo = m_id_arquivo                                
-         AND edi_pe1_547.id_pe1 = m_id_pe1                                        
-         AND ped_itens_edi_547.cod_empresa = edi_pe1_547.cod_empresa              
-         AND ped_itens_edi_547.id_pe1 = edi_pe1_547.id_pe1                        
-         AND ped_itens_edi_547.cod_empresa = ped_itens_edi_pe5_547.cod_empresa    
-         AND ped_itens_edi_547.id_pe1 = ped_itens_edi_pe5_547.id_pe1              
-         AND ped_itens_edi_547.num_sequencia = ped_itens_edi_pe5_547.num_sequencia
+    DECLARE cq_le_prog CURSOR FOR
+    SELECT ped_itens_edi_547.prz_entrega,
+           ped_itens_edi_547.num_pedido,
+           ped_itens_edi_547.qtd_solic,
+           ped_itens_edi_547.qtd_saldo,
+           ped_itens_edi_547.qtd_solic_nova,
+           ped_itens_edi_547.mensagem,
+           ped_itens_edi_547.num_sequencia,
+           ped_itens_edi_pe5_547.ies_programacao,
+           ped_itens_edi_pe5_547.dat_abertura,
+           ped_itens_edi_pe5_547.cod_item
+      FROM ped_itens_edi_547, ped_itens_edi_pe5_547
+     WHERE ped_itens_edi_547.cod_empresa = p_cod_empresa
+       AND ped_itens_edi_547.id_pe1 = m_id_pe1
+       AND ped_itens_edi_547.cod_empresa = ped_itens_edi_pe5_547.cod_empresa
+       AND ped_itens_edi_547.id_pe1 = ped_itens_edi_pe5_547.id_pe1
+       AND ped_itens_edi_547.num_sequencia = ped_itens_edi_pe5_547.num_sequencia
        
-     FOREACH cq_le_prog INTO             
-        ma_prog[m_ind].prz_entrega,      
-        ma_prog[m_ind].num_pedido,       
-        ma_prog[m_ind].qtd_solic,        
-        ma_prog[m_ind].qtd_saldo,        
-        ma_prog[m_ind].qtd_solic_nova,   
-        ma_prog[m_ind].mensagem,         
-        ma_prog[m_ind].num_sequencia,    
-        l_ies_prog,                      
-        l_dat_abertura,                  
-        m_cod_item                       
+   FOREACH cq_le_prog INTO
+      ma_prog[m_ind].prz_entrega,  
+      ma_prog[m_ind].num_pedido,
+      ma_prog[m_ind].qtd_solic,     
+      ma_prog[m_ind].qtd_saldo, 
+      ma_prog[m_ind].qtd_solic_nova,
+      ma_prog[m_ind].mensagem,
+      ma_prog[m_ind].num_sequencia,
+      l_ies_prog,
+      l_dat_abertura,
+      m_cod_item
       
-        IF STATUS <> 0 THEN                               
-           CALL log003_err_sql('SELECT','cq_le_prog')     
-           EXIT FOREACH                                   
-        END IF                                            
-                                                          
-        LET m_num_pedido = ma_prog[m_ind].num_pedido                                                                                                                         
-        LET m_prz_entrega = ma_prog[m_ind].prz_entrega    
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','cq_le_prog')
+         EXIT FOREACH
+      END IF
       
-        IF NOT pol1370_le_ped_itens() THEN                     
-           RETURN FALSE                                        
-        END IF                                                 
-                                                               
-        LET ma_prog[m_ind].qtd_solic = m_qtd_solic             
-        LET ma_prog[m_ind].qtd_saldo = m_qtd_saldo             
-                                                               
-        IF m_qtd_atend > 0 OR m_qtd_romaneio > 0 THEN          
-           IF ma_prog[m_ind].mensagem = "ATUALIZAR" THEN       
-              LET ma_prog[m_ind].mensagem = 'C/FATURAMENTO'    
-           END IF                                              
-        END IF                                                 
-                                                               
-        LET ma_prog[m_ind].ies_select = 'N'                    
-                                                               
-        #IF l_dat_abertura IS NOT NULL THEN                    
-        #   LET ma_prog[m_ind].prz_entrega = l_dat_abertura    
-        #END IF                                                
+      LET m_num_pedido = ma_prog[m_ind].num_pedido
+      
+      IF l_num_pedido IS NULL OR l_num_pedido = 0 THEN
+         LET l_num_pedido = m_num_pedido
+         LET l_cod_item = m_cod_item
+      END IF
+      
+      LET ma_prog[m_ind].ies_select = 'N'
+      
+      IF l_dat_abertura IS NOT NULL THEN
+         LET ma_prog[m_ind].prz_entrega = l_dat_abertura
+      END IF
+      
+      LET m_prz_entrega = ma_prog[m_ind].prz_entrega
+
+      IF NOT pol1370_le_ped_itens() THEN
+         RETURN FALSE
+      END IF
+      
+      LET ma_prog[m_ind].qtd_solic = m_qtd_solic
+      LET ma_prog[m_ind].qtd_saldo = m_qtd_saldo
+      
+      CASE l_ies_prog
+         WHEN '1' 
+            LET ma_prog[m_ind].programacao = 'FIRME'
+         WHEN '3' 
+            LET ma_prog[m_ind].programacao = 'REQUISIC.'
+         WHEN '4' 
+            LET ma_prog[m_ind].programacao = 'PLANEJADO'
+         OTHERWISE
+            LET ma_prog[m_ind].programacao = 'DOL'
+      END CASE
             
-        CASE l_ies_prog                                          
-           WHEN '1'                                              
-              LET ma_prog[m_ind].programacao = 'FIRME'           
-           WHEN '3'                                              
-              LET ma_prog[m_ind].programacao = 'REQUISIC.'       
-           WHEN '4'                                              
-              LET ma_prog[m_ind].programacao = 'PLANEJADO'       
-           OTHERWISE                                             
-              LET ma_prog[m_ind].programacao = 'INDEFINIDA'      
-        END CASE                                                 
-                                                                 
-        INSERT INTO w_progs_edi VALUES(ma_prog[m_ind].*)         
-                                                                 
-        IF STATUS <> 0 THEN                                      
-           CALL log003_err_sql('INSERT','w_progs_edi:cq_le_prog')
-           EXIT FOREACH                                          
-        END IF                                                   
-            
-      END FOREACH    
-                     
-      FREE cq_le_prog
+      IF ma_prog[m_ind].mensagem = 'PROCESSADO' THEN
+      ELSE
+         LET m_qtd_entrega = ma_prog[m_ind].qtd_solic_nova
+         CALL pol1370_ve_prazo(m_prz_entrega)
+         LET ma_prog[m_ind].mensagem = m_critica
+      END IF      
+      
+      DELETE FROM w_progs_edi 
+       WHERE num_pedido = m_num_pedido
+         AND prz_entrega = m_prz_entrega
+         
+      INSERT INTO w_progs_edi VALUES(ma_prog[m_ind].*)
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('INSERT','w_progs_edi:cq_le_prog')
+         EXIT FOREACH
+      END IF
+      
+      LET m_ind = m_ind + 1
+      
+      IF m_ind > 3000 THEN
+         LET m_msg = 'Limite de programações previstas ultrapassou.'
+         CALL log0030_mensagem(m_msg,'info')
+         EXIT FOREACH
+      END IF
+      
+    END FOREACH
+    FREE cq_le_prog
 
    END IF
       
@@ -3424,12 +3362,8 @@ FUNCTION pol1370_le_programacao()#
       
       FREE cq_prog_antes
       
-      LET m_ies_processado = TRUE
       LET m_ind = 1
       
-      INITIALIZE ma_prog TO NULL
-      CALL _ADVPL_set_property(m_brz_prog,"CLEAR")
-
       CALL _ADVPL_set_property(m_brz_prog,"CLEAR_ALL_LINE_FONT_COLOR")
       
       DECLARE cq_prog_temp CURSOR FOR
@@ -3452,13 +3386,6 @@ FUNCTION pol1370_le_programacao()#
          
          IF ma_prog[m_ind].mensagem = 'CANCELAR' THEN 
             CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,255,0,0)
-         END IF
-
-         IF ma_prog[m_ind].mensagem = 'INCLUIR' OR 
-            ma_prog[m_ind].mensagem = 'ATUALIZAR' OR
-            ma_prog[m_ind].mensagem = 'CANCELAR' OR
-            ma_prog[m_ind].mensagem = 'C/FATURAMENTO' THEN
-            LET m_ies_processado = FALSE
          END IF
 
          LET m_ind = m_ind + 1
@@ -3484,230 +3411,6 @@ FUNCTION pol1370_le_programacao()#
       CALL _ADVPL_set_property(m_brz_prog,"ENABLE",FALSE)
    END IF
          
-END FUNCTION
-
-#-------------------------------#
-FUNCTION pol1370_grava_cenario()#
-#-------------------------------#
-    
-    DEFINE l_dat_abertura    DATE,
-           l_ies_prog        CHAR(01)
-    
-    DELETE FROM edi_audit_547
-     WHERE cod_empresa = p_cod_empresa
-       AND id_pe1 = m_id_pe1
-       AND id_arquivo = m_id_arquivo
-
-    IF STATUS <> 0 THEN
-       CALL log003_err_sql('DELETE','edi_audit_547')
-       RETURN
-    END IF
-       
-    INITIALIZE mr_audit TO NULL
-    LET mr_audit.cod_empresa = p_cod_empresa
-    LET mr_audit.id_registro = 0
-    LET mr_audit.usuario = p_user
-    LET mr_audit.num_pedido = m_num_pedido
-    LET mr_audit.cod_item = m_cod_item
-    LET mr_audit.dat_operacao = mr_arquivo.dat_carga
-    LET mr_audit.cod_cliente = mr_arquivo.cod_cliente
-    LET mr_audit.id_arquivo = m_id_arquivo
-    LET mr_audit.id_pe1 = m_id_pe1
-    LET mr_audit.item_cliente = m_item_cliente
-    LET mr_audit.situacao = m_ies_situa
-    
-    DECLARE cq_cenario CURSOR FOR
-    SELECT ped_itens_edi_547.prz_entrega,
-           ped_itens_edi_547.num_pedido,
-           ped_itens_edi_547.qtd_solic,
-           ped_itens_edi_547.qtd_saldo,
-           ped_itens_edi_547.qtd_solic_nova,
-           ped_itens_edi_547.mensagem,
-           ped_itens_edi_pe5_547.ies_programacao,
-           ped_itens_edi_pe5_547.dat_abertura
-      FROM ped_itens_edi_547, ped_itens_edi_pe5_547, edi_pe1_547
-     WHERE edi_pe1_547.cod_empresa = p_cod_empresa
-       AND edi_pe1_547.id_arquivo = m_id_arquivo
-       AND edi_pe1_547.id_pe1 = m_id_pe1
-       AND ped_itens_edi_547.cod_empresa = edi_pe1_547.cod_empresa
-       AND ped_itens_edi_547.id_pe1 = edi_pe1_547.id_pe1
-       AND ped_itens_edi_547.cod_empresa = ped_itens_edi_pe5_547.cod_empresa
-       AND ped_itens_edi_547.id_pe1 = ped_itens_edi_pe5_547.id_pe1
-       AND ped_itens_edi_547.num_sequencia = ped_itens_edi_pe5_547.num_sequencia
-       
-   FOREACH cq_cenario INTO
-      mr_audit.prz_entrega,  
-      mr_audit.num_pedido,
-      mr_audit.qtd_solic,     
-      mr_audit.qtd_antes, 
-      mr_audit.qtd_operacao,
-      mr_audit.mensagem,
-      l_ies_prog,
-      l_dat_abertura
-
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','cq_cenario')
-         EXIT FOREACH
-      END IF
-
-      #IF l_dat_abertura IS NOT NULL THEN
-      #   LET mr_audit.prz_entrega = l_dat_abertura
-      #END IF      
-      
-      CASE l_ies_prog
-         WHEN '1' 
-            LET ma_prog[m_ind].programacao = 'FIRME'
-         WHEN '3' 
-            LET ma_prog[m_ind].programacao = 'REQUISIC.'
-         WHEN '4' 
-            LET ma_prog[m_ind].programacao = 'PLANEJADO'
-         OTHERWISE
-            LET ma_prog[m_ind].programacao = 'INDEFINIDA'
-      END CASE
-      
-      LET mr_audit.qtd_atual = mr_audit.qtd_antes
-      
-      INSERT INTO edi_audit_547 VALUES(mr_audit.*)
-
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('INSERT','edi_audit_547:cq_cenario')
-         EXIT FOREACH
-      END IF
-            
-    END FOREACH
-    
-    FREE cq_cenario
-      
-   IF m_num_pedido IS NULL THEN
-      RETURN
-   END IF
-      
-   LET mr_audit.situacao = 'L' #Carteira do Logix                                            
-                                                                                                
-   DECLARE cq_na_cart CURSOR FOR                                                                
-    SELECT prz_entrega, qtd_pecas_solic,                                              
-           (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio),         
-           'CANCELAR'                                                                           
-      FROM ped_itens                                                                            
-     WHERE cod_empresa = p_cod_empresa                                                          
-       AND num_pedido = m_num_pedido     
-       AND cod_item = m_cod_item                                                       
-       AND qtd_pecas_atend = 0                                                                  
-       AND qtd_pecas_romaneio = 0                                                               
-       AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio) > 0      
-                                                                                             
-   FOREACH cq_na_cart INTO                                                                      
-      mr_audit.prz_entrega,                                                                     
-      mr_audit.qtd_solic,                                                                       
-      mr_audit.qtd_antes,                                                                       
-      mr_audit.mensagem                                                                         
-                                                                                             
-      IF STATUS <> 0 THEN                                                                       
-         CALL log003_err_sql('SELECT','ped_itens:cq_na_cart')                                   
-         EXIT FOREACH                                                                           
-      END IF                                                                                    
-         
-      SELECT COUNT(*) INTO m_count                                    
-        FROM edi_audit_547                                               
-       WHERE cod_empresa = p_cod_empresa                                 
-         AND num_pedido = m_num_pedido                                   
-         AND cod_item = mr_audit.cod_item                        
-         AND prz_entrega = mr_audit.prz_entrega  
-         AND id_arquivo = m_id_arquivo
-                                                                      
-      IF STATUS <> 0 THEN                                                
-         CALL log003_err_sql('SELECT','edi_audit_547:cq_na_cart')        
-         EXIT FOREACH                                                    
-      END IF                                                             
-                                                                         
-      IF m_count = 0 THEN                                                
-         LET mr_audit.qtd_operacao = 0        
-         LET mr_audit.qtd_atual = mr_audit.qtd_antes                           
-         LET mr_audit.programacao = 'NAO ENVIADA'                                
-         INSERT INTO edi_audit_547 VALUES(mr_audit.*)                    
-                                                                      
-         IF STATUS <> 0 THEN                                             
-            CALL log003_err_sql('INSERT','edi_audit_547:cq_na_cart')     
-            EXIT FOREACH                                                 
-         END IF                                                          
-      END IF                                                             
-      
-   END FOREACH
-      
-   FREE cq_na_cart
-               
-END FUNCTION
-
-#----------------------------------#
-FUNCTION pol1370_prog_da_carteira()#
-#----------------------------------#
-
-    INITIALIZE mr_audit TO NULL
-    LET mr_audit.cod_empresa = p_cod_empresa
-    LET mr_audit.id_registro = 0
-    LET mr_audit.usuario = p_user
-    LET mr_audit.num_pedido = m_num_pedido
-    LET mr_audit.cod_item = m_cod_item
-    LET mr_audit.dat_operacao = mr_arquivo.dat_carga
-    LET mr_audit.cod_cliente = mr_arquivo.cod_cliente
-    LET mr_audit.id_arquivo = m_id_arquivo
-    LET mr_audit.id_pe1 = m_id_pe1
-    LET mr_audit.item_cliente = m_item_cliente
-    LET mr_audit.situacao = m_ies_situa
-                                                                          
-   DECLARE cq_na_ped_it CURSOR FOR                                                                
-    SELECT prz_entrega, qtd_pecas_solic,                                              
-           (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio),         
-           'CANCELAR'                                                                           
-      FROM ped_itens                                                                            
-     WHERE cod_empresa = p_cod_empresa                                                          
-       AND num_pedido = m_num_pedido     
-       AND cod_item = m_cod_item                                                       
-       AND qtd_pecas_atend = 0                                                                  
-       AND qtd_pecas_romaneio = 0                                                               
-       AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio) > 0      
-                                                                                             
-   FOREACH cq_na_ped_it INTO                                                                      
-      mr_audit.prz_entrega,                                                                     
-      mr_audit.qtd_solic,                                                                       
-      mr_audit.qtd_antes,                                                                       
-      mr_audit.mensagem                                                                         
-                                                                                             
-      IF STATUS <> 0 THEN                                                                       
-         CALL log003_err_sql('SELECT','ped_itens:cq_na_ped_it')                                   
-         EXIT FOREACH                                                                           
-      END IF                                                                                    
-         
-      SELECT COUNT(*) INTO m_count                                    
-        FROM edi_audit_547                                               
-       WHERE cod_empresa = p_cod_empresa                                 
-         AND num_pedido = m_num_pedido                                   
-         AND cod_item = mr_audit.cod_item                        
-         AND prz_entrega = mr_audit.prz_entrega  
-         AND id_arquivo = m_id_arquivo
-                                                                
-      IF STATUS <> 0 THEN                                                
-         CALL log003_err_sql('SELECT','edi_audit_547:cq_na_ped_it')        
-         EXIT FOREACH                                                    
-      END IF                                                             
-                                                                         
-      IF m_count = 0 THEN                                                
-         LET mr_audit.qtd_operacao = 0    
-         LET mr_audit.qtd_atual = mr_audit.qtd_antes                               
-         LET mr_audit.programacao = 'NAO ENVIADA'
-                                                                      
-         INSERT INTO edi_audit_547 VALUES(mr_audit.*)                    
-                                                                      
-         IF STATUS <> 0 THEN                                             
-            CALL log003_err_sql('INSERT','edi_audit_547:cq_na_ped_it')     
-            EXIT FOREACH                                                 
-         END IF                                                          
-      END IF                                                             
-      
-   END FOREACH
-      
-   FREE cq_na_ped_it
-               
 END FUNCTION
 
 #----------------------------------#
@@ -3740,12 +3443,10 @@ END FUNCTION
 
 END FUNCTION
 
-#--------------------------------------#
-FUNCTION pol1370_ve_possibilidade(l_op)#
-#--------------------------------------#
-   
-   DEFINE l_op    CHAR(01)
-   
+#----------------------------------#
+FUNCTION pol1370_ve_possibilidade()#
+#----------------------------------#
+
    IF mr_arquivo.cod_cliente IS NULL OR m_excluiu THEN
       LET m_msg = 'Não há arquivo na tela. Selecione um previamente.'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
@@ -3758,28 +3459,6 @@ FUNCTION pol1370_ve_possibilidade(l_op)#
       RETURN FALSE
    END IF
    
-   IF l_op = 'E' THEN
-      
-      SELECT COUNT(*)   
-        INTO m_count
-        FROM edi_audit_547 
-       WHERE cod_empresa = p_cod_empresa
-         AND id_arquivo = m_id_arquivo 
-         AND operacao IS NOT NULL
-      
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','edi_audit_547')
-         RETURN FALSE
-      END IF
-     
-      IF m_count > 0 THEN
-         LET m_msg = 'Esse arquivo já está PARCIALMENTE processado'
-         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-         RETURN FALSE
-      END IF
-   
-   END IF
-   
    RETURN TRUE
 
 END FUNCTION
@@ -3790,7 +3469,7 @@ FUNCTION pol1370_exclui_arq()#
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
 
-   IF NOT pol1370_ve_possibilidade('E') THEN
+   IF NOT pol1370_ve_possibilidade() THEN
       RETURN FALSE
    END IF
 
@@ -3871,15 +3550,6 @@ FUNCTION pol1370_proc_exclusao()#
       RETURN FALSE
    END IF      
 
-   DELETE FROM edi_audit_547
-    WHERE cod_empresa = p_cod_empresa
-      AND id_arquivo = m_id_arquivo
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','edi_audit_547')
-      RETURN FALSE
-   END IF      
-
    RETURN TRUE
 
 END FUNCTION   
@@ -3952,7 +3622,7 @@ FUNCTION pol1370_consistir()#
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
 
-   IF NOT pol1370_ve_possibilidade('C') THEN
+   IF NOT pol1370_ve_possibilidade() THEN
       RETURN FALSE
    END IF
    
@@ -4136,7 +3806,6 @@ FUNCTION pol1370_grava_info()#
             RETURN FALSE
          END IF
       END IF      
-      LET m_ies_status = m_situacao
       CALL pol1370_le_programacao()  
    END IF
 
@@ -4255,7 +3924,7 @@ FUNCTION pol1370_processar()#
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    
    IF mr_arquivo.cod_cliente IS NULL OR m_excluiu THEN
-      LET m_msg = 'Não há arquivo na tela a ser processado'
+      LET m_msg = 'Não há arquivo na tela a ser excluído'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
    END IF   
@@ -4276,11 +3945,11 @@ FUNCTION pol1370_processar()#
       RETURN FALSE
    END IF   
 
-   IF ma_pedido[m_lin_ped].situacao = 'P' THEN
+   {IF ma_pedido[m_lin_ped].situacao = 'P' THEN
       LET m_msg = 'O pedido/item selecionado já foi processado.'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
-   END IF   
+   END IF   }
    
    LET m_count = 0
    
@@ -4307,7 +3976,6 @@ FUNCTION pol1370_processar()#
    LET m_num_pedido = ma_pedido[m_lin_ped].num_pedido
    LET m_cod_item = ma_pedido[m_lin_ped].cod_item
    LET m_cod_it_cli = ma_pedido[m_lin_ped].item_cliente
-   LET m_ies_status = ma_pedido[m_lin_ped].situacao
    
    CALL LOG_transaction_begin()
    
@@ -4329,14 +3997,9 @@ FUNCTION pol1370_processar()#
    LET m_msg = 'Operação efetuada com sucesso.'
 
    CALL log0030_mensagem(m_msg,'info')
-      
+   
    CALL pol1370_le_programacao()  
    
-   IF m_ies_processado THEN
-      CALL pol1370_atu_pe1() RETURNING p_status
-      CALL _ADVPL_set_property(m_brz_pedido,"COLUMN_VALUE","situacao",m_lin_ped,'P')
-   END IF
-         
    RETURN TRUE
 
 END FUNCTION
@@ -4361,8 +4024,9 @@ FUNCTION pol1370_proc_edi()#
           LET m_qtd_nova = ma_prog[l_ind].qtd_solic_nova
           LET m_qtd_saldo = ma_prog[l_ind].qtd_saldo
           LET m_qtd_antes = m_qtd_saldo
-          LET m_qtd_atual = m_qtd_saldo 
-          LET m_tip_prog = ma_prog[l_ind].programacao
+          LET m_qtd_atual = m_qtd_nova
+          
+          #LET m_dat_abertura = ma_prog[l_ind].prz_entrega
           LET m_prz_entrega = ma_prog[l_ind].prz_entrega
           LET m_seq_prog = ma_prog[l_ind].num_sequencia
           
@@ -4377,11 +4041,8 @@ FUNCTION pol1370_proc_edi()#
                 CALL log003_err_sql('UPDATE','ped_itens')
                 RETURN FALSE
              END IF
-             
-             LET mr_audit.operacao = 'CANCELOU SALDO'
-             LET mr_audit.situacao = 'L'
+             LET mr_audit.mensagem = 'CANCELOU SALDO'
              LET m_qtd_atual = 0
-             
              IF NOT pol1370_ins_audit() THEN
                 RETURN FALSE
              END IF
@@ -4414,32 +4075,28 @@ FUNCTION pol1370_grv_programacao()#
                                              
    IF m_qtd_nova = 0 OR m_qtd_nova IS NULL THEN                     
       IF m_qtd_saldo > 0 THEN        
-         LET mr_audit.operacao = 'CANCELOU SALDO'   
-         LET m_qtd_atual = 0      
+         LET mr_audit.mensagem = 'CANCELOU SALDO'
          IF NOT pol1370_atu_prog('C') THEN    
             RETURN FALSE                      
          END IF   
       ELSE
-         LET mr_audit.operacao = NULL                            
+         LET mr_audit.mensagem = NULL                            
       END IF                                  
    ELSE                                       
-      IF m_qtd_solic = 0 THEN    
-         LET m_qtd_atual = m_qtd_nova 
-         LET m_qtd_antes = 0              
+      IF m_qtd_solic = 0 THEN                 
          IF NOT pol1370_add_prog() THEN       
             RETURN FALSE                      
          END IF         
-         LET mr_audit.operacao = 'INCLUIU PROGRAMAÇÃO'                     
+         LET mr_audit.mensagem = 'INCLUIU PROGRAMAÇÃO'                     
       ELSE                                
-         LET mr_audit.operacao = 'ALTEROU SALDO' 
-         LET m_qtd_atual = m_qtd_nova 
+         LET mr_audit.mensagem = 'ALTEROU SALDO' 
          IF NOT pol1370_atu_prog('A') THEN    
             RETURN FALSE                      
          END IF                               
       END IF                                  
    END IF                                     
   
-   IF mr_audit.operacao IS NOT NULL THEN
+   IF mr_audit.mensagem IS NOT NULL THEN
       IF NOT pol1370_ins_audit() THEN
          RETURN FALSE
       END IF
@@ -4487,8 +4144,6 @@ END FUNCTION
 FUNCTION pol1370_ins_audit()#
 #---------------------------#
    
-   DEFINE l_ld    INTEGER
-   
    LET mr_audit.cod_empresa = p_cod_empresa
    LET mr_audit.num_pedido = m_num_pedido
    LET mr_audit.cod_item = m_cod_item
@@ -4496,51 +4151,27 @@ FUNCTION pol1370_ins_audit()#
    LET mr_audit.usuario = p_user
    LET mr_audit.dat_operacao = TODAY
    LET mr_audit.cod_cliente = mr_arquivo.cod_cliente
-   LET mr_audit.qtd_solic = m_qtd_solic
-   LET mr_audit.qtd_atual = m_qtd_atual
+   LET mr_audit.qtd_operacao = m_qtd_atual
    LET mr_audit.qtd_antes = m_qtd_antes
    LET mr_audit.id_arquivo = m_id_arquivo
-   LET mr_audit.id_pe1 = m_id_pe1
    LET mr_audit.item_cliente = m_cod_it_cli
-   LET mr_audit.qtd_operacao = m_qtd_nova
-   LET mr_audit.programacao = m_tip_prog
-   
-   SELECT id_registro INTO l_ld
-     FROM edi_audit_547
-    WHERE cod_empresa = p_cod_empresa
-      AND id_arquivo = m_id_arquivo
-      AND id_pe1 = m_id_pe1
-      AND num_pedido = m_num_pedido
-      AND cod_item = m_cod_item
-      AND prz_entrega = m_prz_entrega
-   
-   IF STATUS = 100 THEN
-      INSERT INTO edi_audit_547
-       VALUES(mr_audit.*)
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('INSERT','edi_audit_547:1')
-         RETURN FALSE
-      END IF
-   ELSE 
-      IF STATUS = 0 THEN
-         UPDATE edi_audit_547
-          SET operacao = mr_audit.operacao,
-              dat_operacao = mr_audit.dat_operacao,
-              qtd_solic = m_qtd_solic,
-              qtd_atual = m_qtd_atual,
-              qtd_antes = m_qtd_antes
-         WHERE cod_empresa = p_cod_empresa
-           AND id_registro = l_ld
-        IF STATUS <> 0 THEN
-           CALL log003_err_sql('UPDATE','edi_audit_547:3')
-           RETURN FALSE
-        END IF
-      ELSE
-         CALL log003_err_sql('SELECT','edi_audit_547:2')
-         RETURN FALSE
-      END IF   
+
+   IF mr_audit.qtd_operacao IS NULL THEN
+      LET mr_audit.qtd_operacao = 0
    END IF
-      
+   
+   IF mr_audit.qtd_antes IS NULL THEN
+      LET mr_audit.qtd_antes = 0
+   END IF
+   
+   INSERT INTO edi_audit_547
+    VALUES(mr_audit.*)
+    
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','edi_audit_547')
+      RETURN FALSE
+   END IF
+   
    RETURN TRUE
 
 END FUNCTION   
@@ -4753,7 +4384,7 @@ FUNCTION pol1370_proc_all()#
 
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    
-   IF NOT pol1370_ve_possibilidade('P') THEN
+   IF NOT pol1370_ve_possibilidade() THEN
       RETURN FALSE
    END IF
    
@@ -4855,7 +4486,7 @@ FUNCTION pol1370_proc_todos()#
       RETURN FALSE
    END IF
    
-   LET m_ind_canc = m_qtd_itens_edi + 1
+   LET m_ind_canc = m_qtd_itens_edi + 2
 
    FOR m_ind = m_ind_canc TO m_qtd_item
    
@@ -4912,9 +4543,9 @@ FUNCTION pol1370_atu_carteira()#
          RETURN FALSE
       END IF
             
-      #IF m_dat_abertura IS NOT NULL THEN
-      #   LET m_prz_entrega = m_dat_abertura
-      #END IF
+      IF m_dat_abertura IS NOT NULL THEN
+         LET m_prz_entrega = m_dat_abertura
+      END IF
       
       IF NOT pol1370_le_ped_itens() THEN
          RETURN FALSE
@@ -5042,7 +4673,7 @@ FUNCTION pol1370_canc_prog()#
       RETURN FALSE                                            
    END IF                                                     
                                                               
-   LET mr_audit.operacao = 'CANCELOU SALDO'   
+   LET mr_audit.mensagem = 'CANCELOU SALDO'   
    LET m_qtd_antes = m_qtd_saldo                           
    LET m_qtd_atual = 0                           
                                                               
@@ -5169,6 +4800,7 @@ FUNCTION pol1370_par_print(l_container)#
           l_layout          VARCHAR(10),
           l_label           VARCHAR(10),
           l_caixa           VARCHAR(10),
+          l_dat_oper        VARCHAR(10),
           l_lupa_cli        VARCHAR(10)
    
    INITIALIZE mr_print.* TO NULL
@@ -5195,13 +4827,14 @@ FUNCTION pol1370_par_print(l_container)#
    CALL _ADVPL_set_property(l_lupa_cli,"CLICK_EVENT","pol1370_imp_cliente")
 
    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
-   CALL _ADVPL_set_property(l_label,"TEXT","Nome:")    
+   CALL _ADVPL_set_property(l_label,"TEXT","Arquivo:")    
    CALL _ADVPL_set_property(l_label,"FONT",NULL,11,FALSE,TRUE)
    
    LET m_arq_imp = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
    CALL _ADVPL_set_property(m_arq_imp,"LENGTH",25)
-   CALL _ADVPL_set_property(m_arq_imp,"VARIABLE",mr_print,"nom_cliente")
+   CALL _ADVPL_set_property(m_arq_imp,"VARIABLE",mr_print,"nom_arquivo")
    CALL _ADVPL_set_property(m_arq_imp,"ENABLE",FALSE)
+   #CALL _ADVPL_set_property(m_arq_imp,"VALID","pol1370_chec_arq")
 
    CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")           
    
@@ -5216,34 +4849,11 @@ FUNCTION pol1370_par_print(l_container)#
    CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")           
 
    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
-   CALL _ADVPL_set_property(l_label,"TEXT","Dat proces de:")    
+   CALL _ADVPL_set_property(l_label,"TEXT","Dat proces:")    
    
-   LET m_dat_de = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
-   CALL _ADVPL_set_property(m_dat_de,"VARIABLE",mr_print,"dat_de")
-   CALL _ADVPL_set_property(m_dat_de,"ENABLE",TRUE)
-
-   CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")           
-
-   LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
-   CALL _ADVPL_set_property(l_label,"TEXT","Dat proces até:")    
-   
-   LET m_dat_ate = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
-   CALL _ADVPL_set_property(m_dat_ate,"VARIABLE",mr_print,"dat_ate")
-   CALL _ADVPL_set_property(m_dat_ate,"ENABLE",TRUE)
-
-   CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")           
-
-   LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
-   CALL _ADVPL_set_property(l_label,"TEXT","Tip processo:")    
-   CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,FALSE,TRUE)
-
-    LET m_tip_proces = _ADVPL_create_component(NULL,"LCOMBOBOX",l_layout)
-    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","0"," ")     
-    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","1","Alterados")     
-    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","2","Não Alterados")     
-    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","3","Todos")     
-    CALL _ADVPL_set_property(m_tip_proces,"VARIABLE",mr_print,"tip_proces")    
-    CALL _ADVPL_set_property(m_tip_proces,"VALID","pol1370_valida_processo")     
+   LET l_dat_oper = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
+   CALL _ADVPL_set_property(l_dat_oper,"VARIABLE",mr_print,"dat_operacao")
+   CALL _ADVPL_set_property(l_dat_oper,"ENABLE",TRUE)
 
 END FUNCTION
 
@@ -5276,16 +4886,7 @@ FUNCTION pol1370_chec_cli()#
       CALL _ADVPL_set_property(m_cli_imp,"GET_FOCUS")
       RETURN FALSE
    END IF
-   
-   SELECT nom_cliente 
-     INTO mr_print.nom_cliente
-     FROM clientes
-    WHERE cod_cliente = mr_print.cod_cliente
-
-   IF STATUS <> 0 THEN
-      LET mr_print.nom_cliente = NULL
-   END IF
-   
+      
    RETURN TRUE
 
 END FUNCTION   
@@ -5298,23 +4899,51 @@ FUNCTION pol1370_imp_cliente()#
 
 END FUNCTION
 
-#---------------------------------#
-FUNCTION pol1370_valida_processo()#
-#---------------------------------#
+#--------------------------#
+FUNCTION pol1370_chec_arq()#
+#--------------------------#
    
-   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   DEFINE l_processado    CHAR(01)
    
-   IF mr_print.tip_proces = '0' THEN
-      LET m_msg = 'Informe o tipo de processo.'
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-      CALL _ADVPL_set_property(m_tip_proces,"GET_FOCUS")
+   SELECT id_arquivo,
+          processado
+     INTO m_id_imp, 
+          l_processado
+     FROM arquivo_edi_547
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_cliente = mr_print.cod_cliente
+      AND nom_arquivo = mr_print.nom_arquivo
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','arquivo_edi_547')
+      CALL _ADVPL_set_property(m_arq_imp,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+   
+   IF l_processado <> 'S' THEN
+      LET m_msg = "Arquivo não está processado."
+      CALL log0030_mensagem(m_msg,'info')
+      CALL _ADVPL_set_property(m_arq_imp,"GET_FOCUS")
       RETURN FALSE
    END IF
 
-   RETURN TRUE   
+   SELECT DISTINCT dat_operacao
+     INTO mr_print.dat_operacao 
+     FROM edi_audit_547
+    WHERE cod_empresa = p_cod_empresa
+      AND id_arquivo = m_id_imp
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','edi_audit_547:2')
+      RETURN FALSE
+   END IF
+   
+   CALL _ADVPL_set_property(m_ped_imp,"GET_FOCUS")
+   
+   RETURN TRUE      
 
 END FUNCTION
-                 
+              
 #------------------------#   
 FUNCTION pol1370_cancel()#
 #------------------------#
@@ -5328,22 +4957,7 @@ END FUNCTION
 #--------------------------#  
 FUNCTION pol1370_conf_imp()#
 #--------------------------#
-   
-   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
-   
-   IF NOT pol1370_valida_processo() THEN
-      RETURN FALSE
-   END IF
-   
-   IF mr_print.dat_de IS NOT NULL AND mr_print.dat_ate IS NOT NULL THEN
-      IF mr_print.dat_ate < mr_print.dat_de THEN
-         LET m_msg = 'Período inválido.'
-         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-         CALL _ADVPL_set_property(m_dat_de,"GET_FOCUS")
-         RETURN FALSE
-      END IF
-   END IF
-   
+
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    
    LET p_status = LOG_progresspopup_start(
@@ -5367,64 +4981,25 @@ END FUNCTION
 FUNCTION pol1370_le_audit()#
 #--------------------------#
    
-   DEFINE l_status SMALLINT,
-          l_sql    CHAR(800)
-   
-   LET l_sql = "SELECT COUNT(*) FROM edi_audit_547 WHERE cod_empresa = '",p_cod_empresa,"' "
+   DEFINE l_status SMALLINT
 
-   IF mr_print.cod_cliente IS NOT NULL THEN
-      LET l_sql = l_sql CLIPPED, " AND cod_cliente = '",mr_print.cod_cliente,"' "
-   END IF
-   
-   IF mr_print.num_pedido IS NULL OR mr_print.num_pedido <= 0 THEN
-   ELSE
-      LET l_sql = l_sql CLIPPED, " AND num_pedido = '",mr_print.num_pedido,"' "
-   END IF
-
-   IF mr_print.dat_de IS NOT NULL THEN
-      LET l_sql = l_sql CLIPPED, " AND dat_operacao >= '",mr_print.dat_de,"' "
-   END IF
-
-   IF mr_print.dat_ate IS NOT NULL THEN
-      LET l_sql = l_sql CLIPPED, " AND dat_operacao <= '",mr_print.dat_ate,"' "
-   END IF
-
-   IF mr_print.tip_proces = '1' THEN
-      LET l_sql = l_sql CLIPPED, " AND operacao IS NOT NULL "
-   ELSE
-      IF mr_print.tip_proces = '2' THEN
-         LET l_sql = l_sql CLIPPED, " AND operacao IS NULL "
-      END IF
-   END IF
-   
-   #LET l_sql = l_sql CLIPPED, " ORDER BY cod_cliente, dat_operacao, cod_item, prz_entrega "
-      
-   PREPARE var_imp FROM l_sql
-   
-   IF STATUS <> 0 THEN 
-      CALL log003_err_sql('PREPARE','var_imp')
-      RETURN FALSE
-   END IF
-   
-   DECLARE cq_cont CURSOR FOR var_imp
+    SELECT COUNT(*) INTO m_count
+      FROM edi_audit_547
+     WHERE cod_empresa = p_cod_empresa
+       AND ((cod_cliente = mr_print.cod_cliente AND mr_print.cod_cliente IS NOT NULL) OR
+           (1=1 AND mr_print.cod_cliente IS NULL)) 
+       AND ((num_pedido = mr_print.num_pedido AND mr_print.num_pedido IS NOT NULL) OR
+           (1=1 AND mr_print.num_pedido IS NULL)) 
+       AND ((dat_operacao = mr_print.dat_operacao AND mr_print.dat_operacao IS NOT NULL) OR
+           (1=1 AND mr_print.dat_operacao IS NULL)) 
 
    IF STATUS <> 0 THEN
-      CALL log0030_processa_err_sql("DECLARE","cq_cont",0)
-      RETURN FALSE
-   END IF
-    
-   OPEN cq_cont
-    
-   FETCH cq_cont INTO m_count
-    
-   IF STATUS <> 0 AND STATUS <> 100 THEN
-      CALL log0030_processa_err_sql("FETCH","cq_cont",0)
+      CALL log003_err_sql('SELECT','edi_audit_547:pont01')
       RETURN FALSE
    END IF
    
    IF m_count = 0 THEN
-      LET m_msg = 'Não há dados p/ o parêmtros informados.'
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL log0030_mensagem('Não há dados para os parâmetros informados', 'info')
       RETURN FALSE
    END IF
    
@@ -5449,8 +5024,7 @@ FUNCTION pol1370_relatorio(l_report)#
    DEFINE l_report    CHAR(300),
           l_progres   SMALLINT,
           l_cod_cli   CHAR(15),
-          l_status    SMALLINT,
-          l_sql       CHAR(800)
+          l_status    SMALLINT
    
    LET l_status = TRUE   
    LET m_page_length = ReportPageLength("pol1370")
@@ -5462,63 +5036,33 @@ FUNCTION pol1370_relatorio(l_report)#
    CALL LOG_progresspopup_set_total("PROCESS",m_count)
    LET m_ind_print = 1
    
-   LET l_sql = "SELECT cod_cliente, dat_operacao, num_pedido, cod_item, prz_entrega, ",
-       " qtd_operacao, mensagem, usuario, item_cliente, qtd_antes, qtd_atual, operacao, ",
-       " programacao FROM edi_audit_547 WHERE cod_empresa = '",p_cod_empresa,"' "
+   DECLARE cq_imp CURSOR FOR
+    SELECT cod_cliente, num_pedido, cod_item, prz_entrega, 
+           dat_operacao, qtd_operacao, mensagem, usuario,
+           item_cliente, qtd_antes
+      FROM edi_audit_547
+     WHERE cod_empresa = p_cod_empresa
+       AND ((cod_cliente = mr_print.cod_cliente AND mr_print.cod_cliente IS NOT NULL) OR
+           (1=1 AND mr_print.cod_cliente IS NULL)) 
+       AND ((num_pedido = mr_print.num_pedido AND mr_print.num_pedido IS NOT NULL) OR
+           (1=1 AND mr_print.num_pedido IS NULL)) 
+       AND ((dat_operacao = mr_print.dat_operacao AND mr_print.dat_operacao IS NOT NULL) OR
+           (1=1 AND mr_print.dat_operacao IS NULL)) 
 
-   IF mr_print.cod_cliente IS NOT NULL THEN
-      LET l_sql = l_sql CLIPPED, " AND cod_cliente = '",mr_print.cod_cliente,"' "
-   END IF
-   
-   IF mr_print.num_pedido IS NULL OR mr_print.num_pedido <= 0 THEN
-   ELSE
-      LET l_sql = l_sql CLIPPED, " AND num_pedido = '",mr_print.num_pedido,"' "
-   END IF
-
-   IF mr_print.dat_de IS NOT NULL THEN
-      LET l_sql = l_sql CLIPPED, " AND dat_operacao >= '",mr_print.dat_de,"' "
-   END IF
-
-   IF mr_print.dat_ate IS NOT NULL THEN
-      LET l_sql = l_sql CLIPPED, " AND dat_operacao <= '",mr_print.dat_ate,"' "
-   END IF
-
-   IF mr_print.tip_proces = '1' THEN
-      LET l_sql = l_sql CLIPPED, " AND operacao IS NOT NULL "
-   ELSE
-      IF mr_print.tip_proces = '2' THEN
-         LET l_sql = l_sql CLIPPED, " AND operacao IS NULL "
-      END IF
-   END IF
-   
-   LET l_sql = l_sql CLIPPED, " ORDER BY cod_cliente, dat_operacao, cod_item, prz_entrega "
-   
-   PREPARE var_rel FROM l_sql
-   
-   IF STATUS <> 0 THEN 
-      CALL log003_err_sql('PREPARE','var_rel')
-      RETURN FALSE
-   END IF
-   
-   DECLARE cq_rel CURSOR FOR var_rel
-          
-   FOREACH cq_rel INTO
+   FOREACH cq_imp INTO
       mr_relat.cod_cliente,
-      mr_relat.dat_operacao,
       mr_relat.num_pedido,
       mr_relat.cod_item,
       mr_relat.prz_entrega,
+      mr_relat.dat_operacao,
       mr_relat.qtd_operacao,
       mr_relat.mensagem,
       mr_relat.usuario,
       mr_relat.item_cliente,
-      mr_relat.qtd_antes,
-      mr_relat.qtd_atual,
-      mr_relat.operacao,
-      mr_relat.programacao
-      
+      mr_relat.qtd_antes
+         
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','edi_audit_547:cq_rel')
+         CALL log003_err_sql('SELECT','edi_audit_547:pont02')
          LET l_status = FALSE
          EXIT FOREACH
       END IF
@@ -5548,19 +5092,8 @@ FUNCTION pol1370_relatorio(l_report)#
          CALL log003_err_sql('SELECT','item:cq_imp')
          LET l_status = FALSE
          EXIT FOREACH
-      END IF         
-      
-      LET mr_relat.sinal = ' '
-      LET mr_relat.variacao = mr_relat.qtd_atual - mr_relat.qtd_antes
-      
-      IF mr_relat.qtd_atual > mr_relat.qtd_antes THEN
-         LET mr_relat.sinal = '+'
-      ELSE
-         IF mr_relat.qtd_atual < mr_relat.qtd_antes THEN
-            LET mr_relat.sinal = '-'
-         END IF
       END IF
-      
+               
       OUTPUT TO REPORT pol1370_relat(l_cod_cli)
 
    END FOREACH
@@ -5615,27 +5148,24 @@ REPORT pol1370_relat(l_cod_cliente)#
       SKIP 1 LINE
            
    BEFORE GROUP OF l_cod_cliente
-      SKIP TO TOP OF PAGE
+      #SKIP TO TOP OF PAGE
       SKIP 1 LINE
       PRINT COLUMN 001, l_cod_cliente CLIPPED, ' - ', mr_relat.nom_cliente
       PRINT 
-      PRINT COLUMN 001, 'DT ACAO    ACAO                 PEDIDO ITEM            DESCRICAO             ITEM CLIETE   PRZ ENTREG QTD ANT  QTD ATU VARIACAO  INDICACAO   USUARIO'
-      PRINT COLUMN 001, '---------- -------------------- ------ --------------- ------------------  --------------- ---------- -------  ------- --------  ----------- --------'
-           
+      PRINT COLUMN 001, 'PEDIDO ITEM            DESCRICAO             ITEM CLIETE     PRZ ENTREG DAT PROCES QTD ANT  QTD ATU MENSAGEM            USUARIO'
+      PRINT COLUMN 001, '------ --------------- --------------------  --------------- ---------- ---------- -------  ------- ------------------- --------'
+            
     ON EVERY ROW
-        PRINT COLUMN 001, mr_relat.dat_operacao,
-              COLUMN 012, mr_relat.operacao,
-              COLUMN 033, mr_relat.num_pedido USING '######',
-              COLUMN 040, mr_relat.cod_item,
-              COLUMN 056, mr_relat.den_item_reduz,
-              COLUMN 076, mr_relat.item_cliente[1,15],              
-              COLUMN 092, mr_relat.prz_entrega,                            
-              COLUMN 103, mr_relat.qtd_antes USING '#######',              
-              COLUMN 112, mr_relat.qtd_atual USING '#######',              
-              COLUMN 120, mr_relat.variacao USING '#######',     
-              COLUMN 127, mr_relat.sinal,                            
-              COLUMN 130, mr_relat.mensagem,
-              COLUMN 142, mr_relat.usuario
+        PRINT COLUMN 001, mr_relat.num_pedido USING '######',
+              COLUMN 008, mr_relat.cod_item,
+              COLUMN 024, mr_relat.den_item_reduz,
+              COLUMN 046, mr_relat.item_cliente[1,15],              
+              COLUMN 062, mr_relat.prz_entrega,              
+              COLUMN 073, mr_relat.dat_operacao,
+              COLUMN 084, mr_relat.qtd_antes USING '#######',              
+              COLUMN 093, mr_relat.qtd_operacao USING '#######',              
+              COLUMN 101, mr_relat.mensagem[1,19],
+              COLUMN 121, mr_relat.usuario
 
 END REPORT
 

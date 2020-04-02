@@ -472,10 +472,10 @@ FUNCTION pol1350_dialog_item()#
     LET l_menubar = _ADVPL_create_component(NULL,"LMENUBAR",m_form_item)
     CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
 
-   {LET l_importa = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
+   LET l_importa = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
    CALL _ADVPL_set_property(l_importa,"IMAGE","IMPORTAR")     
    CALL _ADVPL_set_property(l_importa,"TYPE","NO_CONFIRM")     
-   CALL _ADVPL_set_property(l_importa,"EVENT","pol1350_importar")   }  
+   CALL _ADVPL_set_property(l_importa,"EVENT","pol1350_importar")     
 
    LET l_confirma = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
    CALL _ADVPL_set_property(l_confirma,"IMAGE","CONFIRM_EX")     

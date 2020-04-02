@@ -104,7 +104,7 @@ FUNCTION pol1372()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1372-12.00.01  "
+   LET p_versao = "pol1372-12.00.00  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1372_menu()
@@ -690,8 +690,8 @@ FUNCTION pol1372_le_cli_item()#
    END FOREACH
    
    IF NOT p_status THEN
-      LET mr_cabec.den_it_cli = 'Item não cadastrdo no MAN10021/Comercial3.'
-      #RETURN FALSE
+      LET m_msg = 'Item cliente inválido.'
+      RETURN FALSE
    END IF
    
    RETURN TRUE

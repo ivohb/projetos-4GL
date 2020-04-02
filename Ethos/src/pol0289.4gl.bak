@@ -210,8 +210,8 @@ END FUNCTION
 
       AFTER FIELD cod_cliente   
       IF p_tela.cod_cliente IS NULL THEN
-         ERROR "Campo de preenchimento obrigatorio"
-         NEXT FIELD cod_cliente
+         #ERROR "Campo de preenchimento obrigatorio"
+         #NEXT FIELD cod_cliente
          LET p_tela.nom_cliente = NULL
       ELSE
          SELECT nom_cliente
@@ -222,10 +222,10 @@ END FUNCTION
             ERROR "Cliente nao Cadastrado"
             NEXT FIELD cod_cliente
          END IF
-         DISPLAY BY NAME p_tela.nom_cliente
-         LET p_relat.nom_cliente = p_tela.nom_cliente
       END IF
 
+         DISPLAY BY NAME p_tela.nom_cliente
+         LET p_relat.nom_cliente = p_tela.nom_cliente
 
       AFTER FIELD cod_cli1   
       IF p_tela.cod_cli1 IS NOT NULL THEN
@@ -271,13 +271,13 @@ END FUNCTION
 
 
       AFTER FIELD dat_ini    
-      IF p_tela.dat_ini IS NULL THEN
+      {IF p_tela.dat_ini IS NULL THEN
          ERROR "Campo de Preenchimento Obrigatorio"
          NEXT FIELD dat_ini       
-      END IF 
+      END IF }
 
       AFTER FIELD dat_fim   
-      IF p_tela.dat_fim IS NULL THEN
+      {IF p_tela.dat_fim IS NULL THEN
          ERROR "Campo de Preenchimento Obrigatorio"
          NEXT FIELD dat_fim
       ELSE
@@ -289,7 +289,7 @@ END FUNCTION
             ERROR "Periodo nao pode ser maior que 720 Dias"
             NEXT FIELD dat_ini
          END IF 
-      END IF 
+      END IF }
 
       AFTER FIELD cod_item   
          IF p_tela.cod_item IS NULL THEN

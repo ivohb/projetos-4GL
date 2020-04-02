@@ -352,7 +352,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.27  "
+   LET p_versao = "POL1370-12.00.26  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
 

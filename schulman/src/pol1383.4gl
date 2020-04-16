@@ -573,7 +573,22 @@ FUNCTION pol1383_load_arq()#
       
    CALL LOG_transaction_begin()
    
-   LOAD FROM m_arq_arigem INSERT INTO lista_temp_schulman
+   LOAD FROM m_arq_arigem 
+     INSERT INTO lista_temp_schulman(
+        cod_empresa,	         
+        num_Lista,	           
+        den_lista,	           
+        dat_val_ini,	         
+        dat_val_fim,	         
+        bloqueia_pedido,	     
+        bloqueia_faturamento, 
+        cod_moeda,	           
+        unid_medida,	         
+        cod_cliente,	         
+        area_e_linha,	       
+        cod_item,	           
+        preco_unit,	         
+        preco_minimo)         
    
    IF STATUS <> 0 THEN 
       CALL log003_err_sql('SELECT','lista_temp_schulman:LOAD')
@@ -613,6 +628,14 @@ FUNCTION pol1383_load_arq()#
       RETURN FALSE
    END IF
 
+   IF NOT pol1383_gera_id() THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1383_tira_espaco() THEN
+      RETURN FALSE
+   END IF
+
    IF NOT pol1383_exibe_dados() THEN
       RETURN FALSE
    END IF
@@ -628,20 +651,21 @@ FUNCTION pol1383_cria_temp()#
    DROP TABLE lista_temp_schulman
    
    CREATE  TABLE lista_temp_schulman (
-      cod_empresa	          char(02),     
+      cod_empresa	          char(80),     
       num_Lista	            integer,      
-      den_lista	            varchar(30),  
+      den_lista	            char(80),  
       dat_val_ini	          date,         
       dat_val_fim	          date,         
-      bloqueia_pedido	      char(01),     
-      bloqueia_faturamento  char(01),     
+      bloqueia_pedido	      char(80),     
+      bloqueia_faturamento  char(80),     
       cod_moeda	            integer,      
-      unid_medida	          char(03),     
-      cod_cliente	          char(15),     
-      area_e_linha	        char(08),     
-      cod_item	            char(15),     
-      preco_unit	          char(20),     
-      preco_minimo          char(20)
+      unid_medida	          char(80),     
+      cod_cliente	          char(80)),     
+      area_e_linha	        char(80),     
+      cod_item	            char(80),     
+      preco_unit	          char(80),     
+      preco_minimo          char(80),
+      id_registro           integer
    )
    
    IF STATUS <> 0 THEN
@@ -660,6 +684,71 @@ FUNCTION pol1383_cria_temp()#
    RETURN TRUE
 
 END FUNCTION
+
+#-------------------------#
+FUNCTION pol1383_gera_id()#
+#-------------------------#
+
+   DEFINE l_id    INTEGER
+   
+   LET l_id = 0
+
+   DECLARE cq_id CURSOR FOR
+   SELECT *
+     FROM lista_temp_schulman
+   
+   FOREACH cq_id INTO lr_lista.*
+   
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','lista_temp_schulman:cq_espaco')
+         RETURN FALSE
+      END IF
+   
+   
+
+#-----------------------------#
+FUNCTION pol1383_tira_espaco()#
+#-----------------------------#
+   
+   DEFINE lr_lista       RECORD
+      cod_empresa	          char(80),     
+      num_Lista	            integer,      
+      den_lista	            char(80),  
+      dat_val_ini	          date,         
+      dat_val_fim	          date,         
+      bloqueia_pedido	      char(80),     
+      bloqueia_faturamento  char(80),     
+      cod_moeda	            integer,      
+      unid_medida	          char(80),     
+      cod_cliente	          char(80)),     
+      area_e_linha	        char(80),     
+      cod_item	            char(80),     
+      preco_unit	          char(80),     
+      preco_minimo          char(80)
+   END RECORD   
+   
+   
+   DECLARE cq_espaco CURSOR FOR
+   SELECT *
+     FROM lista_temp_schulman
+   
+   FOREACH cq_espaco INTO lr_lista.*
+   
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','lista_temp_schulman:cq_espaco')
+         RETURN FALSE
+      END IF
+
+      LET lr_lista.cod_empresa = func002_trim(lr_lista.cod_empresa)
+      LET lr_lista.den_lista = func002_trim(lr_lista.den_lista)
+      LET lr_lista.bloqueia_pedido = func002_trim(lr_lista.bloqueia_pedido)
+      LET lr_lista.bloqueia_faturamento = func002_trim(lr_lista.bloqueia_faturamento)
+      LET lr_lista.unid_medida = func002_trim(lr_lista.unid_medida)
+      LET lr_lista.cod_cliente = func002_trim(lr_lista.cod_cliente)
+      LET lr_lista.area_e_linha = func002_trim(lr_lista.area_e_linha)
+      LET lr_lista.cod_item = func002_trim(lr_lista.cod_item)
+      LET lr_lista.preco_unit = func002_trim(lr_lista.preco_unit)
+      LET lr_lista.preco_minimo = func002_trim(lr_lista.preco_minimo)
 
 #-----------------------------#
 FUNCTION pol1383_exibe_dados()#

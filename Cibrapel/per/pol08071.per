@@ -1,0 +1,43 @@
+DATABASE logix
+SCREEN 
+{
+   LOCAL         DENOMINACAO         QTDE       USUARIO DATA ALTER   HORA 
+  RECURSO                                 DATA AREA     PRZ CLIENTE  OBS
+-----------------------------------------------------------------------------
+[a        |b                      |f         |c         |d         |e       ]
+[g        |h                      ]      [i         ]   [j         ]
+                                                  [k                        ]
+[a        |b                      |f         |c         |d         |e       ]
+[g        |h                      ]      [i         ]   [j         ]
+                                                  [k                        ]
+[a        |b                      |f         |c         |d         |e       ]
+[g        |h                      ]      [i         ]   [j         ]
+                                                  [k                        ]
+[a        |b                      |f         |c         |d         |e       ]
+[g        |h                      ]      [i         ]   [j         ]
+                                                  [k                        ]
+[a        |b                      |f         |c         |d         |e       ]
+[g        |h                      ]      [i         ]   [j         ]
+                                                  [k                        ]
+}
+
+END
+
+
+ATTRIBUTES
+   a = FORMONLY.cod_local,NOENTRY;
+   b = FORMONLY.den_local,NOENTRY;
+   f = FORMONLY.qtde,NOENTRY;
+   c = FORMONLY.usuario,NOENTRY;
+   d = FORMONLY.data_alter,NOENTRY;
+   e = FORMONLY.hora_alter,NOENTRY;
+   g = FORMONLY.cod_recur,NOENTRY;
+   h = FORMONLY.den_recur,NOENTRY;
+   i = FORMONLY.dat_area,NOENTRY;
+   j = FORMONLY.prz_cliente,NOENTRY;
+   k = FORMONLY.observacao1,NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_audit[05] (cod_local THRU observacao1);
+END 

@@ -1,0 +1,31 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------
+       BANCOS PARA EMPRÉSTIMOS CONSIGNADOS            
+              
+     Código            Descrição                       
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+     [a   ]  [b                             ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_banco, NOENTRY
+  --# ,OPTIONS='-nolist';
+b = FORMONLY.nom_banco, NOENTRY, REVERSE, color = blue
+  --# ,OPTIONS='-nolist';
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_bancos[10](cod_banco THRU nom_banco);
+END 

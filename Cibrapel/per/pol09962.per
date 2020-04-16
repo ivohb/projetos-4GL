@@ -1,0 +1,35 @@
+DATABASE FORMONLY 
+SCREEN
+{
+--------------------------------------------------------------
+                        ORDENS DE MONTAGEM
+                        
+       Cliente                    Nome
+[a              ] [b                                       ]
+ 
+   Num OM      Cliente            Nome               Pedido
+[c       |d              |e                         |f     ]
+[c       |d              |e                         |f     ]
+[c       |d              |e                         |f     ]
+[c       |d              |e                         |f     ]
+[c       |d              |e                         |f     ]
+[c       |d              |e                         |f     ]
+[c       |d              |e                         |f     ]
+[c       |d              |e                         |f     ]
+[c       |d              |e                         |f     ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_cliente,       UPSHIFT, AUTONEXT;
+ b = FORMONLY.nom_cliente,       UPSHIFT, AUTONEXT;
+ c = FORMONLY.num_om            --#, OPTIONS="-nolist";
+ d = FORMONLY.cod_cli           --#, OPTIONS="-nolist";
+ e = FORMONLY.nom_cli           --#, OPTIONS="-nolist";
+ f = FORMONLY.num_pedido        --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_om[9] (num_om THRU num_pedido);
+END
+

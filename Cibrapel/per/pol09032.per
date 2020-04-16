@@ -1,0 +1,32 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------------------------------
+ 
+       Cod Operação   Nº Sequencia           Descrição
+       ------------   -------------   --------------------------------
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+       [a2      ]     [a3      ]      [a4                            ]
+
+}
+END
+
+ATTRIBUTES
+a2 = FORMONLY.cod_operac, 		UPSHIFT, AUTONEXT;
+a3 = FORMONLY.num_seq_operac, UPSHIFT, AUTONEXT;
+a4 = FORMONLY.den_operac, 		UPSHIFT, NOENTRY;
+END 
+
+INSTRUCTIONS
+
+   SCREEN RECORD s_operac_popup[10](cod_operac THRU den_operac);
+                     
+END 

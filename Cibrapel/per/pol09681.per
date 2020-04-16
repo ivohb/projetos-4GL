@@ -1,0 +1,27 @@
+DATABASE FORMONLY
+SCREEN
+{
+         MOVIMENTOS DE PARADA
+----------------------------------------
+ Código  Descrição
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+[a    ] [b                             ]
+}
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_parada, NOENTRY;
+  b = FORMONLY.des_parada, NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_parada[10](cod_parada THRU des_parada);
+END 

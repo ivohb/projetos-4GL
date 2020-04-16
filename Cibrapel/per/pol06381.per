@@ -1,0 +1,36 @@
+DATABASE logix
+SCREEN
+{
+    CARTEIRA     CLIENTE      LISTA PRECO
+    -------- ---------------  ----------- 
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+      [a ]  [b              ]   [c   ]
+    
+}
+END
+TABLES
+   carteira_cli_885
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_tip_carteira, AUTONEXT;
+   b = FORMONLY.cod_cliente, NOENTRY;
+   c = FORMONLY.num_list_preco, NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_lista[15] (cod_tip_carteira THRU num_list_preco);
+END 

@@ -1,0 +1,36 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-------------------------------------------------------
+                      LOCALIDADES
+
+     Local:[a                         ] UF:[b ]
+ 
+ Rota  Local Praça Descrição                      UF
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+[d    |e    |f    |g                             |h ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.den_local, UPSHIFT, AUTONEXT;
+ b = FORMONLY.uni_feder, UPSHIFT, AUTONEXT;
+ d = FORMONLY.cod_rota,  UPSHIFT --#, OPTIONS="-nolist";
+ e = FORMONLY.cod_local, UPSHIFT --#, OPTIONS="-nolist";
+ f = FORMONLY.cod_praca, UPSHIFT --#, OPTIONS="-nolist";
+ g = FORMONLY.nom_local, UPSHIFT --#, OPTIONS="-nolist";
+ h = FORMONLY.uf_local,  UPSHIFT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_rota[10] (cod_rota THRU uf_local);
+END
+

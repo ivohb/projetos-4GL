@@ -1,0 +1,31 @@
+DATABASE logix       
+SCREEN
+{
+-------------------------------------------------
+                 BAIXAS PENDENTES            
+                                      
+                    Mês/Ano        
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+              [a                   ]
+}
+
+ATTRIBUTES
+a = FORMONLY.ano_mes, NOENTRY  --# ,OPTIONS='-nolist';
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_mes[14](ano_mes);
+END 

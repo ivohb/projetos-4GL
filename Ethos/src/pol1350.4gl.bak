@@ -129,7 +129,7 @@ FUNCTION pol1350()#
    SET LOCK MODE TO WAIT 300
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1350-12.00.13  "
+   LET p_versao = "pol1350-12.00.14  "
    CALL func002_versao_prg(p_versao)
    CALL pol1350_menu()
     
@@ -472,10 +472,10 @@ FUNCTION pol1350_dialog_item()#
     LET l_menubar = _ADVPL_create_component(NULL,"LMENUBAR",m_form_item)
     CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
 
-   LET l_importa = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
+   {LET l_importa = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
    CALL _ADVPL_set_property(l_importa,"IMAGE","IMPORTAR")     
    CALL _ADVPL_set_property(l_importa,"TYPE","NO_CONFIRM")     
-   CALL _ADVPL_set_property(l_importa,"EVENT","pol1350_importar")     
+   CALL _ADVPL_set_property(l_importa,"EVENT","pol1350_importar")   }  
 
    LET l_confirma = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
    CALL _ADVPL_set_property(l_confirma,"IMAGE","CONFIRM_EX")     
@@ -1320,6 +1320,10 @@ FUNCTION pol1350_explode_estrut()#
       
             IF l_ies_tipo MATCHES '[BC]' THEN
                IF NOT pol1350_ins_compon() THEN
+                  RETURN FALSE
+               END IF
+               IF l_ies_tipo MATCHES '[BC]' THEN
+               IF NOT pol1350_ins_it(m_cod_comp) THEN
                   RETURN FALSE
                END IF
             ELSE

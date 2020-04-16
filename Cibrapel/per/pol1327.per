@@ -1,0 +1,30 @@
+DATABASE logix
+SCREEN
+{
+ -----------------------------------------------------------------------------
+  
+  [a ]                 CLIENTES COM UM PEDIDO POR NOTA
+  
+ 
+ 
+                Cod cliente: [b              ]
+            
+                  Descrição: [c                             ] 
+                
+                    
+ 
+ 
+ 
+
+
+
+
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.cod_cliente, UPSHIFT, AUTONEXT
+      --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   c = FORMONLY.nom_cliente, UPSHIFT, NOENTRY;
+END 

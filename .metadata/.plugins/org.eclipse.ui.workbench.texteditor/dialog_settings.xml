@@ -12,14 +12,14 @@
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="VERSAO"/>
 			<item value="versao"/>
+			<item value="#&amp;"/>
+			<item value="le_programa"/>
+			<item value="estrut_gr"/>
+			<item value="&quot;BC"/>
+			<item value="&apos;BC"/>
+			<item value="VERSAO"/>
 			<item value="MOVE_"/>
-			<item value="move_"/>
-			<item value="vdp_pre"/>
-			<item value="le_cami"/>
-			<item value="quest"/>
-			<item value="l_pre_min"/>
 		</list>
 		<list key="replacehistory">
 			<item value="pol1381"/>

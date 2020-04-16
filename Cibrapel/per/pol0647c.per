@@ -1,0 +1,32 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+----------------------------------------------------------
+                 PAPEIS DA ESTURTURA DA ORDEM
+ 
+               Item              Descrição
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+         [k              ]  [l                 ]
+
+}
+END
+
+ATTRIBUTES 
+ k = FORMONLY.item; 
+ l = FORMONLY.descricao;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[10] (item THRU descricao);
+END
+
+

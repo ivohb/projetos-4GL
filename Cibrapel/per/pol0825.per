@@ -1,0 +1,51 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a0]           CONSULTA DIMENCIONAL DE PEDIDOS  -  CHAPAS
+
+ Numero Pedido :[a1    ] 
+ Cliente  :[a2             ][a3                                  ]
+ =============================================================================
+ Item      Descricao         Qtde Sol. Preço un    Larg.    Comp. Peso unit.  
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+[a6       |a7             |a10        |a8      |a13     |a11     |a12       ]
+
+}
+END
+TABLES
+item_chapa_885,
+pedidos,
+ped_itens,
+item
+END
+ATTRIBUTES
+a0 = pedidos.cod_empresa,              NOENTRY;
+a1 = pedidos.num_pedido,               AUTONEXT,
+     COMMENTS = "Digite o Nro do Pedido";
+a2 = pedidos.cod_cliente,              NOENTRY;               
+a3 = FORMONLY.nom_cliente,             NOENTRY;
+a6 = ped_itens.cod_item,               NOENTRY; 
+a7 = item.den_item_reduz,              NOENTRY; 
+a10= ped_itens.qtd_pecas_solic,        NOENTRY;
+a8 = FORMONLY.pre_unit,                NOENTRY;
+a13= item_chapa_885.largura,           NOENTRY;
+a11= item_chapa_885.comprimento,       NOENTRY;
+a12= ped_itens.qtd_pecas_atend,        NOENTRY;
+INSTRUCTIONS
+screen record s_item_chapa_885[10] (ped_itens.cod_item,        
+                                    item.den_item_reduz,                            
+                                    ped_itens.qtd_pecas_solic, 
+                                    FORMONLY.pre_unit,         
+                                    item_chapa_885.largura,    
+                                    item_chapa_885.comprimento,
+                                    ped_itens.qtd_pecas_atend);    
+END

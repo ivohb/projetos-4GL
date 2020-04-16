@@ -1,0 +1,60 @@
+DATABASE FORMONLY 
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                     APARAS - LANÇAMENTO DE LOTES E FARDOS
+
+Num AR:[b      ] St:[h] NF:[c     ][z] Entrada:[d         ] Umd Padrão:[e     ]
+Fornec:[f              ][g                                          ]
+Motorista:[nm                  ]                               Placa:[pl      ]
+                                            Cnsiderar           
+ Seq     Item           Descrição     Umidad Padrão Motivo   Decrição
+[k |l              |m                 |n    ] [o]   [p ] [q                  ]
+[k |l              |m                 |n    ] [o]   [p ] [q                  ]
+[k |l              |m                 |n    ] [o]   [p ] [q                  ]
+[k |l              |m                 |n    ] [o]   [p ] [q                  ]
+[k |l              |m                 |n    ] [o]   [p ] [q                  ]
+                                         Lote        Qtd Fardo   Peso Balança
+                                  [r              ] [s        ] [t           ]
+                                  [r              ] [s        ] [t           ]
+                                  [r              ] [s        ] [t           ]
+                                  [r              ] [s        ] [t           ]
+                                  [r              ] [s        ] [t           ]
+                 
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,    NOENTRY;
+ b = FORMONLY.num_aviso_rec,  AUTONEXT;
+ c = FORMONLY.num_nf,         NOENTRY, REVERSE;
+ z = FORMONLY.tipo,           NOENTRY, REVERSE;
+ d = FORMONLY.dat_entrada,    NOENTRY, REVERSE;
+ e = FORMONLY.pct_umd_pad,    NOENTRY, REVERSE;
+ f = FORMONLY.cod_fornecedor, NOENTRY, REVERSE;
+ g = FORMONLY.nom_fornecedor, NOENTRY, REVERSE;
+ nm= FORMONLY.motorista,      UPSHIFT, AUTONEXT;
+ pl= FORMONLY.placa,          UPSHIFT, AUTONEXT;
+ h = FORMONLY.cod_status,     NOENTRY, UPSHIFT;
+ k = FORMONLY.num_seq,        NOENTRY, REVERSE;
+ l = FORMONLY.cod_item,       NOENTRY, REVERSE;
+ m = FORMONLY.den_item,       NOENTRY, REVERSE;
+ n = FORMONLY.pct_umd_med,    AUTONEXT,
+     COMMENTS = 'Ctrl-t = Informar lotes' --#,OPTIONS='-nolist';
+ o = FORMONLY.ies_consid,     UPSHIFT, AUTONEXT,
+     INCLUDE=('S','N'), 
+     COMMENTS='S(Considera umd padrão) N(Considera umd medida)  /  Ctrl-t = Informar lotes'
+     --#,OPTIONS='-nolist';
+ p = FORMONLY.cod_motivo,    UPSHIFT, AUTONEXT,
+     COMMENTS = 'Ctrl-t = Informar lotes'
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z', OPTIONS='-nolist';
+ q = FORMONLY.den_motivo,    NOENTRY;
+ r = FORMONLY.num_lote,      AUTONEXT, UPSHIFT --#,OPTIONS='-nolist';
+ s = FORMONLY.qtd_fardo,     AUTONEXT, UPSHIFT --#,OPTIONS='-nolist';
+ t = FORMONLY.qtd_contagem,  NOENTRY;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[05] (num_seq THRU den_motivo);
+   SCREEN RECORD sr_lote[05] (num_lote THRU qtd_contagem);
+END

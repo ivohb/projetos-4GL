@@ -1,0 +1,67 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                           PARAMETROS DO SISTEMA
+              
+          Item apara nobre:[b              ] [c                              ]               
+          Lote apara nobre:[d              ]              
+             Cód faturista:[f         ] [g                                   ]  
+            Umidade padrão:[h     ]             
+           Cód item refugo:[i              ] [j                              ]
+           Cód item sucata:[k              ] [l                              ]
+       Cód item retrabalho:[m              ] [n                              ]
+           Num lote refugo:[o              ]
+       Num lote retrabalho:[p              ] 
+           Num lote sucata:[q              ]
+ Oper sai transf p/ refugo:[s   ] [u                                         ]
+ Oper ent transf p/ refugo:[r   ] [t                                         ]           
+   Operação entrada sucata:[os  ] [do                                        ]
+Oper sucateamento de itens:[or  ] [dr                                        ]
+         Cód pacote bobina:[a1 ]     
+   Dat de corte virda 10.2:[dc        ]      
+ Tolerância baixa de aparas:[tl        ] KG.
+}
+
+END
+
+ATTRIBUTES
+
+a = FORMONLY.cod_empresa,        UPSHIFT,NOENTRY,REVERSE;  
+b = FORMONLY.cod_item_sucata_dq, UPSHIFT, AUTONEXT 
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.den_item_sucata_dq, UPSHIFT, NOENTRY,REVERSE;
+d = FORMONLY.num_lote_sucata_dq, UPSHIFT, AUTONEXT;
+f = FORMONLY.cod_faturista,      AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+g = FORMONLY.nom_usuario,        UPSHIFT, NOENTRY,REVERSE;
+h = FORMONLY.pct_umid_pad,       UPSHIFT, AUTONEXT;
+i = FORMONLY.cod_item_refugo,    UPSHIFT, AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+j = FORMONLY.den_item_refugo,    UPSHIFT, NOENTRY,REVERSE;
+k = FORMONLY.cod_item_sucata,    UPSHIFT, AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+l = FORMONLY.den_item_sucata,    UPSHIFT, NOENTRY,REVERSE;
+m = FORMONLY.cod_item_retrab,    UPSHIFT, AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+n = FORMONLY.den_item_retrab,    UPSHIFT, NOENTRY,REVERSE;
+o = FORMONLY.num_lote_refugo,    UPSHIFT, AUTONEXT;
+p = FORMONLY.num_lote_retrab,    UPSHIFT, AUTONEXT;
+q = FORMONLY.num_lote_sucata,    UPSHIFT, AUTONEXT;
+r = FORMONLY.oper_ent_tp_refugo, UPSHIFT, AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+t = FORMONLY.den_oper_ent_tp_refugo, UPSHIFT, NOENTRY,REVERSE;
+s = FORMONLY.oper_sai_tp_refugo, UPSHIFT, AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+u = FORMONLY.den_oper_sai_tp_refugo,      UPSHIFT, NOENTRY,REVERSE;
+a1= FORMONLY.cod_pacote_bob,     UPSHIFT, AUTONEXT;
+dc= FORMONLY.dat_corte,    UPSHIFT, AUTONEXT;
+os= FORMONLY.oper_entr_sucata, UPSHIFT, AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+do= FORMONLY.den_oper_entr_sucata,      UPSHIFT, NOENTRY,REVERSE;
+or= FORMONLY.oper_sucateamento, UPSHIFT, AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ dr= FORMONLY.den_oper_sucateamento,      UPSHIFT, NOENTRY,REVERSE;
+ tl= FORMONLY.tol_bx_aparas,  UPSHIFT, AUTONEXT;
+
+END 

@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+  
+  [a ]                  CADASTRO DE GRAMATURA
+ 
+
+       Codigo Item: [b              ] [c                 ]
+          
+         Gramatura: [d           ] gramas
+
+       Peso Minimo: [e              ] kg
+                
+  
+
+ 
+ 
+ 
+ 
+
+}
+END
+TABLES
+   gramatura_885
+END
+ATTRIBUTES
+a = FORMONLY.cod_empresa, NOENTRY;
+b = FORMONLY.cod_item, UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.den_item_reduz, UPSHIFT, NOENTRY;
+d = gramatura_885.gramatura, UPSHIFT, AUTONEXT;
+e = gramatura_885.peso_minimo, UPSHIFT, AUTONEXT;
+END 

@@ -482,16 +482,6 @@ FUNCTION pol1270a_grava_ordens()
       
    END FOREACH
 
-   INSERT INTO pedido_lote_885
-    VALUES(p_cod_empresa, p_man.lote, p_man.comprimento,
-           p_man.largura, p_man.altura, p_man.diametro,
-           p_man.num_pedido, p_man.num_seq_pedido)
-
-   IF STATUS <> 0 THEN
-      LET p_msg = 'ERRO:(',STATUS, ') INSERINDO DADOS NA TABELA PEDIDO_LOTE_885'
-      RETURN FALSE
-   END IF     
-
    IF p_tipo_processo = 1 THEN
       UPDATE ped_itens
          SET qtd_pecas_atend = qtd_pecas_atend + p_tot_apont
@@ -1869,15 +1859,6 @@ FUNCTION pol1270a_estorna_ordem()#
       END IF  
          
    END FOREACH
-   
-   DELETE FROM pedido_lote_885
-    WHERE cod_empresa = p_cod_empresa
-      AND num_lote = p_man.lote
-      
-   IF STATUS <> 0 THEN
-      LET p_msg = 'ERRO:(',STATUS, ') DELETADO DADOS DA TABELA PEDIDO_LOTE_885'
-      RETURN FALSE
-   END IF     
 
    RETURN TRUE
 

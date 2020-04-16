@@ -1,0 +1,32 @@
+DATABASE logix
+SCREEN
+{
+   COD.FAMILIA         DESCRICAO      
+    -------- -----------------------------   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+      [a  ]  [b                            ]   
+
+    
+}
+END
+
+
+ATTRIBUTES
+   a = FORMONLY.cod_familia,AUTONEXT;
+   b = FORMONLY.den_familia,NOENTRY;
+   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_empresa[12] (cod_familia THRU den_familia);
+END 

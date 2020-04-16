@@ -1,0 +1,30 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------------------------------
+    [a0]                    FATURA X NOTAFISCAL
+
+
+
+               Tipo: [a                            ]
+
+
+             Numero: [b     ]
+
+     N.Fatura ou NF: [c     ] [d          ]
+
+
+
+}
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, 		UPSHIFT, NOENTRY;
+a = FORMONLY.tipo TYPE CHAR, UPSHIFT, AUTONEXT,
+		COMMENTS = "Você deseja obter o numero da Fatura ou da Nota Fiscal?"
+--#, WIDGET="RADIO", config="NF {Nota Fiscal} SOL {Solicitação de Fatura} " ;
+b = FORMONLY.entrada, 					 UPSHIFT, AUTONEXT,	COMMENTS = "Informar o numero"; 
+c = FORMONLY.saida, 		UPSHIFT, NOENTRY;
+d = FORMONLY.tipo_sai, 		UPSHIFT, NOENTRY;
+		
+END 

@@ -1,0 +1,46 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------------------------------------
+[a ]                       PEDIDOS COM RESTRIÇÃO
+
+     Cliente:[b              ][c                                    ] 
+      Dt Lib:[d         ]-[e         ]     Linha de produto:[f ] [g ]
+     Cliente             Nome         Pedido Sit  Emissão
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+   [l              |m                       |n     |o ][p         ]
+ 
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,  NOENTRY;
+ b = FORMONLY.cod_client,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.nom_reduzido, NOENTRY, REVERSE;
+ d = FORMONLY.dat_ini,      UPSHIFT, AUTONEXT;
+ e = FORMONLY.dat_fim,      UPSHIFT, AUTONEXT;
+ f = FORMONLY.cod_lin_prod, UPSHIFT, AUTONEXT;
+ g = FORMONLY.cod_lin_recei,UPSHIFT;
+
+ l = FORMONLY.cod_cliente,  NOENTRY       --#, OPTIONS="-nolist"; 
+     
+ m = FORMONLY.nom_cliente,  NOENTRY       --#, OPTIONS="-nolist"; 
+ n = FORMONLY.num_pedido,             
+     COMMENTS = 'Ctr-z: Itens / Sit: D-Digitado E-Sem estoque B-Bloqueado' 
+                                          --#, OPTIONS="-nolist"; 
+ o = FORMONLY.cod_restricao, NOENTRY      --#, OPTIONS="-nolist"; 
+ p = FORMONLY.dat_emissao,  NOENTRY       --#, OPTIONS="-nolist"; 
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_bloqueados[10](cod_cliente THRU dat_emissao);
+END 

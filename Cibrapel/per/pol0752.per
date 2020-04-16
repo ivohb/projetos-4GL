@@ -1,0 +1,36 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------
+                           GERENTES 
+ 
+Gerente     : [a1     ] [a2                                      ]
+
+Pct. Comis 1: [a3     ]              Pct. Comis 2: [a4     ]        
+
+Garantia 1  : [a6               ]    Garantia 2  : [a7               ]
+
+Dat Validade: [d1        ]           Experiencia:[e]                       
+ 
+}   
+
+END
+
+TABLES
+ger_com_885,
+representante    
+END
+
+attributes
+a1   = ger_com_885.cod_gerente, UPSHIFT, AUTONEXT 
+        --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   
+a2   = representante.raz_social, NOENTRY; 
+a3   = ger_com_885.pct_com_ofi, UPSHIFT, AUTONEXT;    
+a4   = ger_com_885.pct_com_ger, UPSHIFT, AUTONEXT;    
+a6   = ger_com_885.val_gar_ofi, UPSHIFT, AUTONEXT;   
+a7   = ger_com_885.val_gar_ger, UPSHIFT, AUTONEXT;    
+d1   = ger_com_885.dat_exp_gar, UPSHIFT, AUTONEXT;    
+e    = ger_com_885.ies_exp,   UPSHIFT, AUTONEXT;    
+END

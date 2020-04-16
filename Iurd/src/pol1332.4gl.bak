@@ -498,14 +498,14 @@ FUNCTION pol1332_exibe_dados()#
           den_parametro,     
           cod_item,          
           especie_nf,        
-          cnd_pgto,
-          cod_uni_funcio          
+          cnd_pgto
+          #cod_uni_funcio          
      INTO mr_campos.tip_obrigacao,
           mr_campos.den_parametro,
           mr_campos.cod_item,
           mr_campos.especie_nf,
-          mr_campos.cnd_pgto,
-          mr_campos.cod_uni_funcio
+          mr_campos.cnd_pgto
+          #mr_campos.cod_uni_funcio
     FROM gi_param_ar_912
    WHERE cod_tipo_obrigacao = m_tipo_obrigacao
 
@@ -516,7 +516,7 @@ FUNCTION pol1332_exibe_dados()#
          
    CALL pol1332_le_item(mr_campos.cod_item) RETURNING p_status
    CALL pol1332_le_cond(mr_campos.cnd_pgto) RETURNING p_status
-   CALL pol1332_le_funcio (mr_campos.cod_uni_funcio) RETURNING p_status
+   #CALL pol1332_le_funcio (mr_campos.cod_uni_funcio) RETURNING p_status
    
    LET p_status = pol1332_carga_grade()
    
@@ -824,15 +824,15 @@ FUNCTION pol1332_ins_registro()#
       cod_operacao,
       cod_item,          
       especie_nf,        
-      cnd_pgto,
-      cod_uni_funcio)             
+      cnd_pgto)
+      #cod_uni_funcio)             
     VALUES(mr_campos.tip_obrigacao,
            mr_campos.den_parametro,
            ' ',
            mr_campos.cod_item,
            mr_campos.especie_nf,
-           mr_campos.cnd_pgto,
-           mr_campos.cod_uni_funcio)     
+           mr_campos.cnd_pgto)
+           #mr_campos.cod_uni_funcio)     
 
    IF STATUS <> 0 THEN
       CALL log0030_processa_err_sql('INSERT','gi_param_ar_912',0)
@@ -1369,8 +1369,8 @@ FUNCTION pol1332_atu_tabs()#
       SET den_parametro = mr_campos.den_parametro,
           cod_item = mr_campos.cod_item,
           especie_nf = mr_campos.especie_nf,
-          cnd_pgto =  mr_campos.cnd_pgto,
-          cod_uni_funcio = mr_campos.cod_uni_funcio
+          cnd_pgto =  mr_campos.cnd_pgto
+          #cod_uni_funcio = mr_campos.cod_uni_funcio
     WHERE cod_tipo_obrigacao = m_tipo_obrigacao
    
    IF STATUS <> 0 THEN

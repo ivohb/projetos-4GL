@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                            ERROS DA NOTA
+  
+           
+    Nota                  Descrição do erro
+ [b        ]
+ [c                                                                         ]
+ [b        ]
+ [c                                                                         ]
+ [b        ]
+ [c                                                                         ]
+ [b        ]
+ [c                                                                         ]
+ [b        ]
+ [c                                                                         ]
+ [b        ]
+ [c                                                                         ]
+     
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa,     UPSHIFT, NOENTRY;   
+b = FORMONLY.num_pedido,      UPSHIFT, AUTONEXT;
+c = FORMONLY.den_erro,        UPSHIFT, AUTONEXT;
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_nota[6](num_pedido THRU den_erro);
+END  

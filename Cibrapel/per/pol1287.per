@@ -1,0 +1,41 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                     CADASTRO DE PLACAS DE TRANSPORTADORES            
+  
+       Transportador:[b              ] [c                             ]              
+                                                                                    
+                            Placa   Tara Mínima(tn)  Seq
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+                         [d       ] [e            ] [f  ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+b = FORMONLY.cod_transpor, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.nom_transpor, NOENTRY, REVERSE, color = blue;
+d = FORMONLY.num_placa, UPSHIFT, AUTONEXT
+  --# ,OPTIONS="-nolist";
+e = FORMONLY.tara_minima, UPSHIFT, AUTONEXT
+  --#, OPTIONS="-nolist";
+f = FORMONLY.controle, NOENTRY
+  --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_placa[13](num_placa THRU controle);
+END 

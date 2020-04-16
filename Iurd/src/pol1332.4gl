@@ -108,9 +108,9 @@ FUNCTION pol1332_menu()#
 
     DEFINE l_menubar   VARCHAR(10),
            l_panel     VARCHAR(10),
-           l_titulo    VARCHAR(100) 
+           l_titulo    VARCHAR(120) 
     
-    LET l_titulo = 'PARÂMETROS POR TIPO DE DESPESA - GI IMOVEL'
+    LET l_titulo = 'PARÂMETROS POR TIPO DE DESPESA - GI IMOVEL: ',p_versao
     
     LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
     CALL _ADVPL_set_property(m_dialog,"TITLE",l_titulo)

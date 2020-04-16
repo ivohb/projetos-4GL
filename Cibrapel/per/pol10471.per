@@ -1,0 +1,35 @@
+DATABASE logix
+SCREEN
+{
+                         APONTA FABRICAÇÃO
+                                
+ Inicio:[a         ] Ás:[b       ]     Fim:[c         ] Ás:[d       ]
+                                
+   Boas:[e        ]     Refugo:[f        ]    Sucatas:[g        ]
+
+             Uso de retrabalho:[h        ] 
+             
+             
+}
+
+END
+
+ATTRIBUTES
+a = FORMONLY.dat_inicial, UPSHIFT, AUTONEXT, 
+    COMMENTS = "Digite a data do inicio da produção!  (dd/mm/yyyy)";
+b = FORMONLY.hor_inicial, UPSHIFT, AUTONEXT, 
+    COMMENTS = "Digite o horário do inicio da produção!  (hh:mm:ss)", picture = "##:##:##";
+c = FORMONLY.dat_final,   UPSHIFT, AUTONEXT, 
+    COMMENTS = "Digite a data do fim da produção!  (dd/mm/yyyy)";
+d = FORMONLY.hor_final,   UPSHIFT, AUTONEXT, 
+    COMMENTS = "Digite o horário do fim da produção!  (hh:mm:ss)", picture = "##:##:##";
+e = FORMONLY.qtd_boas,    UPSHIFT, AUTONEXT, 
+    COMMENTS = "Digite a quantidade de peças boas produzidas!";
+f = FORMONLY.qtd_refugo,  UPSHIFT, AUTONEXT, 
+    COMMENTS = "Digite a quantidade de peças rejeitadas para retrabalho!";
+g = FORMONLY.qtd_sucata,  UPSHIFT, AUTONEXT, 
+    COMMENTS = "Digite a quantidade de sucatas produzidas!";
+h = FORMONLY.usou_retrab, UPSHIFT, AUTONEXT, 
+    COMMENTS = "Uso de retrabalho na produção (kilogramas)"; 
+
+END

@@ -56,16 +56,14 @@ END GLOBALS
    DEFINE p_ordens             RECORD LIKE ordens_bob_885.*,
           p_item_chapa_885     RECORD LIKE item_chapa_885.*,
           p_loc_entrega_885    RECORD LIKE loc_entrega_885.*,
-          p_ped_end_ent        RECORD LIKE ped_end_ent.*,
-          m_cod_empresa        LIKE empresa.cod_empresa
+          p_ped_end_ent        RECORD LIKE ped_end_ent.*
    
    DEFINE p_msg                CHAR(100),
-          p_erro               CHAR(10),
-          m_ies_benef          SMALLINT
+          p_erro               CHAR(10)
 
 DEFINE m_num_ver_pc            INTEGER,
-       m_cod_emp_op            CHAR(02),
-       m_num_pc                INTEGER
+       m_num_pc                INTEGER,
+       m_cod_emp_op            CHAR(02)
 
 MAIN
    CALL log0180_conecta_usuario()
@@ -178,12 +176,12 @@ FUNCTION pol0654_exportar()#
       RETURN FALSE
    END IF
    
-   IF p_cod_empresa <> m_cod_emp_op THEN
-      LET m_ies_benef = TRUE
-   ELSE
-      LET m_ies_benef = FALSE
+   IF m_cod_emp_op <> p_cod_empresa THEN
+      #IF NOT pol0654_le_parametros() THEN
+      #   RETURN FALSE
+      #END IF      
    END IF
-   
+
    SELECT MAX(numsequencia)
      INTO p_num_seq
      FROM ordens_bob_885
@@ -205,6 +203,54 @@ FUNCTION pol0654_exportar()#
    RETURN TRUE
       
 END FUNCTION
+
+#-------------------------------#
+FUNCTION pol0654_le_parametros()#
+#-------------------------------#
+
+   DEFINE l_min_par     CHAR(06)
+   
+   SELECT parametro_numerico
+     INTO l_min_par 
+     FROM min_par_modulo
+    WHERE empresa = p_cod_empresa
+      AND parametro = 'PEDIDO_COMPRAS_INDUS'
+
+   IF STATUS <> 0 THEN
+      LET p_erro = STATUS
+      LET p_msg = 'Erro ',p_erro CLIPPED, ' lendo tab min_par_modulo'
+      RETURN FALSE
+   END IF
+
+   IF l_min_par IS NULL THEN
+      LET p_msg = 'Parâmetro PEDIDO_COMPRAS_INDUS está nulo '
+      RETURN FALSE
+   END IF
+   
+   LET m_num_pc = l_min_par
+   
+   SELECT num_versao
+     INTO m_num_ver_pc
+     FROM pedido_sup     
+    WHERE cod_empresa = p_cod_empresa
+      AND num_pedido = m_num_pc
+      AND ies_versao_atual = 'S'
+
+   IF STATUS = 100 THEN
+      LET p_msg = 'Pedido de compra ',l_min_par, ' não existe.'
+      RETURN FALSE
+   ELSE
+      IF STATUS <> 0 THEN
+         LET p_erro = STATUS
+         LET p_msg = 'Erro ',p_erro CLIPPED, ' lendo tab pedido_sup'
+         RETURN FALSE
+      END IF
+   END IF
+      
+   RETURN TRUE
+
+END FUNCTION
+   
 
 #-----------------------------#
 FUNCTION pol0654_le_clientes()
@@ -436,6 +482,127 @@ FUNCTION pol0654_exporta_operacao()#
 	 RETURN TRUE
 
 END FUNCTION
+
+
+#-------------------------------# 
+FUNCTION pol0654_gera_ord_comp()#
+#-------------------------------#
+   
+   DEFINE l_param          RECORD
+          cod_empresa       CHAR(02),
+          cod_user          CHAR(08),
+          cod_item          CHAR(15),
+          dat_entrega       DATE,                   
+          dat_abertura      DATE,                   
+          qtd_planej        DECIMAL(10,3),          
+          dat_emissao       DATE,                    
+          gru_ctr_desp      LIKE item_sup.gru_ctr_desp,
+          cod_tip_despesa   LIKE item_sup.cod_tip_despesa            
+   END RECORD
+
+   LET l_param.cod_empresa  = p_cod_empresa
+   LET l_param.cod_user     = p_user
+   LET l_param.cod_item     = p_ordens.CodItem
+   LET l_param.dat_entrega  = p_ordens.DatEntrega
+   LET l_param.dat_abertura = NULL
+   LET l_param.qtd_planej   = p_ordens.QtdPedida
+   LET l_param.dat_emissao  = TODAY
+   LET l_param.gru_ctr_desp = NULL
+   LET l_param.cod_tip_despesa = NULL
+   
+   LET p_msg = func017_gera_oc(l_param)
+   
+   IF NOT func002_isNumero(p_msg) THEN
+      RETURN FALSE
+   END IF
+
+   {LET l_param.cod_empresa  = m_cod_emp_op
+   LET l_param.gru_ctr_desp = 2
+   LET l_param.cod_tip_despesa = 7777
+
+   LET p_msg = func017_gera_oc(l_param)
+
+   IF NOT func002_isNumero(p_msg) THEN
+      RETURN FALSE
+   END IF}
+   
+   DELETE FROM ord_benef_885
+    WHERE cod_empresa = m_cod_emp_op 
+      AND num_ordem = p_ordens.NumOrdem
+
+   IF STATUS <> 0 THEN
+      LET p_erro = STATUS
+      LET p_msg = 'Erro ',p_erro CLIPPED, ' deletando registro da tab ord_benef_885'
+     RETURN FALSE
+   END IF
+   
+   INSERT INTO ord_benef_885 VALUES(m_cod_emp_op, p_ordens.NumOrdem)
+   
+   IF STATUS <> 0 THEN
+      LET p_erro = STATUS
+      LET p_msg = 'Erro ',p_erro CLIPPED, ' inserindo registro na tab ord_benef_885'
+     RETURN FALSE
+   END IF
+     
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------------# 
+FUNCTION pol0654_gera_ped_indus()#
+#--------------------------------#
+   
+   DEFINE l_count         INTEGER,
+          l_num_pedido    DECIMAL(6,0)
+
+   DEFINE lr_pedido       RECORD
+          empresa         LIKE pedidos.cod_empresa,
+          pedido          LIKE pedidos.num_pedido,
+          item            LIKE item.cod_item,
+          quantidade      LIKE ped_itens.qtd_pecas_solic,
+          entrega         LIKE ped_itens.prz_entrega          
+   END RECORD
+
+   LET p_msg = func018_le_ped_indus(p_cod_empresa, m_cod_emp_op )
+   
+   IF NOT func002_isNumero(p_msg) THEN
+      RETURN FALSE
+   END IF
+   
+   LET l_num_pedido = p_msg
+   
+   SELECT COUNT(*) 
+     INTO l_count
+     FROM ped_itens
+    WHERE cod_empresa = m_cod_emp_op
+      AND num_pedido = l_num_pedido
+      AND cod_item = p_ordens.CodItem
+      
+   IF STATUS <> 0 THEN
+      LET p_erro = STATUS
+      LET p_msg = 'ERRO ', p_erro CLIPPED,' LENDO ITEM DO PEDIDO ',l_num_pedido
+      RETURN p_msg 
+   END IF
+   
+   IF l_count > 0 THEN
+      RETURN TRUE
+   END IF
+   
+   LET lr_pedido.empresa    = m_cod_emp_op
+   LET lr_pedido.pedido     = l_num_pedido
+   LET lr_pedido.item       = p_ordens.CodItem
+   LET lr_pedido.quantidade = p_ordens.QtdPedida
+   LET lr_pedido.entrega    = p_ordens.DatEntrega
+   
+   LET p_msg = func018_ins_ped_itens(lr_pedido)
+         
+   IF p_msg = 'OK' THEN
+      RETURN TRUE
+   END IF      
+   
+   RETURN FALSE
+
+END FUNCTION
     
 #---------------------------------#
 FUNCTION pol0654_exporta_pedidos()
@@ -443,8 +610,6 @@ FUNCTION pol0654_exporta_pedidos()
    
    DEFINE l_cod_nat_oper      LIKE pedidos.cod_nat_oper,
           l_ies_tip_controle  LIKE nat_operacao.ies_tip_controle
-             
-   LET m_cod_empresa = p_cod_empresa
    
    INITIALIZE p_ordens TO NULL      
    
@@ -462,7 +627,8 @@ FUNCTION pol0654_exporta_pedidos()
        AND a.num_pedido NOT IN (
            SELECT c.numpedido
              FROM ordens_bob_885 c
-            WHERE c.CodEmpresa = m_cod_emp_op)
+            WHERE c.CodEmpresa = a.cod_empresa
+              AND c.NumPedido  = a.num_pedido)
 
    FOREACH cq_pedidos INTO
            p_ordens.NumPedido,
@@ -475,10 +641,7 @@ FUNCTION pol0654_exporta_pedidos()
          LET p_msg = 'Erro ',p_erro CLIPPED, ' lendo cursor cq_pedidos'
          RETURN FALSE
       END IF
-      
-      LET p_cod_empresa = m_cod_empresa
-      LET m_num_pc = 0
-      
+
       SELECT ies_tip_controle
         INTO l_ies_tip_controle
         FROM nat_operacao
@@ -513,17 +676,8 @@ FUNCTION pol0654_exporta_pedidos()
          CALL log085_transacao("ROLLBACK")
          RETURN FALSE
       END IF
-
-      IF m_ies_benef THEN
-   	     IF NOT pol0654_copia_pedido() THEN      
-   	        CALL log085_transacao("ROLLBACK")                                                                          
-	          RETURN FALSE                                                                                                       
-	       END IF                                                                                                                
-      END IF
       
       CALL log085_transacao("COMMIT")
-      
-      INITIALIZE p_ordens TO NULL 
    
    END FOREACH
    
@@ -536,11 +690,6 @@ END FUNCTION
 #--------------------------#
 FUNCTION pol0654_exp_item()
 #--------------------------#
-
-   DEFINE l_param             RECORD
-          cod_empresa         CHAR(02),
-          num_pedido          INTEGER
-   END RECORD
    
    DECLARE cq_itens CURSOR FOR                                                 
     SELECT num_sequencia,                                                         
@@ -569,10 +718,9 @@ FUNCTION pol0654_exp_item()
       DISPLAY p_ordens.NumPedido TO num_pedido                                     
 		    #lds CALL LOG_refresh_display()	                                         
       
-      LET p_cod_empresa = m_cod_empresa
       LET p_num_docum = p_ordens.NumPedido USING '<<<<<<'
-      LET p_num_docum = p_num_docum CLIPPED,'/', p_ordens.NumSeqItem USING '<<<'       
-                                     
+      LET p_num_docum = p_num_docum CLIPPED,'/', p_ordens.NumSeqItem USING '<<<'
+                                                                
       IF p_tipo_processo <> 2 THEN                                                
          IF NOT pol0654_exp_ordens() THEN                                          
             RETURN FALSE                                                          
@@ -587,17 +735,6 @@ FUNCTION pol0654_exp_item()
    
    FREE cq_itens
    
-   IF m_num_pc > 0 THEN
-      LET l_param.cod_empresa = m_cod_empresa
-      LET l_param.num_pedido = m_num_pc
-      LET p_msg = func017_libera_pc(l_param)
-   
-      IF p_msg <> 'OK' THEN
-         RETURN FALSE
-      END IF
-   
-   END IF
-
    RETURN TRUE
    
 END FUNCTION
@@ -656,15 +793,17 @@ FUNCTION pol0654_exp_ordens()
 	       RETURN FALSE                                                                                                       
 	    END IF                                                                                                                
 
-      IF m_ies_benef THEN
+      IF p_cod_empresa <> m_cod_emp_op THEN
    	     IF NOT pol0654_gera_ord_comp() THEN                                                                                
 	          RETURN FALSE                                                                                                       
 	       END IF                                                                                                                
-   	     #IF NOT pol0654_gera_ped_indus() THEN                                                                                
-	       #   RETURN FALSE                                                                                                       
-	       #END IF                                                                                                                
+   	     IF NOT pol0654_gera_ped_indus() THEN                                                                                
+	          RETURN FALSE                                                                                                       
+	       END IF                                                                                                                
       END IF
       	                                                                                                                        	                                                                                                                          
+	    INITIALIZE p_ordens TO NULL                                                                                           
+                                                                                                                          
     END FOREACH                                                                                                             
     
     FREE cq_ordens
@@ -674,208 +813,5 @@ FUNCTION pol0654_exp_ordens()
 END FUNCTION
 
 
-#-------------------------------# 
-FUNCTION pol0654_gera_ord_comp()#
-#-------------------------------#
-   
-   DEFINE l_num_cgc        LIKE empresa.num_cgc
-   
-   DEFINE l_param          RECORD
-          cod_empresa       CHAR(02),
-          cod_user          CHAR(08),
-          cod_item          CHAR(15),
-          dat_entrega       DATE,                   
-          dat_abertura      DATE,                   
-          qtd_planej        DECIMAL(10,3),          
-          dat_emissao       DATE,
-          num_prog          CHAR(08),         
-          gru_ctr_desp      LIKE item_sup.gru_ctr_desp,
-          cod_tip_despesa   LIKE item_sup.cod_tip_despesa
-   END RECORD
-
-   DEFINE l_cotacao         RECORD
-          cod_empresa       CHAR(02),
-          cod_user          CHAR(08),
-          num_oc            INTEGER,
-          cod_fornecedor    CHAR(15)
-   END RECORD
-
-   DEFINE l_pedido            RECORD
-          cod_empresa         CHAR(02),
-          cod_user            CHAR(08),
-          num_oc              INTEGER,
-          num_pedido          INTEGER,
-          num_prog            CHAR(08)
-   END RECORD
-
-   LET l_param.cod_empresa  = p_cod_empresa
-   LET l_param.cod_user     = p_user
-   LET l_param.cod_item     = p_ordens.CodItem
-   LET l_param.dat_entrega  = p_ordens.DatEntrega
-   LET l_param.dat_abertura = TODAY
-   LET l_param.qtd_planej   = p_ordens.QtdPedida
-   LET l_param.dat_emissao  = TODAY
-   LET l_param.gru_ctr_desp = NULL
-   LET l_param.cod_tip_despesa = NULL
-   LET l_param.num_prog = p_num_docum
-   
-   LET p_msg = func017_gera_oc(l_param)
-
-   IF NOT func002_isNumero(p_msg) THEN
-      RETURN FALSE
-   END IF
-
-   LET l_cotacao.cod_empresa = p_cod_empresa
-   LET l_cotacao.cod_user = p_user
-   LET l_cotacao.num_oc = p_msg
-
-   SELECT num_cgc 
-     INTO l_num_cgc
-     FROM empresa
-    WHERE cod_empresa = m_cod_emp_op
-
-   IF STATUS <> 0 THEN
-      LET p_erro = STATUS
-      LET p_msg = 'Erro ',p_erro CLIPPED, ' lendo CNPJ da tab empresa'
-      RETURN FALSE
-   END IF
-    
-   SELECT cod_fornecedor
-     INTO l_cotacao.cod_fornecedor
-     FROM fornecedor 
-    WHERE num_cgc_cpf = l_num_cgc
-
-   IF STATUS <> 0 THEN
-      LET p_erro = STATUS
-      LET p_msg = 'Erro ',p_erro CLIPPED, ' lendo dados da tab fornecedor'
-      RETURN FALSE
-   END IF
-
-   LET p_msg = func017_designa_cotacao(l_cotacao)
-   
-   IF p_msg <> 'OK' THEN
-      RETURN FALSE
-   END IF
-  
-   LET l_pedido.cod_empresa = p_cod_empresa
-   LET l_pedido.cod_user = p_user
-   LET l_pedido.num_oc = l_cotacao.num_oc
-   LET l_pedido.num_pedido = m_num_pc
-   LET l_pedido.num_prog = 'POL0654'
-   
-   LET p_msg = func017_gera_pc(l_pedido)
-
-   IF NOT func002_isNumero(p_msg) THEN
-      RETURN FALSE
-   END IF
-   
-   LET m_num_pc = p_msg
-   
-   INSERT INTO ped_vend_comp_885
-    VALUES(p_cod_empresa,
-           p_ordens.numpedido,
-           p_ordens.NumSeqItem,
-           m_num_pc,
-           l_cotacao.num_oc)
-           
-   IF STATUS <> 0 THEN
-      LET p_erro = STATUS
-      LET p_msg = 'Erro ',p_erro CLIPPED, ' inserindo registro na tab ped_vend_comp_885'
-     RETURN FALSE
-   END IF           
-   
-   DELETE FROM ord_benef_885
-    WHERE cod_empresa = m_cod_emp_op 
-      AND num_ordem = p_ordens.NumOrdem
-
-   IF STATUS <> 0 THEN
-      LET p_erro = STATUS
-      LET p_msg = 'Erro ',p_erro CLIPPED, ' deletando registro da tab ord_benef_885'
-     RETURN FALSE
-   END IF
-   
-   INSERT INTO ord_benef_885 VALUES(m_cod_emp_op, p_ordens.NumOrdem)
-   
-   IF STATUS <> 0 THEN
-      LET p_erro = STATUS
-      LET p_msg = 'Erro ',p_erro CLIPPED, ' inserindo registro na tab ord_benef_885'
-     RETURN FALSE
-   END IF
-     
-   RETURN TRUE
-
-END FUNCTION
-
-#--------------------------------# 
-FUNCTION pol0654_gera_ped_indus()#
-#--------------------------------#
-   
-   DEFINE l_count         INTEGER,
-          l_num_pedido    DECIMAL(6,0)
-
-   DEFINE lr_pedido       RECORD
-          empresa         LIKE pedidos.cod_empresa,
-          pedido          LIKE pedidos.num_pedido,
-          item            LIKE item.cod_item,
-          quantidade      LIKE ped_itens.qtd_pecas_solic,
-          entrega         LIKE ped_itens.prz_entrega          
-   END RECORD
-   
-   LET p_msg = func018_le_ped_indus(
-     p_cod_empresa, m_cod_emp_op, p_ordens.numpedido )
-   
-   IF NOT func002_isNumero(p_msg) THEN
-      RETURN FALSE
-   END IF
-   
-   LET l_num_pedido = p_msg
-   
-   SELECT COUNT(*) 
-     INTO l_count
-     FROM ped_itens
-    WHERE cod_empresa = m_cod_emp_op
-      AND num_pedido = l_num_pedido
-      AND cod_item = p_ordens.CodItem
-      
-   IF STATUS <> 0 THEN
-      LET p_erro = STATUS
-      LET p_msg = 'ERRO ', p_erro CLIPPED,' LENDO ITEM DO PEDIDO ',l_num_pedido
-      RETURN p_msg 
-   END IF
-   
-   IF l_count > 0 THEN
-      RETURN TRUE
-   END IF
-   
-   LET lr_pedido.empresa    = m_cod_emp_op
-   LET lr_pedido.pedido     = l_num_pedido
-   LET lr_pedido.item       = p_ordens.CodItem
-   LET lr_pedido.quantidade = p_ordens.QtdPedida
-   LET lr_pedido.entrega    = p_ordens.DatEntrega
-   
-   LET p_msg = func018_ins_ped_itens(lr_pedido)
-         
-   IF p_msg = 'OK' THEN
-      RETURN TRUE
-   END IF      
-   
-   RETURN FALSE
-
-END FUNCTION
-
-#------------------------------# 
-FUNCTION pol0654_copia_pedido()#
-#------------------------------#
-      
-   LET p_msg = func018_copia_pedido(
-     m_cod_empresa, m_cod_emp_op, p_ordens.numpedido )
-   
-   IF p_msg = 'OK' THEN
-      RETURN TRUE
-   END IF      
-   
-   RETURN FALSE
-
-END FUNCTION
 	       
    

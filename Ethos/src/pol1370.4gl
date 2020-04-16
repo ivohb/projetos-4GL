@@ -330,11 +330,11 @@ DEFINE mr_relat          RECORD
       mensagem           CHAR(11),
       usuario            CHAR(08),
       item_cliente       CHAR(30),
-      qtd_antes          DECIMAL(7,0),
-      qtd_atual          DECIMAL(7,0),
+      qtd_antes          integer,
+      qtd_atual          integer,
       operacao           CHAR(20),
       programacao        CHAR(11),
-      variacao           DECIMAL(7,0),
+      variacao           integer,
       sinal              CHAR(01)
 END RECORD
 
@@ -352,7 +352,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.27  "
+   LET p_versao = "POL1370-12.00.32  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
 
@@ -1650,6 +1650,13 @@ FUNCTION pol1370_limpa_tabelas()#
    
    IF STATUS <> 0 THEN
       CALL log003_err_sql('DELETE','erro_edi_547')
+      RETURN FALSE
+   END IF
+
+   DELETE FROM edi_audit_547
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE','edi_audit_547')
       RETURN FALSE
    END IF
 
@@ -3335,7 +3342,12 @@ FUNCTION pol1370_le_programacao()#
            EXIT FOREACH                                   
         END IF                                            
                                                           
-        LET m_num_pedido = ma_prog[m_ind].num_pedido                                                                                                                         
+        LET m_num_pedido = ma_prog[m_ind].num_pedido       
+        
+        IF l_dat_abertura IS NOT NULL THEN                    
+           LET ma_prog[m_ind].prz_entrega = l_dat_abertura    
+        END IF                                                
+
         LET m_prz_entrega = ma_prog[m_ind].prz_entrega    
       
         IF NOT pol1370_le_ped_itens() THEN                     
@@ -3352,11 +3364,7 @@ FUNCTION pol1370_le_programacao()#
         END IF                                                 
                                                                
         LET ma_prog[m_ind].ies_select = 'N'                    
-                                                               
-        #IF l_dat_abertura IS NOT NULL THEN                    
-        #   LET ma_prog[m_ind].prz_entrega = l_dat_abertura    
-        #END IF                                                
-            
+                                                                           
         CASE l_ies_prog                                          
            WHEN '1'                                              
               LET ma_prog[m_ind].programacao = 'FIRME'           
@@ -3550,9 +3558,9 @@ FUNCTION pol1370_grava_cenario()#
          EXIT FOREACH
       END IF
 
-      #IF l_dat_abertura IS NOT NULL THEN
-      #   LET mr_audit.prz_entrega = l_dat_abertura
-      #END IF      
+      IF l_dat_abertura IS NOT NULL THEN
+         LET mr_audit.prz_entrega = l_dat_abertura
+      END IF      
       
       CASE l_ies_prog
          WHEN '1' 
@@ -4912,9 +4920,9 @@ FUNCTION pol1370_atu_carteira()#
          RETURN FALSE
       END IF
             
-      #IF m_dat_abertura IS NOT NULL THEN
-      #   LET m_prz_entrega = m_dat_abertura
-      #END IF
+      IF m_dat_abertura IS NOT NULL THEN
+         LET m_prz_entrega = m_dat_abertura
+      END IF
       
       IF NOT pol1370_le_ped_itens() THEN
          RETURN FALSE
@@ -5550,6 +5558,11 @@ FUNCTION pol1370_relatorio(l_report)#
          EXIT FOREACH
       END IF         
       
+      IF mr_relat.operacao IS NULL OR mr_relat.operacao = ' ' THEN
+         LET mr_relat.qtd_atual = 0
+         LET mr_relat.qtd_antes = 0
+      END IF
+            
       LET mr_relat.sinal = ' '
       LET mr_relat.variacao = mr_relat.qtd_atual - mr_relat.qtd_antes
       
@@ -5559,6 +5572,10 @@ FUNCTION pol1370_relatorio(l_report)#
          IF mr_relat.qtd_atual < mr_relat.qtd_antes THEN
             LET mr_relat.sinal = '-'
          END IF
+      END IF
+      
+      IF mr_relat.variacao = 0 OR mr_relat.variacao IS NULL THEN
+         LET mr_relat.sinal = ' '
       END IF
       
       OUTPUT TO REPORT pol1370_relat(l_cod_cli)
@@ -5630,9 +5647,9 @@ REPORT pol1370_relat(l_cod_cliente)#
               COLUMN 056, mr_relat.den_item_reduz,
               COLUMN 076, mr_relat.item_cliente[1,15],              
               COLUMN 092, mr_relat.prz_entrega,                            
-              COLUMN 103, mr_relat.qtd_antes USING '#######',              
-              COLUMN 112, mr_relat.qtd_atual USING '#######',              
-              COLUMN 120, mr_relat.variacao USING '#######',     
+              COLUMN 103, mr_relat.qtd_antes USING '######&',              
+              COLUMN 112, mr_relat.qtd_atual USING '######&',              
+              COLUMN 120, mr_relat.variacao USING '######&',     
               COLUMN 127, mr_relat.sinal,                            
               COLUMN 130, mr_relat.mensagem,
               COLUMN 142, mr_relat.usuario
@@ -5757,69 +5774,25 @@ FUNCTION pol1370_sepa_csv()#
       IF l_it_cliente <> l_it_cli_ant THEN
          LET l_it_cli_ant = l_it_cliente
          LET m_id_pe1 = m_id_pe1 + 1
-         LET mr_edi_pe1.id_pe1 = m_id_pe1         
+         LET mr_edi_pe1.id_pe1 = m_id_pe1 
+         LET m_num_seq = 0
          IF NOT pol1370_ins_pe1() THEN
             RETURN FALSE
          END IF
+         IF NOT pol1370_ins_pedidos_edi() THEN
+            RETURN FALSE
+         END IF         
       END IF
       
-      INSERT INTO edi_pe3_547(                                             
-         cod_empresa,                                                  
-         num_pedido,                                                      
-         num_sequencia,                                                   
-         dat_entrega_1,                                                   
-         qtd_entrega_1,                                                   
-         id_pe1)                                                          
-        VALUES(mr_edi_pe1.cod_empresa,                                    
-               mr_edi_pe1.num_pedido,1,                                   
-               m_prz_entrega,                                             
-               m_qtd_entrega,                                               
-               mr_edi_pe1.id_pe1)                                         
-                                                                          
-      IF STATUS <> 0 THEN                                              
-         CALL log003_err_sql('INSERT','edi_pe3_547')                      
-         RETURN FALSE                                                     
-      END IF                                                              
 
       IF m_num_pedido IS NOT NULL AND 
             m_prz_entrega IS NOT NULL AND 
                m_qtd_entrega IS NOT NULL THEN
-         LET m_num_seq = 0
-         IF NOT pol1370_ins_ped_itens() THEN
+         IF NOT pol1370_ins_pe3_5() THEN
             RETURN FALSE
-         END IF
+         END IF                  
       END IF
-                                                                          
-      INSERT INTO edi_pe5_547(                                         
-         cod_empresa,                                                     
-         num_pedido,                                                      
-         num_sequencia,                                                   
-         dat_entrega_1,                                                   
-         id_pe1)                                                          
-        VALUES(mr_edi_pe1.cod_empresa,                                    
-               mr_edi_pe1.num_pedido,1,                                   
-               m_prz_entrega,                                             
-               mr_edi_pe1.id_pe1)                                         
-                                                                          
-      IF STATUS <> 0 THEN                                              
-         CALL log003_err_sql('INSERT','edi_pe5_547')                      
-         RETURN FALSE                                                     
-      END IF                                                              
-         
-
-      IF m_num_pedido IS NOT NULL AND 
-            m_prz_entrega IS NOT NULL THEN
-         LET m_num_seq = 0
-         LET m_ident_prog = '1'
-         IF NOT pol1370_ins_progs_pe5() THEN
-            RETURN FALSE
-         END IF
-      END IF      
-
-      IF NOT pol1370_ins_pedidos_edi() THEN
-         RETURN FALSE
-      END IF
-
+                                                            
       LET m_progres = LOG_progresspopup_increment("PROCESS")
 
    END FOREACH
@@ -5832,6 +5805,68 @@ FUNCTION pol1370_sepa_csv()#
 
 END FUNCTION
  
+#---------------------------#
+FUNCTION pol1370_ins_pe3_5()#
+#---------------------------#
+   
+    IF NOT pol1370_ins_itens_edi_547() THEN
+       RETURN FALSE
+    END IF
+
+   INSERT INTO ped_itens_edi_pe5_547
+    VALUES(p_cod_empresa,
+           m_num_pedido,
+           m_cod_item,
+           m_num_seq,
+           m_prz_entrega,
+           m_ident_prog,
+           m_id_pe1)
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','ped_itens_edi_pe5_547')                  
+      RETURN FALSE
+   END IF        
+   
+   INSERT INTO edi_pe3_547(                                             
+      cod_empresa,                                                     
+      num_pedido,                                                         
+      num_sequencia,                                                      
+      dat_entrega_1,                                                      
+      qtd_entrega_1,                                                      
+      id_pe1)                                                             
+     VALUES(mr_edi_pe1.cod_empresa,                                       
+            mr_edi_pe1.num_pedido,                                
+            m_num_seq,                                            
+            m_prz_entrega,                                                
+            m_qtd_entrega,                                                  
+            mr_edi_pe1.id_pe1)                                            
+                                                                          
+   IF STATUS <> 0 THEN                                                 
+      CALL log003_err_sql('INSERT','edi_pe3_547')                         
+      RETURN FALSE                                                        
+   END IF                                                                 
+                                                               
+    INSERT INTO edi_pe5_547(                                            
+      cod_empresa,                                                        
+      num_pedido,                                                         
+      num_sequencia,                                                      
+      dat_entrega_1,                                                      
+      id_pe1)                                                             
+     VALUES(mr_edi_pe1.cod_empresa,                                       
+            mr_edi_pe1.num_pedido,                                
+            m_num_seq,                                            
+            m_prz_entrega,                                                
+            mr_edi_pe1.id_pe1)                                            
+                                                                          
+   IF STATUS <> 0 THEN                                                 
+      CALL log003_err_sql('INSERT','edi_pe5_547')                         
+      RETURN FALSE                                                        
+   END IF                                                                 
+
+   RETURN TRUE
+
+END FUNCTION
+   
 #---------------------------------#
 FUNCTION pol1370_le_unidade(l_cod)#  
 #---------------------------------#

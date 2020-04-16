@@ -1,0 +1,45 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------------------------------------
+[a ]                   PRIORIDADE DOS PEDIDOS LIBERADOS
+
+  Cliente:[b              ][c                                           ] 
+   Dt Lib:[d         ]-[e         ]            Linha de produto:[f ] [g ]
+ Prio Pedido Liberação  Entrega      Cliente              Nome            
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+[l  |m     |n         |o         |p              |q                       ]
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,  NOENTRY;
+ b = FORMONLY.cod_client,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.nom_reduzido, NOENTRY, REVERSE;
+ d = FORMONLY.dat_ini,      UPSHIFT, AUTONEXT;
+ e = FORMONLY.dat_fim,      UPSHIFT, AUTONEXT;
+ f = FORMONLY.cod_lin_prod, UPSHIFT, AUTONEXT;
+ g = FORMONLY.cod_lin_recei,UPSHIFT;
+ 
+ l = FORMONLY.num_prior,    NOENTRY  --#, OPTIONS="-nolist"; 
+ m = FORMONLY.num_pedido,   picture = '######',
+     COMMENTS = 'Ctr-z: Itens do pedido'  --#, OPTIONS="-nolist"; 
+ n = FORMONLY.dat_liberac,  NOENTRY  --#, OPTIONS="-nolist"; 
+ o = FORMONLY.dat_entrega,  NOENTRY  --#, OPTIONS="-nolist"; 
+ p = FORMONLY.cod_cliente,  NOENTRY  --#, OPTIONS="-nolist"; 
+ q = FORMONLY.nom_cliente,  NOENTRY  --#, OPTIONS="-nolist"; 
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_prior[10](num_prior THRU nom_cliente);
+END 

@@ -1,0 +1,33 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------
+                 CIDADES
+
+Cidade:[a                         ] UF:[b ]
+      
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+[d    |e                                  |f ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.den_cidade,    UPSHIFT, AUTONEXT;
+ b = FORMONLY.cod_uni_feder, UPSHIFT, AUTONEXT;
+ d = FORMONLY.cod_cidade,    UPSHIFT --#, OPTIONS="-nolist";
+ e = FORMONLY.nom_cidade,    UPSHIFT --#, OPTIONS="-nolist";
+ f = FORMONLY.uf_cidade,     UPSHIFT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_cidade[10] (cod_cidade THRU uf_cidade);
+END
+

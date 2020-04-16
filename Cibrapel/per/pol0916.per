@@ -1,0 +1,51 @@
+DATABASE logix
+SCREEN
+{
+ -----------------------------------------------------------------------------
+  [a ]                  INSUMOS EXPORTADOS PARA O TRIM
+  
+               Item:[b              ] [s                                   ]             
+               Lote:[c              ]
+            Largura:[d         ]       
+           Diâmetro:[e         ]
+             Tubete:[f         ]      
+         Quantidade:[g              ]
+           Situação:[h]             
+        Dat entrada:[i         ]
+              Valor:[j                 ]                 
+           É Bobina:[k] 
+         Qtd fardos:[l         ]          
+           Num nota:[m         ]    Emissão:[n         ]  Num AR:[o       ]
+         Fornecedor:[p              ] [q                                   ]                           
+             Status:[r         ]    
+
+}
+
+END
+TABLES
+   insumo_885
+END
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, NOENTRY;
+b = FORMONLY.cod_item, UPSHIFT, AUTONEXT;
+c = FORMONLY.num_lote, UPSHIFT, AUTONEXT;
+d = FORMONLY.largura, UPSHIFT, AUTONEXT;
+e = FORMONLY.diametro, UPSHIFT, AUTONEXT;
+f = FORMONLY.tubete, UPSHIFT, AUTONEXT;
+g = FORMONLY.qtd_movto, UPSHIFT, AUTONEXT;
+h = FORMONLY.tip_movto, UPSHIFT, AUTONEXT;
+i = FORMONLY.dat_movto, UPSHIFT, AUTONEXT, FORMAT = 'dd/mm/yyyy';
+j = FORMONLY.val_movto, UPSHIFT, AUTONEXT;
+k = FORMONLY.ies_bobina, UPSHIFT, AUTONEXT;
+l = FORMONLY.qtd_fardos, UPSHIFT, AUTONEXT;
+m = FORMONLY.num_nf, UPSHIFT, AUTONEXT;
+n = FORMONLY.dat_emis_nf, UPSHIFT, AUTONEXT, FORMAT = 'dd/mm/yyyy';
+o = FORMONLY.num_ar, UPSHIFT, AUTONEXT;
+p = FORMONLY.cod_fornecedor, UPSHIFT, AUTONEXT;
+q = FORMONLY.nom_fornecedor, UPSHIFT, AUTONEXT;
+r = FORMONLY.cod_status, UPSHIFT, AUTONEXT;
+s = FORMONLY.den_item, UPSHIFT, AUTONEXT;
+
+END 
+

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Renomear recurso &quot;Cibrapel/src&quot; a &quot;rio&quot;" description="Renomear recurso &quot;src&quot;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src" name="rio" stamp="1587044169880" updateReferences="true"/>
+</session>

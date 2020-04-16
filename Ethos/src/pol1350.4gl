@@ -129,7 +129,7 @@ FUNCTION pol1350()#
    SET LOCK MODE TO WAIT 300
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1350-12.00.13  "
+   LET p_versao = "pol1350-12.00.14  "
    CALL func002_versao_prg(p_versao)
    CALL pol1350_menu()
     
@@ -1321,6 +1321,11 @@ FUNCTION pol1350_explode_estrut()#
             IF l_ies_tipo MATCHES '[BC]' THEN
                IF NOT pol1350_ins_compon() THEN
                   RETURN FALSE
+               END IF
+               IF l_ies_tipo = 'B' THEN
+                  IF NOT pol1350_ins_it(m_cod_comp) THEN
+                     RETURN FALSE
+                  END IF
                END IF
             ELSE
                IF NOT pol1350_ins_it(m_cod_comp) THEN

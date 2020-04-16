@@ -1,0 +1,31 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------
+               TIPOS DO ITEM
+
+     [a |b                             ]
+     [a |b                             ]
+     [a |b                             ]
+     [a |b                             ]
+     [a |b                             ]
+     [a |b                             ]
+     [a |b                             ]
+     [a |b                             ]
+     [a |b                             ]
+     [a |b                             ]
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_tip_item, UPSHIFT --#, OPTIONS="-nolist";
+ b = FORMONLY.denominacao,  UPSHIFT --#, OPTIONS="-nolist";
+ 
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_cod_tip_item[10] (cod_tip_item THRU denominacao);
+END
+

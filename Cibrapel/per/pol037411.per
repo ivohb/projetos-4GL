@@ -1,0 +1,52 @@
+DATABASE logix
+SCREEN
+{
+   [a ]                REQUISIÇÃO DAS PEÇAS NECESSÁRIAS
+ --------------------------------------------------------------------------
+  Nº da OS: [b         ]   Cliente: [c                                   ]
+
+  Descrição da Peça: [dp                                                 ]
+
+    Código da Peça   Qt.Nec. Qt.Req.   Qt.Pend.  Preço Unitário    % IPI
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ [d              ] [e      ] [f      ]  [g      ] [h            ] [i     ]
+ 
+}
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_empresa, NOENTRY;
+  b = FORMONLY.num_os, UPSHIFT, AUTONEXT;
+  c = FORMONLY.nom_cliente TYPE CHAR, NOENTRY;
+  dp= FORMONLY.den_item TYPE CHAR, NOENTRY;
+  d = FORMONLY.cod_item TYPE CHAR, UPSHIFT, AUTONEXT;
+  e = FORMONLY.qtde_necessaria, AUTONEXT,
+      FORMAT = "##&.&&&";
+  f = FORMONLY.qtde_requisitada, NOENTRY;
+  g = FORMONLY.qtde_pendente, NOENTRY;
+  h = FORMONLY.val_unitario, AUTONEXT,
+      FORMAT = "#########&.&&";
+  i = FORMONLY.pct_ipi, AUTONEXT,
+      FORMAT = "#&.&&&";
+ 
+END 
+
+INSTRUCTIONS
+
+   SCREEN RECORD sr_peca_util[10]
+                    (FORMONLY.cod_item,
+                     FORMONLY.qtde_necessaria,
+                     FORMONLY.qtde_requisitada,
+                     FORMONLY.qtde_pendente,
+                     FORMONLY.val_unitario,
+                     FORMONLY.pct_ipi);
+                     
+END 

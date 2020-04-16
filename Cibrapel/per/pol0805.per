@@ -1,0 +1,32 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+   [a ]                 RELATÓRIO DE NOTAS FISCAIS DE SAIDA
+  
+  
+         Período: De:[b         ] - [c         ]
+                       
+             Cliente:[d              ] 
+
+          Raz Social:[e                                      ]
+
+          Cód Cidade:[f    ]
+   
+
+
+
+
+
+
+}
+END
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, NOENTRY;
+ b = FORMONLY.dat_ini, AUTONEXT, COMMENTS = "Digite a Data Inicial";
+ c = FORMONLY.dat_fim, AUTONEXT, COMMENTS = "Digite a Data Final";
+ d = FORMONLY.cod_cliente, UPSHIFT, AUTONEXT;
+ e = FORMONLY.nom_cliente, UPSHIFT, AUTONEXT;
+ f = FORMONLY.cod_cidade, UPSHIFT, AUTONEXT;
+END 
+

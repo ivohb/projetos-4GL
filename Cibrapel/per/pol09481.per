@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+----------------------------------------------------------------
+                      ESTORNOS HÁ SEREM COPIADOS
+
+   AR     Sequência     Cód. Item        Val. Adiant      AD
+[a     |b           |c              |d                 |e     ]                                           
+[a     |b           |c              |d                 |e     ]
+[a     |b           |c              |d                 |e     ]
+[a     |b           |c              |d                 |e     ]
+[a     |b           |c              |d                 |e     ]
+[a     |b           |c              |d                 |e     ]
+[a     |b           |c              |d                 |e     ]
+[a     |b           |c              |d                 |e     ]
+[a     |b           |c              |d                 |e     ]
+[a     |b           |c              |d                 |e     ]
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.num_aviso_rec, NOENTRY; 
+ b = FORMONLY.num_seq, NOENTRY;
+ c = FORMONLY.cod_item, NOENTRY;
+ d = FORMONLY.val_adiant, NOENTRY;
+ e = FORMONLY.num_ad, NOENTRY;
+ 
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_movto[10](num_aviso_rec THRU num_ad);
+END 
+   

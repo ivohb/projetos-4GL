@@ -1,0 +1,51 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]          Ordem:[b         ]  Status:[c]  Qtd. peças:[d        ]                    
+  
+   Item:[e              ]  Usuário:[f       ] 
+        [g                                                                ]           
+
+   Inicio:[h         ] Ás:[i       ]         Fim:[j         ] Ás:[k       ]                
+
+   Ferram:[l              ]  Equipto:[m              ]  Operador:[n       ]     
+    
+                            PARADAS NA PRODUÇÃO
+    Início      Ás       Fim        Ás     Motivo       Descrição
+ [o         |p       |q         |r       ] [s   |t                           ]
+ [o         |p       |q         |r       ] [s   |t                           ]
+ [o         |p       |q         |r       ] [s   |t                           ]
+ [o         |p       |q         |r       ] [s   |t                           ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa,        UPSHIFT, NOENTRY;   
+b = FORMONLY.num_ordem,          UPSHIFT, AUTONEXT, 
+    COMMENTS = "Digite o número da ordem correspondente ao apontamento!"
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.cod_status,         UPSHIFT, AUTONEXT, COMMENTS = "Digite o status do apontamento!   (P-Pendente  S-Processado)";
+d = FORMONLY.qtd_pecas,          NOENTRY, REVERSE, color = red;
+e = FORMONLY.cod_item,           NOENTRY, REVERSE{, color = blue};
+f = FORMONLY.nom_usuario,        AUTONEXT, COMMENTS = "Digite o código do usuário responsável pelo apontamento!";
+g = FORMONLY.den_item,           NOENTRY, REVERSE{, color = blue};
+h = FORMONLY.dat_inicial,        UPSHIFT, AUTONEXT, COMMENTS = "Digite a data correspondente ao inicio da produção!";
+i = FORMONLY.hor_inicial,        NOENTRY, REVERSE{, color = blue};
+j = FORMONLY.dat_final,          UPSHIFT, AUTONEXT, COMMENTS = "Digite a data correspondente ao fim da produção!";
+k = FORMONLY.hor_final,          NOENTRY, REVERSE{, color = blue};
+l = FORMONLY.cod_ferramenta,     NOENTRY, REVERSE{, color = blue};
+m = FORMONLY.cod_eqpto,          NOENTRY, REVERSE{, color = blue};
+n = FORMONLY.num_matricula,      NOENTRY, REVERSE{, color = blue};
+o = FORMONLY.dat_par_inicial,    NOENTRY, REVERSE{, color = blue}  --#, OPTIONS="-nolist";
+p = FORMONLY.hor_par_inicial,    NOENTRY, REVERSE{, color = blue}  --#, OPTIONS="-nolist";
+q = FORMONLY.dat_par_final,      NOENTRY, REVERSE{, color = blue}  --#, OPTIONS="-nolist";
+r = FORMONLY.hor_par_final,      NOENTRY, REVERSE{, color = blue}  --#, OPTIONS="-nolist";
+s = FORMONLY.cod_parada,         NOENTRY, REVERSE, color = red   --#,OPTIONS="-nolist";
+t = FORMONLY.des_parada,         NOENTRY, REVERSE, color = red   --#, OPTIONS="-nolist";  
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_paradas[4](dat_par_inicial THRU des_parada);
+END

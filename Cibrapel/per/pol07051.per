@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN 
+{
+        TURNO                 DESCRICAO             
+       --------   -------------------------------------  
+      [a       ]  [b                                   ] 
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]  
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ] 
+
+    
+}
+END
+
+
+ATTRIBUTES
+   a = FORMONLY.turno_logix,AUTONEXT;
+   b = FORMONLY.den_turno,NOENTRY;
+   
+   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_empresa[12] (turno_logix THRU den_turno);
+END 

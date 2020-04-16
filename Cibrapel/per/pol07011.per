@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN 
+{
+
+           COD.ITEM                DESCRICAO DO ITEM             
+       ----------------  -------------------------------------  
+      [a               ] [b                                   ] 
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ]  
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ]   
+      [a               ] [b                                   ] 
+
+    
+}
+END
+
+
+ATTRIBUTES
+   a = FORMONLY.cod_item,AUTONEXT;
+   b = FORMONLY.den_item,NOENTRY;
+   
+   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_empresa[12] (cod_item THRU den_item);
+END 

@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN 
+{
+       COD.GRUPO           DESCRICAO             
+       --------   -------------------------------------  
+      [a       ]  [b                                   ] 
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]  
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ] 
+
+    
+}
+END
+
+
+ATTRIBUTES
+   a = FORMONLY.cod_grupo,AUTONEXT;
+   b = FORMONLY.descricao_grupo,NOENTRY;
+   
+   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_empresa[12] (cod_grupo THRU descricao_grupo);
+END 

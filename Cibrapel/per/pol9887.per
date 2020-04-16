@@ -1,0 +1,15 @@
+DATABASE FORMONLY
+SCREEN
+{
+---------------------------------------------------------------------------
+[a0]        RELATORIO DIFERENCA ESTOQUE CONTABIL x ESTOQUE POR LOTE
+
+ Item  : [a1             ][a2                                            ]
+
+}
+END
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, NOENTRY; 
+a1 = FORMONLY.cod_item, AUTONEXT,UPSHIFT;
+a2 = FORMONLY.den_item, NOENTRY;
+END

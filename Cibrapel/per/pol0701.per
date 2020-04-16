@@ -1,0 +1,44 @@
+DATABASE FORMONLY
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                        COTAÇÃO DE PREÇOS DE APARAS
+ 
+          Região dos lagos:[m]         Identificador:[n               ]                   
+
+         Cód Item:[b               ] [c                                      ]                
+ 
+       Fornecedor:[e               ] [f                                      ]                      
+ 
+        Preço FOB:[g               ]  
+        Preço CIF:[h               ] 
+       Cond Pagto:[i  ] [j                                ]               
+      
+               Validade De:[k         ]      Validade Até:[l         ]
+                   
+
+
+
+
+
+}
+END
+
+ATTRIBUTES
+a =  FORMONLY.cod_empresa,NOENTRY; 
+m = FORMONLY.regiao_lagos, UPSHIFT, AUTONEXT;
+n = FORMONLY.id_registro, NOENTRY, REVERSE;
+b = FORMONLY.cod_item,UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.den_item, UPSHIFT, NOENTRY;
+e = FORMONLY.cod_fornecedor, UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+f = FORMONLY.raz_social, UPSHIFT, NOENTRY;
+g = FORMONLY.pre_unit_fob, UPSHIFT, AUTONEXT;
+h = FORMONLY.pre_unit_cif, UPSHIFT, AUTONEXT;
+i = FORMONLY.cnd_pgto, UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+j = FORMONLY.des_cnd_pgto, UPSHIFT, NOENTRY;
+k = FORMONLY.dat_val_ini;
+l = FORMONLY.dat_val_fim;
+END 

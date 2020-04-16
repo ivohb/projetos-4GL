@@ -1,0 +1,33 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-----------------------------------------
+                 DESCONTOS
+
+ Código          Descrição
+[a    ] [b                            ]    
+       
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.tip_desc,      UPSHIFT, AUTONEXT;
+ b = FORMONLY.des_tip_desc,  UPSHIFT, AUTONEXT;
+ c = FORMONLY.cod_desc,      UPSHIFT --#, OPTIONS="-nolist";
+ d = FORMONLY.den_desc,      UPSHIFT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_desc[10] (cod_desc THRU den_desc);
+END
+

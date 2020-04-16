@@ -1,0 +1,56 @@
+DATABASE logix
+
+SCREEN
+{
+--------------------------------------------------------------------------------
+                                 REPRESENTANTES 
+ 
+Representante: [a1  ] [a2                                      ]
+
+Gerente : [a3  ] [a4                                      ]
+
+Linha de produto:[k ]  [l                                    ]
+
+Pct. Comis 1: [a5     ]               Pct. Comis 2     : [a6     ]        
+
+Tipo Percentual: [t]                  Tipo Comissionado:[c]  
+
+Garantia : [a7               ]        Data Validade    : [d1        ] 
+
+Experiencia : [e]
+
+Percentual comissao gerente:    1 - [a8     ]    2 - [a9     ]         
+
+ 
+}   
+
+END
+
+TABLES
+repres_885   
+END
+
+attributes
+a1   = repres_885.cod_repres,  UPSHIFT, AUTONEXT
+        --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   
+a2   = FORMONLY.p_nom_rep,     NOENTRY; 
+a3   = repres_885.cod_gerente, UPSHIFT, AUTONEXT
+        --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+    
+a4   = FORMONLY.p_nom_ger,     NOENTRY; 
+k    = repres_885.cod_lin_prod,UPSHIFT, AUTONEXT
+        --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a5   = repres_885.pct_rep_ofi, UPSHIFT, AUTONEXT;    
+a6   = repres_885.pct_rep_ger, UPSHIFT, AUTONEXT;    
+t    = repres_885.tip_perc,    UPSHIFT, NOENTRY,
+      COMMENTS = "I - SEPARADO POR EMPRESA OU S - SOMA PERCENTUAIS ";   
+c    = repres_885.tip_comis,   UPSHIFT, NOENTRY,
+      COMMENTS = "R - REPRESENTANTE  OU  V - VENDEDOR ";    
+a7   = repres_885.val_garantia,UPSHIFT, NOENTRY;    
+d1   = repres_885.dat_exp_gar, UPSHIFT, NOENTRY;
+e    = repres_885.ies_exp,     UPSHIFT, NOENTRY;
+a8   = repres_885.pct_ger_ofi, UPSHIFT, AUTONEXT;        
+a9   = repres_885.pct_ger_ger, UPSHIFT, AUTONEXT;
+l    = FORMONLY.den_estr_linprod,NOENTRY;
+END

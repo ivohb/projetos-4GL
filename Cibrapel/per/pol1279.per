@@ -1,0 +1,31 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------    
+  [a ]             USUÁRIOS PARA EXCLUSÃO DE BAIXAS PENDENTES 
+ 
+
+
+         Codigo usuário:[b       ] 
+
+       Nome funcionário:[c                                       ] 
+
+
+                
+
+
+
+  
+
+
+
+}
+END
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, NOENTRY;
+b = FORMONLY.cod_usuario, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.nom_usuario, UPSHIFT, NOENTRY;
+
+END 

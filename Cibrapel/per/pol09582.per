@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN 
+{
+  COD.RECUR                DESCRICAO               
+   -----  ------------------------------------------- 
+  [a    ][b                                          ]       
+  [a    ][b                                          ]       
+  [a    ][b                                          ]      
+  [a    ][b                                          ]       
+  [a    ][b                                          ]      
+  [a    ][b                                          ]       
+  [a    ][b                                          ]       
+  [a    ][b                                          ]       
+  [a    ][b                                          ]       
+  [a    ][b                                          ]       
+  [a    ][b                                          ]       
+  [a    ][b                                          ]       
+
+    
+}
+END
+
+
+ATTRIBUTES
+   a = FORMONLY.cod_recurso,NOENTRY;
+   b = FORMONLY.den_recurso,NOENTRY;
+   
+   
+   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_lista[12] (cod_recurso THRU den_recurso);
+END 

@@ -1,0 +1,31 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                           PERÍODO DE APURAÇÃO
+  
+
+                      Início do período: [b         ]
+
+                         Fim do período: [c         ]
+
+
+
+
+
+
+
+
+
+
+
+
+                                           
+}
+ 
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+b = FORMONLY.ini_periodo, UPSHIFT, AUTONEXT;
+c = FORMONLY.fim_periodo, UPSHIFT, AUTONEXT;
+
+END 

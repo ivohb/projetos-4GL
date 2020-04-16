@@ -1,0 +1,27 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------------
+        PARÂMETROS PARA IMPRESSÃO
+  
+
+          Num pedido: [b      ] 
+            
+         Cód cliente: [c              ]    
+         [e                                     ]          
+ 
+  Sequência endereço: [d   ]
+ 
+                                        
+ 
+       
+}
+
+ATTRIBUTES
+   b = FORMONLY.num_pedido,    UPSHIFT, AUTONEXT;   
+   c = FORMONLY.cod_cliente,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';  
+   e = FORMONLY.nom_cliente, NOENTRY, REVERSE;
+   d = FORMONLY.num_sequencia, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';   
+END 

@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------
+[a]   Operações / Sequencia
+
+   Seq  Op 	Descrição Operação         
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+ [c    |b  |d                            ]
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,    	NOENTRY;
+ b = FORMONLY.cod_operac,       NOENTRY  --#, OPTIONS="-nolist"; 
+ c = FORMONLY.num_seq_operac,   NOENTRY  --#, OPTIONS="-nolist";
+ d = FORMONLY.den_operac, 			NOENTRY --#, OPTIONS="-nolist";
+END 
+
+INSTRUCTIONS
+
+   SCREEN RECORD s_oper[10](cod_operac THRU den_operac);
+                     
+END 

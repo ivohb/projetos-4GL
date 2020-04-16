@@ -1,0 +1,34 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-----------------------------------------------------------------------
+                         NATUREZA DE OPERAÇÃO
+                 
+    Código          Descrição               Emite
+ [a    ] [b                             ]   Duplicata:[c]
+ [d    ] [e                             ]    
+         [f                                                          ]
+ [d    ] [e                             ]    
+         [f                                                          ]
+ [d    ] [e                             ]    
+         [f                                                          ]
+ [d    ] [e                             ]    
+         [f                                                          ]
+ [d    ] [e                             ]    
+         [f                                                          ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_nat_oper,     UPSHIFT, AUTONEXT;
+ b = FORMONLY.den_nat_oper,     UPSHIFT, AUTONEXT;
+ c = FORMONLY.ies_emite_dupl,   UPSHIFT, AUTONEXT;
+ d = FORMONLY.cod_operacao,     UPSHIFT --#, OPTIONS="-nolist";
+ e = FORMONLY.den_operacao,     UPSHIFT --#, OPTIONS="-nolist";
+ f = FORMONLY.txt_observacao,   UPSHIFT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_operacao[05] (cod_operacao THRU txt_observacao);
+END
+

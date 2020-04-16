@@ -1,0 +1,41 @@
+DATABASE logix
+
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a0]                       ENTRADA DE ESTOQUE DE SUCATAS
+
+  
+   Codigo Produto : [a1             ]
+
+   [a2                                                                       ]
+
+  
+                     Peso : [a3               ]
+
+
+                    Tipo de movimento:[h         ]
+
+
+
+
+
+
+ 
+}   
+
+END
+
+TABLES
+   item
+END
+
+attributes
+a0   = item.cod_empresa, UPSHIFT, NOENTRY;
+a1   = item.cod_item, UPSHIFT, NOENTRY;
+a2   = item.den_item, UPSHIFT, NOENTRY;
+a3   = FORMONLY.qtd_movto, UPSHIFT, AUTONEXT;
+ h   = FORMONLY.ies_tip_movto TYPE CHAR, INCLUDE=('N','R')
+--#, widget='RADIO', config='N Apontar R Reverter'; 
+
+END  

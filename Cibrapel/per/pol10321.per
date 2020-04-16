@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                         ERROS DO PEDIDO
+  
+           
+  Pedido     OC               Descrição do erro
+ [b     ][d         ]
+ [c                                                                         ]
+ [b     ][d         ]
+ [c                                                                         ]
+ [b     ][d         ]
+ [c                                                                         ]
+ [b     ][d         ]
+ [c                                                                         ]
+ [b     ][d         ]
+ [c                                                                         ]
+ [b     ][d         ]
+ [c                                                                         ]
+   
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa,     UPSHIFT, NOENTRY;   
+b = FORMONLY.num_pedido,      UPSHIFT, AUTONEXT;
+d = FORMONLY.num_oc,           UPSHIFT, AUTONEXT;
+c = FORMONLY.den_erro,        UPSHIFT, AUTONEXT;
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_pedido[6](num_pedido THRU den_erro);
+END  

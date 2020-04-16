@@ -1,0 +1,33 @@
+DATABASE FORMONLY 
+SCREEN
+{
+----------------------------------------------
+                  REPRESENTANTES
+
+    Código        Descrição
+[a   ][b                                   ]    
+       
+[c   ][d                                   ]
+[c   ][d                                   ]
+[c   ][d                                   ]
+[c   ][d                                   ]
+[c   ][d                                   ]
+[c   ][d                                   ]
+[c   ][d                                   ]
+[c   ][d                                   ]
+[c   ][d                                   ]
+[c   ][d                                   ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_repres,   UPSHIFT, AUTONEXT;
+ b = FORMONLY.raz_social,   UPSHIFT, AUTONEXT;
+ c = FORMONLY.cod_rep,      UPSHIFT --#, OPTIONS="-nolist";
+ d = FORMONLY.den_rep,      UPSHIFT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_repres[10] (cod_rep THRU den_rep);
+END
+

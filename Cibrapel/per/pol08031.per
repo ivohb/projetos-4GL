@@ -1,0 +1,29 @@
+DATABASE logix
+SCREEN
+{
+----------------------------------------------------------------------------
+                   ERROS ENCONTRADOS DURANTE A CONSISTÊNCIA
+
+    Ordem     Qtd Apontar             Descrição da Crítica
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+[a           |c         |d                                                 ]
+}
+END
+
+ATTRIBUTES
+  a = FORMONLY.num_ordem;
+  c = FORMONLY.qtd_boas;
+  d = FORMONLY.den_critica;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_erros[10](num_ordem THRU den_critica);
+END 

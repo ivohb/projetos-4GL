@@ -1,0 +1,6 @@
+Implantação modolo de aparas
+- criar as tabelas
+- subir path aparas.ptm
+- colocar programas no menu (pol0779/pol0895/pol0896/pol0910/pol0888)
+
+

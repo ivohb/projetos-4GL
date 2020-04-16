@@ -95,8 +95,7 @@ DEFINE p_msg                CHAR(150),
        p_hor_operac         CHAR(08),                     
        p_tip_movto          CHAR(01),                     
        p_ies_processando    CHAR(01),
-       p_sem_estoque        SMALLINT,
-       m_qtd_produzida      CHAR(10)
+       p_sem_estoque        SMALLINT
 
    DEFINE p_ies_situa_bob      LIKE estoque_trans.ies_sit_est_orig,  
           p_cod_local_bob      LIKE estoque_lote.cod_local,                
@@ -256,7 +255,7 @@ DEFINE p_qtd_apontar        LIKE estoque_lote.qtd_saldo,
 MAIN
    CALL log0180_conecta_usuario()
    
-   LET p_versao = 'pol1270-12.00.02  ' 
+   LET p_versao = 'pol1270-12.00.01  ' 
    CALL func002_versao_prg(p_versao)
 
    WHENEVER ERROR CONTINUE
@@ -745,7 +744,6 @@ FUNCTION pol1270_aponta_producao()#
       LET p_hor_operac = EXTEND(p_datageracao, HOUR TO SECOND)
 
       IF p_man.qtd_movto IS NOT NULL THEN
-         LET m_qtd_produzida = p_man.qtd_movto
          IF p_estorno = 1 THEN
             LET p_man.qtd_movto = -p_man.qtd_movto
          END IF
@@ -855,8 +853,6 @@ END FUNCTION
 FUNCTION pol1270_consiste_apont()
 #-------------------------------#
 
-   DEFINE p_query         CHAR(2000)
-
    SELECT num_docum,
           cod_item,
           ies_situa,
@@ -914,7 +910,7 @@ FUNCTION pol1270_consiste_apont()
          RETURN FALSE
       END IF
    END IF   
-       
+
    LET p_num_lote = p_man.lote
 
    SELECT tipo_processo
@@ -968,45 +964,39 @@ FUNCTION pol1270_consiste_apont()
       END IF
    END IF
    
-   LET p_num_seq_orig = NULL
-   
    IF p_man.qtd_movto IS NOT NULL THEN
-      
-      IF p_man.qtd_movto < 0 THEN
-         
-         LET m_qtd_produzida = log2260_troca_virgula_por_ponto(m_qtd_produzida)
-      
-         LET p_query = "SELECT numsequencia FROM apont_papel_885 ",
-          " WHERE codempresa = '",p_man.empresa,"' ",
-          " AND coditem = '",p_man.item,"' ",
-          " AND numordem = '",p_man.ordem_producao,"' ",
-          " AND codmaquina = '",p_man.cod_recur,"' ",
-          " AND CONVERT(CHAR(19),datiniproducao,120) = '",p_dat_ini,"' ",
-          " AND CONVERT(CHAR(19),datproducao,120) = '",p_dat_fim,"' ",
-          " AND numlote = '",p_man.lote,"' ",
-          " AND largura = '",p_man.largura,"' ",
-          " AND tubete = '",p_man.altura,"' ",
-          " AND diametro = '",p_man.diametro,"' ",
-          " AND tipmovto = '",p_man.tip_movto,"' ",
-          " AND pesobalanca = '",m_qtd_produzida,"' ",
-          " AND estorno = '0' ",
-          " AND StatusRegistro = '1' "
+     IF p_man.qtd_movto < 0 THEN
+      SELECT numsequencia
+        INTO p_num_seq_orig 
+        FROM apont_papel_885
+       WHERE codempresa     = p_man.empresa
+         AND coditem        = p_man.item
+         AND numordem       = p_man.ordem_producao
+         AND codmaquina     = p_man.cod_recur
+         AND datiniproducao = p_dat_ini
+         AND datproducao    = p_dat_fim
+         AND numlote        = p_man.lote
+         AND largura        = p_man.largura
+         AND tubete         = p_man.altura
+         AND diametro       = p_man.diametro
+         AND tipmovto       = p_man.tip_movto
+         AND pesobalanca    = -p_man.qtd_movto
+         AND estorno        = 0
+         AND StatusRegistro = 1
 
-         PREPARE var_queryx FROM p_query   
-         DECLARE cq_achou CURSOR FOR var_queryx
-         FOREACH cq_achou INTO p_num_seq_orig
-            EXIT FOREACH
-         END FOREACH
-
-         IF p_num_seq_orig IS NULL THEN
-            LET p_msg = 'ESTORNO DE APONTAMENTO NAO ENVIADO AO LOGIX'
-            IF NOT pol1270_insere_erro() THEN
-               RETURN FALSE
-            END IF
+      IF STATUS = 100 THEN
+         LET p_msg = 'ESTORNO DE APONTAMENTO NAO ENVIADO AO LOGIX'
+         IF NOT pol1270_insere_erro() THEN
+            RETURN FALSE
          END IF
-      ELSE
-               
-      END IF      
+      ELSE 
+         IF STATUS <> 0 THEN
+            LET p_msg = 'ERRO:(',STATUS, ') CHECADO ESTORNO NA TAB APONT_PAPEL_885'
+            RETURN FALSE
+         END IF
+      END IF
+      
+     END IF
    END IF
    
    IF p_man.cod_recur IS NULL OR p_man.cod_recur = 0 THEN
@@ -1769,18 +1759,31 @@ END FUNCTION
 #---------------------------#
 FUNCTION pol1270_ck_bobina()#
 #---------------------------#
-
-   SELECT 1 FROM pedido_lote_885
+   
+   SELECT COUNT(num_transac)
+     INTO p_count
+     FROM estoque_trans
     WHERE cod_empresa = p_cod_empresa
-      AND num_lote = p_man.lote
-
-   IF STATUS = 0 THEN
-      LET p_msg = 'Bobina já apontada no logix '
+      AND num_lote_dest = p_man.lote
+      AND ies_sit_est_dest = p_man.tip_movto
+      AND ies_tip_movto = 'N'
+      AND num_prog = p_man.nom_prog
+      AND num_transac NOT IN
+         (SELECT num_transac_normal 
+           FROM estoque_trans_rev WHERE cod_empresa = p_cod_empresa)
+           
+   IF STATUS <> 0 THEN 
+      LET p_msg = 'ERRO:(',STATUS, ') LENDO NA ESTOQUE_TRANS/ESTOQUE_TRANS_REV'
+      RETURN FALSE
+   END IF
+   
+   IF p_count > 0 THEN
+      LET p_msg = 'NUMERO DE BOBINA JA APONTADO NO LOGIX'
       IF NOT pol1270_insere_erro() THEN
          RETURN FALSE
       END IF
-   END IF     
-      
+   END IF
+   
    RETURN TRUE
 
 END FUNCTION

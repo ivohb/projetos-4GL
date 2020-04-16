@@ -1,0 +1,30 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-----------------------------------------------------------
+                    CLIENTES ERICSSON
+
+      Código                     Descrição
+ [a              ]  [b                                   ] 
+ [a              ]  [b                                   ]
+ [a              ]  [b                                   ]
+ [a              ]  [b                                   ]
+ [a              ]  [b                                   ]
+ [a              ]  [b                                   ]
+ [a              ]  [b                                   ]
+ [a              ]  [b                                   ]
+ [a              ]  [b                                   ]
+ [a              ]  [b                                   ]   
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_cliente, UPSHIFT --#, OPTIONS="-nolist";
+ b = FORMONLY.nom_cliente, UPSHIFT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_clientes[10] (cod_cliente THRU nom_cliente);
+END
+

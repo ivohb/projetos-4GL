@@ -71,7 +71,7 @@ FUNCTION pol1380()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1380-12.00.02  "
+   LET p_versao = "pol1380-12.00.01  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1380_menu()

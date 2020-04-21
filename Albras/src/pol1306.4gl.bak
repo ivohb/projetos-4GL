@@ -17,7 +17,9 @@ cDoc := GetSXENum("SC1","C1_NUM")
     ConfirmSX8()
     cDoc := GetSXENum("SC1","C1_NUM")
    EndDo
+}
 
+{
 
 [MAIL] Falha na conexao com o servidor SMTP.
 
@@ -36,14 +38,12 @@ PROTOCOL: TLS
 STATUS..: 54
 
 DETAIL..: The HELLO command failed.
-
+}
 
 
 #Execução via bat-------------------------------------------------------------------------------#
 # \\10.10.0.38\smartclient\totvssmartclient.exe -M -Q -P=pol1306.4GL -A=01 -C=tcp -E=logix_albras
 #-----------------------------------------------------------------------------------------------#
-
-}
    
  DATABASE logix
 

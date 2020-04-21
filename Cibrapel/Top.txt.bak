@@ -7,6 +7,3 @@ Tabelas a serem copiadas:
 estrutura
 estrut_grade
 
-select COUNT(*) from item_man where cod_empresa = '01' -- 76376
-select COUNT(*) from item_sup where cod_empresa = '01' -- 77698
-select COUNT(*) from item_vdp where cod_empresa = '01' -- 65429

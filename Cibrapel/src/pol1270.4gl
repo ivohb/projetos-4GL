@@ -40,8 +40,6 @@ GLOBALS
           p_ind_men            INTEGER,
           p_ies_retrabalho     SMALLINT,      
           p_ies_relac          CHAR(01)
-
-DEFINE m_cod_emp_pv            CHAR(02)
               
 DEFINE p_cod_operacao       LIKE estoque_trans.cod_operacao,            
        p_ies_situa          LIKE ordens.ies_situa                                
@@ -123,8 +121,8 @@ DEFINE p_statusregistro     LIKE apont_papel_885.statusregistro,
        p_cod_tip_movto      LIKE apo_oper.cod_tip_movto,                          
        p_qtd_ant            LIKE ordens.qtd_boas,                                 
        p_sequencia          LIKE apont_papel_885.numsequencia,                    
-       p_num_seq_cons       LIKE cons_insumo_885.numsequencia,                    
-       p_num_sequencia      LIKE cons_insumo_885.numsequencia,                    
+       p_num_seq_cons       LIKE apont_papel_885.numsequencia,                    
+       p_num_sequencia      LIKE apont_papel_885.numsequencia,                    
        p_qtd_consumo        LIKE estoque_lote.qtd_saldo,                          
        p_num_seq_pedido     LIKE ped_itens.num_sequencia,                         
        p_qtd_prod           LIKE estoque_lote.qtd_saldo,                          
@@ -139,7 +137,6 @@ DEFINE p_statusregistro     LIKE apont_papel_885.statusregistro,
        p_num_docum          LIKE ordens.num_docum,                                
        p_cod_local_baixa    LIKE ord_compon.cod_local_baixa,                      
        p_cod_operac         LIKE ord_oper.cod_operac,                             
-       p_ies_refugo         LIKE cons_insumo_885.iesrefugo,                       
        p_cod_prod           LIKE ordens.cod_item,                                 
        p_cod_chapa          LIKE ordens.cod_item,                                 
        p_area_livre         LIKE par_cst.area_livre,                              
@@ -191,7 +188,6 @@ DEFINE p_statusregistro     LIKE apont_papel_885.statusregistro,
        p_qtd_movto          LIKE estoque_trans.qtd_movto,                         
        p_qtd_baixar         LIKE estoque_trans.qtd_movto,                         
        p_qtd_baixar_ant     LIKE estoque_trans.qtd_movto,                         
-       p_num_versao         LIKE frete_roma_885.num_versao,                       
        p_num_processo       LIKE apo_oper.num_processo,                           
        p_ies_situa_dest     LIKE estoque_trans.ies_sit_est_dest,                  
        p_cod_local_orig     LIKE estoque_trans.cod_local_est_orig,                
@@ -205,7 +201,6 @@ DEFINE p_statusregistro     LIKE apont_papel_885.statusregistro,
        p_cod_cent_cust      LIKE ord_oper.cod_cent_cust,                          
        p_num_seq_reg        LIKE cfp_apms.num_seq_registro,                       
        p_cod_local_estoq    LIKE item.cod_local_estoq,                            
-       p_cod_maquina        LIKE apont_trim_885.codmaquina,                       
        p_cod_local_insp     LIKE item.cod_local_insp,                             
        p_num_transac        LIKE estoque_lote.num_transac,                        
        p_ctr_estoque        LIKE item.ies_ctr_estoque,                            
@@ -213,7 +208,6 @@ DEFINE p_statusregistro     LIKE apont_papel_885.statusregistro,
        p_sobre_baixa        LIKE item_man.ies_sofre_baixa,                        
        p_cod_emp_ger        LIKE empresa.cod_empresa,                             
        p_cod_emp_ofic       LIKE empresa.cod_empresa,                             
-       p_tip_trim           LIKE empresas_885.tip_trim,                           
        p_datproducao        LIKE apont_papel_885.datproducao,                     
        p_tempoproducao      LIKE apont_papel_885.tempoproducao,                   
        p_estorno            LIKE apont_papel_885.estorno,                         
@@ -228,7 +222,6 @@ DEFINE p_statusregistro     LIKE apont_papel_885.statusregistro,
        p_altura             LIKE apont_papel_885.tubete,                          
        p_diametro           LIKE apont_papel_885.diametro,                        
        p_comprimento        LIKE apont_papel_885.comprimento,                     
-       p_gramatura          LIKE gramatura_885.gramatura,                         
        p_largura_ped        LIKE apont_papel_885.largura,                         
        p_altura_ped         LIKE apont_papel_885.tubete,                          
        p_diametro_ped       LIKE apont_papel_885.diametro,                        
@@ -285,26 +278,21 @@ FUNCTION pol1270_job(l_rotina) #
           l_param2_user     CHAR(08),
           l_status          SMALLINT
 
-   {CALL JOB_get_parametro_gatilho_tarefa(1,0) RETURNING l_status, l_param1_empresa
+   CALL JOB_get_parametro_gatilho_tarefa(1,0) RETURNING l_status, l_param1_empresa
    CALL JOB_get_parametro_gatilho_tarefa(2,1) RETURNING l_status, l_param2_user
    CALL JOB_get_parametro_gatilho_tarefa(2,2) RETURNING l_status, l_param2_user
    
    IF l_param1_empresa IS NULL THEN
-      RETURN 1
+      LET p_cod_empresa = '01'
+   ELSE
+      LET p_cod_empresa = l_param1_empresa
    END IF
-
-   SELECT den_empresa
-     INTO l_den_empresa
-     FROM empresa
-    WHERE cod_empresa = l_param1_empresa
-      
-   IF STATUS <> 0 THEN
-      RETURN 1
+ 
+   IF l_param2_user IS NULL THEN
+      LET p_user = 'pol1270'  
+   ELSE
+      LET p_user = l_param2_user
    END IF
-   }
-   
-   LET p_cod_empresa = '02' #l_param1_empresa
-   LET p_user = 'pol1270'  #l_param2_user
       
    CALL pol1270_controle() RETURNING p_status
    
@@ -324,7 +312,6 @@ FUNCTION pol1270_controle()
   
    LET p_qtd_apontado = 0   
    LET p_qtd_criticado = 0
-   LET p_cod_empresa = '02'
    
    DISPLAY p_cod_empresa TO cod_empresa
    DISPLAY p_qtd_criticado TO qtd_criticado
@@ -883,11 +870,6 @@ FUNCTION pol1270_consiste_apont()
    CALL pol1270_pega_pedido()
    LET p_man.num_pedido = p_num_pedido
    LET p_man.num_seq_pedido = p_num_seq_pedido
-   IF p_num_pedido >= 500000 THEN
-      LET m_cod_emp_pv = '12'
-   ELSE
-      LET m_cod_emp_pv = '02'
-   END IF
    
    IF p_ies_situa <> '4' THEN
       IF p_ies_situa = '5' THEN
@@ -916,7 +898,7 @@ FUNCTION pol1270_consiste_apont()
    SELECT tipo_processo
      INTO p_tipo_processo
      FROM tipo_pedido_885
-    WHERE cod_empresa = m_cod_emp_pv
+    WHERE cod_empresa = p_cod_empresa
       AND num_pedido  = p_man.num_pedido         
       
    IF STATUS = 100 THEN
@@ -1393,7 +1375,7 @@ FUNCTION pol1270_le_dimensional()#
           p_diametro_ped,
           p_altura_ped
      FROM item_bobina_885        
-    WHERE cod_empresa   = m_cod_emp_pv
+    WHERE cod_empresa   = p_cod_empresa
       AND num_pedido    = p_num_pedido
       AND num_sequencia = p_num_seq_pedido
  
@@ -1994,7 +1976,7 @@ FUNCTION pol1270_le_desconto()#
    SELECT pct_desc_qtd            #verifica se o pedido tem desconto de quantidade
      INTO p_pct_desc_qtd                                                                      
      FROM desc_nat_oper_885                                                                   
-    WHERE cod_empresa = m_cod_emp_pv                                                         
+    WHERE cod_empresa = p_cod_empresa                                                         
       AND num_pedido = p_man.num_pedido                                                       
                                                                                      
    IF STATUS <> 0 THEN                                                                        

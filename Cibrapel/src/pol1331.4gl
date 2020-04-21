@@ -59,7 +59,7 @@ FUNCTION pol1331()#
    LET p_versao = "pol1331-12.00.07  "
    CALL func002_versao_prg(p_versao)
    
-   IF pol1323_cria_tab() THEN
+   IF pol1331_cria_tab() THEN
       CALL pol1331_menu()
    END IF
     
@@ -740,7 +740,7 @@ FUNCTION pol1331_acerta_peso()#
 END FUNCTION
 
 #--------------------------#
-FUNCTION pol1323_cria_tab()#
+FUNCTION pol1331_cria_tab()#
 #--------------------------#
    
    DEFINE l_tab     CHAR(30)

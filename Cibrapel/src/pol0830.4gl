@@ -88,9 +88,7 @@ MAIN
       PREVIOUS KEY control-b
 
    CALL log001_acessa_usuario("ESPEC999","") RETURNING p_status, p_cod_empresa, p_user
-   
-   LET p_status = 0; LET p_cod_empresa = '02'; LET p_user = 'admlog'
-   
+      
    IF p_status = 0  THEN
       CALL pol0830_controle()
    END IF
@@ -171,14 +169,14 @@ FUNCTION pol0830_inconsistencia()
          
    END INPUT
 
-   CALL pol647_le_inconsist() RETURNING p_status
+   CALL pol0830_le_inconsist() RETURNING p_status
   
    RETURN  p_status
    
 END FUNCTION
 
 #----------------------------#
-FUNCTION pol647_le_inconsist()
+FUNCTION pol0830_le_inconsist()
 #----------------------------#
    
    DEFINE p_query           CHAR(3000),

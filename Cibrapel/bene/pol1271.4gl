@@ -226,8 +226,7 @@ DEFINE m_ies_situa             CHAR(01),
           m_ies_frete          INTEGER,
           p_num_nff            INTEGER,
           p_qtd_linha          INTEGER,
-          p_tipo_processo      INTEGER,
-          m_ies_top            SMALLINT
+          p_tipo_processo      INTEGER
              
    DEFINE mr_ordem_montag_mest  RECORD LIKE ordem_montag_mest.*,
           mr_ordem_montag_item  RECORD LIKE ordem_montag_item.*,
@@ -623,26 +622,21 @@ FUNCTION pol1271_le_parametros()
       CALL log003_err_sql('Lendo','clientes')
       RETURN FALSE
    END IF
- 
-   IF p_num_cgc = '035.503.800/0001-00' THEN
-      LET p_tip_trim = 'T'
+
+   SELECT cod_fornecedor
+     INTO m_fornec
+     FROM fornecedor
+    WHERE num_cgc_cpf = p_num_cgc
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('Lendo','fornecedor')
+      RETURN FALSE
+   END IF
+   
+   IF p_cod_empresa = '01' OR p_cod_empresa = '11' THEN
+      LET p_tip_trim = 'B'
    ELSE
-      IF p_cod_empresa = '01' OR p_cod_empresa = '11' THEN
-         LET p_tip_trim = 'B'
-      ELSE
-         LET p_tip_trim = 'P'
-      END IF
-
-      SELECT cod_fornecedor
-        INTO m_fornec
-        FROM fornecedor
-       WHERE num_cgc_cpf = p_num_cgc
-
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('Lendo','fornecedor')
-         RETURN FALSE
-      END IF
-        
+      LET p_tip_trim = 'P'
    END IF
    
    SELECT substring(par_vdp_txt,215,2)
@@ -692,29 +686,35 @@ FUNCTION pol1271_le_parametros()
       RETURN FALSE
    END IF 
 
-   IF p_tip_trim = 'T' THEN
-      LET m_cod_emp_op = p_cod_empresa
-   ELSE   
-      SELECT cod_emp_ordem
-        INTO m_cod_emp_op
-        FROM de_para_empresa_885
-       WHERE cod_emp_pedido = p_cod_empresa
+   SELECT cod_emp_ordem
+     INTO m_cod_emp_op
+     FROM de_para_empresa_885
+    WHERE cod_emp_pedido = p_cod_empresa
 
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','de_para_empresa_885.1')
-         RETURN FALSE
-      END IF
-   
-      IF m_cod_emp_op IS NULL THEN
-         LET p_msg = 'Empresa produtora não cadastrada para empresa ',p_cod_empresa
-         CALL log0030_mensagem(p_msg,'info')
-         RETURN FALSE
-      END IF      
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','de_para_empresa_885.1')
+      RETURN FALSE
    END IF
    
-   IF p_tip_trim = 'T' THEN
-      LET m_cod_emp_pv = p_cod_empresa
-   ELSE
+   IF m_cod_emp_op IS NULL THEN
+      LET p_msg = 'Empresa produtora não cadastrada para empresa ',p_cod_empresa
+      CALL log0030_mensagem(p_msg,'info')
+      RETURN FALSE
+   END IF      
+     
+  SELECT parametro_numerico 
+    INTO m_ordem_antiga
+    FROM min_par_modulo 
+   WHERE empresa = m_cod_emp_op
+     AND parametro = 'MAIOR_OP_ANTIGA'
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('Lendo','min_par_modulo')
+      ERROR 'Não foi possivel ler MAIOR_OP_ANTIGA'
+      RETURN FALSE
+   END IF 
+ 
+    IF m_cod_emp_op = p_cod_empresa THEN
       SELECT MAX(cod_emp_pedido) 
         INTO m_cod_emp_pv
         FROM de_para_empresa_885
@@ -724,7 +724,9 @@ FUNCTION pol1271_le_parametros()
          CALL log003_err_sql('SELECT','de_para_empresa_885.2')
          RETURN FALSE
       END IF
-   END IF
+  ELSE
+     LET m_cod_emp_pv = p_cod_empresa
+  END IF
 
     SELECT num_cgc
      INTO p_num_cgc
@@ -1089,16 +1091,13 @@ FUNCTION pol1271_processar()
 
    CALL log085_transacao("BEGIN")
    
-   IF p_tip_trim = 'T' THEN
-   ELSE
-      IF m_opcao = 'I' AND m_cod_emp_op = p_cod_empresa THEN
-         IF NOT pol1271_copia_roma_885() THEN
-            CALL log085_transacao("ROLLBACK")
-            RETURN FALSE
-         END IF
+   IF m_opcao = 'I' AND m_cod_emp_op = p_cod_empresa THEN
+      IF NOT pol1271_copia_roma_885() THEN
+         CALL log085_transacao("ROLLBACK")
+         RETURN FALSE
       END IF
    END IF
-    
+       
    IF NOT pol1271_importa_romaneio() THEN
       CALL log085_transacao("ROLLBACK")
       RETURN FALSE
@@ -2106,7 +2105,7 @@ FUNCTION pol1271_tem_saldo()
       IF p_ies_chapa AND p_tipo_processo <> 4 THEN
          LET m_ies_chapa = 'S'
       ELSE
-         IF p_cod_empresa = '01' AND p_tip_trim = 'B' THEN
+         IF p_cod_empresa = '01' THEN
             IF NOT pol1271_ve_se_eh_conjunto() THEN   
                RETURN FALSE
             END IF
@@ -5617,18 +5616,6 @@ FUNCTION pol1271_ve_se_eh_conjunto()#
          RETURN FALSE
       END IF
    END IF  
-
-  SELECT parametro_numerico 
-    INTO m_ordem_antiga
-    FROM min_par_modulo 
-   WHERE empresa = m_cod_emp_op
-     AND parametro = 'MAIOR_OP_ANTIGA'
-
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('Lendo','min_par_modulo')
-      ERROR 'Não foi possivel ler MAIOR_OP_ANTIGA'
-      RETURN FALSE
-   END IF 
 
    SELECT count(a.cod_item_compon)                   
      INTO p_count                                            

@@ -39,26 +39,26 @@
           <tags>persp.newWizSC:br.com.totvs.tds.sdk.advpl.ui.wizard.CodeAssistantWizard</tags>
           <tags>persp.newWizSC:br.com.totvs.tds.sdk.advpl.ui.FunctionAssistantWizard</tags>
           <children xsi:type="basic:PartSashContainer" xmi:id="_BIP45UIMEeqv95ZfTr4OmQ" selectedElement="_BIP45kIMEeqv95ZfTr4OmQ" horizontal="true">
-            <children xsi:type="basic:PartSashContainer" xmi:id="_BIP45kIMEeqv95ZfTr4OmQ" containerData="2000" selectedElement="_BIP450IMEeqv95ZfTr4OmQ">
+            <children xsi:type="basic:PartSashContainer" xmi:id="_BIP45kIMEeqv95ZfTr4OmQ" containerData="2000" selectedElement="_BIP46UIMEeqv95ZfTr4OmQ">
               <children xsi:type="basic:PartStack" xmi:id="_BIP450IMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.navigator.ProjectExplorerMStack" containerData="7000" selectedElement="_BIP46EIMEeqv95ZfTr4OmQ">
                 <tags>newtablook</tags>
-                <tags>active</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_BIP46EIMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.navigator.ProjectExplorer" ref="_BIQf8kIMEeqv95ZfTr4OmQ"/>
               </children>
               <children xsi:type="basic:PartStack" xmi:id="_BIP46UIMEeqv95ZfTr4OmQ" elementId="br.com.totvs.tds.server.ui.views.ServersViewMStack" containerData="3000" selectedElement="_BIP46kIMEeqv95ZfTr4OmQ">
                 <tags>newtablook</tags>
+                <tags>active</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_BIP46kIMEeqv95ZfTr4OmQ" elementId="br.com.totvs.tds.server.ui.views.ServersView" ref="_BIQgKkIMEeqv95ZfTr4OmQ"/>
               </children>
             </children>
-            <children xsi:type="basic:PartSashContainer" xmi:id="_BIP460IMEeqv95ZfTr4OmQ" containerData="8000" selectedElement="_BIP47EIMEeqv95ZfTr4OmQ">
-              <children xsi:type="basic:PartSashContainer" xmi:id="_BIP47EIMEeqv95ZfTr4OmQ" containerData="7423" selectedElement="_BIP47UIMEeqv95ZfTr4OmQ" horizontal="true">
+            <children xsi:type="basic:PartSashContainer" xmi:id="_BIP460IMEeqv95ZfTr4OmQ" containerData="8000" selectedElement="_BIP48EIMEeqv95ZfTr4OmQ">
+              <children xsi:type="basic:PartSashContainer" xmi:id="_BIP47EIMEeqv95ZfTr4OmQ" containerData="5300" selectedElement="_BIP47UIMEeqv95ZfTr4OmQ" horizontal="true">
                 <children xsi:type="advanced:Placeholder" xmi:id="_BIP47UIMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.editorss" containerData="7500" ref="_BIP50EIMEeqv95ZfTr4OmQ"/>
                 <children xsi:type="basic:PartStack" xmi:id="_BIP47kIMEeqv95ZfTr4OmQ" elementId="right" toBeRendered="false" containerData="2500">
                   <tags>newtablook</tags>
                   <children xsi:type="advanced:Placeholder" xmi:id="_BIP470IMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.views.ContentOutline" toBeRendered="false" ref="_BIQgWEIMEeqv95ZfTr4OmQ"/>
                 </children>
               </children>
-              <children xsi:type="basic:PartStack" xmi:id="_BIP48EIMEeqv95ZfTr4OmQ" elementId="bottom" containerData="2577" selectedElement="_BIP48UIMEeqv95ZfTr4OmQ">
+              <children xsi:type="basic:PartStack" xmi:id="_BIP48EIMEeqv95ZfTr4OmQ" elementId="bottom" containerData="4700" selectedElement="_BIP48UIMEeqv95ZfTr4OmQ">
                 <tags>newtablook</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_BIP48UIMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.console.ConsoleView" ref="_BIQgOUIMEeqv95ZfTr4OmQ"/>
                 <children xsi:type="advanced:Placeholder" xmi:id="_BIP48kIMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.views.ProblemView" ref="_BIQgTUIMEeqv95ZfTr4OmQ"/>
@@ -98,8 +98,6 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view CommonNavigator.LINKING_ENABLED=&quot;0&quot; org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets=&quot;0&quot;/>"/>
       <tags>View</tags>
       <tags>categoryTag:Gerais</tags>
-      <tags>active</tags>
-      <tags>activeOnClose</tags>
       <menus xmi:id="_BIQf80IMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.navigator.ProjectExplorer">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -134,6 +132,8 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:TOTVS Plataforma</tags>
+      <tags>active</tags>
+      <tags>activeOnClose</tags>
       <menus xmi:id="_BIQgK0IMEeqv95ZfTr4OmQ" elementId="br.com.totvs.tds.server.ui.views.ServersView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -263,7 +263,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_BIQgXkIMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.workbench.file">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_KSTsQH_nEeqXRJIjbmkg-A" elementId="print" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Imprimir" enabled="false" command="_BISVOUIMEeqv95ZfTr4OmQ"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_sL_54IQhEeq5SfF28OAgEQ" elementId="print" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Imprimir" enabled="false" command="_BISVOUIMEeqv95ZfTr4OmQ"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_BIQga0IMEeqv95ZfTr4OmQ" elementId="additions" toBeRendered="false">
         <tags>toolbarSeparator</tags>
@@ -284,7 +284,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_BIQglUIMEeqv95ZfTr4OmQ" elementId="org.eclipse.ui.workbench.navigate">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_KShHoH_nEeqXRJIjbmkg-A" elementId="org.eclipse.ui.window.pinEditor" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Reter Editor" type="Check" command="_BIRvkkIMEeqv95ZfTr4OmQ"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_sMN8UIQhEeq5SfF28OAgEQ" elementId="org.eclipse.ui.window.pinEditor" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Reter Editor" type="Check" command="_BIRvkkIMEeqv95ZfTr4OmQ"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_BIQgokIMEeqv95ZfTr4OmQ" elementId="group.editor" toBeRendered="false">
         <tags>toolbarSeparator</tags>

@@ -301,6 +301,32 @@ FUNCTION pol1297_exibe_dados()
 	
 END FUNCTION
 
+
+#--------------------------------#
+FUNCTION pol1297_prende_registro()
+#--------------------------------#
+	
+	CALL log085_transacao("BEGIN")
+	
+	DECLARE cq_prende CURSOR FOR
+	 SELECT cod_rota
+	   FROM rotas_885
+	  WHERE cod_rota = p_rotas.cod_rota
+
+	FOR UPDATE
+
+	OPEN cq_prende
+	FETCH cq_prende
+
+	IF STATUS = 0 THEN
+		RETURN TRUE
+	ELSE
+		CALL log003_err_sql("Lendo","rota_frete_455")
+		RETURN FALSE
+	END IF
+	
+END FUNCTION
+
 #----------------------------#
 FUNCTION pol1297_modificacao()
 #----------------------------#
@@ -337,31 +363,6 @@ RETURN p_retorno
 
 END FUNCTION
 
-#--------------------------------#
-FUNCTION pol1297_prende_registro()
-#--------------------------------#
-	
-	CALL log085_transacao("BEGIN")
-	
-	DECLARE cq_prende CURSOR FOR
-	 SELECT cod_rota
-	   FROM rotas_885
-	  WHERE cod_rota = p_rotas.cod_rota
-
-	FOR UPDATE
-
-	OPEN cq_prende
-	FETCH cq_prende
-
-	IF STATUS = 0 THEN
-		RETURN TRUE
-	ELSE
-		CALL log003_err_sql("Lendo","rota_frete_455")
-		RETURN FALSE
-	END IF
-	
-END FUNCTION
-
 #-------------------------#
 FUNCTION pol1297_atualiza()
 #-------------------------#
@@ -386,7 +387,7 @@ FUNCTION pol1297_exclusao()
 	
 	IF p_excluiu THEN
 		CALL log0030_mensagem("Não há dados a serem excluídos !!!", "exclamation")
-		RETURN p_return
+		RETURN p_retorno
 	END IF
 
 	LET p_msg = "Confirma a exclusão do registro?"

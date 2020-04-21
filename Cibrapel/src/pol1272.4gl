@@ -355,6 +355,33 @@ FUNCTION pol1272_exibe_dados()
 	
 END FUNCTION
 
+#--------------------------------#
+FUNCTION pol1272_prende_registro()
+#--------------------------------#
+	
+	CALL log085_transacao("BEGIN")
+	
+	DECLARE cq_prende CURSOR FOR
+	 SELECT cod_item
+	   FROM apara_alternat_885
+	  WHERE cod_empresa = p_cod_empresa
+	    AND cod_item    = p_apara_alternat.cod_item
+
+	FOR UPDATE
+
+	OPEN cq_prende
+	FETCH cq_prende
+
+	IF STATUS = 0 THEN
+		RETURN TRUE
+	ELSE
+		CALL log003_err_sql("Lendo","apara_alternat_885")
+		RETURN FALSE
+	END IF
+	
+END FUNCTION
+
+
 #----------------------------#
 FUNCTION pol1272_modificacao()
 #----------------------------#
@@ -391,32 +418,6 @@ RETURN p_retorno
 
 END FUNCTION
 
-#--------------------------------#
-FUNCTION pol1272_prende_registro()
-#--------------------------------#
-	
-	CALL log085_transacao("BEGIN")
-	
-	DECLARE cq_prende CURSOR FOR
-	 SELECT cod_item
-	   FROM apara_alternat_885
-	  WHERE cod_empresa = p_cod_empresa
-	    AND cod_item    = p_apara_alternat.cod_item
-
-	FOR UPDATE
-
-	OPEN cq_prende
-	FETCH cq_prende
-
-	IF STATUS = 0 THEN
-		RETURN TRUE
-	ELSE
-		CALL log003_err_sql("Lendo","rota_frete_455")
-		RETURN FALSE
-	END IF
-	
-END FUNCTION
-
 #-------------------------#
 FUNCTION pol1272_atualiza()
 #-------------------------#
@@ -442,7 +443,7 @@ FUNCTION pol1272_exclusao()
 	
 	IF p_excluiu THEN
 		CALL log0030_mensagem("Não há dados a serem excluídos !!!", "exclamation")
-		RETURN p_return
+		RETURN p_retorno
 	END IF
 
 	LET p_msg = "Confirma a exclusão do registro?"

@@ -99,7 +99,9 @@ DEFINE m_dialog          VARCHAR(10),
        m_arq_imp         VARCHAR(10),
        m_ped_imp         VARCHAR(10),
        m_dat_de          VARCHAR(10),
-       m_dat_ate         VARCHAR(10)
+       m_dat_ate         VARCHAR(10),
+       m_prz_de          VARCHAR(10),
+       m_prz_ate         VARCHAR(10)
        
 DEFINE m_ies_info        SMALLINT,
        m_count           INTEGER,
@@ -315,6 +317,8 @@ DEFINE mr_print           RECORD
        num_pedido         DECIMAL(6,0),
        dat_de             DATE,
        dat_ate            DATE,
+       prz_de             DATE,
+       prz_ate            DATE,
        tip_proces         CHAR(01)
 END RECORD
        
@@ -352,7 +356,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.32  "
+   LET p_versao = "POL1370-12.00.34  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
 
@@ -3358,8 +3362,9 @@ FUNCTION pol1370_le_programacao()#
         LET ma_prog[m_ind].qtd_saldo = m_qtd_saldo             
                                                                
         IF m_qtd_atend > 0 OR m_qtd_romaneio > 0 THEN          
-           IF ma_prog[m_ind].mensagem = "ATUALIZAR" THEN       
-              LET ma_prog[m_ind].mensagem = 'C/FATURAMENTO'    
+           IF ma_prog[m_ind].mensagem = "ATUALIZAR" OR 
+              ma_prog[m_ind].mensagem = "INCLUIR" THEN       
+                 LET ma_prog[m_ind].mensagem = 'C/FATURAMENTO'    
            END IF                                              
         END IF                                                 
                                                                
@@ -5242,6 +5247,24 @@ FUNCTION pol1370_par_print(l_container)#
    CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")           
 
    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+   CALL _ADVPL_set_property(l_label,"TEXT","Prz entrega de:")    
+   
+   LET m_prz_de = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
+   CALL _ADVPL_set_property(m_prz_de,"VARIABLE",mr_print,"prz_de")
+   CALL _ADVPL_set_property(m_prz_de,"ENABLE",TRUE)
+
+   CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")           
+
+   LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+   CALL _ADVPL_set_property(l_label,"TEXT","Prz entrega até:")    
+   
+   LET m_prz_ate = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
+   CALL _ADVPL_set_property(m_prz_ate,"VARIABLE",mr_print,"prz_ate")
+   CALL _ADVPL_set_property(m_prz_ate,"ENABLE",TRUE)
+
+   CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")           
+
+   LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
    CALL _ADVPL_set_property(l_label,"TEXT","Tip processo:")    
    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,FALSE,TRUE)
 
@@ -5345,9 +5368,18 @@ FUNCTION pol1370_conf_imp()#
    
    IF mr_print.dat_de IS NOT NULL AND mr_print.dat_ate IS NOT NULL THEN
       IF mr_print.dat_ate < mr_print.dat_de THEN
-         LET m_msg = 'Período inválido.'
+         LET m_msg = 'Período de processamento inválido.'
          CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
          CALL _ADVPL_set_property(m_dat_de,"GET_FOCUS")
+         RETURN FALSE
+      END IF
+   END IF
+
+   IF mr_print.prz_de IS NOT NULL AND mr_print.prz_ate IS NOT NULL THEN
+      IF mr_print.prz_ate < mr_print.prz_de THEN
+         LET m_msg = 'Período de prazo de entrega inválido.'
+         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+         CALL _ADVPL_set_property(m_prz_de,"GET_FOCUS")
          RETURN FALSE
       END IF
    END IF
@@ -5395,6 +5427,14 @@ FUNCTION pol1370_le_audit()#
 
    IF mr_print.dat_ate IS NOT NULL THEN
       LET l_sql = l_sql CLIPPED, " AND dat_operacao <= '",mr_print.dat_ate,"' "
+   END IF
+
+   IF mr_print.prz_de IS NOT NULL THEN
+      LET l_sql = l_sql CLIPPED, " AND prz_entrega >= '",mr_print.prz_de,"' "
+   END IF
+
+   IF mr_print.prz_ate IS NOT NULL THEN
+      LET l_sql = l_sql CLIPPED, " AND prz_entrega <= '",mr_print.prz_ate,"' "
    END IF
 
    IF mr_print.tip_proces = '1' THEN
@@ -5491,6 +5531,14 @@ FUNCTION pol1370_relatorio(l_report)#
       LET l_sql = l_sql CLIPPED, " AND dat_operacao <= '",mr_print.dat_ate,"' "
    END IF
 
+   IF mr_print.prz_de IS NOT NULL THEN
+      LET l_sql = l_sql CLIPPED, " AND prz_entrega >= '",mr_print.prz_de,"' "
+   END IF
+
+   IF mr_print.prz_ate IS NOT NULL THEN
+      LET l_sql = l_sql CLIPPED, " AND prz_entrega <= '",mr_print.prz_ate,"' "
+   END IF
+
    IF mr_print.tip_proces = '1' THEN
       LET l_sql = l_sql CLIPPED, " AND operacao IS NOT NULL "
    ELSE
@@ -5541,9 +5589,7 @@ FUNCTION pol1370_relatorio(l_report)#
        WHERE cod_cliente = l_cod_cli
 
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','clientes:cq_imp')
-         LET l_status = FALSE
-         EXIT FOREACH
+         LET mr_relat.nom_cliente = NULL
       END IF
 
       SELECT den_item_reduz
@@ -5553,9 +5599,7 @@ FUNCTION pol1370_relatorio(l_report)#
          AND cod_item = mr_relat.cod_item
 
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','item:cq_imp')
-         LET l_status = FALSE
-         EXIT FOREACH
+         LET mr_relat.den_item_reduz = NULL
       END IF         
       
       IF mr_relat.operacao IS NULL OR mr_relat.operacao = ' ' THEN

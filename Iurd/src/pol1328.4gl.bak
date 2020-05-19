@@ -593,7 +593,7 @@ END FUNCTION
           l_ano          INTEGER,
           l_qtd_ap       INTEGER
    
-   LET l_dat_proces = EXTEND(CURRENT, YEAR TO DAY
+   LET l_dat_proces = EXTEND(CURRENT, YEAR TO DAY)
             				
    DECLARE cq_nota CURSOR WITH HOLD FOR
     SELECT * FROM gi_ad_912

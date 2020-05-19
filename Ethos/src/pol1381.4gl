@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------#
 # SISTEMA.: LOGIX                                                   #
 # PROGRAMA: pol1381                                                 #
-# OBJETIVO: ESTRUTURA - APURAÇÃO DAS NECESSIDADES                   #
+# OBJETIVO: EMBALAGEM - APURAÇÃO DAS NECESSIDADES                   #
 # AUTOR...: IVO                                                     #
 # DATA....: 19/03/19                                                #
 #-------------------------------------------------------------------#
@@ -161,7 +161,7 @@ FUNCTION pol1381()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1381-12.00.00  "
+   LET p_versao = "pol1381-12.00.02  "
    CALL func002_versao_prg(p_versao)
 
    IF NOT pol1381_cria_tabs() THEN
@@ -181,7 +181,7 @@ FUNCTION pol1381_menu()#
            l_inform,
            l_titulo           VARCHAR(80)
     
-    LET l_titulo = "ESTRUTURA - APURAÇÃO DAS NECESSIDADES - ",p_versao
+    LET l_titulo = "EMBALAGEM - APURAÇÃO DAS NECESSIDADES - ",p_versao
     
     LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
     CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)
@@ -536,16 +536,17 @@ FUNCTION pol1381_valida_cliente()#
    END IF
    
    SELECT COUNT(*) INTO m_count
-     FROM emabalagem_padrao_405
+     FROM embalagem_padrao_405
     WHERE cod_cliente = mr_campos.cod_cliente
    
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('SELECT','emabalagem_padrao_405')
+      CALL log003_err_sql('SELECT','embalagem_padrao_405')
       RETURN FALSE
    END IF
    
    IF m_count = 0 THEN
       LET m_msg = 'Cliente não cadastrados no POL1379'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", m_msg)
       RETURN FALSE
    END IF
 
@@ -559,7 +560,8 @@ FUNCTION pol1381_valida_cliente()#
    END IF
    
    IF m_count = 0 THEN
-      LET m_msg = 'Cliente não cadastrados no pol1381'
+      LET m_msg = 'Cliente não cadastrados no pol1380'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", m_msg)
       RETURN FALSE
    END IF
      
@@ -1148,7 +1150,7 @@ FUNCTION pol1381_proc_analitic()#
       SELECT id_embal, den_item_embal 
         INTO ma_pedido[m_ind_ped].id_embal,
              ma_pedido[m_ind_ped].den_item_embal
-        FROM emabalagem_padrao_405
+        FROM embalagem_padrao_405
        WHERE cod_cliente = mr_campos.cod_cliente       
          AND cod_item_embal = ma_pedido[m_ind_ped].cod_item_embal
    
@@ -1188,21 +1190,21 @@ FUNCTION pol1381_le_compon()#
    INITIALIZE ma_embal TO NULL
    CALL _ADVPL_set_property(m_brz_embal,"CLEAR")
    LET l_ind = 1
-   LET m_qtd_neces = 1
    
    DECLARE cq_compon CURSOR FOR
-    SELECT cod_item_compon, den_item_reduz
-      FROM emabalagem_compon_405, item
+    SELECT cod_item_compon, den_item_reduz, qtd_necess
+      FROM embalagem_compon_405, item
      WHERE item.cod_empresa = p_cod_empresa
-       AND item.cod_item = emabalagem_compon_405.cod_item_compon
-       AND emabalagem_compon_405.id_embal = l_id
+       AND item.cod_item = embalagem_compon_405.cod_item_compon
+       AND embalagem_compon_405.id_embal = l_id
 
    FOREACH cq_compon INTO 
       ma_embal[l_ind].cod_item_compon,
-      ma_embal[l_ind].den_compon
+      ma_embal[l_ind].den_compon,
+      m_qtd_neces
 
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','emabalagem_compon_405:cq_compon')
+         CALL log003_err_sql('SELECT','embalagem_compon_405:cq_compon')
          EXIT FOREACH
       END IF
       
@@ -1316,15 +1318,16 @@ FUNCTION pol1381_proc_sintetic()#
       END IF
       
       DECLARE cq_estrut CURSOR FOR
-       SELECT cod_item_compon, 1 from emabalagem_compon_405, emabalagem_padrao_405
-        WHERE emabalagem_padrao_405.cod_item_embal = m_cod_embal
-          AND emabalagem_padrao_405.cod_cliente = mr_campos.cod_cliente
-          AND emabalagem_padrao_405.id_embal = emabalagem_compon_405.id_embal
+       SELECT cod_item_compon, qtd_necess 
+         FROM embalagem_compon_405, embalagem_padrao_405
+        WHERE embalagem_padrao_405.cod_item_embal = m_cod_embal
+          AND embalagem_padrao_405.cod_cliente = mr_campos.cod_cliente
+          AND embalagem_padrao_405.id_embal = embalagem_compon_405.id_embal
 
       FOREACH cq_estrut INTO m_cod_compon, m_qtd_neces
 
          IF STATUS <> 0 THEN
-            CALL log003_err_sql('SELECT','emabalagem_padrao_405:cq_estrut')
+            CALL log003_err_sql('SELECT','embalagem_padrao_405:cq_estrut')
             RETURN FALSE
          END IF
          

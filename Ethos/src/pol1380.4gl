@@ -239,10 +239,12 @@ FUNCTION pol1380_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_cod_embal,"PICTURE","@!")
     CALL _ADVPL_set_property(m_cod_embal,"VALID","pol1380_valida_embal")
 
-    LET m_lupa_embal = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_layout)
+    {LET m_lupa_embal = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_layout)
     CALL _ADVPL_set_property(m_lupa_embal,"IMAGE","BTPESQ")
     CALL _ADVPL_set_property(m_lupa_embal,"SIZE",24,20)
-    CALL _ADVPL_set_property(m_lupa_embal,"CLICK_EVENT","pol1380_zoom_embal")
+    CALL _ADVPL_set_property(m_lupa_embal,"CLICK_EVENT","pol1380_zoom_embal") }
+
+    CALL _ADVPL_set_property(l_layout,"ADD_EMPTY_COLUMN")
 
     LET l_campo = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
     CALL _ADVPL_set_property(l_campo,"LENGTH",50) 
@@ -282,7 +284,7 @@ FUNCTION pol1380_ativa_desativa(l_status)#
    END IF
    
    CALL _ADVPL_set_property(m_cod_embal,"EDITABLE",l_status)
-   CALL _ADVPL_set_property(m_lupa_embal,"EDITABLE",l_status)
+   #CALL _ADVPL_set_property(m_lupa_embal,"EDITABLE",l_status)
    CALL _ADVPL_set_property(m_qtd_item,"EDITABLE",l_status)
 
 END FUNCTION
@@ -332,11 +334,11 @@ FUNCTION pol1380_valida_cliente()#
    LET mr_campos.nom_cliente = m_nom_cliente  
    
    SELECT COUNT(*) INTO m_count
-     FROM emabalagem_padrao_405
+     FROM embalagem_padrao_405
     WHERE cod_cliente = mr_campos.cod_cliente
    
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('SELECT','emabalagem_padrao_405')
+      CALL log003_err_sql('SELECT','embalagem_padrao_405')
       RETURN FALSE
    END IF
    
@@ -500,7 +502,7 @@ FUNCTION pol1380_le_embal(l_cod)#
    
    SELECT den_item_embal
      INTO m_den_item
-     FROM emabalagem_padrao_405
+     FROM embalagem_padrao_405
     WHERE cod_cliente = mr_campos.cod_cliente
       AND cod_item_embal = l_cod
 
@@ -510,7 +512,7 @@ FUNCTION pol1380_le_embal(l_cod)#
    END IF
    
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('SELECT','emabalagem_padrao_405:cliente/embalagem')
+      CALL log003_err_sql('SELECT','embalagem_padrao_405:cliente/embalagem')
       RETURN FALSE
    END IF
       

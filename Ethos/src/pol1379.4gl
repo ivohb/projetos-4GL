@@ -56,7 +56,9 @@ END RECORD
 DEFINE ma_compon         ARRAY[100] OF RECORD
        cod_compon        LIKE item.cod_item,
        den_compon        LIKE item.den_item,
-       excluir           CHAR(01)      
+       excluir           CHAR(01),
+       qtd_necess        DECIMAL(10,3),
+       filler            CHAR(01)
 END RECORD
 
 DEFINE m_codigo          LIKE item.cod_item,
@@ -76,7 +78,7 @@ FUNCTION pol1379()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1379-12.00.01  "
+   LET p_versao = "pol1379-12.00.02  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1379_menu()
@@ -280,8 +282,21 @@ FUNCTION pol1379_cria_grade(l_container)#
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
     CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",FALSE)
-    #CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",270)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",270)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_compon")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Qtd neces")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","qtd_necess")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
+    #CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","LENGTH",15)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","PICTURE","@E ###.###")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","filler")
 
     CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_compon,1)
     CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
@@ -362,7 +377,8 @@ FUNCTION pol1379_valid_itens()#
 #-----------------------------#
    
    DEFINE l_compon     SMALLINT,
-          l_ind        SMALLINT
+          l_ind        SMALLINT,
+          l_count      INTEGER
 
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
@@ -374,20 +390,32 @@ FUNCTION pol1379_valid_itens()#
        RETURN FALSE
    END IF
 
-   LET m_count =_ADVPL_get_property(m_browse,"ITEM_COUNT")
+   LET l_count =_ADVPL_get_property(m_browse,"ITEM_COUNT")
    LET l_compon = FALSE
 
-   FOR l_ind = 1 TO  m_count
+   FOR l_ind = 1 TO  l_count
+
       IF ma_compon[l_ind].cod_compon IS NULL OR ma_compon[l_ind].cod_compon = ' '  THEN
       ELSE
          LET l_compon = TRUE
-         EXIT FOR
+
+         IF NOT pol1379_le_item(ma_compon[l_ind].cod_compon) THEN  
+            CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+            RETURN FALSE
+         END IF
+
+         IF  ma_compon[l_ind].qtd_necess IS NULL OR ma_compon[l_ind].qtd_necess <= 0 THEN
+             LET m_msg = "Informe a quantidade necessária"
+             CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+             RETURN FALSE
+         END IF
+         
       END IF
    END FOR
 
    IF NOT l_compon THEN
       LET m_msg = 'Informe os componentes da embalagem.'
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", m_msg)
       RETURN FALSE
    END IF
 
@@ -400,10 +428,10 @@ FUNCTION pol1379_ins_embalagem()#
 #-------------------------------#
    
    SELECT MAX(id_embal) INTO m_id_embal
-     FROM emabalagem_padrao_405
+     FROM embalagem_padrao_405
    
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('SELECT','emabalagem_padrao_405;max')
+      CALL log003_err_sql('SELECT','embalagem_padrao_405;max')
       RETURN FALSE
    END IF
    
@@ -413,12 +441,12 @@ FUNCTION pol1379_ins_embalagem()#
    
    LET m_id_embal = m_id_embal + 1
    
-   INSERT INTO emabalagem_padrao_405(
+   INSERT INTO embalagem_padrao_405(
       id_embal, cod_cliente, cod_item_embal, den_item_embal)
    VALUES(m_id_embal, mr_campos.cod_cliente, mr_campos.cod_item,  mr_campos.den_item_embal)
     
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('INSERT','emabalagem_padrao_405')
+      CALL log003_err_sql('INSERT','embalagem_padrao_405')
       RETURN FALSE
    END IF
             
@@ -432,7 +460,7 @@ FUNCTION pol1379_ins_compon()#
    
    DEFINE l_ind    SMALLINT
    
-   DELETE FROM emabalagem_compon_405
+   DELETE FROM embalagem_compon_405
     WHERE id_embal = m_id_embal
    
    LET m_count =_ADVPL_get_property(m_browse,"ITEM_COUNT")
@@ -440,15 +468,13 @@ FUNCTION pol1379_ins_compon()#
    FOR l_ind = 1 TO m_count
        IF ma_compon[l_ind].cod_compon IS NULL OR ma_compon[l_ind].cod_compon = ' '  THEN
        ELSE
-          DELETE FROM emabalagem_compon_405
-           WHERE id_embal = m_id_embal 
-             AND cod_item_compon = ma_compon[l_ind].cod_compon
            
-          INSERT INTO emabalagem_compon_405(id_embal, cod_item_compon)
-          VALUES (m_id_embal, ma_compon[l_ind].cod_compon)
+          INSERT INTO embalagem_compon_405(
+             id_embal, cod_item_compon, qtd_necess)
+          VALUES (m_id_embal, ma_compon[l_ind].cod_compon, ma_compon[l_ind].qtd_necess)
        
           IF STATUS <> 0 THEN
-             CALL log003_err_sql('INSERT','emabalagem_compon_405')
+             CALL log003_err_sql('INSERT','embalagem_compon_405')
              RETURN FALSE
           END IF
        END IF
@@ -603,7 +629,7 @@ FUNCTION pol1379_cli_item_existe()#
    LET m_msg = ''
    
    SELECT 1
-     FROM emabalagem_padrao_405
+     FROM embalagem_padrao_405
     WHERE cod_cliente = mr_campos.cod_cliente
       AND cod_item_embal = mr_campos.cod_item
    
@@ -613,7 +639,7 @@ FUNCTION pol1379_cli_item_existe()#
       IF STATUS = 0 THEN
          LET m_msg = 'Cliente/embalagem já cadastrados. Use o botão modificar.'
       ELSE
-         CALL log003_err_sql('SELECT','emabalagem_padrao_405')
+         CALL log003_err_sql('SELECT','embalagem_padrao_405')
       END IF
    END IF   
    
@@ -701,7 +727,13 @@ FUNCTION pol1379_after_compon()#
       RETURN FALSE
    END IF
       
-   IF NOT pol1379_le_item(ma_compon[m_lin_atu].cod_compon) THEN     
+   IF NOT pol1379_le_item(ma_compon[m_lin_atu].cod_compon) THEN  
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+
+   IF ma_compon[m_lin_atu].qtd_necess IS NULL OR ma_compon[m_lin_atu].qtd_necess <= 0 THEN    
+      LET m_msg = 'Informe a quantidade necessária.' 
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
    END IF
@@ -719,28 +751,35 @@ FUNCTION pol1379_le_item(l_cod)#
    DEFINE l_cod              LIKE item.cod_item,
           l_ies_ctr_estoque  LIKE item.ies_ctr_estoque,
           l_tipo             LIKE item.ies_tip_item,
-          l_pes_unit         LIKE item.pes_unit
+          l_pes_unit         LIKE item.pes_unit,
+          l_cod_local_estoq  LIKE item.cod_local_estoq,
+          l_ies_situacao     LIKE item.ies_situacao,
+          l_count            INTEGER
    
    IF l_cod IS NULL THEN
       RETURN TRUE
    END IF
-   
+      
    LET m_msg = ''
       
    SELECT den_item,
           ies_ctr_estoque,
           ies_tip_item,
-          pes_unit
+          pes_unit,
+          cod_local_estoq,
+          ies_situacao
      INTO m_den_item,
           l_ies_ctr_estoque,
           l_tipo,
-          l_pes_unit
+          l_pes_unit,
+          l_cod_local_estoq,
+          l_ies_situacao
      FROM item
     WHERE cod_empresa =  p_cod_empresa
       AND cod_item = l_cod
    
    IF STATUS = 100 THEN
-      LET m_msg = 'item não cadastrado no Logix'
+      LET m_msg = 'Componente não cadastrado no Logix'
       LET m_den_item = NULL
       RETURN FALSE
    ELSE
@@ -751,22 +790,28 @@ FUNCTION pol1379_le_item(l_cod)#
       END IF
    END IF
 
+   IF l_ies_situacao = 'A' THEN
+   ELSE
+      LET m_msg = m_msg CLIPPED, '- Componente não está ativo.\n'
+   END IF
+   
    IF l_ies_ctr_estoque = 'N' THEN
-      LET m_msg = 'Item não controla estoque.'
-      RETURN FALSE
+      LET m_msg = m_msg CLIPPED, '- Componente não controla estoque.\n'
    END IF
 
    IF l_tipo <> 'C' THEN
-      LET m_msg = 'O item componente deve ser do tipo comprado (C)'
-      RETURN FALSE
+      LET m_msg = m_msg CLIPPED, '- O componente deve ser do tipo comprado (C)\n'
    END IF
 
    IF l_pes_unit <= 0 THEN
-      LET m_msg = 'O peso unitário do item no MAN10021 não é válido.'
-      RETURN FALSE
+      LET m_msg = m_msg CLIPPED, '- O peso unitário do componente no MAN10021 não é válido.\n'
+   END IF
+
+   IF l_cod_local_estoq IS NULL OR l_cod_local_estoq = ' ' THEN
+      LET m_msg = m_msg CLIPPED, '- O local de estoque do componente está nulo no MAN10021\n'
    END IF
    
-   SELECT COUNT(*) INTO m_count FROM cliente_item
+   SELECT COUNT(*) INTO l_count FROM cliente_item
     WHERE cod_empresa = p_cod_empresa
       AND cod_cliente_matriz = mr_campos.cod_cliente
       AND cod_item = l_cod
@@ -776,11 +821,15 @@ FUNCTION pol1379_le_item(l_cod)#
       RETURN FALSE
    END IF
    
-   IF m_count = 0 THEN
-      LET m_msg = 'O item não está cadastrado como um item do cliente.'
-      RETURN FALSE
+   IF l_count = 0 THEN
+      LET m_msg = m_msg CLIPPED,  '- Componente não está cadastrado como um item do cliente.\n'
    END IF
       
+   IF m_msg IS NOT NULL THEN
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN FALSE
+   END IF
+   
    RETURN TRUE
 
 END FUNCTION
@@ -811,10 +860,10 @@ FUNCTION pol1379_find()#
     IF m_construct IS NULL THEN
        LET m_construct = _ADVPL_create_component(NULL,"LCONSTRUCT")
        CALL _ADVPL_set_property(m_construct,"CONSTRUCT_NAME","pol1379_FILTER")
-       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_TABLE","emabalagem_padrao_405","embalagem")
-       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","emabalagem_padrao_405","cod_cliente","Cliente",1 {CHAR},5,0,"zoom_clientes")
-       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","emabalagem_padrao_405","cod_item_embal","Emabalagem",1 {CHAR},15,0,"zoom_item")
-       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","emabalagem_padrao_405","cod_item_compon","Componente",1 {CHAR},15,0,"zoom_item")
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_TABLE","embalagem_padrao_405","embalagem")
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","embalagem_padrao_405","cod_cliente","Cliente",1 {CHAR},5,0,"zoom_clientes")
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","embalagem_padrao_405","cod_item_embal","embalagem",1 {CHAR},15,0,"zoom_item")
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","embalagem_padrao_405","cod_item_compon","Componente",1 {CHAR},15,0,"zoom_item")
     END IF
 
     LET l_status = _ADVPL_get_property(m_construct,"INIT_CONSTRUCT")
@@ -844,13 +893,13 @@ FUNCTION pol1379_create_cursor(l_where, l_order)#
     LET m_ies_cons = FALSE
 
     LET l_sql_stmt = "SELECT id_embal ",
-                      " FROM emabalagem_padrao_405",
+                      " FROM embalagem_padrao_405",
                      " WHERE ",l_where CLIPPED,
                      " ORDER BY ",l_order
 
     PREPARE var_cons FROM l_sql_stmt
     IF STATUS <> 0 THEN
-       CALL log003_err_sql("PREPARE SQL","emabalagem_padrao_405")
+       CALL log003_err_sql("PREPARE SQL","embalagem_padrao_405")
        RETURN FALSE
     END IF
 
@@ -905,11 +954,11 @@ FUNCTION pol1379_exibe_dados()#
      INTO mr_campos.cod_cliente,
           mr_campos.cod_item,
           mr_campos.den_item_embal
-     FROM emabalagem_padrao_405
+     FROM embalagem_padrao_405
     WHERE id_embal = m_id_embal
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('SELECT','emabalagem_padrao_405:ed')
+      CALL log003_err_sql('SELECT','embalagem_padrao_405:ed')
       RETURN FALSE
    END IF
    
@@ -936,22 +985,25 @@ FUNCTION pol1379_load_itens()#
    LET l_ind = 1
    
    DECLARE cq_le_it CURSOR FOR
-    SELECT cod_item_compon 
-      FROM emabalagem_compon_405
+    SELECT cod_item_compon,
+           qtd_necess
+      FROM embalagem_compon_405
      WHERE id_embal = m_id_embal
    
-   FOREACH cq_le_it INTO ma_compon[l_ind].cod_compon
+   FOREACH cq_le_it INTO 
+      ma_compon[l_ind].cod_compon,
+      ma_compon[l_ind].qtd_necess
       
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','emabalagem_compon_405:cq_le_it')
+         CALL log003_err_sql('SELECT','embalagem_compon_405:cq_le_it')
          RETURN FALSE
       END IF
       
       IF NOT pol1379_le_item(ma_compon[l_ind].cod_compon) THEN
-         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-      ELSE
-         LET ma_compon[l_ind].den_compon = m_den_item
+         CALL log0030_mensagem(m_msg,'info')
       END IF
+      
+      LET ma_compon[l_ind].den_compon = m_den_item
       
       LET ma_compon[l_ind].excluir = 'N'
       LET l_ind = l_ind + 1
@@ -1029,7 +1081,7 @@ FUNCTION pol1379_paginacao(l_opcao)#
          EXIT WHILE
       ELSE
          SELECT 1
-           FROM emabalagem_padrao_405
+           FROM embalagem_padrao_405
           WHERE id_embal = m_id_embal
          IF STATUS = 100 THEN
          ELSE
@@ -1106,7 +1158,7 @@ END FUNCTION
    
    DECLARE cq_prende CURSOR FOR
     SELECT 1
-      FROM emabalagem_padrao_405
+      FROM embalagem_padrao_405
      WHERE id_embal = m_id_embal
      FOR UPDATE 
     
@@ -1169,14 +1221,14 @@ FUNCTION pol1379_update_confirm()#
       RETURN FALSE
    END IF
 
-   UPDATE emabalagem_padrao_405
+   UPDATE embalagem_padrao_405
       SET den_item_embal = mr_campos.den_item_embal
     WHERE id_embal = m_id_embal
    
    IF STATUS = 0 THEN
       LET l_ret = pol1379_ins_compon() 
    ELSE
-      CALL log003_err_sql('UPDATE','emabalagem_padrao_405')
+      CALL log003_err_sql('UPDATE','embalagem_padrao_405')
       LET l_ret = FALSE
    END IF
    
@@ -1236,16 +1288,16 @@ FUNCTION pol1379_delete()#
 
    LET l_ret = FALSE
 
-   DELETE FROM emabalagem_padrao_405
+   DELETE FROM embalagem_padrao_405
     WHERE id_embal = m_id_embal
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','emabalagem_padrao_405')
+      CALL log003_err_sql('DELETE','embalagem_padrao_405')
    ELSE
-      DELETE FROM emabalagem_compon_405
+      DELETE FROM embalagem_compon_405
        WHERE id_embal = m_id_embal
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('DELETE','emabalagem_compon_405')
+         CALL log003_err_sql('DELETE','embalagem_compon_405')
       ELSE
          LET l_ret = TRUE
       END IF

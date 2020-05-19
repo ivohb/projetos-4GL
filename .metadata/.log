@@ -1087,3 +1087,27 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.ui 4 4 2020-04-21 19:44:40.456
 !MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+!SESSION 2020-04-28 10:30:47.257 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2020-04-28 10:30:55.461
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2020-04-28 10:30:55.596
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler} vs {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler}
+!SESSION 2020-05-07 14:07:20.857 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_131
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 4 4 2020-05-07 14:07:29.546
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}
+
+!ENTRY org.eclipse.ui 4 4 2020-05-07 14:07:29.633
+!MESSAGE Conflicting handlers for org.eclipse.ltk.ui.refactoring.commands.deleteResources: {br.com.totvs.tds.sdk.ui.refactor.TdsDeleteResourcesHandler} vs {org.eclipse.ltk.internal.ui.refactoring.actions.DeleteResourcesHandler}

@@ -233,7 +233,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.99  "
+   LET p_versao = "pol1328-12.00.100 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -612,6 +612,10 @@ END FUNCTION
       LET p_cod_empresa = mr_nota.cod_empresa
       LET m_le_ap = FALSE
       
+      IF mr_nota.ies_gera_nota = 'F' THEN
+         LET mr_nota.num_nf = mr_nota.num_nf_dig
+      END IF
+            	 
       SELECT 
       num_ad,      
       num_ar,      
@@ -688,11 +692,32 @@ END FUNCTION
             END IF
             
          ELSE      
-            IF mr_nota.ser_nf IS NULL OR mr_nota.ser_nf = ' ' THEN
-               IF NOT pol1328_gera_ser_ssr() THEN
-                  RETURN FALSE
+            IF mr_nota.ies_gera_nota = 'F' THEN
+            	 IF mr_nota.num_nf IS NULL OR mr_nota.ser_nf = 0 THEN
+                  LET m_msg = 'Para pgto de ART é obrigaório informar a série da NF'
+                  IF NOT pol1328_grava_erro() THEN
+                     RETURN FALSE
+                  END IF
                END IF
-            END IF         
+            	 IF mr_nota.ser_nf IS NULL THEN
+                  LET m_msg = 'Para pgto de ART é obrigaório informar o número da NF'
+                  IF NOT pol1328_grava_erro() THEN
+                     RETURN FALSE
+                  END IF
+               END IF
+            	 IF mr_nota.ssr_nf IS NULL  THEN
+                  LET m_msg = 'Para pgto de ART é obrigaório informar a  sub-série da NF'
+                  IF NOT pol1328_grava_erro() THEN
+                     RETURN FALSE
+                  END IF
+               END IF
+            ELSE
+               IF mr_nota.ser_nf IS NULL OR mr_nota.ser_nf = ' ' THEN
+                  IF NOT pol1328_gera_ser_ssr() THEN
+                     RETURN FALSE
+                  END IF
+               END IF         
+            END IF
          END IF
          
       END IF
@@ -1110,7 +1135,7 @@ FUNCTION pol1328_consiste_ad()#
       RETURN FALSE
    END IF
    
-   IF mr_nota.ies_gera_nota MATCHES '[ASN]' THEN
+   IF mr_nota.ies_gera_nota MATCHES '[ASNF]' THEN
    ELSE
       LET m_msg = 'O valor do campo gi_ad_912.ies_gera_nota não é válido.'
       IF NOT pol1328_grava_erro() THEN
@@ -1297,7 +1322,7 @@ FUNCTION pol1328_valida_obrigacao()#
       END IF
 
       IF mr_nota.dt_emissao IS NULL THEN                
-         LET m_msg = 'Campo obrigatório DT_EMISSAO não foi preenchido.'
+         LET m_msg = 'Campo obrigatório. DT_EMISSAO não foi preenchido.'
          IF NOT pol1328_grava_erro() THEN
             RETURN FALSE
          END IF
@@ -3192,7 +3217,7 @@ FUNCTION pol1328_gera_titulo()#
       RETURN FALSE
    END IF
 
-   IF mr_nota.ies_gera_nota = 'N' THEN
+   IF mr_nota.ies_gera_nota MATCHES '[FN]' THEN
       IF NOT pol1328_insere_lanc() THEN
          RETURN FALSE
       END IF
@@ -3727,7 +3752,7 @@ FUNCTION pol1328_insere_ad_aen()#
          EXIT FOREACH
       END IF
 
-      IF mr_nota.ies_gera_nota = 'N' THEN
+      IF mr_nota.ies_gera_nota MATCHES '[FN]' THEN
          IF NOT pol1328_ins_ctbl_cap(1) THEN
             EXIT FOREACH
          END IF

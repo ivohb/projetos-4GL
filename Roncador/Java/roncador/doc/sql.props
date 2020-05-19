@@ -1,0 +1,13 @@
+url = jdbc:sqlserver://192.168.1.56;DatabaseName=LOGIXPRD
+driver = com.microsoft.sqlserver.jdbc.SQLServerDriver 
+drive  = sun.jdbc.odbc.JdbcOdbcDriver    
+user = logix
+password = logix
+
+# parametros de configuração do pool
+
+initialSize = 10
+minIdle	= 10
+maxTotal = 100
+minIdleTime = 1
+

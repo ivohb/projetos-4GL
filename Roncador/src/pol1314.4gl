@@ -38,7 +38,6 @@ DEFINE m_dialog          VARCHAR(10),
        m_lupa_fornec     VARCHAR(10),
        m_zoom_fornec     VARCHAR(10),
        m_raz_social      VARCHAR(10),
-       m_cod_portador    VARCHAR(10),
        m_lupa_portador   VARCHAR(10),
        m_zoom_portador   VARCHAR(10),
        m_nom_portador    VARCHAR(10),
@@ -57,7 +56,6 @@ DEFINE mr_cabec          RECORD
        nom_tip_despesa   CHAR(30),
        cod_fornecedor    CHAR(15),
        raz_social        CHAR(40),
-       cod_portador      DECIMAL(4,0),
        nom_portador      CHAR(36),
        timesheet         CHAR(01),
        situacao          CHAR(01),
@@ -116,7 +114,7 @@ FUNCTION pol1314()#
 
    LET g_tipo_sgbd = LOG_getCurrentDBType()
    
-   LET p_versao = "pol1314-12.00.06  "
+   LET p_versao = "pol1314-12.00.09  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1314_menu()
@@ -256,6 +254,7 @@ FUNCTION pol1314_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_deo,"LENGTH",40) 
     CALL _ADVPL_set_property(m_deo,"EDITABLE",FALSE) 
     CALL _ADVPL_set_property(m_deo,"VARIABLE",mr_cabec,"den_emp_orig")
+    CALL _ADVPL_set_property(m_deo,"CAN_GOT_FOCUS",FALSE)
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
     CALL _ADVPL_set_property(l_label,"POSITION",30,35)     
@@ -280,6 +279,7 @@ FUNCTION pol1314_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_nom_desp,"LENGTH",30) 
     CALL _ADVPL_set_property(m_nom_desp,"EDITABLE",FALSE) 
     CALL _ADVPL_set_property(m_nom_desp,"VARIABLE",mr_cabec,"nom_tip_despesa")
+    CALL _ADVPL_set_property(m_nom_desp,"CAN_GOT_FOCUS",FALSE)
     
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
     CALL _ADVPL_set_property(l_label,"POSITION",30,60)     
@@ -304,38 +304,15 @@ FUNCTION pol1314_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_raz_social,"LENGTH",40) 
     CALL _ADVPL_set_property(m_raz_social,"EDITABLE",FALSE) 
     CALL _ADVPL_set_property(m_raz_social,"VARIABLE",mr_cabec,"raz_social")
-
+    CALL _ADVPL_set_property(m_raz_social,"CAN_GOT_FOCUS",FALSE)
+    
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
     CALL _ADVPL_set_property(l_label,"POSITION",30,85)     
-    CALL _ADVPL_set_property(l_label,"TEXT","  Cód portador:")    
-    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,FALSE,FALSE)
-
-    LET m_cod_portador = _ADVPL_create_component(NULL,"LNUMERICFIELD",l_panel)
-    CALL _ADVPL_set_property(m_cod_portador,"POSITION",140,85)     
-    CALL _ADVPL_set_property(m_cod_portador,"VARIABLE",mr_cabec,"cod_portador")
-    CALL _ADVPL_set_property(m_cod_portador,"LENGTH",4,0)
-    CALL _ADVPL_set_property(m_cod_portador,"PICTURE","@E ####")
-    CALL _ADVPL_set_property(m_cod_portador,"VALID","pol1314_valida_portador")
-
-    LET m_lupa_portador = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_panel)
-    CALL _ADVPL_set_property(m_lupa_portador,"POSITION",180,85)     
-    CALL _ADVPL_set_property(m_lupa_portador,"IMAGE","BTPESQ")
-    CALL _ADVPL_set_property(m_lupa_portador,"SIZE",24,20)
-    CALL _ADVPL_set_property(m_lupa_portador,"CLICK_EVENT","pol1314_zoom_portador")
-    
-    LET m_nom_portador = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-    CALL _ADVPL_set_property(m_nom_portador,"POSITION",220,85)     
-    CALL _ADVPL_set_property(m_nom_portador,"LENGTH",36) 
-    CALL _ADVPL_set_property(m_nom_portador,"EDITABLE",FALSE) 
-    CALL _ADVPL_set_property(m_nom_portador,"VARIABLE",mr_cabec,"nom_portador")
-
-    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
-    CALL _ADVPL_set_property(l_label,"POSITION",30,110)     
     CALL _ADVPL_set_property(l_label,"TEXT","     TimeSheet:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_timesheet = _ADVPL_create_component(NULL,"LCHECKBOX",l_panel)
-    CALL _ADVPL_set_property(m_timesheet,"POSITION",140,110)     
+    CALL _ADVPL_set_property(m_timesheet,"POSITION",140,85)     
     CALL _ADVPL_set_property(m_timesheet,"EDITABLE",TRUE)
     CALL _ADVPL_set_property(m_timesheet,"VARIABLE",mr_cabec,"timesheet")
     CALL _ADVPL_set_property(m_timesheet,"VALUE_CHECKED","S")     
@@ -343,40 +320,40 @@ FUNCTION pol1314_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_timesheet,"VALID","pol1314_valida_timesheet")
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
-    CALL _ADVPL_set_property(l_label,"POSITION",170,110)     
+    CALL _ADVPL_set_property(l_label,"POSITION",170,85)     
     CALL _ADVPL_set_property(l_label,"TEXT","Liberação:")    
     
     LET m_dat_liberac = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-    CALL _ADVPL_set_property(m_dat_liberac,"POSITION",230,110)     
+    CALL _ADVPL_set_property(m_dat_liberac,"POSITION",230,85)     
     CALL _ADVPL_set_property(m_dat_liberac,"EDITABLE",FALSE)
     CALL _ADVPL_set_property(m_dat_liberac,"VARIABLE",mr_cabec,"dat_liberac")
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
-    CALL _ADVPL_set_property(l_label,"POSITION",340,110)     
+    CALL _ADVPL_set_property(l_label,"POSITION",340,85)     
     CALL _ADVPL_set_property(l_label,"TEXT","Versão:")    
 
     LET m_versao = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-    CALL _ADVPL_set_property(m_versao,"POSITION",390,110)     
+    CALL _ADVPL_set_property(m_versao,"POSITION",390,85)     
     CALL _ADVPL_set_property(m_versao,"LENGTH",2)
     CALL _ADVPL_set_property(m_versao,"VARIABLE",mr_cabec,"versao")
     CALL _ADVPL_set_property(m_versao,"EDITABLE",FALSE) 
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
-    CALL _ADVPL_set_property(l_label,"POSITION",430,110)     
+    CALL _ADVPL_set_property(l_label,"POSITION",430,85)     
     CALL _ADVPL_set_property(l_label,"TEXT","Status:")    
 
     LET m_situacao = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-    CALL _ADVPL_set_property(m_situacao,"POSITION",476,110)     
+    CALL _ADVPL_set_property(m_situacao,"POSITION",476,85)     
     CALL _ADVPL_set_property(m_situacao,"LENGTH",1)
     CALL _ADVPL_set_property(m_situacao,"VARIABLE",mr_cabec,"situacao")
     CALL _ADVPL_set_property(m_situacao,"EDITABLE",FALSE) 
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
-    CALL _ADVPL_set_property(l_label,"POSITION",510,110)     
+    CALL _ADVPL_set_property(l_label,"POSITION",510,85)     
     CALL _ADVPL_set_property(l_label,"TEXT","Aprovantes:")    
 
     LET m_aprovantes = _ADVPL_create_component(NULL,"LTEXTFIELD",l_panel)
-    CALL _ADVPL_set_property(m_aprovantes,"POSITION",580,110)     
+    CALL _ADVPL_set_property(m_aprovantes,"POSITION",580,85)     
     CALL _ADVPL_set_property(m_aprovantes,"EDITABLE",FALSE)
     CALL _ADVPL_set_property(m_aprovantes,"VARIABLE",mr_cabec,"aprovantes")
 
@@ -529,8 +506,6 @@ FUNCTION pol1314_ativa_desativa(l_status)#
    
    CALL _ADVPL_set_property(m_cod_fornec,"EDITABLE",l_status)
    CALL _ADVPL_set_property(m_lupa_fornec,"EDITABLE",l_status)      
-   CALL _ADVPL_set_property(m_cod_portador,"EDITABLE",l_status)
-   CALL _ADVPL_set_property(m_lupa_portador,"EDITABLE",l_status)      
    CALL _ADVPL_set_property(m_timesheet,"EDITABLE",l_status)
 
    CALL _ADVPL_set_property(m_browse,"EDITABLE",l_status)
@@ -731,8 +706,7 @@ FUNCTION pol1314_insere_orig()#
         cod_tip_desp,        
         cod_fornecedor,     
         timesheet,           
-        situacao,
-        cod_portador)           
+        situacao)
       VALUES(
           m_num_rateio,
           mr_cabec.cod_emp_orig,
@@ -740,8 +714,7 @@ FUNCTION pol1314_insere_orig()#
           mr_cabec.cod_tip_desp,
           mr_cabec.cod_fornecedor,
           mr_cabec.timesheet,
-          mr_cabec.situacao,
-          mr_cabec.cod_portador)
+          mr_cabec.situacao)
       
    IF STATUS <> 0 THEN
       CALL log003_err_sql('INSERT','rateio_tip_desp_orig912')
@@ -1080,81 +1053,6 @@ FUNCTION pol1314_zoom_fornec()#
    IF l_codigo IS NOT NULL THEN
       LET mr_cabec.cod_fornecedor = l_codigo
       LET mr_cabec.raz_social = l_descricao
-   END IF
-    
-END FUNCTION
-
-#---------------------------------#
-FUNCTION pol1314_valida_portador()#
-#---------------------------------#
-    
-    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
-    
-    IF  mr_cabec.cod_portador IS NULL THEN
-        LET m_msg = 'Informe o portador.'
-        CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-        RETURN FALSE
-    END IF
-      
-   IF NOT pol1314_le_portador(mr_cabec.cod_portador) THEN
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-      RETURN FALSE
-   END IF
-        
-   LET mr_cabec.nom_portador = m_des_portador
-   
-   RETURN TRUE
-
-END FUNCTION
-
-#---------------------------------------#
-FUNCTION pol1314_le_portador(l_codigo)#
-#---------------------------------------#
-
-   DEFINE l_codigo LIKE portador.cod_portador
-   
-   LET m_msg = ''
-   
-   SELECT nom_portador
-     INTO m_des_portador
-     FROM portador
-    WHERE cod_portador = l_codigo
-
-   IF STATUS = 0 THEN
-      RETURN TRUE
-   ELSE
-      LET m_des_portador = ''
-      IF STATUS = 100 THEN
-         LET m_msg = 'Portador inexistente.'    
-      ELSE
-         CALL log003_err_sql('SELECT','portador')
-      END IF
-   END IF
-   
-   RETURN FALSE
-
-END FUNCTION
-
-#-------------------------------#
-FUNCTION pol1314_zoom_portador()#
-#-------------------------------#
-    
-   DEFINE l_codigo      LIKE portador.cod_portador,
-          l_descricao   LIKE portador.nom_portador
-          
-   IF  m_zoom_portador IS NULL THEN
-       LET m_zoom_portador = _ADVPL_create_component(NULL,"LZOOMMETADATA")
-       CALL _ADVPL_set_property(m_zoom_portador,"ZOOM","zoom_portador")
-   END IF
-
-   CALL _ADVPL_get_property(m_zoom_portador,"ACTIVATE")
-
-   LET l_codigo    = _ADVPL_get_property(m_zoom_portador,"RETURN_BY_TABLE_COLUMN","portador","cod_portador")
-   LET l_descricao = _ADVPL_get_property(m_zoom_portador,"RETURN_BY_TABLE_COLUMN","portador","nom_portador")
-
-   IF l_codigo IS NOT NULL THEN
-      LET mr_cabec.cod_portador = l_codigo
-      LET mr_cabec.nom_portador = l_descricao
    END IF
     
 END FUNCTION
@@ -1766,16 +1664,14 @@ FUNCTION pol1314_exibe_dados()#
           cod_fornecedor,
           timesheet,
           situacao,
-          dat_liberac,
-          cod_portador
+          dat_liberac
      INTO mr_cabec.cod_emp_orig,
           mr_cabec.versao,
           mr_cabec.cod_tip_desp,
           mr_cabec.cod_fornecedor,
           mr_cabec.timesheet,
           mr_cabec.situacao,
-          mr_cabec.dat_liberac,
-          mr_cabec.cod_portador          
+          mr_cabec.dat_liberac
     FROM rateio_tip_desp_orig912
    WHERE num_rateio = m_num_rateio
 
@@ -1796,9 +1692,6 @@ FUNCTION pol1314_exibe_dados()#
    ELSE
       LET mr_cabec.raz_social = NULL
    END IF
-
-   CALL pol1314_le_portador(mr_cabec.cod_portador) RETURNING p_status
-   LET mr_cabec.nom_portador = m_des_portador
    
    CALL pol1314_le_arpvantes()
    
@@ -2254,11 +2147,10 @@ END FUNCTION
 #----------------------------#          
 FUNCTION pol1314_grava_orig()#
 #----------------------------#
-
+   
    UPDATE rateio_tip_desp_orig912
       SET cod_fornecedor = mr_cabec.cod_fornecedor,
-          timesheet = mr_cabec.timesheet,
-          cod_portador = mr_cabec.cod_portador
+          timesheet = mr_cabec.timesheet
     WHERE num_rateio = m_num_rateio
 
    IF STATUS <> 0 THEN
@@ -2291,7 +2183,7 @@ FUNCTION pol1314_aprovar()#
    IF mr_cabec.situacao = 'B' THEN
    ELSE
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",
-             "Somente grade com status B podem ser aptovada.")
+             "Somente grade com status B podem ser aprovada.")
       RETURN FALSE
    END IF
 
@@ -2442,9 +2334,11 @@ FUNCTION pol1314_grava_tabs()#
    IF NOT pol1314_atu_rateio('A') THEN
       RETURN FALSE
    END IF
-
-   IF NOT pol1314_atu_versao_ant() THEN
-      RETURN FALSE
+   
+   IF mr_cabec.versao > 1 THEN
+      IF NOT pol1314_atu_versao_ant() THEN
+         RETURN FALSE
+      END IF
    END IF
 
    LET mr_cabec.situacao = 'A'
@@ -2488,7 +2382,9 @@ FUNCTION pol1314_atu_versao_ant()#
       SET situacao = 'I'
     WHERE empresa_orig = mr_cabec.cod_emp_orig
       AND cod_tip_desp = mr_cabec.cod_tip_desp
-      AND versao = l_versao
+      AND versao < mr_cabec.versao
+      AND ((cod_fornecedor = mr_cabec.cod_fornecedor AND mr_cabec.cod_fornecedor IS NOT NULL)
+        OR (cod_fornecedor IS NULL AND mr_cabec.cod_fornecedor IS NULL))
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('UPDATE','rateio_tip_desp_orig912')
@@ -2524,7 +2420,7 @@ FUNCTION pol1314_nova_versao()#
       AND cod_tip_desp = mr_cabec.cod_tip_desp
       AND situacao = 'B'
       AND ((cod_fornecedor = mr_cabec.cod_fornecedor AND mr_cabec.cod_fornecedor IS NOT NULL) OR 
-           (1=1 AND mr_cabec.cod_fornecedor IS NULL) )
+           (cod_fornecedor IS NULL AND mr_cabec.cod_fornecedor IS NULL) )
    
    IF STATUS <> 0 THEN
       CALL log003_err_sql('SELECT','rateio_tip_desp_orig912')

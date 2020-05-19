@@ -425,9 +425,9 @@ END MAIN
       
       BEFORE MENU
 
-        IF p_cod_empresa <> m_cod_emp_op THEN
+        #IF p_cod_empresa <> m_cod_emp_op THEN
            HIDE OPTION "Nf de Retorno"
-        END IF
+        #END IF
       
       COMMAND "Informar" "Informa parametros p/ o processamento "
          LET p_info = 'I'

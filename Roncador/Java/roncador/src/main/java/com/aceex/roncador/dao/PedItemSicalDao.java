@@ -23,15 +23,16 @@ public class PedItemSicalDao extends Dao {
 		boolean result = false;
 		String query = "";
 
-		query += "select 1 from ped_item_sical";
-		query += " where cnpj_empresa = ? and pedido_sical = ? ";
-		query += " and cod_produto =  ? ";
+		query += "select pedido_sical from ped_item_sical";
+		query += " where num_versao = ? and trim(cnpj_empresa) = ?  ";
+		query += " and trim(pedido_sical) = ? and trim(cod_produto) =  ? ";
 		
 		stmt = getConexao().prepareStatement(query);
 
-		stmt.setString(1, pis.getCnpj_empresa());
-		stmt.setString(2, pis.getNum_pedido());
-		stmt.setString(3, pis.getCod_produto());
+		stmt.setInt(1, pis.getNum_versao());
+		stmt.setString(2, pis.getCnpj_empresa().trim());
+		stmt.setString(3, pis.getNum_pedido().trim());
+		stmt.setString(4, pis.getCod_produto().trim());
 
 		rs = stmt.executeQuery();
 
@@ -85,13 +86,15 @@ public class PedItemSicalDao extends Dao {
 		query += ", qtd_canc_tonelada = '"+pis.getQuant_cancelada()+"' ";
 		query += ", total_bruto = '"+pis.getTotal_bruto()+"' ";
 		query += ", total_liquido = '"+pis.getTotal_liquido()+"' ";
-		query += " where cnpj_empresa = ? and pedido_sical = ? ";
-		query += " and cod_produto =  ? ";
+		query += " where num_versao = ? and trim(cnpj_empresa) = ?  ";
+		query += " and trim(pedido_sical) = ? and trim(cod_produto) =  ? ";
 		
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, pis.getCnpj_empresa());
-		stmt.setString(2, pis.getNum_pedido());
-		stmt.setString(3, pis.getCod_produto());
+
+		stmt.setInt(1, pis.getNum_versao());
+		stmt.setString(2, pis.getCnpj_empresa().trim());
+		stmt.setString(3, pis.getNum_pedido().trim());
+		stmt.setString(4, pis.getCod_produto().trim());
 
 		stmt.executeUpdate();
 	    stmt.close();	
@@ -110,11 +113,12 @@ public class PedItemSicalDao extends Dao {
 		query += "SELECT cod_produto, qtd_prod_tonelada, qtd_canc_tonelada, ";
 		query += "preco_tabela, pct_desc, preco_unit_liquido ";
 		query += "FROM ped_item_sical ";
-		query += " WHERE cnpj_empresa = ? and pedido_sical = ? and num_versao = ?";
+		query += " WHERE trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and num_versao = ?";
 
 		stmt = con.prepareStatement(query);
-		stmt.setString(1, empresa);
-		stmt.setString(2, pedido);
+		stmt.setString(1, empresa.trim());
+		stmt.setString(2, pedido.trim());
 		stmt.setInt(3, versao);
 		
 		rs = stmt.executeQuery();

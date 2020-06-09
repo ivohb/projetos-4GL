@@ -5,7 +5,6 @@ import java.io.Serializable;
 public class NatOperSical implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private String cod_empresa;
 	private String tip_pedido;
 	private String entrega_furura;
 	private Integer cod_nat_venda;
@@ -13,12 +12,6 @@ public class NatOperSical implements Serializable {
 	
 	public NatOperSical() {}
 	
-	public String getCod_empresa() {
-		return cod_empresa;
-	}
-	public void setCod_empresa(String cod_empresa) {
-		this.cod_empresa = cod_empresa;
-	}
 	public String getTip_pedido() {
 		return tip_pedido;
 	}

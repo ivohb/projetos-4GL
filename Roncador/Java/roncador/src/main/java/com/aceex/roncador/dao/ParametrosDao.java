@@ -5,12 +5,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
+import main.java.com.aceex.roncador.action.Pedidos;
 import main.java.com.aceex.roncador.model.CliCanalVenda;
 import main.java.com.aceex.roncador.model.NatOperSical;
 import main.java.com.aceex.roncador.model.Parvdp;
 
 public class ParametrosDao extends Dao {
 
+	private static Logger log = Logger.getLogger(ParametrosDao.class);
+	
 	private PreparedStatement stmt;
 	private ResultSet rs;
 
@@ -26,10 +31,10 @@ public class ParametrosDao extends Dao {
 		
 		query += "select cod_moeda, num_prx_pedido, par_vdp_txt, ";
 		query += "qtd_dias_atr_dupl, qtd_dias_atr_med from par_vdp";
-		query += " where cod_empresa =  ? ";
+		query += " where trim(cod_empresa) =  ? ";
 
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, codEmpresa);
+		stmt.setString(1, codEmpresa.trim());
 
 		rs = stmt.executeQuery();
 
@@ -74,10 +79,10 @@ public class ParametrosDao extends Dao {
 		 
 		query += "select cod_nivel_1, cod_nivel_2, cod_nivel_3, ";
 		query += "ies_nivel, cod_tip_carteira from cli_canal_venda";
-		query += " where cod_cliente =  ? ";
+		query += " where trim(cod_cliente) =  ? ";
 
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, codCliente);
+		stmt.setString(1, codCliente.trim());
 
 		rs = stmt.executeQuery();
 
@@ -102,11 +107,11 @@ public class ParametrosDao extends Dao {
 		String query = "";
 		 
 		query += "select cod_logix from de_para_produto ";
-		query += " where cod_empresa =  ? and cod_sical = ?";
+		query += " where trim(cod_empresa) =  ? and trim(cod_sical) = ?";
 
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, codEmpresa);
-		stmt.setString(2, codSical);
+		stmt.setString(1, codEmpresa.trim());
+		stmt.setString(2, codSical.trim());
 
 		rs = stmt.executeQuery();
 
@@ -144,29 +149,32 @@ public class ParametrosDao extends Dao {
 		return codLogix;
 	}
 
-	public NatOperSical getNatOper(String codEmpresa, 
-			String tipPedido, String entregaFurura) throws SQLException {
+	public NatOperSical getNatOper(String tipPedido, 
+			String entregaFurura) throws SQLException {
 
+		log.info("Tipo "+tipPedido+" Entrega "+entregaFurura);
+		
 		NatOperSical nos = null;
 		String query = "";
 		 
 		query += "select cod_nat_venda, cod_nat_remessa from nat_oper_sical ";
-		query += " where cod_empresa =  ? and tip_pedido = ? and entrega_furura = ?";
+		query += " where trim(tip_pedido) = ? ";
+		query += " and trim(entrega_furura) = ? ";
 
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, codEmpresa);
-		stmt.setString(2, tipPedido);
-		stmt.setString(3, entregaFurura);
+		stmt.setString(1, tipPedido);
+		stmt.setString(2, entregaFurura);
 
 		rs = stmt.executeQuery();
 
 		if (rs.next()) {
 			nos = new NatOperSical();
-			nos.setCod_empresa(codEmpresa);
 			nos.setTip_pedido(tipPedido);
 			nos.setEntrega_furura(entregaFurura);
 			nos.setCod_nat_venda(rs.getInt("cod_nat_venda"));
 			nos.setCod_nat_remessa(rs.getInt("cod_nat_remessa"));
+			log.info("Venda "+nos.getCod_nat_venda());
+			log.info("Remessa "+nos.getCod_nat_remessa());
 		}
 
 		rs.close();

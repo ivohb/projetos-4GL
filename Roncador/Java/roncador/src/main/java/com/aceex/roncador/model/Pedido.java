@@ -43,6 +43,14 @@ public class Pedido implements Serializable {
 	private String obsNf;
 	private String obsPedido;
 	private Integer natOperRemessa;
+	private String obs2Nf;
+	private String obs2Pedido;
+	private String obs3Nf;
+	private String obs3Pedido;
+	private String obs4Nf;
+	private String obs4Pedido;
+	private String obs5Nf;
+	private String obs5Pedido;
 
 	public Pedido() { }
 
@@ -348,6 +356,70 @@ public class Pedido implements Serializable {
 
 	public void setNatOperRemessa(Integer natOperRemessa) {
 		this.natOperRemessa = natOperRemessa;
+	}
+
+	public String getObs2Nf() {
+		return obs2Nf;
+	}
+
+	public void setObs2Nf(String obs2Nf) {
+		this.obs2Nf = obs2Nf;
+	}
+
+	public String getObs2Pedido() {
+		return obs2Pedido;
+	}
+
+	public void setObs2Pedido(String obs2Pedido) {
+		this.obs2Pedido = obs2Pedido;
+	}
+
+	public String getObs3Nf() {
+		return obs3Nf;
+	}
+
+	public void setObs3Nf(String obs3Nf) {
+		this.obs3Nf = obs3Nf;
+	}
+
+	public String getObs3Pedido() {
+		return obs3Pedido;
+	}
+
+	public void setObs3Pedido(String obs3Pedido) {
+		this.obs3Pedido = obs3Pedido;
+	}
+
+	public String getObs4Nf() {
+		return obs4Nf;
+	}
+
+	public void setObs4Nf(String obs4Nf) {
+		this.obs4Nf = obs4Nf;
+	}
+
+	public String getObs4Pedido() {
+		return obs4Pedido;
+	}
+
+	public void setObs4Pedido(String obs4Pedido) {
+		this.obs4Pedido = obs4Pedido;
+	}
+
+	public String getObs5Nf() {
+		return obs5Nf;
+	}
+
+	public void setObs5Nf(String obs5Nf) {
+		this.obs5Nf = obs5Nf;
+	}
+
+	public String getObs5Pedido() {
+		return obs5Pedido;
+	}
+
+	public void setObs5Pedido(String obs5Pedido) {
+		this.obs5Pedido = obs5Pedido;
 	}
 
 }

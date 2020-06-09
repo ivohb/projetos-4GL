@@ -1,16 +1,21 @@
 package main.java.com.aceex.roncador.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import main.java.com.aceex.roncador.action.Pedidos;
 import main.java.com.aceex.roncador.model.PedidoSical;
 
 public class PedidoSicalDao extends Dao {
 
+	private static Logger log = Logger.getLogger(PedidoSicalDao.class);
 	private PreparedStatement stmt;
 	private ResultSet rs;
 
@@ -24,11 +29,11 @@ public class PedidoSicalDao extends Dao {
 		String query = "";
 
 		query += "select max(num_versao) as versao from pedido_sical ";
-		query += "where cnpj_empresa = ? and pedido_sical = ? ";
+		query += "where trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
 		
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, cnpjEmpresa);
-		stmt.setString(2, numPedido);
+		stmt.setString(1, cnpjEmpresa.trim());
+		stmt.setString(2, numPedido.trim());
 
 		rs = stmt.executeQuery();
 
@@ -42,24 +47,24 @@ public class PedidoSicalDao extends Dao {
 		return numVersao;
 	}
 
-	public Integer getVersao(String cnpjEmpresa, 
-			String numPedido, String situacao) throws SQLException {
+	public Integer getVersaoAtual(String cnpjEmpresa, 
+			String numPedido) throws SQLException {
 
 		Integer numVersao = 0;
 		String query = "";
 
-		query += "select max(num_versao) as versao from pedido_sical ";
-		query += "where cnpj_empresa = ? and pedido_sical = ? and situacao = ? ";
+		query += "select num_versao from pedido_sical ";
+		query += "where trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and situacao = 'S' ";
 		
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, cnpjEmpresa);
-		stmt.setString(2, numPedido);
-		stmt.setString(3, situacao);
+		stmt.setString(1, cnpjEmpresa.trim());
+		stmt.setString(2, numPedido.trim());
 
 		rs = stmt.executeQuery();
 
 		if (rs.next()) {
-			numVersao = rs.getInt("versao");
+			numVersao = rs.getInt("num_versao");
 		}
 
 		rs.close();
@@ -75,11 +80,12 @@ public class PedidoSicalDao extends Dao {
 		String query = "";
 
 		query += "SELECT pedido_logix from pedido_sical ";
-		query += "where cnpj_empresa = ? and pedido_sical = ? and num_versao = ? ";
+		query += "where trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and num_versao = ? ";
 		
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, cnpjEmpresa);
-		stmt.setString(2, numPedido);
+		stmt.setString(1, cnpjEmpresa.trim());
+		stmt.setString(2, numPedido.trim());
 		stmt.setInt(3, numVersao);
 		
 		rs = stmt.executeQuery();
@@ -105,11 +111,12 @@ public class PedidoSicalDao extends Dao {
 		query += "cod_cond_pagto, cnpj_cpf_vendedor, pedido_logix ";
 		query += "num_versao, versao_atual, situacao ";
 		query += "from pedido_sical";
-		query += "where cnpj_empresa = ? and pedido_sical = ? and num_versao = ?";
+		query += "where trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and num_versao = ?";
 		
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, cnpjEmpresa);
-		stmt.setString(2, numPedido);
+		stmt.setString(1, cnpjEmpresa.trim());
+		stmt.setString(2, numPedido.trim());
 		stmt.setInt(3, numVersao);
 		
 		rs = stmt.executeQuery();
@@ -146,11 +153,12 @@ public class PedidoSicalDao extends Dao {
 		String query = "";
 		
 		query += "UPDATE pedido_sical SET versao_atual = 'N' ";
-		query += " WHERE cnpj_empresa = ? and pedido_sical = ? and num_versao = ?";
+		query += " WHERE trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and num_versao = ?";
 
 		stmt = con.prepareStatement(query);
-		stmt.setString(1, cnpjEmpresa);
-		stmt.setString(2, numPedido);
+		stmt.setString(1, cnpjEmpresa.trim());
+		stmt.setString(2, numPedido.trim());
 		stmt.setInt(3, numVersao);		
 	    stmt.executeUpdate();
 	    stmt.close();	
@@ -186,9 +194,9 @@ public class PedidoSicalDao extends Dao {
 		String query =
 			"INSERT INTO pedido_sical (cnpj_empresa, tipo_pedido, cnpj_cpf_cliente, "
 			+ " pedido_sical, dt_emissao, entrega_futura, cod_portador, "
-			+ " cod_cond_pagto, cnpj_cpf_vendedor, pedido_logix, situacao, "
-			+ " num_versao, versao_atual, cod_empresa, pedido_bloqueado, tipo_frete )"
-			+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			+ " cod_cond_pagto, cnpj_cpf_vendedor, pedido_logix, situacao, num_versao, "
+			+ " versao_atual, cod_empresa, pedido_bloqueado, tipo_frete, insc_estad )"
+			+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		stmt = con.prepareStatement(query); 
 		stmt.setString(1, ps.getCnpj_empresa());
@@ -207,6 +215,7 @@ public class PedidoSicalDao extends Dao {
 		stmt.setString(14, ps.getCod_empresa());
 		stmt.setString(15, ps.getPedido_bloqueado());
 		stmt.setString(16, ps.getTipo_frete());
+		stmt.setString(17, ps.getIE_cliente());
 		stmt.executeUpdate();
 		stmt.close();
 		con.commit();
@@ -223,31 +232,11 @@ public class PedidoSicalDao extends Dao {
 		query += ", entrega_futura = '"+ps.getEntrega_futura()+"' ";
 		query += ", cod_cond_pagto = '"+ps.getCod_cond_pagto()+"' ";
 		query += ", situacao = 'N' ";
-		query += " WHERE cnpj_empresa = ? and pedido_sical = ?";
+		query += " WHERE trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
 
 		stmt = con.prepareStatement(query);
-		stmt.setString(1, ps.getCnpj_empresa());
-		stmt.setString(2, ps.getNum_pedido());
-
-	    stmt.executeUpdate();
-	    stmt.close();	
-	    con.commit();		    
-	}
-
-	public void atuStatus(String empresa, String pedSial,
-			Integer versao, Integer pedLogix) throws SQLException {
-		
-		Connection con = getConexao();
-		con.setAutoCommit(false);
-		String query = "";
-		
-		query += "UPDATE pedido_sical SET situacao = 'F', pedido_logix '"+pedLogix+"' ";
-		query += " WHERE cnpj_empresa = ? and pedido_sical = ? and num_versao = ?";
-
-		stmt = con.prepareStatement(query);
-		stmt.setString(1, empresa);
-		stmt.setString(2, pedSial);
-		stmt.setInt(3, versao);
+		stmt.setString(1, ps.getCnpj_empresa().trim());
+		stmt.setString(2, ps.getNum_pedido().trim());
 
 	    stmt.executeUpdate();
 	    stmt.close();	
@@ -262,18 +251,20 @@ public class PedidoSicalDao extends Dao {
 		String query = "";
 		
 		query += "UPDATE pedido_sical SET situacao = '"+situa+"' ";
-		query += " WHERE cnpj_empresa = ? and pedido_sical = ?";
+		query += " WHERE trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and versao_atual = 'S' ";
 
 		stmt = con.prepareStatement(query);
-		stmt.setString(1, empresa);
-		stmt.setString(2, pedido);
+		stmt.setString(1, empresa.trim());
+		stmt.setString(2, pedido.trim());
 
 	    stmt.executeUpdate();
 	    stmt.close();	
 	    con.commit();		    
 	}
 
-	public List<PedidoSical> listaPedido() throws SQLException {
+	public List<PedidoSical> listaPedido(String datCorte,
+			String codEmpresa, String cnpj) throws SQLException {
 		
 		List<PedidoSical> pedidos = new ArrayList<PedidoSical>();
 		PedidoSical ps = null;
@@ -284,8 +275,13 @@ public class PedidoSicalDao extends Dao {
 		query += "SELECT cnpj_empresa, tipo_pedido, cnpj_cpf_cliente, ";
 		query += "pedido_sical, dt_emissao, entrega_futura, cod_portador, ";
 		query += "cod_cond_pagto, cnpj_cpf_vendedor, pedido_logix, num_versao, ";
-		query += "cod_empresa, pedido_bloqueado, tipo_frete FROM pedido_sical ";
-		query += "WHERE (situacao = 'N' OR situacao = 'C') and versao_atual = 'S' ";
+		query += "cod_empresa, pedido_bloqueado, tipo_frete, insc_estad ";
+		query += " FROM pedido_sical WHERE cod_empresa = '"+codEmpresa+"' ";
+		query += " and cnpj_empresa = '"+cnpj+"' ";
+		query += " AND (situacao = 'N' OR situacao = 'C') and versao_atual = 'S' ";
+		query += " AND SUBSTR(dt_emissao,1,10)) >= '"+datCorte+"' ";
+
+		log.info(query);
 
 		stmt = con.prepareStatement(query);
 		rs = stmt.executeQuery();
@@ -300,8 +296,6 @@ public class PedidoSicalDao extends Dao {
 			data = data.trim();
 			if (data.length() >= 10) {
 				data = data.substring(0,10);
-			} else {
-				data = "";
 			}
 			ps.setDt_emissao(data);
 			ps.setEntrega_futura(rs.getString(6));
@@ -313,12 +307,15 @@ public class PedidoSicalDao extends Dao {
 			ps.setCod_empresa(rs.getString(12));
 			ps.setPedido_bloqueado(rs.getString(13));
 			ps.setTipo_frete(rs.getString(14));
+			ps.setIE_cliente(rs.getString(15));
 			pedidos.add(ps);
 		}
 		return pedidos;		
 	}
 
-	public List<PedidoSical> listaPedido(String situacao) throws SQLException {
+	public List<PedidoSical> listaPedido(String datCorte,
+			String codEmpresa, String situacao, String cnpj) throws SQLException {
+		log.info("codEmpresa "+codEmpresa+" Corte: "+datCorte);
 		
 		List<PedidoSical> pedidos = new ArrayList<PedidoSical>();
 		PedidoSical ps = null;
@@ -328,12 +325,17 @@ public class PedidoSicalDao extends Dao {
 
 		query += "SELECT cnpj_empresa, tipo_pedido, cnpj_cpf_cliente, ";
 		query += "pedido_sical, dt_emissao, entrega_futura, cod_portador, ";
-		query += "cod_cond_pagto, cnpj_cpf_vendedor, pedido_logix, num_versao ";
-		query += "FROM pedido_sical ";
-		query += "WHERE versao_atual = 'S' and situacao = ? ";
+		query += "cod_cond_pagto, cnpj_cpf_vendedor, pedido_logix, num_versao, ";
+		query += " insc_estad FROM pedido_sical WHERE cod_empresa = '"+codEmpresa+"' ";
+		query += " and cnpj_empresa = '"+cnpj+"' ";
+		query += " AND versao_atual = 'S' and situacao = ? ";
+		query += " AND SUBSTR(dt_emissao,1,10) >= ? ";
+
+		log.info(query);
 
 		stmt = con.prepareStatement(query);
 		stmt.setString(1, situacao);		
+		stmt.setString(2, datCorte);		
 		rs = stmt.executeQuery();
 
 		while (rs.next()) {
@@ -346,8 +348,6 @@ public class PedidoSicalDao extends Dao {
 			data = data.trim();
 			if (data.length() >= 10) {
 				data = data.substring(0,10);
-			} else {
-				data = "";
 			}
 			ps.setDt_emissao(data);
 			ps.setEntrega_futura(rs.getString(6));
@@ -356,6 +356,7 @@ public class PedidoSicalDao extends Dao {
 			ps.setCNPJ_CPF_vendedor(rs.getString(9));
 			ps.setPedido_logix(rs.getInt(10));
 			ps.setNum_versao(rs.getInt(11));
+			ps.setIE_cliente(rs.getString(12));
 			pedidos.add(ps);
 		}
 		return pedidos;		

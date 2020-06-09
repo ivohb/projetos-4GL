@@ -1,17 +1,25 @@
 package main.java.com.aceex.roncador.main;
 
+import main.java.com.aceex.roncador.action.Erros;
 import main.java.com.aceex.roncador.action.Notas;
 import main.java.com.aceex.roncador.action.Pedidos;
+import main.java.com.aceex.roncador.connection.OracleConexao;
 
 public class App {
 
 	public static void main(String[] args) {
-		//PedidosBean pb = new PedidosBean();
-		//pb.processa("05872541000123");
-		//NotasBean nb = new NotasBean();
-		//nb.processa("05872541000123");
+
+		OracleConexao.abreConexao();
+		new Pedidos().execute();
+		new Notas().execute();
 		
-		new IntegraSical().contextInitialized(null);
+		OracleConexao.abreErroConexao();
+		new Erros().processa();
+
+		OracleConexao.fechaErroConexao();
+		OracleConexao.fechaConexao();
+
+		//new IntegraSical().contextInitialized(null);
 	}
 	
 }

@@ -17,17 +17,19 @@ public class PedidoErroDao extends Dao {
 		super(conexao);
 	}
 	
-	public void excluir(String empresa, String pedido) throws SQLException {
+	public void excluir(int versao, 
+			String empresa, String pedido) throws SQLException {
 		
 		Connection con = getConexao();
 		con.setAutoCommit(false);
 
 		String query = "DELETE FROM pedido_erro_sical "
-			+ "WHERE cnpj_empresa = ? and pedido_sical = ? ";
+		+ "WHERE num_versao = ? and trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
 		
 		stmt = con.prepareStatement(query); 
-		stmt.setString(1, empresa);
-		stmt.setString(2, pedido);
+		stmt.setInt(1, versao);
+		stmt.setString(2, empresa.trim());
+		stmt.setString(3, pedido.trim());
 		
 		stmt.executeUpdate();
 		stmt.close();
@@ -41,13 +43,15 @@ public class PedidoErroDao extends Dao {
 		con.setAutoCommit(false);
 
 		String query =
-			"INSERT INTO pedido_erro_sical (cnpj_empresa, pedido_sical, mensagem)"
-			+ " VALUES(?,?,?)";
+			"INSERT INTO pedido_erro_sical "
+			+ "(num_versao, cnpj_empresa, pedido_sical, mensagem)"
+			+ " VALUES(?,?,?,?)";
 
 		stmt = con.prepareStatement(query); 
-		stmt.setString(1, pe.getEmpresa());
-		stmt.setString(2, pe.getPedido());
-		stmt.setString(3, pe.getMensagem());
+		stmt.setInt(1, pe.getVersao());
+		stmt.setString(2, pe.getEmpresa());
+		stmt.setString(3, pe.getPedido());
+		stmt.setString(4, pe.getMensagem());
 		
 		stmt.executeUpdate();
 		stmt.close();
@@ -63,16 +67,23 @@ public class PedidoErroDao extends Dao {
 		Connection con = getConexao();
 		String query = "";
 
-		query += "SELECT  cnpj_empresa, pedido_sical, mensagem from pedido_erro_sical ";
-		
+		query += "SELECT e.num_versao, e.cnpj_empresa, "
+			+ " e.pedido_sical, i.cod_produto, e.mensagem "
+			+ "from pedido_erro_sical e, ped_item_sical i "
+		    + " where e.cnpj_empresa = i.cnpj_empresa "
+		    + " and e.pedido_sical = i.pedido_sical "
+		    + " and e.num_versao = i.num_versao ";
+		    
 		PreparedStatement stmt = con.prepareStatement(query);
 		ResultSet rs = stmt.executeQuery();
 
 		while (rs.next()) {
 			erro = new PedidoErro();
-			erro.setEmpresa(rs.getString(1));
-			erro.setPedido(rs.getString(2));
-			erro.setMensagem(rs.getString(3));
+			erro.setVersao(rs.getInt(1));
+			erro.setEmpresa(rs.getString(2));
+			erro.setProduto(rs.getString(3));
+			erro.setPedido(rs.getString(4));
+			erro.setMensagem(rs.getString(5));
 			erros.add(erro);
 		}
 

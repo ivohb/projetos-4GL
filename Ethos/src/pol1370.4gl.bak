@@ -356,12 +356,48 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.33  "
+   LET p_versao = "POL1370-12.00.38  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
-
-   CALL pol1370_menu()
+   
+   IF pol1370_cria_tabs() THEN
+      CALL pol1370_menu()
+   END IF
     
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1370_cria_tabs()#
+#---------------------------#
+
+   DROP TABLE w_progs_edi;
+   
+   CREATE TABLE w_progs_edi (
+       num_pedido         CHAR(06),
+       ies_select         CHAR(01),
+       prz_entrega        DATE,
+       programacao        CHAR(11),
+       qtd_solic          DECIMAL(10,3),
+       qtd_saldo          DECIMAL(10,3),
+       qtd_solic_nova     DECIMAL(10,3),
+       mensagem           CHAR(30),
+       num_sequencia      INTEGER
+   );
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('CREATE','tabele w_progs_edi')
+      RETURN FALSE
+   END IF
+   
+   CREATE INDEX ix_w_progs_edi ON w_progs_edi(num_pedido)
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('CREATE','indice w_progs_edi')
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+   
 END FUNCTION
    
 #----------------------#
@@ -440,7 +476,7 @@ FUNCTION pol1370_menu()#
     LET l_proc_all = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_proc_all,"IMAGE","PROC_ALL")     
     CALL _ADVPL_set_property(l_proc_all,"TYPE","CONFIRM")     
-    CALL _ADVPL_set_property(l_proc_all,"ENABLE",FALSE) 
+    CALL _ADVPL_set_property(l_proc_all,"ENABLE",TRUE) 
     CALL _ADVPL_set_property(l_proc_all,"TOOLTIP","Processa todos os itens")
     CALL _ADVPL_set_property(l_proc_all,"EVENT","pol1370_proc_all")
     CALL _ADVPL_set_property(l_proc_all,"CONFIRM_EVENT","pol1370_proc_all_conf")
@@ -3245,39 +3281,23 @@ FUNCTION pol1370_le_programacao()#
           l_dat_abertura  DATE,
           l_situacao      CHAR(01),
           l_num_pedido    INTEGER,
-          l_cod_item      CHAR(15)
+          l_cod_item      CHAR(15),
+          l_count         INTEGER
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","")
    
-   DROP TABLE w_progs_edi;
-   
-   CREATE TABLE w_progs_edi (
-       num_pedido         CHAR(06),
-       ies_select         CHAR(01),
-       prz_entrega        DATE,
-       programacao        CHAR(11),
-       qtd_solic          DECIMAL(10,3),
-       qtd_saldo          DECIMAL(10,3),
-       qtd_solic_nova     DECIMAL(10,3),
-       mensagem           CHAR(30),
-       num_sequencia      INTEGER
-   );
-
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('CREATE','tabele w_progs_edi')
-      RETURN 
-   END IF
-   
-   CREATE INDEX ix_w_progs_edi ON w_progs_edi(num_pedido)
-
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('CREATE','indice w_progs_edi')
-      RETURN 
-   END IF
-       
    INITIALIZE ma_prog TO NULL
    CALL _ADVPL_set_property(m_brz_prog,"CLEAR")
 
+   DELETE FROM w_progs_edi
+   SELECT COUNT(*) INTO l_count FROM w_progs_edi
+   
+   IF l_count > 0 THEN
+      LET m_msg = 'Erro limpando tabele temporária w_progs_edi'
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN
+   END IF      
+   
    IF m_id_pe1 IS NULL OR m_id_pe1 = 0 THEN
       RETURN 
    END IF
@@ -3360,10 +3380,43 @@ FUNCTION pol1370_le_programacao()#
                                                                
         LET ma_prog[m_ind].qtd_solic = m_qtd_solic             
         LET ma_prog[m_ind].qtd_saldo = m_qtd_saldo             
-                                                               
+
+        IF ma_prog[m_ind].qtd_solic_nova = ma_prog[m_ind].qtd_saldo THEN
+           IF ma_prog[m_ind].mensagem <> 'PROCESSADO' THEN
+              LET ma_prog[m_ind].mensagem = 'DESCARTAR'    
+           END IF    
+        END IF
+        
+        IF ma_prog[m_ind].prz_entrega < TODAY THEN
+           LET ma_prog[m_ind].mensagem = 'PRZ VENCIDO'
+        END IF
+        
+        IF ma_prog[m_ind].mensagem = 'PRZ VENCIDO' 
+            OR ma_prog[m_ind].mensagem = 'CANCELAR'
+            OR ma_prog[m_ind].mensagem = 'PROCESSADO' THEN
+        ELSE
+           IF ma_prog[m_ind].qtd_solic_nova = 0 OR ma_prog[m_ind].qtd_solic_nova IS NULL  THEN
+              IF ma_prog[m_ind].qtd_saldo > 0 THEN
+                 LET ma_prog[m_ind].mensagem = 'CANCELAR' 
+              ELSE
+                 LET ma_prog[m_ind].mensagem = 'DESCARTAR' 
+              END IF
+           ELSE
+              IF ma_prog[m_ind].qtd_solic_nova <> ma_prog[m_ind].qtd_saldo THEN
+                 IF ma_prog[m_ind].qtd_solic = 0 THEN
+                    LET ma_prog[m_ind].mensagem = 'INCLUIR'      
+                 ELSE  
+                    LET ma_prog[m_ind].mensagem = 'ATUALIZAR'   
+                 END IF  
+              END IF
+           END IF
+        END IF
+                                                                        
         IF m_qtd_atend > 0 OR m_qtd_romaneio > 0 THEN          
-           IF ma_prog[m_ind].mensagem = "ATUALIZAR" THEN       
-              LET ma_prog[m_ind].mensagem = 'C/FATURAMENTO'    
+           IF ma_prog[m_ind].mensagem = "ATUALIZAR" OR 
+              ma_prog[m_ind].mensagem = "INCLUIR" OR
+              ma_prog[m_ind].mensagem = "CANCELAR" THEN       
+                 LET ma_prog[m_ind].mensagem = 'C/FATURAMENTO'    
            END IF                                              
         END IF                                                 
                                                                
@@ -3386,7 +3439,9 @@ FUNCTION pol1370_le_programacao()#
            CALL log003_err_sql('INSERT','w_progs_edi:cq_le_prog')
            EXIT FOREACH                                          
         END IF                                                   
-            
+        
+        CALL pol1370_atuali_audit()
+        
       END FOREACH    
                      
       FREE cq_le_prog
@@ -3443,7 +3498,15 @@ FUNCTION pol1370_le_programacao()#
       CALL _ADVPL_set_property(m_brz_prog,"CLEAR")
 
       CALL _ADVPL_set_property(m_brz_prog,"CLEAR_ALL_LINE_FONT_COLOR")
-      
+
+      LET m_count = _ADVPL_get_property(m_brz_prog,"ITEM_COUNT")
+
+      IF l_count > 0 THEN
+         LET m_msg = 'Erro limpando grade m_brz_prog'
+         CALL log0030_mensagem(m_msg,'info')
+         RETURN
+      END IF      
+
       DECLARE cq_prog_temp CURSOR FOR
        SELECT *
          FROM w_progs_edi
@@ -3496,6 +3559,42 @@ FUNCTION pol1370_le_programacao()#
       CALL _ADVPL_set_property(m_brz_prog,"ENABLE",FALSE)
    END IF
          
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1370_atuali_audit()#
+#------------------------------#
+
+   DEFINE l_ld       integer
+
+   SELECT id_registro INTO l_ld
+     FROM edi_audit_547
+    WHERE cod_empresa = p_cod_empresa
+      AND id_arquivo = m_id_arquivo
+      AND id_pe1 = m_id_pe1
+      AND num_pedido = m_num_pedido
+      AND cod_item = m_cod_item
+      AND prz_entrega = m_prz_entrega
+   
+   IF STATUS <> 0 THEN
+      RETURN
+   END IF
+
+   LET ma_prog[m_ind].qtd_solic = m_qtd_solic             
+   LET ma_prog[m_ind].qtd_saldo = m_qtd_saldo                  
+                                                      
+   UPDATE edi_audit_547                                   
+    SET mensagem = ma_prog[m_ind].mensagem,               
+        qtd_solic = m_qtd_solic,                          
+        qtd_atual = m_qtd_saldo,                          
+        qtd_antes = m_qtd_saldo                           
+   WHERE cod_empresa = p_cod_empresa                      
+     AND id_registro = l_ld                               
+   
+   IF STATUS <> 0 THEN                                     
+      CALL log003_err_sql('UPDATE','edi_audit_547:3')      
+   END IF
+
 END FUNCTION
 
 #-------------------------------#
@@ -4383,13 +4482,20 @@ FUNCTION pol1370_proc_edi()#
                 SET qtd_pecas_cancel = qtd_pecas_cancel + m_qtd_saldo
               WHERE cod_empresa = p_cod_empresa
                 AND num_pedido = ma_prog[l_ind].num_pedido
-                AND num_sequencia  = ma_prog[l_ind].num_sequencia
+                AND prz_entrega  = m_prz_entrega
 
              IF STATUS <> 0 THEN
                 CALL log003_err_sql('UPDATE','ped_itens')
                 RETURN FALSE
              END IF
              
+             UPDATE ped_itens_edi_547
+                SET mensagem = 'PROCESSADO'
+              WHERE cod_empresa = p_cod_empresa
+                AND id_pe1 = m_id_pe1
+                AND num_pedido = m_num_pedido 
+                AND num_sequencia = m_seq_prog
+      
              LET mr_audit.operacao = 'CANCELOU SALDO'
              LET mr_audit.situacao = 'L'
              LET m_qtd_atual = 0
@@ -5220,7 +5326,7 @@ FUNCTION pol1370_par_print(l_container)#
    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
    CALL _ADVPL_set_property(l_label,"TEXT","Pedido:")    
    
-   LET m_ped_imp = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+   LET m_ped_imp = _ADVPL_create_component(NULL,"LNUMERICFIELD",l_layout)
    CALL _ADVPL_set_property(m_ped_imp,"LENGTH",10)
    CALL _ADVPL_set_property(m_ped_imp,"VARIABLE",mr_print,"num_pedido")
    CALL _ADVPL_set_property(m_ped_imp,"PICTURE","######")
@@ -5601,10 +5707,18 @@ FUNCTION pol1370_relatorio(l_report)#
          LET mr_relat.den_item_reduz = NULL
       END IF         
       
-      IF mr_relat.operacao IS NULL OR mr_relat.operacao = ' ' THEN
+      IF mr_relat.qtd_atual IS NULL THEN
          LET mr_relat.qtd_atual = 0
+      END IF
+
+      IF mr_relat.qtd_antes IS NULL THEN
          LET mr_relat.qtd_antes = 0
       END IF
+      
+      {IF mr_relat.operacao IS NULL OR mr_relat.operacao = ' ' THEN
+         LET mr_relat.qtd_atual = 0
+         LET mr_relat.qtd_antes = 0
+      END IF}
             
       LET mr_relat.sinal = ' '
       LET mr_relat.variacao = mr_relat.qtd_atual - mr_relat.qtd_antes

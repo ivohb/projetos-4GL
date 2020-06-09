@@ -7,10 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import main.java.com.aceex.roncador.action.Notas;
 import main.java.com.aceex.roncador.model.Nota;
 
 public class NotaDao extends Dao {
 
+	private static Logger log = Logger.getLogger(Notas.class);
 	private Nota nota;
 
 	public NotaDao(Connection conexao) {
@@ -27,11 +31,13 @@ public class NotaDao extends Dao {
 		query += "SELECT trans_nota_fiscal, nota_fiscal, serie_nota_fiscal, dat_hor_cancel ";
 		query += " FROM fat_nf_mestre f, nota_sical s ";
 		query += " where f.empresa = ? and  f.sit_nota_fiscal = 'C' ";
-		query += " and f.empresa = S.cod_empresa ";
+		query += " and f.empresa = s.cod_empresa ";
 		query += " and f.trans_nota_fiscal = s.num_transac ";
 		query += " and f.trans_nota_fiscal not in (select n.num_transac from nota_sical n ";
 		query += " where n.cod_empresa = f.empresa and n.sit_nota = 'C')";
 
+		log.info(query);
+		
 		PreparedStatement stmt = con.prepareStatement(query);
 		stmt.setString(1, codEmpresa);
 		ResultSet rs = stmt.executeQuery();
@@ -65,14 +71,14 @@ public class NotaDao extends Dao {
 		query += "SELECT DISTINCT f.trans_nota_fiscal, f.item,  f.qtd_item as quant, ";
 		query += " p.pedido_logix as pedido, p.tipo_pedido as tipo, p.entrega_futura as entrega, ";
 		query += " nota_fiscal,serie_nota_fiscal,placa_veiculo,dat_hor_emissao,sit_nota_fiscal ";
-		query += " FROM fat_nf_item f, pedido_sical p, ped_item_sical i, fat_nf_mestre m ";
+		query += " FROM fat_nf_item f, pedido_sical p, fat_nf_mestre m ";
 		query += " where m.empresa = ? and m.sit_nota_fiscal <> 'C' and m.empresa = f.empresa ";
 		query += " and m.trans_nota_fiscal = f.trans_nota_fiscal and f.empresa = p.cod_empresa";
 		query += " and f.pedido = p.pedido_logix and p.pedido_logix  > 0 ";
-		query += " and i.num_versao = p.num_versao and i.cnpj_empresa = p.cnpj_empresa";
-		query += " and i.pedido_sical = p.pedido_sical and i.cod_produto = f.item ";
 		query += " and f.trans_nota_fiscal not in (select n.num_transac from  nota_sical n ";
-		query += " where n.cod_empresa = f.empresa and n.sit_nota <> 'C')";
+		query += " where n.cod_empresa = f.empresa )";
+		
+		log.info(query);
 		
 		PreparedStatement stmt = con.prepareStatement(query);
 		stmt.setString(1, codEmpresa);

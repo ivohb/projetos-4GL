@@ -22,7 +22,7 @@ public class SqlConecta {
 	}
 
 	private void conecta() {
-		
+
 		String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 		String url = "jdbc:sqlserver://192.168.1.56;DatabaseName=LOGIXPRD";
 		String login = "logix";

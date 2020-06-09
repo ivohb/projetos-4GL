@@ -55,10 +55,10 @@ public class PedidosDao extends Dao {
 		String query = "";
 
 		query += "select ies_sit_pedido from pedidos";
-		query += " where cod_empresa = ? and num_pedido =  ? ";
+		query += " where trim(cod_empresa) = ? and num_pedido =  ? ";
 
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, empresa);
+		stmt.setString(1, empresa.trim());
 		stmt.setInt(2, numero);
 
 		rs = stmt.executeQuery();
@@ -127,7 +127,18 @@ public class PedidosDao extends Dao {
 		stmt.setInt(29, pedido.getNumVersaoLista());
 		stmt.executeUpdate();
 		stmt.close();
-		
+
+		query = "INSERT INTO ped_inf_com_mestre (empresa, pedido, usuario, dat_inclusao) "
+			+ " VALUES(?,?,?,?) ";
+
+		stmt = conect.prepareStatement(query); 
+		stmt.setString(1, pedido.getCodEmpresa());
+		stmt.setInt(2, pedido.getNumPedido());
+		stmt.setString(3,"sical");
+		stmt.setDate(4, data);
+		stmt.executeUpdate();
+		stmt.close();
+
 		if (pedido.getNatOperRemessa() != null && pedido.getNatOperRemessa() > 0) {
 			query = "INSERT INTO ped_item_nat "
 				+ "(cod_empresa, num_pedido, num_sequencia, ies_tipo, "
@@ -150,27 +161,33 @@ public class PedidosDao extends Dao {
 
 		if (pedido.getObsNf() != null && pedido.getObsNf().trim().length() > 0) {
 			query = "INSERT INTO ped_itens_texto "
-				+ "(cod_empresa, num_pedido, num_sequencia, den_texto_1)"
-				+ " VALUES(?,?,?,?)";	
+				+ "(cod_empresa, num_pedido, num_sequencia, den_texto_1,"
+				+ " den_texto_2, den_texto_3, den_texto_4, den_texto_5)"
+				+ " VALUES(?,?,?,?,?,?,?,?)";	
 
 			stmt = conect.prepareStatement(query); 
 			stmt.setString(1, pedido.getCodEmpresa());
 			stmt.setInt(2, pedido.getNumPedido());
 			stmt.setInt(3, 0);
 			stmt.setString(4, pedido.getObsNf());
+			stmt.setString(5, pedido.getObs2Nf());
+			stmt.setString(6, pedido.getObs3Nf());
+			stmt.setString(7, pedido.getObs4Nf());
+			stmt.setString(8, pedido.getObs5Nf());
 			stmt.executeUpdate();
 			stmt.close();
 		}
 
 		if (pedido.getObsPedido() != null && pedido.getObsPedido().trim().length() > 0) {
 			query = "INSERT INTO ped_observacao "
-				+ "(cod_empresa, num_pedido, tex_observ_1)"
-				+ " VALUES(?,?,?)";	
+				+ "(cod_empresa, num_pedido, tex_observ_1, tex_observ_2)"
+				+ " VALUES(?,?,?,?)";	
 
 			stmt = conect.prepareStatement(query); 
 			stmt.setString(1, pedido.getCodEmpresa());
 			stmt.setInt(2, pedido.getNumPedido());
 			stmt.setString(3, pedido.getObsPedido());
+			stmt.setString(4, pedido.getObs2Pedido());
 			stmt.executeUpdate();
 			stmt.close();
 		}
@@ -217,7 +234,8 @@ public class PedidosDao extends Dao {
 		
 		query = "UPDATE pedido_sical SET situacao = 'F', ";
 		query += " pedido_logix = '"+pedido.getNumPedido()+"' ";
-		query += " WHERE cnpj_empresa = ? and pedido_sical = ? and num_versao = ?";
+		query += " WHERE trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and num_versao = ?";
 
 		stmt = conect.prepareStatement(query);
 		stmt.setString(1, ps.getCnpj_empresa());
@@ -237,11 +255,11 @@ public class PedidosDao extends Dao {
 		String query = "";
 		 
 		query += "select cod_logix from de_para_produto ";
-		query += " where cod_empresa =  ? and cod_sical = ?";
+		query += " where trim(cod_empresa) =  ? and trim(cod_sical) = ?";
 
 		PreparedStatement stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, codEmpresa);
-		stmt.setString(2, codSical);
+		stmt.setString(1, codEmpresa.trim());
+		stmt.setString(2, codSical.trim());
 
 		rs = stmt.executeQuery();
 

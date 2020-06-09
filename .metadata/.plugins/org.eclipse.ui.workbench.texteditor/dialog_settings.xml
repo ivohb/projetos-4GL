@@ -13,13 +13,13 @@
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
 			<item value="versao"/>
+			<item value="tira_"/>
 			<item value="#&amp;"/>
 			<item value="le_programa"/>
 			<item value="estrut_gr"/>
 			<item value="&quot;BC"/>
 			<item value="&apos;BC"/>
 			<item value="VERSAO"/>
-			<item value="MOVE_"/>
 		</list>
 		<list key="replacehistory">
 			<item value="pol1381"/>

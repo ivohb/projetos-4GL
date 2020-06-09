@@ -20,12 +20,13 @@ public class ItemDao extends Dao {
 		String query = "";
 
 		query += "select 1 from item ";
-		query += "where cod_empresa = ? and cod_item = ? and ies_situacao = 'A' ";
+		query += "where trim(cod_empresa) = ? ";
+		query += " and trim(cod_item) = ? and ies_situacao = 'A' ";
 
 		stmt = getConexao().prepareStatement(query);
 
-		stmt.setString(1, codEmpresa);
-		stmt.setString(2, codItem);
+		stmt.setString(1, codEmpresa.trim());
+		stmt.setString(2, codItem.trim());
 
 		rs = stmt.executeQuery();
 

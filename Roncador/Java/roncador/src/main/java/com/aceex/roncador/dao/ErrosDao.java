@@ -21,28 +21,30 @@ public class ErrosDao {
 		con.setAutoCommit(false);
 
 		String query = "DELETE FROM pedido_erro_sical "
-				+ " WHERE cnpj_empresa = ? and pedido_sical = ? ";
+				+ " WHERE num_versao = ? and cnpj_empresa = ? and pedido_sical = ? ";
 
 		PreparedStatement stmt = con.prepareStatement(query); 
-		stmt.setString(1, erro.getEmpresa());
-		stmt.setString(2, erro.getPedido());
+		stmt.setInt(1, erro.getVersao());
+		stmt.setString(2, erro.getEmpresa());
+		stmt.setString(3, erro.getPedido());
 		stmt.executeUpdate();
 		stmt.close();
 
 		 query = "INSERT INTO pedido_erro_sical"
-			+ "(cnpj_empresa, pedido_sical, mensagem)"
-			+ " VALUES(?,?,?)";	
+			+ "(num_versao, cnpj_empresa, pedido_sical, cod_produto, mensagem)"
+			+ " VALUES(?,?,?,?,?)";	
 		
 		stmt = con.prepareStatement(query); 
-		stmt.setString(1, erro.getEmpresa());
-		stmt.setString(2, erro.getPedido());
-		stmt.setString(3, erro.getMensagem());
+		stmt.setInt(1, erro.getVersao());
+		stmt.setString(2, erro.getEmpresa());
+		stmt.setString(3, erro.getPedido());
+		stmt.setString(4, erro.getProduto());
+		stmt.setString(5, erro.getMensagem());
 		stmt.executeUpdate();
 		stmt.close();
 		con.commit();
 
 	}
-
 	
 	public Connection getConexao() {
 		return conexao;

@@ -3,6 +3,8 @@ package main.java.com.aceex.roncador.action;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.log4j.Logger;
 
 import br.com.soap.MetodosSoap;
@@ -34,27 +36,30 @@ public class Notas {
 				processa();
 			}		
 
-		} catch (SQLException e1) {
-			log.info(e1.getMessage()+" "+e1.getCause());
-			e1.printStackTrace();
+		} catch (SQLException e) {
+			log.info(new RuntimeException(e));
+			e.printStackTrace();
 		}
 	}
 
-	public void processa() {
+	private void processa() {
 		
 		try {
 			notaCancelada();
 			notaEmitida();
 		} catch (Exception e) {
-			log.info("Erro: NotasBean.processa ");
+			log.info("Erro: Notas.processa ");
+			log.info(new RuntimeException(e));
 			e.printStackTrace();
 		}
 	}
 	
 	private void notaCancelada() throws Exception {
 		NotaDao nDao = fd.getNotaDao();
-		notasEmitidas = nDao.lstCanceladas(this.codEmpresa);
+		notasEmitidas = nDao.lstCanceladas(codEmpresa);
 
+		log.info("Notas canceladas: "+notasEmitidas.size());
+		
 		if (notasEmitidas.size() == 0) {
 			return;
 		}
@@ -63,7 +68,9 @@ public class Notas {
 		String xml = "<NewDataSet>\r\n";
 
 		for (Nota nota : notasEmitidas) {
-
+			
+			log.info("Exportando nota "+nota.getNum_nota());
+			
 			xml = xml + "<NotasCanceladas>\r\n";
 			xml = xml + "<num_nota>"+nota.getNum_nota()+"</num_nota>\r\n";
 			xml = xml + "<serie>"+nota.getSerie()+"</serie>\r\n";
@@ -87,7 +94,9 @@ public class Notas {
 	private void notaEmitida() throws Exception {
 		NotaDao nDao = fd.getNotaDao();
 		notasEmitidas = nDao.lstEmitidas(this.codEmpresa);
-
+		
+		log.info("Notas emitidas: "+notasEmitidas.size());
+		
 		if (notasEmitidas.size() == 0) {
 			return;
 		}
@@ -96,7 +105,9 @@ public class Notas {
 		String xml = "<NewDataSet>\r\n";
 
 		for (Nota nota : notasEmitidas) {
-
+			
+			log.info("Exportando nota "+nota.getNum_nota());
+			
 			if (nota.getPlaca_veiculo() == null) {
 				nota.setPlaca_veiculo(" ");
 			}
@@ -128,6 +139,7 @@ public class Notas {
 	
 	private void salva(Nota nota) throws Exception {
 		NotaDao nDao = fd.getNotaDao();
+		log.info("Salvando nota "+nota.getNum_nota());
 		nDao.salva(nota);
 	}
 }

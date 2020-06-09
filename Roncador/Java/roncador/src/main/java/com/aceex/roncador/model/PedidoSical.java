@@ -11,6 +11,7 @@ public class PedidoSical implements Serializable {
 	private String cnpj_empresa;
 	private String tipo_pedido;
 	private String CNPJ_CPF_cliente;
+	private String IE_cliente;
 	private String num_pedido;
 	private String dt_emissao;
 	private String entrega_futura;
@@ -70,6 +71,14 @@ public class PedidoSical implements Serializable {
 
 	public void setCNPJ_CPF_cliente(String CNPJ_CPF_cliente) {
 		this.CNPJ_CPF_cliente = CNPJ_CPF_cliente;
+	}
+
+	public String getIE_cliente() {
+		return IE_cliente;
+	}
+
+	public void setIE_cliente(String iE_cliente) {
+		IE_cliente = iE_cliente;
 	}
 
 	public String getNum_pedido() {

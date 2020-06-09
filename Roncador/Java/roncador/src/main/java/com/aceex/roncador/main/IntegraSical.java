@@ -23,17 +23,16 @@ public class IntegraSical implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent event) {
  
-		log.info("Integraçao Logix x Sical V 1.004");
-
+		log.info("Integraçao Logix x Sical V 1.018");
 		Propriedade prop = new Propriedade();				
 		int tempo_minuto = prop.getTempo();
 		
 		if (tempo_minuto < 10) {
-			tempo_minuto = 1;
+			tempo_minuto = 10;
 		}
 		
 		final long TEMPO = ((1000 * tempo_minuto ) * 60);
-			 
+	
 		Timer timer = new Timer();
 		TimerTask timerTask = new TimerTask() {
 			@Override
@@ -50,8 +49,8 @@ public class IntegraSical implements ServletContextListener {
 				
 				OracleConexao.abreErroConexao();
 				new Erros().processa();
-
 				OracleConexao.fechaErroConexao();
+
 				OracleConexao.fechaConexao();
 			}
 		};

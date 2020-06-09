@@ -24,11 +24,11 @@ public class EmpresaDao extends Dao {
 		String query = "";
 
 		query += "select cod_empresa from empresa";
-		query += " where num_cgc =  ? ";
+		query += " where trim(num_cgc) =  ? ";
 
 		stmt = getConexao().prepareStatement(query);
 
-		stmt.setString(1, numCgc);
+		stmt.setString(1, numCgc.trim());
 
 		rs = stmt.executeQuery();
 
@@ -50,7 +50,7 @@ public class EmpresaDao extends Dao {
 		Connection con = getConexao();
 		String query = "";
 
-		query += "SELECT  cod_empresa, num_cgc from empresa ";
+		query += "SELECT  cod_empresa, num_cnpj from cnpj_empresa ";
 		
 		PreparedStatement stmt = con.prepareStatement(query);
 		ResultSet rs = stmt.executeQuery();

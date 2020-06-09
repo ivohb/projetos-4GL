@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.java.com.aceex.roncador.model.PedComplSical;
 
@@ -21,13 +23,15 @@ public class PedComplSicalDao extends Dao {
 		boolean result = false;
 		String query = "";
 
-		query += "select 1 from pedido_compl_sical";
-		query += " where cnpj_empresa = ? and pedido_sical = ? ";
+		query += "select pedido_sical from pedido_compl_sical";
+		query += " where num_versao = ? and trim(cnpj_empresa) = ? ";
+		query += " and trim(pedido_sical) = ? ";
 		
 		stmt = getConexao().prepareStatement(query);
 
-		stmt.setString(1, pcs.getCnpj_empresa());
-		stmt.setString(2, pcs.getNum_pedido());
+		stmt.setInt(1, pcs.getNum_versao());
+		stmt.setString(2, pcs.getCnpj_empresa().trim());
+		stmt.setString(3, pcs.getNum_pedido().trim());
 
 		rs = stmt.executeQuery();
 
@@ -43,6 +47,7 @@ public class PedComplSicalDao extends Dao {
 
 	public void inserir(PedComplSical pcs) throws SQLException {
 		
+		String texto = "";
 		Connection con = getConexao();
 		con.setAutoCommit(false);
 
@@ -55,8 +60,18 @@ public class PedComplSicalDao extends Dao {
 		stmt.setInt(1, pcs.getNum_versao());
 		stmt.setString(2, pcs.getCnpj_empresa());
 		stmt.setString(3, pcs.getNum_pedido());
-		stmt.setString(4, pcs.getObs());
-		stmt.setString(5, pcs.getObs_nota_fiscal());
+		
+		texto =  pcs.getObs();
+		if (texto.length() > 76) {
+			texto = texto.substring(0, 76);
+		}		
+		stmt.setString(4, texto);
+		
+		texto =   pcs.getObs_nota_fiscal();
+		if (texto.length() > 76) {
+			texto = texto.substring(0, 76);
+		}
+		stmt.setString(5, texto);
 		
 		stmt.executeUpdate();
 		stmt.close();
@@ -72,11 +87,13 @@ public class PedComplSicalDao extends Dao {
 		
 		query += "UPDATE pedido_compl_sical SET obs = '"+pcs.getObs()+"' ";
 		query += ", obs_nota_fiscal = '"+pcs.getObs_nota_fiscal()+"' ";
-		query += " WHERE cnpj_empresa = ? and pedido_sical = ?";
+		query += " where num_versao = ? and trim(cnpj_empresa) = ? ";
+		query += " and trim(pedido_sical) = ? ";
 
 		stmt = con.prepareStatement(query);
-		stmt.setString(1, pcs.getCnpj_empresa());
-		stmt.setString(2, pcs.getNum_pedido());
+		stmt.setInt(1, pcs.getNum_versao());
+		stmt.setString(2, pcs.getCnpj_empresa().trim());
+		stmt.setString(3, pcs.getNum_pedido().trim());
 	    stmt.executeUpdate();
 	    stmt.close();	
 	    con.commit();		    
@@ -90,7 +107,8 @@ public class PedComplSicalDao extends Dao {
 		String query = "";
 
 		query += "select cnpj_empresa, obs, obs_nota_fiscal from pedido_compl_sical";
-		query += " where cnpj_empresa = ? and pedido_sical = ? and num_versao = ? ";
+		query += " where trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and num_versao = ? ";
 		
 		stmt = getConexao().prepareStatement(query);
 		stmt.setString(1, empresa);
@@ -112,6 +130,40 @@ public class PedComplSicalDao extends Dao {
 		stmt.close();
 
 		return pcs;
+				
+		
+	}
+
+	public List<PedComplSical> getLista(String empresa, 
+			String pedido, Integer versao) throws SQLException {
+		
+		List<PedComplSical> lista = new ArrayList<PedComplSical>();
+		PedComplSical pcs = null;
+
+		String query = "";
+
+		query += "select obs, obs_nota_fiscal from pedido_compl_sical";
+		query += " where trim(cnpj_empresa) = ? and trim(pedido_sical) = ? ";
+		query += " and num_versao = ? ";
+		
+		stmt = getConexao().prepareStatement(query);
+		stmt.setString(1, empresa);
+		stmt.setString(2, pedido);
+		stmt.setInt(3, versao);
+
+		rs = stmt.executeQuery();
+
+		if (rs.next()) {
+			pcs = new PedComplSical();
+			pcs.setObs(rs.getString("obs"));
+			pcs.setObs_nota_fiscal(rs.getString("obs_nota_fiscal"));
+			lista.add(pcs);
+		}
+
+		rs.close();
+		stmt.close();
+
+		return lista;
 				
 		
 	}

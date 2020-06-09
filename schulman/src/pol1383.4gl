@@ -90,7 +90,7 @@ FUNCTION pol1383()#
    WHENEVER ANY ERROR CONTINUE
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1383-12.00.10  "
+   LET p_versao = "pol1383-12.00.11  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1383_menu()
@@ -551,7 +551,7 @@ FUNCTION pol1383_checa_carga()#
                   'Deseja recarregá-lo ?'
    ELSE
       IF STATUS <> 100 THEN
-         CALL log003_err_sql('SELECT','arquivo_edi_547')
+         CALL log003_err_sql('SELECT','lista_schulman')
          RETURN FALSE
       END IF
    END IF
@@ -628,6 +628,9 @@ FUNCTION pol1383_load_arq()#
       RETURN FALSE
    END IF
 
+{   #usuário monta o arquivo com espaçõ no inicio da informação
+    #os blocos a seguir estão em desenvolvimento
+    
    IF NOT pol1383_gera_id() THEN
       RETURN FALSE
    END IF
@@ -635,7 +638,7 @@ FUNCTION pol1383_load_arq()#
    IF NOT pol1383_tira_espaco() THEN
       RETURN FALSE
    END IF
-
+}
    IF NOT pol1383_exibe_dados() THEN
       RETURN FALSE
    END IF
@@ -660,7 +663,7 @@ FUNCTION pol1383_cria_temp()#
       bloqueia_faturamento  char(80),     
       cod_moeda	            integer,      
       unid_medida	          char(80),     
-      cod_cliente	          char(80)),     
+      cod_cliente	          char(80),     
       area_e_linha	        char(80),     
       cod_item	            char(80),     
       preco_unit	          char(80),     
@@ -685,6 +688,7 @@ FUNCTION pol1383_cria_temp()#
 
 END FUNCTION
 
+{
 #-------------------------#
 FUNCTION pol1383_gera_id()#
 #-------------------------#
@@ -749,6 +753,7 @@ FUNCTION pol1383_tira_espaco()#
       LET lr_lista.cod_item = func002_trim(lr_lista.cod_item)
       LET lr_lista.preco_unit = func002_trim(lr_lista.preco_unit)
       LET lr_lista.preco_minimo = func002_trim(lr_lista.preco_minimo)
+}
 
 #-----------------------------#
 FUNCTION pol1383_exibe_dados()#
@@ -950,7 +955,13 @@ END FUNCTION
 #---------------------------#
 FUNCTION pol1383_del_lista()#
 #---------------------------#   
-
+   
+   DEFINE l_dat_atu     DATE,
+          l_hor_atu     CHAR(08)
+   
+   LET l_dat_atu = TODAY
+   LET l_hor_atu = TIME
+   
    DELETE FROM desc_preco_item
     WHERE cod_empresa = mr_cabec.cod_empresa
       AND num_list_preco = mr_cabec.num_Lista
@@ -987,6 +998,34 @@ FUNCTION pol1383_del_lista()#
       CALL log003_err_sql('DELETE','vdp_pre_mst_compl')
       RETURN FALSE
    END IF
+
+   DELETE FROM ctr_acesso
+    WHERE cod_refer = mr_cabec.num_Lista
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE','ctr_acesso')
+      RETURN FALSE
+   END IF
+
+   LET m_msg = 'Excluído Item da Lista de Preço ', mr_cabec.num_Lista
+   
+   INSERT INTO audit_vdp (
+     cod_empresa, 
+     num_pedido, 
+     tipo_informacao, 
+     tipo_movto, 
+     texto, 
+     num_programa, 
+     data, 
+     hora, 
+     usuario) VALUES( 
+        mr_cabec.cod_empresa,0,'I','E',
+        m_msg,'POL1383',l_dat_atu,l_hor_atu,p_user)
+        
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','audit_vdp')
+      RETURN FALSE
+   END IF  
    
    RETURN TRUE
 
@@ -1000,8 +1039,12 @@ FUNCTION pol1383_ins_item()#
    DEFINE l_campo          VARCHAR(30),
           l_num_trans      INTEGER,
           l_pre_min        LIKE desc_preco_item.pre_unit
+   DEFINE l_dat_atu        DATE,
+          l_hor_atu        CHAR(08)
    
-
+   LET l_dat_atu = TODAY
+   LET l_hor_atu = TIME
+   
    LET mr_cabec.cod_empresa      = ma_itens[m_ind].cod_empresa           
    LET mr_cabec.num_Lista        = ma_itens[m_ind].num_Lista             
    LET mr_cabec.den_lista        = ma_itens[m_ind].den_Lista             
@@ -1082,10 +1125,155 @@ FUNCTION pol1383_ins_item()#
             lr_lista_item.pre_unit_adic_ant)
         
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('INSERT','desc_preco_mest')
+      CALL log003_err_sql('INSERT','desc_preco_item')
       RETURN FALSE
    END IF
 
+   SELECT COUNT (cod_refer)
+     INTO m_count 
+     FROM ctr_acesso  
+    WHERE cod_refer = lr_lista_item.num_list_preco
+      AND ies_tip_infor = '3' 
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','ctr_acesso')
+      RETURN FALSE
+   END IF
+   
+   LET m_count = m_count + 1
+   
+   INSERT INTO ctr_acesso (
+      cod_refer, ies_tip_infor, num_ctr_acesso) 
+   VALUES(lr_lista_item.num_list_preco,'3',m_count)
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','ctr_acesso')
+      RETURN FALSE
+   END IF
+
+   LET l_pre_min = ma_itens[m_ind].preco_minimo
+
+   IF l_pre_min IS NULL THEN
+      LET l_pre_min = 0
+   END IF
+
+   INSERT INTO vdp_pre_it_audit ( 
+    empresa,            
+    lista_preco,        
+    estado,             
+    cliente,            
+    linha_produto,      
+    linha_receita,      
+    segmento_mercado,   
+    classe_uso,         
+    item,               
+    preco_unitario,     
+    desc_lista_preco,   
+    desc_adic_lpre,     
+    grupo,              
+    acabamento,         
+    condicao_pagto,     
+    pre_unit_adicional, 
+    pre_unit_anterior,  
+    pre_unit_adic_ant,  
+    preco_minimo,       
+    dat_auditoria,      
+    usuario) VALUES (lr_lista_item.cod_empresa,     
+                     lr_lista_item.num_list_preco,
+                     lr_lista_item.cod_uni_feder,
+                     lr_lista_item.cod_cliente,
+                     lr_lista_item.cod_lin_prod, 
+                     lr_lista_item.cod_lin_recei,
+                     lr_lista_item.cod_seg_merc, 
+                     lr_lista_item.cod_cla_uso,  
+                     lr_lista_item.cod_item,      
+                     lr_lista_item.pre_unit,                           
+                     lr_lista_item.pct_desc,                           
+                     lr_lista_item.pct_desc_adic,                      
+                     lr_lista_item.cod_grupo,                          
+                     lr_lista_item.cod_acabam,                         
+                     lr_lista_item.cod_cnd_pgto,                       
+                     lr_lista_item.pre_unit_adic,                       
+                     lr_lista_item.pre_unit_ant,                  
+                     lr_lista_item.pre_unit_adic_ant,             
+                     l_pre_min,   
+                     l_dat_atu,
+                     p_user)                  
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','vdp_pre_it_audit')
+      RETURN FALSE
+   END IF
+
+   LET m_msg = 'Incluido de lista de preco 2001 ',lr_lista_item.num_list_preco
+
+   INSERT INTO audit_vdp (   
+     cod_empresa,            
+     num_pedido,             
+     tipo_informacao,        
+     tipo_movto,             
+     texto,                  
+     num_programa,           
+     data,                   
+     hora,                   
+     usuario) VALUES(mr_cabec.cod_empresa,              
+                     0,'I','I',m_msg,'POL1383',  
+                     l_dat_atu,l_hor_atu,p_user) 
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','audit_vdp')
+      RETURN FALSE
+   END IF
+                                            
+   INSERT INTO vdp_audit_lpre (
+      empresa,                    
+      lista_preco,                
+      unid_federal,               
+      cliente,                    
+      linha_produto,              
+      linha_receita,              
+      segmto_mercado,             
+      classe_uso,                 
+      item,                       
+      preco_unit,                 
+      pct_desc,                   
+      pct_desc_adicional,         
+      grupo,                      
+      acabamto,                   
+      cond_pagto,                 
+      pre_unit_adicional,         
+      preco_unit_ant,             
+      pre_uni_adic_ant,           
+      usuario,                    
+      dat_alteracao,              
+      programa) 
+    VALUES(mr_cabec.cod_empresa, 
+           lr_lista_item.num_list_preco,   
+           lr_lista_item.cod_uni_feder,              
+           lr_lista_item.cod_cliente,                
+           lr_lista_item.cod_lin_prod,               
+           lr_lista_item.cod_lin_recei,              
+           lr_lista_item.cod_seg_merc,               
+           lr_lista_item.cod_cla_uso,                
+           lr_lista_item.cod_item,                   
+           lr_lista_item.pre_unit,                                     
+           lr_lista_item.pct_desc,                                     
+           lr_lista_item.pct_desc_adic,                                
+           lr_lista_item.cod_grupo,                                    
+           lr_lista_item.cod_acabam,                                   
+           lr_lista_item.cod_cnd_pgto,                                 
+           lr_lista_item.pre_unit_adic,                                 
+           lr_lista_item.pre_unit_ant,                            
+           lr_lista_item.pre_unit_adic_ant,              
+           p_user,                                   
+           l_dat_atu,                                
+           'POL1383')                                
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','vdp_audit_lpre')
+      RETURN FALSE
+   END IF
+   
    DELETE FROM vdp_pre_item_compl
     WHERE empresa = lr_lista_item.cod_empresa
       AND lista_preco = lr_lista_item.num_list_preco
@@ -1116,7 +1304,6 @@ FUNCTION pol1383_ins_item()#
    END IF
    
    LET l_num_trans = l_num_trans + 1
-   LET l_pre_min = ma_itens[m_ind].preco_minimo
    LET l_campo = 'PRECO MINIMO'
    
    INSERT INTO vdp_pre_item_compl(
@@ -1154,8 +1341,8 @@ FUNCTION pol1383_ins_item()#
 
    RETURN TRUE
 
-END FUNCTION
-
+END FUNCTION 
+ 
 #--------------------------#
 FUNCTION pol1383_ins_mest()#
 #--------------------------#

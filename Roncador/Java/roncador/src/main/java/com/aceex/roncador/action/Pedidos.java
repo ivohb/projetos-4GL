@@ -2,6 +2,7 @@ package main.java.com.aceex.roncador.action;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,19 +33,22 @@ import main.java.com.aceex.roncador.model.PedItemSical;
 import main.java.com.aceex.roncador.model.Pedido;
 import main.java.com.aceex.roncador.model.PedidoErro;
 import main.java.com.aceex.roncador.model.PedidoSical;
+import main.java.com.aceex.roncador.util.Arquivo;
 import main.java.com.aceex.roncador.util.Biblioteca;
 
 public class Pedidos {
 
-	private List<PedItemSical> itens = new ArrayList<PedItemSical>();
-	private List<PedidoSical> pedidos = new ArrayList<PedidoSical>();
-	private List<PedComplSical> pedCompls = new ArrayList<PedComplSical>();
+	private List<PedItemSical> itens;
+	private List<PedidoSical> pedidos;
+	private List<PedComplSical> pedCompls;
 
 	private PedidoSical pedSical;
 	private PedidoErro pe;
 	private String codEmpresa;
 	private String cnpj;
-	private String codCliente;
+	private String cnpjEmpressa;
+	private String datCorte;
+	
 	private List<PedidoErro> erros;
 
 	private Pedido pedidoLogix;
@@ -67,29 +71,39 @@ public class Pedidos {
 		try {
 			List<Empresa> empresas = eDao.getEmpresas();
 			for (Empresa empresa : empresas) {
-				cnpj = bib.tiraFormato(empresa.getCnpj());
+				cnpjEmpressa = empresa.getCnpj();
+				cnpj = bib.tiraFormato(cnpjEmpressa);
+				datCorte = empresa.getDatCorte();
+				
 				if (cnpj.length() == 15) {
 					cnpj = cnpj.substring(1, 15);
 				}
 				codEmpresa = empresa.getCodigo();	
-				log.info(" empresa = "+codEmpresa);
+				log.info("empresa: "+codEmpresa+" Cnpj: "+cnpj+" Corte: "+datCorte);
 				processa();
 			}		
 
 		} catch (SQLException e1) {
 			log.info(e1.getMessage()+" "+e1.getCause());
+			log.info(new RuntimeException(e1));
 			e1.printStackTrace();
 		}
 	}
 	
 	private void processa() {
+
+		itens = new ArrayList<PedItemSical>();
+		pedidos = new ArrayList<PedidoSical>();
+		pedCompls = new ArrayList<PedComplSical>();
+
 		try {
 			buscaPedidos();
 			gravaPedidos();			
 			consistir();
 			integrar();
 		} catch (Exception e) {
-			log.info("Erro: PedidosBean.processa ");
+			log.info("Erro: Pedidos.processa - "+e.getMessage()+" "+e.getCause());
+			log.info(new RuntimeException(e));
 			e.printStackTrace();
 		}				
 		
@@ -101,14 +115,14 @@ public class Pedidos {
 		PedidoSical[] pedsSical = null;		
 		Gson gson = new Gson();
 
-		String cnpjEmpressa =  bib.formataCnpjCpf(cnpj);
-								
+		log.info("Leitura do XML");
 		List<String> lXML = new MetodosSoap(cnpj,"mds123",false).getPedidos();
-				
 		//String xmlBase = new Arquivo().getArquivo();
-		//List<String> lXML = new ArrayList<String>();
-		
+		//List<String> lXML = new ArrayList<String>();		
 		//lXML.add(xmlBase);
+
+		log.info("Leitura do XML concluida");
+				
 
     	for(int i=0;i< lXML.size() ;i++) {
     		
@@ -124,6 +138,7 @@ public class Pedidos {
     			for (PedidoSical p : pedsSical) {
     				
     				p.setCnpj_empresa(cnpjEmpressa);
+    				p.setCod_empresa(codEmpresa);
     				
     				String cnpjCliente = bib.formataCnpjCpf(p.getCNPJ_CPF_cliente());
     				p.setCNPJ_CPF_cliente(cnpjCliente);
@@ -170,8 +185,11 @@ public class Pedidos {
     	}
     	
     	if (pedidos.size() > 0) {
+    		
+    		log.info("Quantidade de pedidos lidos: "+pedidos.size());
+    		
     		try {
-    			String nomeArq = bib.dataPesquisa(0);
+    			String nomeArq = cnpj.trim()+" "+bib.dataPesquisa(0);
     			nomeArq = nomeArq.trim()+" "+bib.horaAtual();
     			nomeArq = nomeArq.trim()+".xml";
     			String path = System.getProperty("catalina.home")+"\\xml\\";
@@ -247,10 +265,13 @@ public class Pedidos {
 	private void gravaPedidos( ) throws Exception {
 		
 		PedidoSicalDao psDao = fd.getPedidoSicalDao();
-				
+
+		log.info("Gravando pedidos..."+pedidos.size());
+		
 		for (PedidoSical ps : pedidos) {
-			
-			Integer numVersao = psDao.getVersao(ps.getCnpj_empresa(), ps.getNum_pedido());
+						
+			Integer numVersao = psDao.getVersao(
+					ps.getCnpj_empresa(), ps.getNum_pedido());
 			
 			if (numVersao > 0) {
 				Integer pedLogix = psDao.getPedidoLogix(numVersao,
@@ -265,9 +286,11 @@ public class Pedidos {
 			ps.setNum_versao(numVersao);
 			ps.setVersao_atual("S");
 			ps.setSituacao("N");
-			ps.setCod_empresa(codEmpresa);
+			//ps.setCod_empresa(codEmpresa);
 			
 			psDao.inserir(ps);
+			
+			log.info("Pedido gravado: "+ps.getNum_pedido());
 		}
 
 		PedComplSicalDao pcsDao = fd.getPedComplSicalDao();
@@ -275,18 +298,31 @@ public class Pedidos {
 		for (PedComplSical pcs : pedCompls) {	
 			
 			Integer numVersao = psDao.getVersao(
-					 pcs.getCnpj_empresa(), pcs.getNum_pedido(), "N");
-			pcs.setNum_versao(numVersao);
+					 pcs.getCnpj_empresa(), pcs.getNum_pedido());
+			pcs.setNum_versao(numVersao);						
 			pcsDao.inserir(pcs);
+			log.info("Texto gravado: "+pcs.getNum_versao());
 		}
 
 		PedItemSicalDao pisDao = fd.getPedItemSicalDao();
 		
 		for (PedItemSical pis : itens) {
 			Integer numVersao = psDao.getVersao(
-					pis.getCnpj_empresa(), pis.getNum_pedido(), "N");
+					pis.getCnpj_empresa(), pis.getNum_pedido());
 			pis.setNum_versao(numVersao);
-			pisDao.inserir(pis);
+			log.info("Texto gravado: "+pis.getNum_versao());
+			
+			try {
+				if (pisDao.isItem(pis)) {
+					pisDao.atualizar(pis);
+				} else {
+					pisDao.inserir(pis);
+				}
+				log.info("Produto gravado: "+pis.getCod_produto());
+			} catch (Exception e) {
+				log.info("Erro gravando pis - "+e.getMessage()+" "+e.getCause());
+				log.info(e.getStackTrace().toString());
+			}
 		}
 		
 	}
@@ -294,9 +330,12 @@ public class Pedidos {
 	private void consistir() throws Exception {
 		
 		PedidoSicalDao psDao = fd.getPedidoSicalDao();		
-		pedidos = psDao.listaPedido();
+		pedidos = psDao.listaPedido(datCorte, codEmpresa, cnpjEmpressa);
+
+		log.info("Consistencia dos pedidos da emprsa "+codEmpresa);
 
 		for (PedidoSical ps : pedidos) {
+						
 			this.pedSical = ps;
 			erros = new ArrayList<PedidoErro>();
 
@@ -304,22 +343,27 @@ public class Pedidos {
 
 			peDao = fd.getPedidoErroDao();
 			
-			peDao.excluir(pedSical.getCnpj_empresa(), ps.getNum_pedido());
+			peDao.excluir(pedSical.getNum_versao(), 
+					pedSical.getCnpj_empresa(), ps.getNum_pedido());
 			
 			String situacao = "I";
 			
 			if (erros.size() > 0) {				
 				for (PedidoErro pe : erros) {
 					peDao.inserir(pe);
+					log.info("Erro "+pe.getMensagem());
 				}
 				situacao = "C";
 			}
-			psDao.atuStatus(pedSical.getCnpj_empresa(), situacao, pedSical.getNum_pedido());
+			psDao.atuStatus(
+				pedSical.getCnpj_empresa(), situacao, pedSical.getNum_pedido());
 		}
 	}
 
 	private void consistePedido() {
-		
+
+		log.info("Consistindo pedido "+pedSical.getNum_pedido());
+
 		String msg = null;
 		
 		if (pedSical.getTipo_pedido() == null || pedSical.getTipo_pedido().isEmpty() ) {
@@ -343,24 +387,34 @@ public class Pedidos {
 		} else {
 			ClientesDao cliDao = fd.getClientesDao();
 			try {
-				this.codCliente = cliDao.getCodigo(pedSical.getCNPJ_CPF_cliente());
-				if (this.codCliente == null || this.codCliente.isEmpty()) {
-					msg="Cliente "+pedSical.getCNPJ_CPF_cliente().trim()+" não existe no logix";
+				String codCliente = cliDao.getCodigo(
+						pedSical.getCNPJ_CPF_cliente(), pedSical.getIE_cliente());
+				log.info("Cod cliente: "+codCliente);
+				
+				if (codCliente == null || codCliente.isEmpty()) {
+					msg="Cliente "+pedSical.getCNPJ_CPF_cliente()+"/"+pedSical.getIE_cliente()
+					+" não existe no logix";
 					addError(msg);
 				} else {
+					/*
 					ParametrosDao paramDao = fd.getParametrosDao();
 					CliCanalVenda cc = paramDao.getCanal(codCliente);
+					log.info("Canal venda: "+cc);
 					if (cc == null) {
 						msg="Cliente "+pedSical.getCNPJ_CPF_cliente().trim()+" sem canal de vendas";
 						addError(msg);						
-					}
+					} else {
+						log.info("Canal venda: "+cc.getCodTipCarteira());
+					}*/
 				}
-			} catch (SQLException e) {				
+			} catch (Exception e) {		
+				log.info("Erro: "+e.getMessage()+" "+e.getCause());
+				log.info(e.getStackTrace());
 				e.printStackTrace();
 			}
 		}
 
-		if (pedSical.getCod_cond_pagto() == null || pedSical.getCod_cond_pagto().isEmpty()) {
+		/*if (pedSical.getCod_cond_pagto() == null || pedSical.getCod_cond_pagto().isEmpty()) {
 			addError("O campo cod_cond_pagto está nulo");
 		} else {
 			try {
@@ -371,10 +425,12 @@ public class Pedidos {
 					addError("Cond pgto "+pedSical.getCod_cond_pagto().trim()+
 							" não cadastrado no de-para");
 				}				
-			} catch (SQLException e) {				
+			} catch (Exception e) {		
+				log.info("Erro: "+e.getMessage()+" "+e.getCause());
+				log.info(e.getStackTrace());
 				e.printStackTrace();
 			}
-		}
+		}*/
 
 		if (pedSical.getDt_emissao() == null || pedSical.getDt_emissao().isEmpty()) {
 			addError("O campo dt_emissao está nulo");
@@ -392,8 +448,9 @@ public class Pedidos {
 				} else {
 					addError("Alteração de pedido inexistente ou cancelado");
 				}
-			} catch (SQLException e) {
-				
+			} catch (Exception e) {		
+				log.info("Erro: "+e.getMessage()+" "+e.getCause());
+				log.info(e.getStackTrace());
 				e.printStackTrace();
 			}
 		}
@@ -418,7 +475,28 @@ public class Pedidos {
 			}
 		}
 
+		if (erros.size() == 0) {
+			try {
+				ParametrosDao paramDao = fd.getParametrosDao();
+				NatOperSical nos = paramDao.getNatOper(
+						pedSical.getTipo_pedido(), pedSical.getEntrega_futura());
+				if (nos == null) {
+					msg = "Nat operação não cadastrada no POL1391 para: ";
+					msg = msg+pedSical.getTipo_pedido()+"/"+pedSical.getEntrega_futura();
+					addError(msg);
+					log.info(msg);
+				} else {
+					log.info(nos.getCod_nat_remessa()+" "+nos.getCod_nat_remessa());
+				}
+			} catch (Exception e) {		
+				log.info("Erro: "+e.getMessage()+" "+e.getCause());
+				log.info(e.getStackTrace());
+				e.printStackTrace();
+			}			
+		}
+		
 		consisteItens();
+		
 	}
 	
 	private void consisteItens() {
@@ -434,17 +512,20 @@ public class Pedidos {
 			}
 		} catch (SQLException e) {
 			addError(e.getMessage()+" - "+e.getCause());
+			log.info(e.getStackTrace());
 			e.printStackTrace();
 			return;
 		}
-
+		
 		for (PedItemSical pis : itens) {
 			consisteItem(pis);
 		}		
 	}
 
 	private void consisteItem(PedItemSical pis) {
-		
+
+		log.info("Consistindo produto "+pis.getCod_produto());
+
 		if (pis.getPreco_unitario() == null || pis.getPreco_unitario().isEmpty()) {
 			addError("O campo preco_unitario está nulo");
 		}
@@ -476,6 +557,7 @@ public class Pedidos {
 	
 	private void addError(String msg) {
 		pe = new PedidoErro();
+		pe.setVersao(pedSical.getNum_versao());
 		pe.setEmpresa(pedSical.getCnpj_empresa());
 		pe.setPedido(pedSical.getNum_pedido());
 		pe.setMensagem(msg);
@@ -484,15 +566,18 @@ public class Pedidos {
 
 	private void integrar() throws Exception {
 		
+		log.info("Integrando na carteira logix");
+		
 		PedidoSicalDao psDao = fd.getPedidoSicalDao();		
-		List<PedidoSical> lstPedidos = psDao.listaPedido("I");
+		List<PedidoSical> lstPedidos = 
+				psDao.listaPedido(datCorte, codEmpresa, "I", cnpjEmpressa);
 
+		log.info("Qtd pedidos a integrar "+lstPedidos.size());
+		
 		if (lstPedidos.size() == 0) {
 			return;
 		}
 
-		PedComplSicalDao pcsDao = fd.getPedComplSicalDao();
-		PedComplSical pcs = null;
 		PedItemSicalDao pisDao = fd.getPedItemSicalDao();
 		List<PedItemSical> itens = new ArrayList<PedItemSical>();
 		ClientesDao cliDao = fd.getClientesDao();
@@ -501,11 +586,12 @@ public class Pedidos {
 		
 		for (PedidoSical ps : lstPedidos) {
 
-			String codClient = cliDao.getCodigo(ps.getCNPJ_CPF_cliente());
-			cliCanal = paramDao.getCanal(codClient);
-
-			pcs = pcsDao.getCompl(ps.getCnpj_empresa(), 
-					ps.getNum_pedido(), ps.getNum_versao());
+			log.info("Integrando pedido: "+ps.getNum_pedido());
+			
+			String codClient = cliDao.getCodigo(
+					ps.getCNPJ_CPF_cliente(), ps.getIE_cliente());
+			
+			//cliCanal = paramDao.getCanal(codClient);
 
 			itens = pisDao.listaItens(ps.getCnpj_empresa(), 
 					ps.getNum_pedido(), ps.getNum_versao());
@@ -514,13 +600,16 @@ public class Pedidos {
 				if (ps.getPedido_logix() == 0) {
 					parvdp = paramDao.getProxnum(codEmpresa);
 					paramDao.atualizar(codEmpresa, (parvdp.getNumProxPedido() + 1));		
-					setPedidoLogix(ps, pcs, codClient);
+					setPedidoLogix(ps, codClient);
 					
 					try {
 						pedDao.inserir(pedidoLogix, ps, itens);
+						log.info("Pedido inserido: "+pedidoLogix.getNumPedido());
 					} catch (Exception e) {
 						e.printStackTrace();
 						pedDao.abortaConec();
+						log.info("Erro: "+e.getMessage()+" "+e.getCause());
+						log.info(e.getStackTrace());
 						break;
 					}
 					
@@ -528,20 +617,20 @@ public class Pedidos {
 					// pedDao.atualiza(ps, pcs, itens);
 				}
 			}
-		}
-		
+		}		
 	}
 	
-	private void setPedidoLogix(PedidoSical ps, 
-			PedComplSical pcs, String client) throws Exception {
+	private void setPedidoLogix(PedidoSical ps, String client) throws Exception {
 		
 		String data = bib.dataExibicao(ps.getDt_emissao(), "MM/dd/yyyy");
 		
-		Integer codCond = Integer.parseInt(ps.getCod_cond_pagto().trim());
-		codCond = paramDao.getCndPgto(codEmpresa, codCond);
+		Integer codCond = 1;// Integer.parseInt(ps.getCod_cond_pagto().trim());
+		//codCond = paramDao.getCndPgto(codEmpresa, codCond);
 		
 		NatOperSical nos = paramDao.getNatOper(
-				codEmpresa, ps.getTipo_pedido(), ps.getEntrega_futura());
+				ps.getTipo_pedido(), ps.getEntrega_futura());
+		
+		log.info(nos.getCod_nat_remessa()+" "+nos.getCod_nat_remessa());
 		
 		pedidoLogix = new Pedido();
 		pedidoLogix.setCodCliente(client);		
@@ -550,25 +639,29 @@ public class Pedidos {
 		pedidoLogix.setCodMoeda(parvdp.getCodMoeda());		
 		pedidoLogix.setCodNatOper(nos.getCod_nat_venda()); 
 		pedidoLogix.setNatOperRemessa(nos.getCod_nat_remessa());
-		pedidoLogix.setCodRepres(cliCanal.getCodNivel1());
+		//pedidoLogix.setCodRepres(cliCanal.getCodNivel1());
+		pedidoLogix.setCodRepres(300); //a pedido do rubens
 		pedidoLogix.setCodRepresAdic(0);
-		pedidoLogix.setCodTipCarteira(cliCanal.getCodTipCarteira());
+		//pedidoLogix.setCodTipCarteira(cliCanal.getCodTipCarteira());
+		pedidoLogix.setCodTipCarteira("01"); //a pedido do rubens
 		pedidoLogix.setCodTipVenda(1); //ver
 		pedidoLogix.setDatPedido(data);
 		pedidoLogix.setDatAltSit(data);
 		pedidoLogix.setDatEmisRepres(data);
-		pedidoLogix.setIesAceite("S");
+		pedidoLogix.setIesAceite("N");
 		pedidoLogix.setIesComissao("N"); //ver
 		pedidoLogix.setIesEmbalPadrao("3");
 		pedidoLogix.setIesFinalidade(1);
 
+		/*
 		String tipFrete = ps.getTipo_frete();
 		if (tipFrete == null || tipFrete.equalsIgnoreCase("1") || tipFrete.isEmpty()) {
 			pedidoLogix.setIesFrete(1);
 		} else {
 			pedidoLogix.setIesFrete(3);
-		}
-
+		}*/
+		
+		pedidoLogix.setIesFrete(3);
 		pedidoLogix.setIesPreco("F");
 
 		String tipPedido = ps.getPedido_bloqueado();
@@ -587,8 +680,54 @@ public class Pedidos {
 		pedidoLogix.setPctDescAdic(Double.parseDouble("0")); //ver
 		pedidoLogix.setPctDescFinanc(Double.parseDouble("0")); //ver
 		pedidoLogix.setPctFrete(Double.parseDouble("0")); //ver
-		pedidoLogix.setObsNf(pcs.getObs_nota_fiscal());
-		pedidoLogix.setObsPedido(pcs.getObs());
 
+		PedComplSicalDao pcsDao = fd.getPedComplSicalDao();
+
+		List<PedComplSical> lista = pcsDao.getLista(ps.getCnpj_empresa(), 
+				ps.getNum_pedido(), ps.getNum_versao());
+		int contador = 0;
+		
+		String texto = "";
+		String obs = "";
+		
+		for (PedComplSical pcs : lista) {
+			
+			texto = pcs.getObs_nota_fiscal();
+			if (texto.length() > 76) {
+				texto = texto.substring(0, 76);
+			}
+			
+			obs   = pcs.getObs();
+			if (obs.length() > 76) {
+				obs = obs.substring(0, 76);
+			}
+			
+			if (texto.contains("{")) {
+				texto = "";
+			}
+			if (obs.contains("{")) {
+				obs = "";
+			}
+			contador++;
+			
+			if (contador == 1) {
+				pedidoLogix.setObsNf(texto);
+				pedidoLogix.setObsPedido(obs);
+			} else if (contador == 2) {
+				pedidoLogix.setObs2Nf(texto);
+				pedidoLogix.setObs2Pedido(obs);				
+			} else if (contador == 3) {
+				pedidoLogix.setObs3Nf(texto);
+				pedidoLogix.setObs3Pedido(obs);								
+			} else if (contador == 4) {
+				pedidoLogix.setObs4Nf(texto);
+				pedidoLogix.setObs4Pedido(obs);				
+			} else if (contador == 5) {
+				pedidoLogix.setObs5Nf(texto);
+				pedidoLogix.setObs5Pedido(obs);								
+			}
+		}
+
+		log.info("Pedido logix: "+pedidoLogix.getNumPedido());
 	}
 }

@@ -145,7 +145,7 @@ FUNCTION pol1393_menu()#
    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
 
    CALL pol1393_cria_campos(l_panel)
-   #CALL pol1393_cria_grade(l_panel)
+   CALL pol1393_cria_grade(l_panel)
 
    CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
 
@@ -221,7 +221,6 @@ FUNCTION pol1393_cria_campos(l_container)#
 
 END FUNCTION
 
-{
 #---------------------------------------#
 FUNCTION pol1393_cria_grade(l_container)#
 #---------------------------------------#
@@ -242,78 +241,84 @@ FUNCTION pol1393_cria_grade(l_container)#
     CALL _ADVPL_set_property(m_browse,"ALIGN","CENTER")
     
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Emp")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Per")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",40)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_empresa")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","pessoal")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Lista")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Funcionário")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",140)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","funcionario")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Identif")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","funcio_id")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Relatorio")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","relat_key")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Empresa")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","num_Lista")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","empresa")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Despesa")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","despesa")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Moeda")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","moeda")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Tp Desp")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tip_desp")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_Lista")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_desp")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Valid ini")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Cent cust")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","dat_val_ini")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cent_cust")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Valid fim")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","dat_val_fim")
-
-    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","B. ped")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",50)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","bloqueia_pedido")
-
-    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","B. fat")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",50)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","bloqueia_faturamento")
-
-    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Moeda")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_moeda")
-
-    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","U Med")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",50)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","unid_medida")
-
-    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Cliente")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_cliente")
-
-    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","AEN")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Situação")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",70)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","area_e_linha")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","situacao")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Item")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Dt emis")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","dat_emissao")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Dt pgto")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_item")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","dat_pagto")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Pre Unit")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Tip pgto")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","preco_unit")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tip_pgto")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Pre mínimo")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","preco_minimo")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Num AD")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","num_ad")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Mensagem")
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","mensagem")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Num AP")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","num_ap")
 
     CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_itens,1)
     CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
@@ -326,4 +331,17 @@ FUNCTION pol1393_ativa_campo(l_status)#
    
    DEFINE l_status       SMALLINT
    
-    CALL _ADVPL_set_property(m_carga,"ENABLE",FALSE) 
+    CALL _ADVPL_set_property(m_arquivo,"ENABLE",not l_status) 
+    CALL _ADVPL_set_property(m_carga,"ENABLE",l_status) 
+    CALL _ADVPL_set_property(m_funcio,"ENABLE",l_status) 
+    CALL _ADVPL_set_property(m_relat,"ENABLE",l_status) 
+    CALL _ADVPL_set_property(m_ad,"ENABLE",l_status) 
+    CALL _ADVPL_set_property(m_ap,"ENABLE",l_status) 
+
+END FUNCTION
+
+  
+ 
+  
+     
+     

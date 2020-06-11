@@ -73,7 +73,7 @@ public class Pedidos {
 			for (Empresa empresa : empresas) {
 				cnpjEmpressa = empresa.getCnpj();
 				cnpj = bib.tiraFormato(cnpjEmpressa);
-				datCorte = empresa.getDatCorte();
+				datCorte = empresa.getDatCorte();				
 				
 				if (cnpj.length() == 15) {
 					cnpj = cnpj.substring(1, 15);

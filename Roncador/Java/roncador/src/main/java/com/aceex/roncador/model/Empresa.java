@@ -1,7 +1,6 @@
 package main.java.com.aceex.roncador.model;
 
 import java.io.Serializable;
-import java.sql.Date;
 
 public class Empresa implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -35,6 +34,6 @@ public class Empresa implements Serializable {
 	public void setDatCorte(String datCorte) {
 		this.datCorte = datCorte;
 	}
-	
+
 	
 }

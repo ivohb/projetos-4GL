@@ -266,6 +266,12 @@ public class PedidoSicalDao extends Dao {
 	public List<PedidoSical> listaPedido(String datCorte,
 			String codEmpresa, String cnpj) throws SQLException {
 		
+		log.info("codEmpresa "+codEmpresa+" Corte: "+datCorte);
+		
+		if (datCorte == null) {
+			datCorte = "2020-05-01";
+		}
+		
 		List<PedidoSical> pedidos = new ArrayList<PedidoSical>();
 		PedidoSical ps = null;
 		Connection con = getConexao();
@@ -279,11 +285,12 @@ public class PedidoSicalDao extends Dao {
 		query += " FROM pedido_sical WHERE cod_empresa = '"+codEmpresa+"' ";
 		query += " and cnpj_empresa = '"+cnpj+"' ";
 		query += " AND (situacao = 'N' OR situacao = 'C') and versao_atual = 'S' ";
-		query += " AND SUBSTR(dt_emissao,1,10)) >= '"+datCorte+"' ";
+		query += " AND SUBSTR(dt_emissao,1,10) >= ? ";
 
 		log.info(query);
 
 		stmt = con.prepareStatement(query);
+		stmt.setString(1, datCorte);	
 		rs = stmt.executeQuery();
 
 		while (rs.next()) {
@@ -315,8 +322,13 @@ public class PedidoSicalDao extends Dao {
 
 	public List<PedidoSical> listaPedido(String datCorte,
 			String codEmpresa, String situacao, String cnpj) throws SQLException {
-		log.info("codEmpresa "+codEmpresa+" Corte: "+datCorte);
 		
+		log.info("codEmpresa "+codEmpresa+" Corte: "+datCorte);
+
+		if (datCorte == null) {
+			datCorte = "2020-05-01";
+		}
+
 		List<PedidoSical> pedidos = new ArrayList<PedidoSical>();
 		PedidoSical ps = null;
 		Connection con = getConexao();

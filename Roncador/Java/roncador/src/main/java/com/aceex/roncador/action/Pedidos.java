@@ -414,13 +414,13 @@ public class Pedidos {
 			}
 		}
 
-		/*if (pedSical.getCod_cond_pagto() == null || pedSical.getCod_cond_pagto().isEmpty()) {
+		if (pedSical.getCod_cond_pagto() == null || pedSical.getCod_cond_pagto().isEmpty()) {
 			addError("O campo cod_cond_pagto está nulo");
 		} else {
 			try {
 				ParametrosDao paramDao = fd.getParametrosDao();
 				Integer codCond = Integer.parseInt(pedSical.getCod_cond_pagto().trim());
-				codCond = paramDao.getCndPgto(codEmpresa, codCond);
+				codCond = paramDao.getCndPgto(codCond);
 				if (codCond == null) {
 					addError("Cond pgto "+pedSical.getCod_cond_pagto().trim()+
 							" não cadastrado no de-para");
@@ -430,7 +430,7 @@ public class Pedidos {
 				log.info(e.getStackTrace());
 				e.printStackTrace();
 			}
-		}*/
+		}
 
 		if (pedSical.getDt_emissao() == null || pedSical.getDt_emissao().isEmpty()) {
 			addError("O campo dt_emissao está nulo");
@@ -624,8 +624,8 @@ public class Pedidos {
 		
 		String data = bib.dataExibicao(ps.getDt_emissao(), "MM/dd/yyyy");
 		
-		Integer codCond = 1;// Integer.parseInt(ps.getCod_cond_pagto().trim());
-		//codCond = paramDao.getCndPgto(codEmpresa, codCond);
+		Integer codCond = Integer.parseInt(ps.getCod_cond_pagto().trim());
+		codCond = paramDao.getCndPgto(codCond);
 		
 		NatOperSical nos = paramDao.getNatOper(
 				ps.getTipo_pedido(), ps.getEntrega_futura());
@@ -651,7 +651,12 @@ public class Pedidos {
 		pedidoLogix.setIesAceite("N");
 		pedidoLogix.setIesComissao("N"); //ver
 		pedidoLogix.setIesEmbalPadrao("3");
-		pedidoLogix.setIesFinalidade(1);
+		
+		if (ps.getIE_cliente() == null || ps.getIE_cliente().contains("ISE") ) {
+			pedidoLogix.setIesFinalidade(2);
+		} else {
+		    pedidoLogix.setIesFinalidade(1);
+		}
 
 		/*
 		String tipFrete = ps.getTipo_frete();

@@ -125,17 +125,16 @@ public class ParametrosDao extends Dao {
 		return codLogix;
 	}
 
-	public Integer getCndPgto(String codEmpresa, Integer codSical) throws SQLException {
+	public Integer getCndPgto(Integer codSical) throws SQLException {
 
 		Integer codLogix = null;
 		String query = "";
 		 
-		query += "select cod_logix from de_para_cond_pgto ";
-		query += " where cod_empresa =  ? and cod_sical = ?";
+		query += "select cod_logix from cnd_pgto_sical ";
+		query += " where cod_sical = ? ";
 
 		stmt = getConexao().prepareStatement(query);
-		stmt.setString(1, codEmpresa);
-		stmt.setInt(2, codSical);
+		stmt.setInt(1, codSical);
 
 		rs = stmt.executeQuery();
 

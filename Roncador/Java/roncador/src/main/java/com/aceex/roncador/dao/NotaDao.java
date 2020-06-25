@@ -159,8 +159,9 @@ public class NotaDao extends Dao {
 
 		String query =
 			"INSERT INTO nota_sical "
-			+ "(cod_empresa, num_transac, num_nota, serie, pedido_sical, sit_nota) "
-			+ " VALUES(?,?,?,?,?,?)";	
+			+ "(cod_empresa, num_transac, num_nota, serie, "
+			+ " pedido_sical, sit_nota, qtd_item) "
+			+ " VALUES(?,?,?,?,?,?,?)";	
 
 		PreparedStatement stmt = con.prepareStatement(query); 
 		stmt.setString(1, nota.getEmpresa());
@@ -173,6 +174,7 @@ public class NotaDao extends Dao {
 		}
 		stmt.setInt(5, pedSical);
 		stmt.setString(6, nota.getSit_nota());
+		stmt.setDouble(7, nota.getQuant());
 		
 		stmt.executeUpdate();
 		stmt.close();

@@ -21,22 +21,40 @@ public class ClientesDao extends Dao {
 	
 	public String getCodigo(String cnpj, String insc) throws SQLException {
 		
-		log.info("Cnpj:"+cnpj+"Inscricao:"+insc+"X");
+		log.info("Cnpj:"+cnpj+"Inscricao:"+insc);
 		
 		String codigo = null;
 		String query = "";
 
-		query += "select cod_cliente from clientes";
-		query += " where trim(num_cgc_cpf) =  ? and trim(ins_estadual) = ? ";
+		if (insc == null) {
+			insc = "ISENTO";
+		}
 
+		query  = "select cod_cliente from clientes ";
+		query += " where trim(num_cgc_cpf) =  ? ";
+	    query += " and trim(ins_estadual) = ? ";		
+						
 		stmt = getConexao().prepareStatement(query);
 		stmt.setString(1, cnpj.trim());
 		stmt.setString(2, insc.trim());
-
 		rs = stmt.executeQuery();
 
 		if (rs.next()) {
 			codigo = rs.getString("cod_cliente");
+		} else {
+			rs.close();
+			stmt.close();
+			
+			query = "select cod_cliente from clientes "
+				+ " where trim(num_cgc_cpf) =  ? ";
+			
+			stmt = getConexao().prepareStatement(query);
+			stmt.setString(1, cnpj.trim());
+			rs = stmt.executeQuery();
+			
+			if (rs.next()) {
+				codigo = rs.getString("cod_cliente");
+			}
 		}
 
 		rs.close();

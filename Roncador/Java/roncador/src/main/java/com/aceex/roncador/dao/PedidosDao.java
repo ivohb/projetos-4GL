@@ -214,13 +214,13 @@ public class PedidosDao extends Dao {
 			stmt.setInt(2, pedido.getNumPedido());
 			stmt.setInt(3, numSeq);
 			stmt.setDouble(4, 0);
-			stmt.setDouble(5, precoTabela);
+			stmt.setDouble(5, precoUnit);
 			stmt.setDouble(6, Double.parseDouble(pis.getQuant()));
 			stmt.setDouble(7, 0);
 			stmt.setDouble(8, Double.parseDouble(pis.getQuant_cancelada()));
 			stmt.setDouble(9, 0);
 			stmt.setDate(10, data);
-			stmt.setDouble(11, valDesc);
+			stmt.setDouble(11, 0);
 			stmt.setDouble(12, 0);
 			stmt.setDouble(13, 0);
 			stmt.setDouble(14, 0);

@@ -13,12 +13,17 @@ import main.java.com.aceex.roncador.dao.FabricaDao;
 import main.java.com.aceex.roncador.dao.NotaDao;
 import main.java.com.aceex.roncador.model.Empresa;
 import main.java.com.aceex.roncador.model.Nota;
+import main.java.com.aceex.roncador.util.Biblioteca;
 
 public class Notas {
 
 	private FabricaDao fd = new FabricaDao();
+	private Biblioteca bib = new Biblioteca();
+
 	private List<Nota> notasEmitidas;
 	private String codEmpresa;
+	private String cnpj;
+	private String datCorte;
 
 	private static Logger log = Logger.getLogger(Notas.class);
 
@@ -33,6 +38,17 @@ public class Notas {
 			for (Empresa empresa : empresas) {
 				codEmpresa = empresa.getCodigo();	
 				log.info(" empresa = "+codEmpresa);
+				cnpj = empresa.getCnpj();
+				cnpj = bib.tiraFormato(cnpj);
+
+				if (cnpj.length() == 15) {
+					cnpj = cnpj.substring(1, 15);
+				}
+				
+				datCorte = empresa.getDatCorte();				
+				
+				log.info("Empresa NF: "+codEmpresa+" Cnpj: "+cnpj+" Corte: "+datCorte);
+				
 				processa();
 			}		
 
@@ -80,7 +96,7 @@ public class Notas {
 		
 		xml = xml + "</NewDataSet>\r\n";
 		
-		retorno = new MetodosSoap("05872541000123", "mds123",false).enviaNotaCancelada(xml);
+		retorno = new MetodosSoap(cnpj, "mds123",false).enviaNotaCancelada(xml);
 		System.out.println(retorno);
 		
 		if (retorno.contains("sucesso")) {
@@ -106,7 +122,7 @@ public class Notas {
 
 		for (Nota nota : notasEmitidas) {
 			
-			log.info("Exportando nota "+nota.getNum_nota());
+			log.info("Exportando nota "+nota.getNum_nota()+"Quant "+nota.getQuant());
 			
 			if (nota.getPlaca_veiculo() == null) {
 				nota.setPlaca_veiculo(" ");
@@ -126,7 +142,7 @@ public class Notas {
 		
 		xml = xml + "</NewDataSet>\r\n";
 		
-		retorno = new MetodosSoap("05872541000123", "mds123",false).enviaNota(xml);
+		retorno = new MetodosSoap(cnpj, "mds123",false).enviaNota(xml);
 		System.out.println(retorno);
 		
 		if (retorno.contains("sucesso")) {

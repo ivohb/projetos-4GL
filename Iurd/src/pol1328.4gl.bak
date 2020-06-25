@@ -234,7 +234,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.107 "
+   LET p_versao = "pol1328-12.00.109 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -601,6 +601,8 @@ END FUNCTION
  FUNCTION pol1328_proc_nota()#
 #----------------------------#       
    
+   DEFINE l_num_nota    VARCHAR(09)
+   
    DEFINE l_dat_proces   CHAR(19),
           l_num_nf       CHAR(07),
           l_count        INTEGER,
@@ -628,7 +630,8 @@ END FUNCTION
       LET m_le_ap = FALSE
       
       IF mr_nota.ies_gera_nota = 'F' THEN
-         LET mr_nota.num_nf = mr_nota.num_nf_dig
+         LET l_num_nota = mr_nota.num_nf_dig USING '<<<<<<<<<'
+         LET mr_nota.num_nf = l_num_nota[1,7]
       END IF
             	 
       SELECT 
@@ -708,7 +711,7 @@ END FUNCTION
             
          ELSE      
             IF mr_nota.ies_gera_nota = 'F' THEN
-            	 IF mr_nota.num_nf IS NULL OR mr_nota.ser_nf = 0 THEN
+            	 IF mr_nota.num_nf IS NULL OR mr_nota.ser_nf IS NULL THEN
                   LET m_msg = 'Para pgto de ART é obrigaório informar a série da NF'
                   IF NOT pol1328_grava_erro() THEN
                      RETURN FALSE

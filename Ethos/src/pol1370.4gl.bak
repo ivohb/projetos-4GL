@@ -85,7 +85,8 @@ DEFINE m_caminho         CHAR(80),
        m_ies_carga       SMALLINT,
        m_tip_prog        CHAR(20),
        m_ies_processado  SMALLINT,
-       m_ies_status      CHAR(01)
+       m_ies_status      CHAR(01),
+       m_num_ped_cli     VARCHAR(30)
 
 DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
@@ -356,7 +357,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.38  "
+   LET p_versao = "POL1370-12.00.39  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
    
@@ -920,6 +921,7 @@ FUNCTION pol1370_ped_before_row()#
    LET m_num_pedido = ma_pedido[m_lin_atu].num_pedido
    LET m_cod_item = ma_pedido[m_lin_atu].cod_item
    LET m_ies_status = ma_pedido[m_lin_atu].situacao
+   LET m_num_ped_cli = ma_pedido[m_lin_atu].num_pc
    
    CALL pol1370_le_programacao() 
    
@@ -3161,6 +3163,8 @@ FUNCTION pol1370_monta_grades()#
    LET m_num_pedido = ma_pedido[1].num_pedido
    LET m_cod_item = ma_pedido[1].cod_item
    LET m_ies_status = ma_pedido[1].situacao
+   LET m_num_ped_cli = ma_pedido[1].num_pc
+
    CALL pol1370_le_programacao()
    
    RETURN TRUE
@@ -3584,10 +3588,7 @@ FUNCTION pol1370_atuali_audit()#
    LET ma_prog[m_ind].qtd_saldo = m_qtd_saldo                  
                                                       
    UPDATE edi_audit_547                                   
-    SET mensagem = ma_prog[m_ind].mensagem,               
-        qtd_solic = m_qtd_solic,                          
-        qtd_atual = m_qtd_saldo,                          
-        qtd_antes = m_qtd_saldo                           
+    SET mensagem = ma_prog[m_ind].mensagem             
    WHERE cod_empresa = p_cod_empresa                      
      AND id_registro = l_ld                               
    
@@ -4133,6 +4134,8 @@ FUNCTION pol1370_le_item_ped()#
    LET m_cod_cliente = mr_arquivo.cod_cliente
    LET m_id_pe1 = ma_pedido[m_ind].id_pe1
    LET m_item_cliente = ma_pedido[m_ind].item_cliente
+   LET m_num_ped_cli = ma_pedido[m_ind].num_pc
+
    LET m_situacao = 'N'
    LET m_msg = ''
       
@@ -4419,6 +4422,7 @@ FUNCTION pol1370_processar()#
    LET m_cod_item = ma_pedido[m_lin_ped].cod_item
    LET m_cod_it_cli = ma_pedido[m_lin_ped].item_cliente
    LET m_ies_status = ma_pedido[m_lin_ped].situacao
+   LET m_num_ped_cli = ma_pedido[m_lin_ped].num_pc
    
    CALL LOG_transaction_begin()
    
@@ -4472,7 +4476,7 @@ FUNCTION pol1370_proc_edi()#
           LET m_qtd_nova = ma_prog[l_ind].qtd_solic_nova
           LET m_qtd_saldo = ma_prog[l_ind].qtd_saldo
           LET m_qtd_antes = m_qtd_saldo
-          LET m_qtd_atual = m_qtd_saldo 
+          LET m_qtd_atual = m_qtd_nova 
           LET m_tip_prog = ma_prog[l_ind].programacao
           LET m_prz_entrega = ma_prog[l_ind].prz_entrega
           LET m_seq_prog = ma_prog[l_ind].num_sequencia
@@ -4551,6 +4555,7 @@ FUNCTION pol1370_grv_programacao()#
       ELSE                                
          LET mr_audit.operacao = 'ALTEROU SALDO' 
          LET m_qtd_atual = m_qtd_nova 
+         LET m_qtd_antes = m_qtd_saldo
          IF NOT pol1370_atu_prog('A') THEN    
             RETURN FALSE                      
          END IF                               
@@ -4582,6 +4587,35 @@ FUNCTION pol1370_grv_programacao()#
       RETURN FALSE
    END IF
    
+   SELECT 1 FROM ped_itens_texto
+    WHERE cod_empresa = p_cod_empresa
+      AND num_pedido = m_num_pedido 
+      AND num_sequencia = m_num_seq
+
+   IF STATUS = 100 THEN
+      INSERT INTO ped_itens_texto(
+         cod_empresa, num_pedido, num_sequencia, den_texto_1)
+       VALUES(p_cod_empresa, m_num_pedido, m_num_seq, m_num_ped_cli)
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('INSERT','ped_itens_texto')
+         RETURN FALSE
+      END IF
+   ELSE
+      IF STATUS = 0 THEN
+         UPDATE ped_itens_texto SET den_texto_1 = m_num_ped_cli
+          WHERE cod_empresa = p_cod_empresa
+            AND num_pedido = m_num_pedido 
+            AND num_sequencia = m_num_seq
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE','ped_itens_texto')
+            RETURN FALSE
+         END IF
+      ELSE   
+         CALL log003_err_sql('SELECT','ped_itens_textoo')
+         RETURN FALSE
+      END IF
+   END IF
+      
    UPDATE ped_itens_edi_547
       SET qtd_solic = m_qtd_solic,
           qtd_atend = m_qtd_atend,
@@ -4640,7 +4674,15 @@ FUNCTION pol1370_ins_audit()#
          RETURN FALSE
       END IF
    ELSE 
-      IF STATUS = 0 THEN
+      DECLARE cq_audit CURSOR FOR
+       SELECT id_registro FROM edi_audit_547
+        WHERE cod_empresa = p_cod_empresa
+          AND id_arquivo = m_id_arquivo
+          AND id_pe1 = m_id_pe1
+          AND num_pedido = m_num_pedido
+          AND cod_item = m_cod_item
+          AND prz_entrega = m_prz_entrega      
+      FOREACH INTO l_ld      
          UPDATE edi_audit_547
           SET operacao = mr_audit.operacao,
               dat_operacao = mr_audit.dat_operacao,
@@ -4649,14 +4691,11 @@ FUNCTION pol1370_ins_audit()#
               qtd_antes = m_qtd_antes
          WHERE cod_empresa = p_cod_empresa
            AND id_registro = l_ld
-        IF STATUS <> 0 THEN
-           CALL log003_err_sql('UPDATE','edi_audit_547:3')
-           RETURN FALSE
-        END IF
-      ELSE
-         CALL log003_err_sql('SELECT','edi_audit_547:2')
-         RETURN FALSE
-      END IF   
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE','edi_audit_547:3')
+            RETURN FALSE
+         END IF
+      END FOREACH
    END IF
       
    RETURN TRUE

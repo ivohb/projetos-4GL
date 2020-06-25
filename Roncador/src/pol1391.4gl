@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------#
 # SISTEMA.: LOGIX                                                   #
 # PROGRAMA: pol1391                                                 #
-# OBJETIVO: CADASTRO DE ENDEREÇOS DO ITEM                           #
+# OBJETIVO: CADASTROS PARA INREGRAÇÃO SICAL X LOGIX                 #
 # AUTOR...: IVO                                                     #
 # DATA....: 18/05/2020                                              #
 #-------------------------------------------------------------------#
@@ -125,7 +125,7 @@ FUNCTION pol1391()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1391-12.00.02  "
+   LET p_versao = "pol1391-12.00.03  "
    CALL func002_versao_prg(p_versao)
    
    LET m_car_item = TRUE
@@ -146,7 +146,7 @@ FUNCTION pol1391_menu()#
            l_label         VARCHAR(10),
            l_titulo        CHAR(80)
 
-    LET l_titulo = 'CADASTRO DE ENDEREÇOS DO ITEM - ',p_versao
+    LET l_titulo = 'CADASTROS PARA INREGRAÇÃO SICAL X LOGIX - ',p_versao
     
     LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
     CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)

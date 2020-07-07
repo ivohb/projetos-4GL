@@ -1,0 +1,32 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------------------------------------
+[a ]                 INCONSISTÊCNIAS DA IMPORTAÇÃO
+                                                                         
+ Pedido seq       Item                   Dencrição do erro
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+[g     |h  |i              |j                                             ]
+ 
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, NOENTRY;
+ g = FORMONLY.num_pedido    --#, OPTIONS="-nolist"; 
+ h = FORMONLY.num_sequencia --#, OPTIONS="-nolist"; 
+ i = FORMONLY.cod_item      --#, OPTIONS="-nolist"; 
+ j = FORMONLY.den_erro      --#, OPTIONS="-nolist"; 
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_erro[10](num_pedido THRU den_erro);
+END 

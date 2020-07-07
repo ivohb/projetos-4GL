@@ -1,0 +1,42 @@
+DATABASE FORMONLY
+SCREEN
+{
+ -----------------------------------------------------------------------------
+  [a ]                   FRETE UNITÁRIO POR ITEM DO PEDIDO
+  
+Pedido: [b     ] Cliente: [c              ][d              ] Total:[t        ]
+
+  Seq.      Item             Descrição       Qtd.Solic.  Vr Frete   Vr Total
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+[e    ][f              ][g                 ][h         ][i       ][j         ]
+                                           Total Geral Frete : [k            ]
+                                           
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.num_pedido, UPSHIFT, AUTONEXT;
+   c = FORMONLY.cod_cliente, NOENTRY;
+   d = FORMONLY.nom_cliente, NOENTRY;
+   t = FORMONLY.tot_info, FORMAT = '#####&.&&';
+   e = FORMONLY.num_seq, NOENTRY;
+   f = FORMONLY.cod_item, NOENTRY;
+   g = FORMONLY.den_item, NOENTRY;
+   h = FORMONLY.qtd_solic, NOENTRY;
+   i = FORMONLY.val_frete, AUTONEXT, FORMAT = '####&.&&';
+   j = FORMONLY.val_total, FORMAT = '######&.&&', NOENTRY;
+   k = FORMONLY.tot_ger, FORMAT = '#########&.&&', NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_itens[10](num_seq THRU val_total);
+END 

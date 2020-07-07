@@ -1,0 +1,49 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+-------------------------------------------------------------------------------
+[a ]         RESERVA DE MATERIAL PARA ORDEM DE PRODUÇÃO NA OP_LOTE
+
+Num. OP:[b            ] Componente[j              ]  Exibir Reservas:[c       ]              
+                           
+                             
+
+    Componente    Ordem     Lote     Local End. Qt.Transf   Qt.Consu     Saldo
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+[d              |k      |e           |f   |g  |h        |i         |l         ]
+}
+
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_empresa, NOENTRY;
+  b = FORMONLY.num_ordem2,UPSHIFT, AUTONEXT;
+  j = FORMONLY.cod_item2, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+
+c   = FORMONLY.exib_reser  TYPE CHAR, INCLUDE=('S','T'), COMMENTS = 'S-Com Saldo  T-Todas da Ordem'
+--#, widget='RADIO', config='S Saldo T Todas'; 
+
+  d = FORMONLY.cod_item   --#, OPTIONS="-nolist";
+  k = FORMONLY.num_ordem  --#, OPTIONS="-nolist";
+  e = FORMONLY.num_lote   --#, OPTIONS="-nolist";
+  f = FORMONLY.cod_local  --#, OPTIONS="-nolist";
+  g = FORMONLY.endereco   --#, OPTIONS="-nolist";
+  h = FORMONLY.qtd_transf --#, OPTIONS="-nolist";
+  i = FORMONLY.qtd_cons   --#, OPTIONS="-nolist";
+  l = FORMONLY.saldo      --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[11](cod_item THRU saldo);
+END

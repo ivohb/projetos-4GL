@@ -1,0 +1,54 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]                         RESULTADO DAS ANÁLISES
+                                                                              
+     Item: [a1             ][a2                                          ]
+         Tem Granulometria: [g]            Granulometria:[a11            ]                
+     Lote: [a3             ] Situac:[d] Data :[a4        ] Hora:[a5      ]
+
+                                  Especificações      
+  Análise Descrição                De         Até    Stat Resultado  
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+  [b     |b1                 |b2        |b3        |b5|c|b6        ]
+}
+
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,   UPSHIFT,  NOENTRY;
+a1 = FORMONLY.cod_item,      UPSHIFT 
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a2 = FORMONLY.den_item,      NOENTRY;
+a11= FORMONLY.tipo_granulo, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a3 = FORMONLY.num_lote,   UPSHIFT;
+d  = FORMONLY.tip_situacao, UPSHIFT, AUTONEXT,
+   COMMENTS =" Situacao: I-Nao Liberada / L-Liberada";
+a4 = FORMONLY.dat_analise,   NOENTRY;
+a5 = FORMONLY.hor_analise,   NOENTRY;
+g  = FORMONLY.granu, NOENTRY;
+b  = FORMONLY.tip_analise,   AUTONEXT, NOENTRY --#, OPTIONS="-nolist";
+b1 = FORMONLY.den_analise,   UPSHIFT,  NOENTRY --#, OPTIONS="-nolist";
+b2 = FORMONLY.val_de,NOENTRY --#, OPTIONS="-nolist";
+b3 = FORMONLY.val_ate,NOENTRY --#, OPTIONS="-nolist";
+#b4 = FORMONLY.variacao,NOENTRY --#, OPTIONS="-nolist";
+b5 = FORMONLY.sinal,NOENTRY --#, OPTIONS="-nolist";
+c  = FORMONLY.situa_analise, NOENTRY --#, OPTIONS="-nolist";
+b6 = FORMONLY.val_analise  --#, WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
+END
+
+INSTRUCTIONS
+   SCREEN RECORD s_itens[9] (FORMONLY.tip_analise THRU FORMONLY.val_analise);
+END
+
+

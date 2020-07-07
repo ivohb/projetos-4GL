@@ -1,0 +1,59 @@
+DATABASE FORMONLY
+ 
+SCREEN
+{
+[a ] ------------------- CERTIFICADO DE ANÁLISE --------------------------------
+
+ Certif:[b    ] Ver:[c ][z] Emis:[d         ] NF:[e     ] Sér:[f  ] Seq:[x   ] 
+Cliente:[h              ] [i                                                  ]
+     OM:[g     ]   Item:[j              ] [k                                  ]  
+   Lote:[l         ] Qtde:[m            ]    Num PA:[n     ]      Impresso?:[o]
+   Fabicação:[df        ]    Validade:[dv        ]    Emisão NF:[de        ]
+Texto:[p                                                                     ]
+      [q                                                                     ]
+        Análise             Espec.de  Espec.até Tipo       Resultado
+[s                        |u         |v         |t] [w                        ]
+[s                        |u         |v         |t] [w                        ]
+[s                        |u         |v         |t] [w                        ]
+[s                        |u         |v         |t] [w                        ]
+[s                        |u         |v         |t] [w                        ]
+[s                        |u         |v         |t] [w                        ]
+[s                        |u         |v         |t] [w                        ]
+[s                        |u         |v         |t] [w                        ]
+}
+END
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa,   NOENTRY;
+b = FORMONLY.num_laudo,     NOENTRY;
+c = FORMONLY.num_versao,    NOENTRY;
+z = FORMONLY.versao_atual,  NOENTRY;
+d = FORMONLY.dat_emissao,   NOENTRY;
+e = FORMONLY.num_nf,        AUTONEXT;
+f = FORMONLY.ser_nf,        AUTONEXT;
+x = FORMONLY.seq_item_nf,   AUTONEXT  --#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+j = FORMONLY.cod_item,      NOENTRY;
+k = FORMONLY.den_item,      NOENTRY;
+g = FORMONLY.num_om,        NOENTRY;
+h = FORMONLY.cod_cliente,   NOENTRY;
+i = FORMONLY.nom_cliente,   NOENTRY;
+l = FORMONLY.lote_tanque,   NOENTRY;
+m = FORMONLY.qtd_laudo,     AUTONEXT;
+n = FORMONLY.num_pa,        UPSHIFT --#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+o = FORMONLY.ies_impresso,  NOENTRY;
+df= FORMONLY.dat_fabricacao,NOENTRY;
+dv= FORMONLY.dat_validade,  NOENTRY;
+de= FORMONLY.dat_emis_nf,   NOENTRY;
+p = FORMONLY.texto_1,       UPSHIFT;
+q = FORMONLY.texto_2,       UPSHIFT;
+s = FORMONLY.den_analise,       NOENTRY --#, OPTIONS="-nolist";
+u = FORMONLY.especificacao_de,  NOENTRY --#, OPTIONS="-nolist";
+v = FORMONLY.especificacao_ate, NOENTRY --#, OPTIONS="-nolist";
+t = FORMONLY.especie, AUTONEXT, COMMENTS = 'N-Normal V-Por validade' --#, OPTIONS="-nolist";
+w = FORMONLY.resultado, UPSHIFT, AUTONEXT, WORDWRAP;
+END 
+
+
+INSTRUCTIONS
+   SCREEN RECORD s_laudo[8] (FORMONLY.den_analise THRU FORMONLY.especie)
+END

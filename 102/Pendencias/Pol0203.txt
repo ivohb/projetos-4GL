@@ -1,0 +1,20 @@
+Bom dia Manuel,
+
+Precisa ajustar no relatório as novas regras dos campos: ies_aceite e ies_sit_pedido. 
+Que contem a forma de aprovação do pedido e a situação.
+
+Outro ponto é que hoje no relatório tem como ver os pedidos em batch, ele deve passar 
+a ver os pedidos ‘em analise’
+
+
+Boa tarde Ivo, 
+
+Precisamos alterar o programa pol0203 para não ler mais as tabelas do pedido 
+digitado PEDIDO_DIG_MEST e PEDIDO_DIG _ITEM e separar os pedidos pelo 
+campo ies_sit_pedido se for igual a ‘E’ – em analise dos demais.  
+Se for ies_sit_pedido=9 não imprimir .  Incluir no cabeçalho o campo ies_aceite.
+
+
+Obrigado,
+
+

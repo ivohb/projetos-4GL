@@ -1,0 +1,34 @@
+DATABASE LOGIX    
+
+SCREEN
+{
+-------------------------------------------------------------------------
+[a0]                   CONSULTA ITENS DO ROMANEIO 
+
+ Item             Descricao              Peso Liquido       Peso Bruto    
+ ---------------  ------------------  ---------------  ---------------
+[a1             ][a2                ][a3             ][a4             ]
+[a1             ][a2                ][a3             ][a4             ]
+[a1             ][a2                ][a3             ][a4             ]
+[a1             ][a2                ][a3             ][a4             ]
+[a1             ][a2                ][a3             ][a4             ]
+[a1             ][a2                ][a3             ][a4             ]
+
+}
+END
+TABLES
+ordem_montag_item, 
+item
+END
+ATTRIBUTES
+a0 = ordem_montag_item.cod_empresa,    NOENTRY;
+a1 = ordem_montag_item.cod_item,       NOENTRY; 
+a2 = item.den_item_reduz, UPSHIFT,     NOENTRY;
+a3 = ordem_montag_item.qtd_reservada,  NOENTRY;
+a4 = ordem_montag_item.pes_total_item, NOENTRY;
+END 
+INSTRUCTIONS
+DELIMITERS " "
+SCREEN RECORD s_om_item[06] (ordem_montag_item.cod_item THRU 
+                             ordem_montag_item.pes_total_item)
+END

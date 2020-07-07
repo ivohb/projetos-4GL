@@ -1,0 +1,44 @@
+Group metaal
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=6
+         File \Projetos\4GL\102\Metaal\4gl\pol1097.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Metaal\4gl\pol1098.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Metaal\4gl\pol1099.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Metaal\per\pol1097.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Metaal\per\pol1098.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Metaal\per\pol1099.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

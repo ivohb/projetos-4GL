@@ -1,0 +1,39 @@
+DATABASE logix
+
+SCREEN
+{
+                 FORNECEDORES AGENDADOS
+-----------------------------------------------------------
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+ [a] [a2             ] [a3                               ]
+
+}
+END
+
+TABLES
+fornecedor
+END
+
+ATTRIBUTES
+a   = formonly.selecao TYPE CHAR, UPSHIFT, AUTONEXT,
+     COMMENTS="S - Sim (Marcado)  N - Não (Desmarcado)"
+--#, OPTIONS="-nolist"
+;
+a2  = fornecedor.cod_fornecedor , NOENTRY;
+a3  = fornecedor.raz_social     , UPSHIFT, AUTONEXT, NOENTRY;
+
+INSTRUCTIONS
+SCREEN RECORD s_tela[10] (formonly.selecao,
+                          fornecedor.cod_fornecedor,
+                          fornecedor.raz_social)
+
+
+END

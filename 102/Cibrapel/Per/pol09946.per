@@ -1,0 +1,34 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-----------------------------------------
+           CONDIÇÃO DE PAGAMENTO
+
+ Código          Descrição          Emite
+[a    ] [b                         ] Dupl
+                                    [e]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+[c    ] [d                            ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_cnd_pgto,   UPSHIFT, AUTONEXT;
+ b = FORMONLY.den_cnd_pgto,   UPSHIFT, AUTONEXT;
+ e = FORMONLY.ies_emite_dupl, UPSHIFT, AUTONEXT;
+ c = FORMONLY.cod_cnd,        UPSHIFT --#, OPTIONS="-nolist";
+ d = FORMONLY.den_cnd,        UPSHIFT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_cnd[10] (cod_cnd THRU den_cnd);
+END
+

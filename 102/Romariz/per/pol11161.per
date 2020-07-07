@@ -1,0 +1,29 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------------------------------------
+                                   ITENS
+      
+[a         |b              |c                                              ]
+[a         |b              |c                                              ]
+[a         |b              |c                                              ]
+[a         |b              |c                                              ]
+[a         |b              |c                                              ]
+[a         |b              |c                                              ]
+[a         |b              |c                                              ]
+[a         |b              |c                                              ]
+[a         |b              |c                                              ] 
+[a         |b              |c                                              ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.seq_item_nf, NOENTRY, REVERSE;
+ b = FORMONLY.cod_item, NOENTRY, REVERSE;
+ c = FORMONLY.den_item, NOENTRY, REVERSE;
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD s_item[10] (seq_item_nf THRU den_item);
+END

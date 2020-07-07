@@ -1,0 +1,45 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a0]                        COPIA DE NOTAS FISCAIS
+
+ Num Nota :[a1    ]   Série:[se ]    Valor de abatimento :[a11             ]
+ Cliente  :[a2             ][a3                                            ]
+ Nat Oper :[a4  ] [a5                            ]
+==============================================================================
+ Cod Item         Descricao           Qtde Nota      Qtde Roman.   Vlr.Roman.
+[a6             ][a7                ][a8          ][a9          ][a10        ]
+[a6             ][a7                ][a8          ][a9          ][a10        ]
+[a6             ][a7                ][a8          ][a9          ][a10        ]
+[a6             ][a7                ][a8          ][a9          ][a10        ]
+[a6             ][a7                ][a8          ][a9          ][a10        ]
+[a6             ][a7                ][a8          ][a9          ][a10        ]
+[a6             ][a7                ][a8          ][a9          ][a10        ]
+[a6             ][a7                ][a8          ][a9          ][a10        ]
+
+}
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,        NOENTRY;
+a1 = FORMONLY.num_nff,            AUTONEXT,
+     COMMENTS = "Digite o Nro da Nota Fiscal";
+se = FORMONLY.ser_nf,             AUTONEXT,
+     COMMENTS = "Digite a Série da Nota Fiscal";     
+a11= FORMONLY.val_desc_cred_icm,  AUTONEXT,
+     COMMENTS = "Valor de abatimento";
+a2 = FORMONLY.cod_cliente,        NOENTRY;               
+a3 = FORMONLY.nom_cliente,         UPSHIFT, NOENTRY;
+a4 = FORMONLY.cod_nat_oper,       NOENTRY;  
+a5 = FORMONLY.den_nat_oper,        UPSHIFT, NOENTRY;
+a6 = FORMONLY.cod_item,             NOENTRY; 
+a7 = FORMONLY.den_item_reduz,          UPSHIFT, NOENTRY;  
+a8 = FORMONLY.qtd_fatur,           NOENTRY; 
+a9 = FORMONLY.qtd_total,           AUTONEXT,
+     COMMENTS = "Digite a Qtde Total";
+a10= FORMONLY.val_unit,            NOENTRY;
+
+INSTRUCTIONS
+   screen record s_nf_item[8] (cod_item thru val_unit);
+END

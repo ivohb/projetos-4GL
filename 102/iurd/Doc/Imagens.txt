@@ -1,0 +1,48 @@
+com.informix.jdbc.IfxDriver
+jdbc:informix-sqli://blavs03:1550/logix:informixserver=logix102
+
+informix
+desenvolvimento
+
+Uma maneira simples de fazer isso ao meu ver....
+
+Vc pode entrar no iReport inserir uma imagem na banda que desejar(Menu Editar >> Inserir Elemento >> Imagem) 
+
+Em seguida vc vai criar um parametro no qual irá receber a imagem q vc 
+ira mandar por sua classe java ex: $P(IMAGEM_DIR)(do tipo String) esse paramentro vc 
+vai colocar na propriedade chamada Imagem do campo Imagem q vc acabou de criar acima. no 
+qual vc pode concatenar com ".jpg" para compactar a imagem. Eh isso q vc deve 
+fazer no iReport, jah na classe java vc vai enviar um parametro para ele poder 
+mostrar a imagem no relatório ex:
+
+String imagemDir = servletContext.getRealPath("pathDaSuaImagem");   
+Map parametros = new HashMap();   
+parametros.put("IMAGEM_DIR", imagemDir);  
+String imagemDir = servletContext.getRealPath("pathDaSuaImagem");
+Map parametros = new HashMap();
+parametros.put("IMAGEM_DIR", imagemDir);
+
+
+basicamente eh isso...boa sorte! 
+
+
+olá pessoal.. 
+consegui pegar as imagens q tenho no banco Mysql armazenadas no tipo LongBlob.. e 
+imprimir no relatorio do iReport.. detalhe: eu utilizo o Hibernate tbm nos relatorios..
+
+o iReport recupera os dados LongBlob com o tipo "Object".. no entanto é preciso 
+transforma-los em byte[] para ser possivel recriar a imagem.. 
+
+então o resultado foi o segunte.. 
+
+adicionei o campo tipo Image no relatório.. 
+e setei para ele o campo como o tipo InputStream.. 
+só que, dentro da expressão do campo.. ficou assim:
+
+new ByteArrayInputStream((byte[])$F{foto})
+
+
+abraços..
+Ricardo Castro 
+
+

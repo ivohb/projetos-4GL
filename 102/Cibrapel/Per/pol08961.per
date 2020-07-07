@@ -1,0 +1,41 @@
+DATABASE FORMONLY 
+SCREEN
+{
+----------------------------------------------------------------------------
+[ce]                  AUTORIZAÇÃO PARA LIBERAÇÃO DO AR
+
+            Tipo de frete:[k] Região dos lagos:[l]  Pedágio:[m         ]
+            
+                                                         Trocar
+ Seq   Item do AR     Preço   Trocar por    Preço  %Desc Preço
+[a  |b              |c     |d              |e     |f    ][g]
+[a  |b              |c     |d              |e     |f    ][g]
+[a  |b              |c     |d              |e     |f    ][g]
+[a  |b              |c     |d              |e     |f    ][g]
+[a  |b              |c     |d              |e     |f    ][g]
+[a  |b              |c     |d              |e     |f    ][g]
+[a  |b              |c     |d              |e     |f    ][g]
+                 
+}
+END 
+
+ATTRIBUTES
+ ce= FORMONLY.cod_empresa,     NOENTRY;
+ k = FORMONLY.tip_frete,       UPSHIFT, AUTONEXT, NOENTRY, COMMENTS = 'C=Cif F=Fob';
+ l = FORMONLY.reg_lagos,       UPSHIFT, AUTONEXT, NOENTRY, COMMENTS = 'S=Sim N=Não';
+ m = FORMONLY.val_pedagio,     UPSHIFT, AUTONEXT;
+ a = FORMONLY.num_seq,         NOENTRY  --#,OPTIONS='-nolist';
+ b = FORMONLY.cod_item_ar,     NOENTRY  --#,OPTIONS='-nolist';
+ c = FORMONLY.preco_cotacao,   AUTONEXT --#,OPTIONS='-nolist';
+ d = FORMONLY.cod_item_tr,     AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
+ e = FORMONLY.preco_item_tr,   AUTONEXT --#,OPTIONS='-nolist';
+ f = FORMONLY.pct_desc,        AUTONEXT --#,OPTIONS='-nolist';
+ g = FORMONLY.ies_troca_preco, UPSHIFT, AUTONEXT,
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado'
+    --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_troca[7] (num_seq THRU ies_troca_preco);
+END

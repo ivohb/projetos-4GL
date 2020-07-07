@@ -1,0 +1,6 @@
+No projeto temos que tirar algumas coisas pois no projeto da Petrom tem a geração de laudo para a Petrom 
+e para a Exxon [09:15:15] manuel pier sobrido: Aqui só tem uma empresa
+[09:15:50] manuel pier sobrido: Além disso o sistema da petrom está preparado para imprimir o laudo em 
+Português e Inglês e aqui além dos dpois tem espanhol tbem
+[09:16:13] manuel pier sobrido: Por isso por enquanto não faça nada até eu te mandar por escrito tudo o que 
+tem que mudar

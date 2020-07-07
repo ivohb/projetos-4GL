@@ -1,0 +1,92 @@
+DATABASE logix
+SCREEN
+{
+-------------------------------------------------------------------------------
+    [a0]        MANUTENCAO	DO APONTAMENTOS DE PARADAS
+
+       Cod.Item: [a48             ]  Num.Sequencia: [a05   ]
+ Num.Seq.Operac: [a49] Num.Ordem: [a47   ] Num.Documento: [a01       ]
+    Cod.Roteiro: [a02             ]	 Num.Alteração: [a03]
+   Cod.Operação: [a04  ] Cod.Centro Trab: [a06  ]   Cod.Arranjo: [a07  ]
+      Cod.Equip: [a08            ]  Cod.Ferramenta: [a09            ]
+   Num.Operador: [a10            ]        Num.Lote: [a11            ]
+       Hora Ini: [a12  ]        Hora Fim: [a13  ]     Cod.Turno: [a14]
+      Qtde Boas: [a15       ] Qtd.Refudo: [a16       ]Qtd.Horas: [a17       ]
+      Cod.Local: [a18       ]                 Cod.Local Estoque: [a19       ]
+  Data Produção: [a20       ] 	Data Ini: [a21       ] Data Fim: [a22       ]
+ Efetua Estorno: [l]  Cod.Tipo Movimento: [j]      Apontamento: [h]
+         Parada: [b]             Defeito: [c]           Sucata: [d]
+    Equipamento: [e]          Ferramenta: [f]    Situação Qtde: [g]
+          Texto: [a32                                               ]
+     Num.Sessão: [a33       ]   Num.Conta: [a34                    ]
+    Num.C.Saida: [a35                     ]
+   Num.Programa: [a36     ]           Nome Usuario: [a37     ]
+     Observação: [a38                                               ]
+ Qtde Refug Ant: [a39      ]         Qtde Boas Ant: [a40       ]
+      Tipo Serv: [i]      Seq.Reg.Integra: [a42   ]   Endereco: [a43   ]
+  Ident.Estoque: [a44   ]             SKU: [a45                      ]  
+}
+END
+
+ATTRIBUTES
+a0 					=  	FORMONLY.cod_empresa, 					UPSHIFT, NOENTRY;
+a48					=		FORMONLY.cod_item,							UPSHIFT,AUTONEXT;
+a05					=		FORMONLY.num_seq_registro , 		UPSHIFT,AUTONEXT;
+a49					=   FORMONLY.num_seq_operac,				UPSHIFT,AUTONEXT,NOENTRY;
+a47					=		FORMONLY.num_ordem,							UPSHIFT,AUTONEXT;
+a01					=		FORMONLY.num_docum, 						UPSHIFT,AUTONEXT;	
+a02					=		FORMONLY.cod_roteiro, 					UPSHIFT,AUTONEXT;
+a03					=		FORMONLY.num_altern, 						UPSHIFT,AUTONEXT;
+a04					=		FORMONLY.cod_operacao, 					UPSHIFT,AUTONEXT;
+a06					=		FORMONLY.cod_cent_trab, 				UPSHIFT,AUTONEXT;
+a07					=		FORMONLY.cod_arranjo, 					UPSHIFT,AUTONEXT;
+a08					=		FORMONLY.cod_equip, 						UPSHIFT,AUTONEXT;
+a09					=		FORMONLY.cod_ferram, 						UPSHIFT,AUTONEXT;
+a10					=		FORMONLY.num_operador, 					UPSHIFT,AUTONEXT;
+a11					=		FORMONLY.num_lote, 							UPSHIFT,AUTONEXT;
+a12					=		FORMONLY.hor_ini_periodo, 			UPSHIFT,AUTONEXT;
+a13					=		FORMONLY.hor_fim_periodo, 			UPSHIFT,AUTONEXT;
+a14					=		FORMONLY.cod_turno, 						UPSHIFT,AUTONEXT;
+a15					=		FORMONLY.qtd_boas, 							UPSHIFT,AUTONEXT;
+a16					=		FORMONLY.qtd_refug, 						UPSHIFT,AUTONEXT;
+a17					=		FORMONLY.qtd_total_horas, 			UPSHIFT,AUTONEXT;
+a18					=		FORMONLY.cod_local, 						UPSHIFT,AUTONEXT;
+a19					=		FORMONLY.cod_local_est, 				UPSHIFT,AUTONEXT;
+a20					=		FORMONLY.dat_producao, 					UPSHIFT,AUTONEXT;
+a21					=		FORMONLY.dat_ini_prod, 					UPSHIFT,AUTONEXT;
+a22					=		FORMONLY.dat_fim_prod, 					UPSHIFT,AUTONEXT;
+j						=		FORMONLY.cod_tip_movto, 				UPSHIFT,AUTONEXT;
+l						=		FORMONLY.efetua_estorno_total, 	UPSHIFT,AUTONEXT,
+								COMMENTS = "S-Sim N-Não";
+b						=		FORMONLY.ies_parada , 					UPSHIFT,AUTONEXT,
+		 						COMMENTS = "0-Não tem 1-Tem ";
+c						=		FORMONLY.ies_defeito, 					UPSHIFT,AUTONEXT,
+		 						COMMENTS = "0-Não tem 1-Tem ";
+d						=		FORMONLY.ies_sucata, 						UPSHIFT,AUTONEXT,
+		 						COMMENTS = "0-Não tem 1-Tem ";
+e						=		FORMONLY.ies_equip_min, 				UPSHIFT,AUTONEXT,
+		 						COMMENTS = "S-Sim N-Não";
+f						=		FORMONLY.ies_ferram_min, 				UPSHIFT,AUTONEXT,
+								COMMENTS = "S-Sim N-Não";
+g						=		FORMONLY.ies_sit_qtd, 					UPSHIFT,AUTONEXT,
+		 						COMMENTS = "L-liberado R-recusado";
+h						=		FORMONLY.ies_apontamento, 			UPSHIFT,AUTONEXT,
+		 						COMMENTS = "0-Não tem 1-Tem ";
+a32					=		FORMONLY.tex_apont, 						UPSHIFT,AUTONEXT;
+a33					=		FORMONLY.num_secao_requis, 			UPSHIFT,AUTONEXT;
+a34					=		FORMONLY.num_conta_ent, 				UPSHIFT,AUTONEXT;
+a35					=		FORMONLY.num_conta_saida, 			UPSHIFT,AUTONEXT;
+a36					=		FORMONLY.num_programa, 					UPSHIFT,AUTONEXT;
+a37					=		FORMONLY.nom_usuario, 					UPSHIFT,AUTONEXT;
+
+a38					=		FORMONLY.observacao, 						UPSHIFT,AUTONEXT;
+a39					=		FORMONLY.qtd_refug_ant, 				UPSHIFT,AUTONEXT;
+a40					=		FORMONLY.qtd_boas_ant, 					UPSHIFT,AUTONEXT;
+i						=		FORMONLY.tip_servico, 					UPSHIFT,AUTONEXT;
+a42  				=		FORMONLY.seq_reg_integra, 			UPSHIFT,AUTONEXT;
+a43					=		FORMONLY.endereco, 							UPSHIFT,AUTONEXT;
+a44					=		FORMONLY.identif_estoque, 			UPSHIFT,AUTONEXT;
+a45					=		FORMONLY.sku,										UPSHIFT,AUTONEXT;
+
+
+END 

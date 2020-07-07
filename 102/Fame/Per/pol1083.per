@@ -1,0 +1,32 @@
+DATABASE FORMONLY
+SCREEN
+{
+-------------------------------------------------------------------------------
+[a ]                   ACERTO DA BASE DE CÁLCULO DE IPI
+
+
+                
+                
+
+               Operação:[b         ]   [c                            ]
+
+                Período:[d         ] - [e         ]
+
+
+
+
+
+
+
+
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa,  NOENTRY;
+   b = FORMONLY.cod_nat_oper, AUTONEXT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   c = FORMONLY.den_nat_oper, NOENTRY, REVERSE;
+   d = FORMONLY.dat_ini,      AUTONEXT;
+   e = FORMONLY.dat_fim,      AUTONEXT;
+END 

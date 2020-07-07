@@ -1,0 +1,71 @@
+DATABASE LOGIX
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [b0]          VARIACAO DA PROGRAMACAO DO CLIENTE (QFP) VOLVO
+
+ Pedido: [a1    ] Produto: [a2             ]  [b1                            ]
+ Cliente: [a11            ]  [a12                                ]
+ Ultima N.F.: [a3    ]   Estoque: [a4      ]   Embarcado: [a5     ]  Data: [c]
+ Programação:       [d] Firme        [e] Req.Materiais        [f] Planejado
+ Data Prog. : [g         ]
+   DATA       ATUAL      NOVA  ACEITA  VARIACAO   PROGRAM.  QTD NFS ATUALISAR?
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+[a6        ][a7     ][a8     ][a9     ][a10     ][a13      ][a14    ]  [h]
+}
+END
+
+TABLES
+ped_itens_qfp
+clientes
+END
+
+ATTRIBUTES
+a1  = ped_itens_qfp.num_pedido,              FORMAT="#####&";
+a2  = ped_itens_qfp.cod_item,    UPSHIFT;
+a3  = formonly.p_num_nff_ult   TYPE DECIMAL, FORMAT="#####&";
+a4  = formonly.p_qtd_estoque   TYPE DECIMAL, FORMAT="-------&";
+a5  = formonly.p_qtd_embarcado TYPE DECIMAL, FORMAT="######&";
+
+a6  = ped_itens_qfp.prz_entrega, UPSHIFT, NOENTRY;
+a7  = ped_itens_qfp.qtd_solic, NOENTRY, FORMAT="######&";
+a8  = ped_itens_qfp.qtd_solic_nova, NOENTRY, FORMAT="######&";
+a9  = ped_itens_qfp.qtd_solic_aceita, NOENTRY, FORMAT="-------&";
+a10 = formonly.p_qtd_variacao, NOENTRY, FORMAT="-------&";
+a13 = formonly.p_sit_programa, NOENTRY;    
+a14 = formonly.qtd_nfs, NOENTRY, FORMAT="######&";
+
+h = FORMONLY.atualisar, UPSHIFT, 
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado '
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+
+b0 = formonly.cod_empresa,     NOENTRY;
+a11= clientes.cod_cliente;
+a12= clientes.nom_cliente;
+b1 = formonly.p_cod_item_cliente;
+c  = formonly.ies_data  TYPE CHAR, UPSHIFT,AUTONEXT,
+     INCLUDE=("A","F"),
+     COMMENTS = "A - ABERTURA JANELA  F - FECHAMENTO JANELA";
+d  = formonly.ies_firme  TYPE CHAR, UPSHIFT,AUTONEXT, 
+     INCLUDE=("S","N"); 
+e  = formonly.ies_requis  TYPE CHAR, UPSHIFT,AUTONEXT,
+     INCLUDE=("S","N"); 
+f  = formonly.ies_planej  TYPE CHAR, UPSHIFT,AUTONEXT,
+     INCLUDE=("S","N"); 
+g  = formonly.dat_prog    TYPE DATE, UPSHIFT,AUTONEXT,
+     COMMENTS = "DATA LIMITE DE PROGRAMACAO";
+     
+END
+
+INSTRUCTIONS
+   screen record s_ped_itens_qfp[10] (prz_entrega THRU atualisar);
+END

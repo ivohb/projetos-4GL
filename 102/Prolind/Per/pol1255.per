@@ -1,0 +1,50 @@
+DATABASE logix         
+SCREEN                  
+{
+--------------------------------------------------------------------------------
+[a ]                  ITEM ALTERNATIVO P/ ORDEM DE PRODUÇÃO
+
+
+             Tipo de documento:[b       ]         Documento:[c         ]
+                         
+  item da ordem                                                     Necessidade
+ [d              ]  [e][f                                          ] [r       ]
+  
+  Item alternativo
+ [g              ]  [h][i                                          ] [s       ]
+
+
+           -----------------------------------------------------
+
+           Usuário:[j       ]  Data:[k         ] Hora:[l       ]
+
+           -----------------------------------------------------
+                    Ident. Registro:[m           ]
+
+}
+
+TABLES
+   item_alternat_1054
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+   b = FORMONLY.tip_docum TYPE CHAR, INCLUDE=('O','P')
+       --#, widget='RADIO', config='O Ordem P Pedido'; 
+   c = item_alternat_1054.num_docum, UPSHIFT, AUTONEXT;
+   d = item_alternat_1054.cod_item, UPSHIFT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   e = FORMONLY.tip_item, NOENTRY;
+   f = FORMONLY.den_item, NOENTRY;
+   r = FORMONLY.neces_item, NOENTRY;
+   g = item_alternat_1054.item_alternat, UPSHIFT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   h = FORMONLY.tip_alternat, NOENTRY;
+   i = FORMONLY.den_alternat, NOENTRY;
+   s = FORMONLY.neces_alternat, AUTONEXT;
+   j = FORMONLY.usuario, NOENTRY;
+   k = FORMONLY.dat_troca, NOENTRY;
+   l = FORMONLY.hor_troca, NOENTRY;
+   m = FORMONLY.id_registro, NOENTRY;
+   
+END

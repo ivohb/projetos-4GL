@@ -1,0 +1,45 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                   VEÍCULOS PARA CONTROLE DE FRETE
+
+
+    Transportadora:[b              ]  [c                                  ]
+
+                     Placa:[d         ]     
+            
+           Tipo de veículo:[e         ]  [dv                              ]    
+
+
+             Tipo de carga:[f         ]     Há diferença de preço a partir
+                                            da segunda viagem do dia para
+                                            a mesma carreta?:[i]
+               Peso mínimo:[g         ]     
+
+                  Qtd eixo:[h         ]
+
+
+
+}
+
+TABLES
+   carreta_455
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,       NOENTRY;
+ b = carreta_455.cod_transpor,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.den_transpor,   NOENTRY;
+ d = carreta_455.chapa, UPSHIFT, AUTONEXT;
+ e = carreta_455.cod_tip_veiculo, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ dv= FORMONLY.des_tip_veiculo,   NOENTRY;  
+ f = FORMONLY.tip_carga TYPE CHAR, INCLUDE=('S','G')
+     --#, widget='RADIO', config='S Seca G Granel'; 
+ g = carreta_455.peso_minimo, AUTONEXT;
+ h = carreta_455.qtd_eixo, AUTONEXT;
+ i = carreta_455.ies_dif_preco, UPSHIFT, AUTONEXT;
+END
+

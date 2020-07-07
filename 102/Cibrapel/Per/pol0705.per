@@ -1,0 +1,36 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+  
+[a ]                         DE PARA TURNO 
+  
+        
+       TURNO TRIM  [b  ]       
+   
+       TURNO LOGIX [c  ][d                             ]                                                    
+       
+                
+          
+  
+
+
+       
+
+                       
+
+}
+END
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+b = FORMONLY.turno_simula, UPSHIFT, AUTONEXT;
+c = FORMONLY.turno_logix, UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+d = FORMONLY.den_turno, UPSHIFT, NOENTRY, AUTONEXT;
+
+
+
+
+
+END 

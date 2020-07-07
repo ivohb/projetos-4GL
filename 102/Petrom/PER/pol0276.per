@@ -1,0 +1,39 @@
+DATABASE logix
+SCREEN
+{
+-------------------------------------------------------------
+[a0]           OPERACAO RETORNO DE MERCADORIAS         
+ 
+Num O.M.     :[a1    ] 
+
+Item Prod    :[a2             ] [a3                      ]
+
+Qtde Reserva :[a4             ]
+
+Data Estrut  :[a5        ]
+
+Oper Retorno :[a6    ] [a7                            ]
+
+}   
+END
+TABLES
+ordem_montag_tran,
+estrut_item_indus,
+nat_operacao
+END
+ATTRIBUTES
+a0 = ordem_montag_tran.cod_empresa, UPSHIFT, NOENTRY; 
+a1 = ordem_montag_tran.num_om, AUTONEXT,
+     COMMENTS = "Digite o Numero da O.M.";
+a2 = estrut_item_indus.cod_item_prd, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Codigo do Item Produzido"
+     --#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a3 = FORMONLY.den_item_prd TYPE CHAR, UPSHIFT, NOENTRY;
+a4 = FORMONLY.qtd_reservada TYPE DEC, NOENTRY;
+a5 = estrut_item_indus.dat_inclusao, AUTONEXT,
+     COMMENTS = "Digite a Data da Formula do Item Produzido";
+a6 = nat_operacao.cod_nat_oper, AUTONEXT,
+     COMMENTS = "Digite a Operacao de Retorno"
+     --#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a7 = nat_operacao.den_nat_oper, UPSHIFT, NOENTRY;
+END

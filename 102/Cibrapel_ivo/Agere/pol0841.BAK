@@ -1,0 +1,39 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a0]         EFETIVA SOLICITACAO DE MATERIAIS ESPECIFICOS
+
+ Solicitante     : [a3                                             ]
+------------------------------------------------------------------------------
+    Num    Solicit.       Material                        Solicit.   Entregue    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+[a4    |a5         |a6                                   |a7       |a8       ]    
+
+} 
+END
+TABLES
+solicit_dd_885
+END
+ATTRIBUTES
+a0 = solicit_dd_885.cod_empresa,     NOENTRY;
+a3 = solicit_dd_885.nom_solicit,     UPSHIFT, AUTONEXT;
+a4 = solicit_dd_885.num_solicit,     NOENTRY;
+a5 = FORMONLY.nom_solicit,           NOENTRY;
+a6 = solicit_dd_885.den_item,        NOENTRY;
+a7 = solicit_dd_885.qtd_solicitada,  NOENTRY;
+a8 = FORMONLY.qtd_entregue,          AUTONEXT;
+INSTRUCTIONS
+screen record s_solicit[10] (solicit_dd_885.num_solicit,      
+                             FORMONLY.nom_solicit,         
+                             solicit_dd_885.den_item,            
+                             solicit_dd_885.qtd_solicitada,
+                             FORMONLY.qtd_entregue);

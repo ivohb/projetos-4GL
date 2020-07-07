@@ -1,0 +1,60 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                     TRATAMENTO DAS DIVERGÊNCIAS      
+
+      Banco:[b  ] [c              ]  CPF:[d             ]  Tip de acerto:[h]
+       Nome:[e                                     ]    Mês:[f ]  Ano:[g   ]    
+                                                 Acerto Tipo Arbitrag  usuário 
+[k|l                            |m              |n       |o |p       |q      ]
+[k|l                            |m              |n       |o |p       |q      ]
+[k|l                            |m              |n       |o |p       |q      ]
+[k|l                            |m              |n       |o |p       |q      ]
+[k|l                            |m              |n       |o |p       |q      ]
+[k|l                            |m              |n       |o |p       |q      ]
+[k|l                            |m              |n       |o |p       |q      ]
+[k|l                            |m              |n       |o |p       |q      ]
+
+   Acerto:[t      ]  Valor:[u           ]   Tipo:[v] [w                      ]
+   [x                                                                    ]
+   [x                                                                    ]
+   [x                                                                    ]
+   [x                                                                    ]
+   [x                                                                    ]
+   [x                                                                    ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,    NOENTRY;
+ b = FORMONLY.cod_banco,      UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.den_reduz,      NOENTRY, color = blue;
+ d = FORMONLY.num_cpf,        UPSHIFT, AUTONEXT;
+ h = FORMONLY.cod_acerto,     UPSHIFT, AUTONEXT, picture = '#'
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ e = FORMONLY.nom_func,       UPSHIFT, AUTONEXT;
+ f = FORMONLY.mes_ref,        AUTONEXT;
+ g = FORMONLY.ano_ref,        AUTONEXT;
+
+ k = FORMONLY.edita,          UPSHIFT, AUTONEXT, picture = '#',
+     COMMENTS = '<Enter> Arbitra'     --#, OPTIONS="-nolist";
+ l = FORMONLY.funcionario,    NOENTRY --#, OPTIONS="-nolist";
+ m = FORMONLY.cpf,            NOENTRY --#, OPTIONS="-nolist";
+ n = FORMONLY.dat_acerto,     NOENTRY --#, OPTIONS="-nolist";
+ o = FORMONLY.cod_tipo,       NOENTRY --#, OPTIONS="-nolist";
+ p = FORMONLY.dat_conciliacao,NOENTRY, FORMAT = 'dd/mm/yy' --#, OPTIONS="-nolist";
+ q = FORMONLY.nom_usuario,    NOENTRY --#, OPTIONS="-nolist";
+ 
+ t = FORMONLY.mes_acerto,     AUTONEXT, REVERSE, color = red, picture = '##/####';
+ u = FORMONLY.val_acerto,     AUTONEXT, REVERSE, color = red;
+ v = FORMONLY.tip_acerto,     AUTONEXT, REVERSE, color = red, picture = '#'
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ w = FORMONLY.den_tipo,       NOENTRY, REVERSE, color = blue;
+ x = FORMONLY.observacao,     AUTONEXT, WORDWRAP;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_func[08] (edita THRU nom_usuario);
+END

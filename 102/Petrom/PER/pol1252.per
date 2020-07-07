@@ -1,0 +1,47 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                    TRANSPORTADORES P/ CONTROLE DE FRETE
+  
+        Transportador:[b              ]  [c                                 ]
+            
+      Cond. Pagamento:[d     ]  [e                                   ]  
+ 
+   % de acréscimo sobre o valor da nota (FRETE PESO):[h     ]  
+ 
+ % de seguro sobe o valor da mercadoria (AD VALOREM):[i     ]
+
+                  % de gerenciamento de risco (GRIS):[j     ]
+                  
+         Valor da taxa de emissão de CTRC (DESPACHO):[k           ]
+
+Valor taxa administração da Secret. da Fazenda (TAS):[l           ]
+
+        Valor da taxa de restrição de transito (TRT):[m           ]       
+
+       Tem carta DDR?:[n]  S/N      Validade da carta DDR:[o         ]
+}
+
+TABLES
+   transportador_455
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,     NOENTRY;
+ b = transportador_455.cod_transpor,    UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.den_transpor,    NOENTRY;
+ d = transportador_455.cod_cnd_pgto,    UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ e = FORMONLY.den_cnd_pgto,    NOENTRY;
+ h = transportador_455.pct_frete_peso,  AUTONEXT;
+ i = transportador_455.pct_ad_valorem,  AUTONEXT;
+ j = transportador_455.pct_gris,        AUTONEXT;
+ k = transportador_455.val_despacho,    AUTONEXT;
+ l = transportador_455.val_tas,         AUTONEXT;
+ m = transportador_455.val_trt,         AUTONEXT;
+ n = transportador_455.ies_ddr,         UPSHIFT, AUTONEXT;
+ o = transportador_455.dat_vencto_ddr,  AUTONEXT;
+END
+

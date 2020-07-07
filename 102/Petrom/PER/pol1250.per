@@ -1,0 +1,43 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                   ERROS DA ANÁLISE DO CONHECIMENTO DE FRETE
+
+          
+           Empresa:[b ]  [c                                  ]  
+
+    Transportadora:[d              ]  [e                                  ]
+            
+      Conhecimento:[f         ]    Série:[g  ]    Sub série:[h  ]
+
+   Data do processamento:[i         ]   Hora do processamento:[j       ]
+
+                               E R R O
+[m                                                                            ]
+[m                                                                            ]
+[m                                                                            ]
+[m                                                                            ]
+[m                                                                            ]
+[m                                                                            ]
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.empresa,       NOENTRY;
+ b = FORMONLY.cod_empresa,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.den_empresa,   NOENTRY;
+ d = FORMONLY.cod_transpor,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ e = FORMONLY.den_transpor,   NOENTRY;
+ f = FORMONLY.num_conhec;     
+ g = FORMONLY.ser_conhec;     
+ h = FORMONLY.ssr_conhec;     
+ i = FORMONLY.dat_ini_proces; 
+ j = FORMONLY.hor_ini_proces; 
+
+ m = FORMONLY.den_erro, REVERSE, WORDWRAP;  
+
+END
+

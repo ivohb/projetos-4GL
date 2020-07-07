@@ -1,0 +1,13 @@
+
+create table est_corresp_eluma 
+  (
+    cod_empresa char(2) not null ,
+    cod_operac_ent char(4) not null ,
+    cod_operac_sai char(4) not null ,
+    cod_prefixo char(5) not null 
+  );
+
+create unique index ix_est_corresp_1 on 
+    est_corresp_eluma(cod_empresa,cod_operac_ent);
+
+

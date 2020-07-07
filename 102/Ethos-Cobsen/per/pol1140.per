@@ -1,0 +1,47 @@
+DATABASE FORMONLY
+SCREEN
+{
+-------------------------------------------------------------------------------
+[a ]                  INTEGRAÇÃO DE APONTAMENTO DE PRODUÇÃO  
+                            
+ Programa:[b                                           ] [c] [d              ]
+ Operador:[e              ]  [f                                              ]
+                 Qtd do     Qtd já    Apontar   Apontar   Cód     Saldo
+       Item      Programa   Apontada  Pç Boas   Pç Refug  Def     da OP
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+[m              |o         |p        |q        |r        |s  ] [t         ] 
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,  NOENTRY;
+ b = FORMONLY.num_programa, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.ies_status,   NOENTRY, color = red;
+ d = FORMONLY.den_status,   NOENTRY, REVERSE;
+ e = FORMONLY.cod_profis,   UPSHIFT, AUTONEXT, NOENTRY
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ f = FORMONLY.nom_profis,   NOENTRY, REVERSE;
+ m = FORMONLY.cod_item,     NOENTRY;
+ #n = FORMONLY.den_item,     NOENTRY;
+ o = FORMONLY.qtd_produzida,NOENTRY;
+ p = FORMONLY.qtd_apontada, NOENTRY;
+ q = FORMONLY.qtd_boas,     AUTONEXT;
+ r = FORMONLY.qtd_refugo,   AUTONEXT;
+ s = FORMONLY.cod_defeito,  UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ t = FORMONLY.qtd_sdo_ops,  NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[10] (cod_item THRU qtd_sdo_ops);
+END

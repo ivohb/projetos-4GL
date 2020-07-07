@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                USUÁRIO ADMINISTRADOR DA GRADE DE APROVAÇÃO
+  
+                Usuário                Nome
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+              [k       ] [l                                        ]
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,       UPSHIFT, NOENTRY;
+ k = FORMONLY.nom_usuario,       AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ l = FORMONLY.nom_funcionario,   NOENTRY;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_usuario[13](nom_usuario THRU nom_funcionario);
+END 

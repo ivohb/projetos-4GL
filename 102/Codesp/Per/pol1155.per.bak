@@ -1,0 +1,39 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                   RELATORIO DE LANÇAMENTOS CONTÁBEIS
+        
+                       
+                       
+     Data Inicial:[b         ]                        Data Final:[c         ]
+    
+   Conta Inicial:[d                      ] [e                               ]
+
+     Conta Final:[f                      ] [g                               ]
+
+
+
+
+
+
+               Conta em processo:[m                      ]
+       	  
+}         
+
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa,      				UPSHIFT,NOENTRY;
+   b = FORMONLY.dat_movto_ini, 					UPSHIFT,AUTONEXT,
+       COMMENTS = "Data inicial do movimento:";
+   c = FORMONLY.dat_movto_fim, 					UPSHIFT,AUTONEXT,
+       COMMENTS = "Data final do movimento:";
+   m = FORMONLY.mensagem, UPSHIFT;    
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_men[01] (mensagem);
+END
+	

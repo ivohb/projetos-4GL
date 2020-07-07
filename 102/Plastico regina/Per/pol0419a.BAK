@@ -1,0 +1,39 @@
+DATABASE FORMONLY 
+                            
+SCREEN
+{
+---------------------------------------------------------------------------
+NOTA FISCAL
+
+Nota    Ser Ssr   Cliente               Nome                NºControle
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+[a      |b |c |d              |e                           |f         ]
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.nota_fiscal       --#, OPTIONS="-nolist";
+ b = FORMONLY.serie_nota_fiscal --#, OPTIONS="-nolist";
+ c = FORMONLY.subserie_nf       --#, OPTIONS="-nolist";
+ d = FORMONLY.cliente           --#, OPTIONS="-nolist";
+ e = FORMONLY.nom_cliente       --#, OPTIONS="-nolist";
+ f = FORMONLY.trans_nota_fiscal --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_mpop[15] (nota_fiscal THRU trans_nota_fiscal);
+END

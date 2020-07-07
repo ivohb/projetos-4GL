@@ -1,0 +1,40 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+  [h ]                     ERROS NA BAIXA DE CONSUMOS
+
+  Corrida     Ordem       Cód  Item          Lote      Qtd Consumo Dat Consumo
+[a         |b         |c              |d              |e          |f         ]
+[g                                                                           ]
+[a         |b         |c              |d              |e          |f         ]
+[g                                                                           ]
+[a         |b         |c              |d              |e          |f         ]
+[g                                                                           ]
+[a         |b         |c              |d              |e          |f         ]
+[g                                                                           ]
+[a         |b         |c              |d              |e          |f         ]
+[g                                                                           ]
+[a         |b         |c              |d              |e          |f         ]
+[g                                                                           ]
+[a         |b         |c              |d              |e          |f         ]
+[g                                                                           ]
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.codcorrida, NOENTRY; 
+ b = FORMONLY.numordem, NOENTRY;
+ c = FORMONLY.coditem, NOENTRY;
+ d = FORMONLY.numlote, NOENTRY;
+ e = FORMONLY.qtdconsumida, NOENTRY;
+ f = FORMONLY.datconsumo, NOENTRY;
+ g = FORMONLY.mensagem, NOENTRY;
+ h = FORMONLY.codempresa, NOENTRY;
+ 
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_erro[7](codcorrida THRU mensagem);
+END 
+   

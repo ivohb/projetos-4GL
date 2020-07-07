@@ -1,0 +1,40 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a0]                MANUTENCAO DA TABELA ORDEM_MONTAG_TRAN  
+
+ Num O.M. :[a1    ]  Item Prod :[a2             ][a3                ] 
+
+------------------------------------------------------------------------------
+ Cod Item Ret         Descricao     U.M.  Qtd Devol     Pre Unit    N.F. 
+[a4             |a5                |a6 |a7         |a8           |a9      ]
+[a4             |a5                |a6 |a7         |a8           |a9      ]
+[a4             |a5                |a6 |a7         |a8           |a9      ]
+[a4             |a5                |a6 |a7         |a8           |a9      ]
+[a4             |a5                |a6 |a7         |a8           |a9      ]
+[a4             |a5                |a6 |a7         |a8           |a9      ]
+[a4             |a5                |a6 |a7         |a8           |a9      ]
+[a4             |a5                |a6 |a7         |a8           |a9      ]
+
+}
+END
+TABLES
+ordem_montag_tran,
+estrut_item_indus
+END
+ATTRIBUTES
+a0  = ordem_montag_tran.cod_empresa, UPSHIFT, NOENTRY; 
+a1  = ordem_montag_tran.num_om, AUTONEXT,
+      COMMENTS = "Digite o Numero da Ordem de Montagem";
+a2  = FORMONLY.cod_item_prd, UPSHIFT, NOENTRY;
+a3  = FORMONLY.den_item_prd TYPE CHAR, UPSHIFT, NOENTRY; 
+a4  = ordem_montag_tran.cod_item, UPSHIFT, NOENTRY; 
+a5  = FORMONLY.den_item_ret, UPSHIFT, NOENTRY;
+a6  = FORMONLY.cod_unid_med TYPE CHAR, UPSHIFT, NOENTRY; 
+a7  = ordem_montag_tran.qtd_devolvida, NOENTRY;
+a8  = ordem_montag_tran.pre_unit, NOENTRY; 
+a9  = ordem_montag_tran.num_nf, NOENTRY; 
+INSTRUCTIONS
+screen record s_ordem_montag[8] (cod_item THRU num_nf);
+END

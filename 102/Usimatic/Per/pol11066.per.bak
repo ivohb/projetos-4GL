@@ -1,0 +1,48 @@
+DATABASE FORMONLY
+SCREEN
+{
+--------------------------------------------------------------------------------
+                          AR (AVISO DE RECEBIMENTO)
+
+Ordem          Item       Descrição         Oper   Qtd boas  Qtd Refug
+[a      |b              |c                 |d    |e         |f         ]
+          AR's:[k     |l     |m     |n     |o     |p     |q     |r     ]
+[a      |b              |c                 |d    |e         |f         ]
+          AR's:[k     |l     |m     |n     |o     |p     |q     |r     ]
+[a      |b              |c                 |d    |e         |f         ]
+          AR's:[k     |l     |m     |n     |o     |p     |q     |r     ]
+[a      |b              |c                 |d    |e         |f         ]
+          AR's:[k     |l     |m     |n     |o     |p     |q     |r     ]
+[a      |b              |c                 |d    |e         |f         ]
+          AR's:[k     |l     |m     |n     |o     |p     |q     |r     ]
+[a      |b              |c                 |d    |e         |f         ]
+          AR's:[k     |l     |m     |n     |o     |p     |q     |r     ]
+[a      |b              |c                 |d    |e         |f         ]
+          AR's:[k     |l     |m     |n     |o     |p     |q     |r     ]
+[a      |b              |c                 |d    |e         |f         ]
+          AR's:[k     |l     |m     |n     |o     |p     |q     |r     ]
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.num_ordem,  NOENTRY;
+ b = FORMONLY.cod_item, NOENTRY;
+ c = FORMONLY.den_item, NOENTRY;
+ d = FORMONLY.cod_operac, NOENTRY;
+ e = FORMONLY.qtd_boas, NOENTRY;
+ f = FORMONLY.qtd_refug, NOENTRY;
+
+ k = FORMONLY.num_ar_1, AUTONEXT;
+ l = FORMONLY.num_ar_2, AUTONEXT;
+ m = FORMONLY.num_ar_3, AUTONEXT;
+ n = FORMONLY.num_ar_4, AUTONEXT;
+ o = FORMONLY.num_ar_5, AUTONEXT;
+ p = FORMONLY.num_ar_6, AUTONEXT;
+ q = FORMONLY.num_ar_7, AUTONEXT;
+ r = FORMONLY.num_ar_8, AUTONEXT;
+ 
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_ar[08] (num_ordem THRU num_ar_8);
+END

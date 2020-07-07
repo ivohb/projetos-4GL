@@ -1,0 +1,25 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-----------------------------------------------------------------
+[a ]             GERAÇÃO DE NFE DE ENERGIA ELÉTRICA
+       
+       
+       
+       
+              Num NF: [b         ]
+       
+       
+       
+       
+       
+        
+   
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa;
+ b = FORMONLY.num_nf;
+END
+

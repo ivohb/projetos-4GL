@@ -1,0 +1,48 @@
+DATABASE FORMONLY
+SCREEN
+{
+------------------------------------------------------------------------------
+  [a ]                       RELATÓRIO DE COMISSÕES    
+  
+         Processo:[p          ]        Período:[b         ] - [c         ]       
+                                       Nível de Representação:[d]      
+                Dupl.da Empresa:[e ][f                                   ] 
+                
+                Repres                  Nome
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+                [g   ]  [h                                   ] 
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.dat_ini, AUTONEXT, FORMAT = 'dd/mm/yyyy';
+   c = FORMONLY.dat_fim, AUTONEXT, FORMAT = 'dd/mm/yyyy';
+   d = FORMONLY.niv_repres TYPE DECIMAL, picture = '#',
+       COMMENTS = 'Iforme se deseja comissão do Representante de Nível 1, 2 ou 3';
+   e = FORMONLY.cod_emp_dupl TYPE CHAR, AUTONEXT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+   f = FORMONLY.den_emp_dupl TYPE CHAR, NOENTRY; 
+   
+   g = FORMONLY.cod_repres, UPSHIFT, AUTONEXT,
+       COMMENTS = 'Iforme o Código do Representante'
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist'
+;       
+   h = FORMONLY.den_repres, UPSHIFT, NOENTRY;
+   p = FORMONLY.tip_proces TYPE CHAR, INCLUDE=('Q','M')
+       --#, widget='RADIO', config='Q Quinzenal M Mensal'; 
+   
+ END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_repres[10](cod_repres THRU den_repres);
+END

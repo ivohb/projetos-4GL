@@ -1,0 +1,343 @@
+{  
+   "itens":[  
+      {  
+         "total_bruto":"508500",
+         "preco_unitario":"54.93",
+         "cod_produto":"46",
+         "quant_cancelada":"0",
+         "msdata:rowOrder":"0",
+         "diffgr:id":"pedidos_i1",
+         "num_pedido":"12910",
+         "quant":"9000",
+         "perc_desc":"2.7787611",
+         "total_liquido":"494370",
+         "diffgr:hasChanges":"modified",
+         "preco_tabela":"56.5"
+
+      
+},
+      {  
+         "total_bruto":"169500",
+         "preco_unitario":"54.93",
+         "cod_produto":"46",
+         "quant_cancelada":"0",
+         "msdata:rowOrder":"1",
+         "diffgr:id":"pedidos_i2",
+         "num_pedido":"12911",
+         "quant":"3000",
+         "perc_desc":"2.7787611",
+         "total_liquido":"164790",
+         "diffgr:hasChanges":"modified",
+         "preco_tabela":"56.5"
+
+      
+},
+      {  
+         "total_bruto":"7489.375",
+         "preco_unitario":"62.5",
+         "cod_produto":"46",
+         "quant_cancelada":"0",
+         "msdata:rowOrder":"2",
+         "diffgr:id":"pedidos_i3",
+         "num_pedido":"13355",
+         "quant":"119.83",
+         "perc_desc":"0.0000000",
+         "total_liquido":"7489.38",
+         "diffgr:hasChanges":"modified",
+         "preco_tabela":"62.5"
+
+      
+}
+
+   
+],
+   "pedidos":[  
+      {  
+         "email_cliente":"matheus.gonzales@gruporoncador.com.br",
+         "obs":"VENDA RONCADOR - DOLOMITICO (FECHAMNETO FINANCEIRO ] EM SP)",
+         "cliente_cons_final":"1",
+         "desc_portador":{  
+            "xml:space":"preserve"
+
+         
+},
+         "total_pedido":"494370",
+         "CEP_cliente":"78643000",
+         "fax_vendedor":"6634683912",
+         "tipo_pedido":"1",
+         "fone_contato_cliente":{  
+
+
+         
+},
+         "num_cliente":{  
+
+
+         
+},
+         "endereco_vendedor":"RUA 03",
+         "CNPJ_CPF_cliente":"03144060000176",
+         "IS_cliente":{  
+
+
+         
+},
+         "fone_cobranca_cliente":"6635291197",
+         "num_pedido":"12910",
+         "UF_cobranca_cliente":"MT",
+         "fone_cliente":"6635291197",
+         "fax_cobranca_cliente":{  
+
+
+         
+},
+         "contato_cliente":"DANILO",
+         "comp_cliente":{  
+
+
+         
+},
+         "cod_mun_cobranca_cliente":"2398",
+         "desc_mun_cliente":"QUERENCIA",
+         "dt_emissao":"2020-03-20T00:00:00-03:00",
+         "UF_cliente":"MT",
+         "comp_cobranca_cliente":{  
+
+
+         
+},
+         "fax_cliente":{  
+
+
+         
+},
+         "UF_vendedor":"MT",
+         "entrega_futura":"0",
+         "msdata:rowOrder":"0",
+         "num_cobranca_cliente":"97",
+         "desc_mun_cobranca_cliente":"QUERENCIA",
+         "CEP_cobranca_cliente":"78643000",
+         "nome_fantasia_cliente":"FAZENDA RONCADOR",
+         "nome_cliente":"AGROPECUARIA RONCADOR S.A.",
+         "cod_portador":"0",
+         "obs_nota_fiscal":"PECUÁRIA EXPANSÃO Nº  ORDEM 041198",
+         "desc_mun_vendedor":"AGUA BOA",
+         "cod_cond_pagto":"2",
+         "nome_vendedor":"SRCAL MATRIZ",
+         "cod_mun_vendedor":"5100201",
+         "CEP_vendedor":"78635000",
+         "bairro_cliente":"ZONA RURAL",
+         "fone_vendedor":"6634683912",
+         "diffgr:id":"pedidos1",
+         "endereco_cliente":"FAZENDA RONCADOR S/Nº",
+         "IE_cliente":"132836696",
+         "cod_mun_cliente":"2398",
+         "endereco_cobranca_cliente":"CAIXA POSTAL",
+         "bairro_cobranca_cliente":"CX. POSTAL  - CORREIOS",
+         "CNPJ_CPF_vendedor":"12678803000189",
+         "desc_cond_pagto":"DEPOSITO A VISTA",
+         "bairro_vendedor":"CENTRO"
+
+      
+},
+      {  
+         "email_cliente":"matheus.gonzales@gruporoncador.com.br",
+         "obs":"VENDA RONCADOR - DOLOMITICO(FECHAMENTO FINANCEIRO EM SP)",
+         "cliente_cons_final":"1",
+         "desc_portador":{  
+            "xml:space":"preserve"
+
+         
+},
+         "total_pedido":"164790",
+         "CEP_cliente":"78643000",
+         "fax_vendedor":"6634683912",
+         "tipo_pedido":"1",
+         "fone_contato_cliente":{  
+
+
+         
+},
+         "num_cliente":{  
+
+
+         
+},
+         "endereco_vendedor":"RUA 03",
+         "CNPJ_CPF_cliente":"03144060000176",
+         "IS_cliente":{  
+
+
+         
+},
+         "fone_cobranca_cliente":"6635291197",
+         "num_pedido":"12911",
+         "UF_cobranca_cliente":"MT",
+         "fone_cliente":"6635291197",
+         "fax_cobranca_cliente":{  
+
+
+         
+},
+         "contato_cliente":"DANILO",
+         "comp_cliente":{  
+
+
+         
+},
+         "cod_mun_cobranca_cliente":"2398",
+         "desc_mun_cliente":"QUERENCIA",
+         "dt_emissao":"2020-03-20T00:00:00-03:00",
+         "UF_cliente":"MT",
+         "comp_cobranca_cliente":{  
+
+
+         
+},
+         "fax_cliente":{  
+
+
+         
+},
+         "UF_vendedor":"MT",
+         "entrega_futura":"0",
+         "msdata:rowOrder":"1",
+         "num_cobranca_cliente":"97",
+         "desc_mun_cobranca_cliente":"QUERENCIA",
+         "CEP_cobranca_cliente":"78643000",
+         "nome_fantasia_cliente":"FAZENDA RONCADOR",
+         "nome_cliente":"AGROPECUARIA RONCADOR S.A.",
+         "cod_portador":"0",
+         "obs_nota_fiscal":"PECUÁRIA EXPANSÃO Nº ORDEM 041198",
+         "desc_mun_vendedor":"AGUA BOA",
+         "cod_cond_pagto":"2",
+         "nome_vendedor":"SRCAL MATRIZ",
+         "cod_mun_vendedor":"5100201",
+         "CEP_vendedor":"78635000",
+         "bairro_cliente":"ZONA RURAL",
+         "fone_vendedor":"6634683912",
+         "diffgr:id":"pedidos2",
+         "endereco_cliente":"FAZENDA RONCADOR S/Nº",
+         "IE_cliente":"132836696",
+         "cod_mun_cliente":"2398",
+         "endereco_cobranca_cliente":"CAIXA POSTAL",
+         "bairro_cobranca_cliente":"CX. POSTAL  - CORREIOS",
+         "CNPJ_CPF_vendedor":"12678803000189",
+         "desc_cond_pagto":"DEPOSITO A VISTA",
+         "bairro_vendedor":"CENTRO"
+
+      
+},
+      {  
+         "email_cliente":"NAO TEM",
+         "obs":"CHEQUE A VISTA",
+         "cliente_cons_final":"1",
+         "desc_portador":{  
+            "xml:space":"preserve"
+
+         
+},
+         "total_pedido":"7489.38",
+         "CEP_cliente":"78635000",
+         "fax_vendedor":{  
+
+
+         
+},
+         "tipo_pedido":"1",
+         "fone_contato_cliente":{  
+
+
+         
+},
+         "num_cliente":"SN",
+         "endereco_vendedor":{  
+
+
+         
+},
+         "CNPJ_CPF_cliente":"07859554020",
+         "IS_cliente":{  
+
+
+         
+},
+         "fone_cobranca_cliente":{  
+
+
+         
+},
+         "num_pedido":"13355",
+         "UF_cobranca_cliente":"MT",
+         "fone_cliente":"6699712461",
+         "fax_cobranca_cliente":{  
+
+
+         
+},
+         "contato_cliente":{  
+
+
+         
+},
+         "comp_cliente":{  
+
+
+         
+},
+         "cod_mun_cobranca_cliente":"5100201",
+         "desc_mun_cliente":"AGUA BOA",
+         "dt_emissao":"2020-04-22T14:16:34-03:00",
+         "UF_cliente":"MT",
+         "comp_cobranca_cliente":{  
+
+
+         
+},
+         "fax_cliente":"6634681254",
+         "UF_vendedor":"MT",
+         "entrega_futura":"0",
+         "msdata:rowOrder":"2",
+         "num_cobranca_cliente":"787",
+         "desc_mun_cobranca_cliente":"AGUA BOA",
+         "CEP_cobranca_cliente":"78635000",
+         "nome_fantasia_cliente":"FAZENDA AGUA BOA I",
+         "nome_cliente":"CELIO FRIES",
+         "cod_portador":"0",
+         "obs_nota_fiscal":{  
+            "xml:space":"preserve"
+
+         
+},
+         "desc_mun_vendedor":"AGUA BOA",
+         "cod_cond_pagto":"6",
+         "nome_vendedor":"ANDREA MARTINS DE SOUZA",
+         "cod_mun_vendedor":"5100201",
+         "CEP_vendedor":"78635000",
+         "bairro_cliente":"ZONA RURAL",
+         "fone_vendedor":{  
+
+
+         
+},
+         "diffgr:id":"pedidos3",
+         "endereco_cliente":"MARG. DIREITA DA MT 240 18 KM DA SEDE",
+         "IE_cliente":"132626543",
+         "cod_mun_cliente":"5100201",
+         "endereco_cobranca_cliente":"AV: ARAGUAIA ESQ. 14",
+         "bairro_cobranca_cliente":"CENTRO",
+         "CNPJ_CPF_vendedor":"98151886153",
+         "desc_cond_pagto":"CHEQUE A VISTA",
+         "bairro_vendedor":{  
+
+
+         
+}
+
+      
+}
+
+   
+]
+
+}

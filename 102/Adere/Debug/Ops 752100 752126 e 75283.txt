@@ -1,0 +1,99 @@
+  FETCH
+  RUNNING TIME: 0.000
+  4GL SOURCE: POL1131.4GL  LINE: 746 
+  STATUS:    0 ROWS AFFECTED:1 SID:19474310
+  NAME_FGL:POL1131.CQ_IMP_ORD
+  NAME_SQL:cu5
+  INTO:25
+    T:         DECIMAL(9,0) V: 752100
+    T:              CHAR(5) V: 'EMBA '
+    T:         DECIMAL(2,0) V: 1
+    T:             CHAR(50) V: '37113202743                                       '
+    T:             CHAR(50) V: 'ET-2127 40X05 ETIQUETAS ROLO BR AT                '
+    T:             CHAR(50) V: 'CLIENTE NAO IDENTIFICADO                          '
+    T:             CHAR(20) V: '                    '
+    T:             CHAR(50) V: 'NULL'
+    T:         DECIMAL(9,0) V: 360
+    T:         DECIMAL(9,0) V: 1
+    T:         DECIMAL(3,0) V: 0
+    T:             DATETIME V: 2018-04-05 00:00:00                                                                                                                                                                                                                                            
+    T:             DATETIME V: 2018-04-05 00:00:00                                                                                                                                                                                                                                            
+    T:        DECIMAL(10,3) V: 15000
+    T:         DECIMAL(2,0) V: 1
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+[THREAD 4145232752 - 02/04/2018 10:06:28]
+  FETCH
+  RUNNING TIME: 0.000
+  4GL SOURCE: POL1131.4GL  LINE: 746 
+  STATUS:    0 ROWS AFFECTED:1 SID:19474310
+  NAME_FGL:POL1131.CQ_IMP_ORD
+  NAME_SQL:cu5
+  INTO:25
+    T:         DECIMAL(9,0) V: 752126
+    T:              CHAR(5) V: 'EMBA '
+    T:         DECIMAL(2,0) V: 1
+    T:             CHAR(50) V: '37101202622                                       '
+    T:             CHAR(50) V: 'ET-2111 25X05 ETIQUETAS ROLO BR AT                '
+    T:             CHAR(50) V: 'CLIENTE NAO IDENTIFICADO                          '
+    T:             CHAR(20) V: '                    '
+    T:             CHAR(50) V: 'NULL'
+    T:         DECIMAL(9,0) V: 3600
+    T:         DECIMAL(9,0) V: 1
+    T:         DECIMAL(3,0) V: 0
+    T:             DATETIME V: 2018-04-05 00:00:00                                                                                                                                                                                                                                            
+    T:             DATETIME V: 2018-04-05 00:00:00                                                                                                                                                                                                                                            
+    T:        DECIMAL(10,3) V: 30000
+    T:         DECIMAL(2,0) V: 1
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+[THREAD 4145232752 - 02/04/2018 10:06:28]
+  FETCH
+  RUNNING TIME: 0.000
+  4GL SOURCE: POL1131.4GL  LINE: 746 
+  STATUS:    0 ROWS AFFECTED:1 SID:19474310
+  NAME_FGL:POL1131.CQ_IMP_ORD
+  NAME_SQL:cu5
+  INTO:25
+    T:         DECIMAL(9,0) V: 752823
+    T:              CHAR(5) V: 'EMBA '
+    T:         DECIMAL(2,0) V: 1
+    T:             CHAR(50) V: '28459108644                                       '
+    T:             CHAR(50) V: 'XT100S 12X02 BLISTER DF M ACRIL ADERMAX TRANS 1MM '
+    T:             CHAR(50) V: 'CLIENTE NAO IDENTIFICADO                          '
+    T:             CHAR(20) V: '                    '
+    T:             CHAR(50) V: 'NULL'
+    T:         DECIMAL(9,0) V: 3600000
+    T:         DECIMAL(9,0) V: 1
+    T:         DECIMAL(3,0) V: 0
+    T:             DATETIME V: 2018-03-28 00:00:00                                                                                                                                                                                                                                            
+    T:             DATETIME V: 2018-04-13 00:00:00                                                                                                                                                                                                                                            
+    T:        DECIMAL(10,3) V: 23700
+    T:         DECIMAL(2,0) V: 1
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+    T:              DECIMAL V: NULL
+[THREAD 4145232752 - 02/04/2018 10:06:28]

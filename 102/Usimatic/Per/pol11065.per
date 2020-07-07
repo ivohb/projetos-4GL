@@ -1,0 +1,28 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------------
+                     DEFEITO
+[a   |b                                           ] 
+[a   |b                                           ] 
+[a   |b                                           ] 
+[a   |b                                           ] 
+[a   |b                                           ] 
+[a   |b                                           ] 
+[a   |b                                           ] 
+[a   |b                                           ] 
+[a   |b                                           ] 
+[a   |b                                           ] 
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_defeito, UPSHIFT --#, OPTIONS="-nolist";
+ b = FORMONLY.den_defeito, UPSHIFT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_programa[10] (cod_defeito thru den_defeito);
+END
+

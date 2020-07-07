@@ -1,0 +1,43 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                      RESERVAS INCONSISTIDAS         Número:[b         ] 
+           
+Emp  Reserva      Item            Descrição             Motivo do erro
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+[c |d       |e              |f               |g                             ]
+
+}
+
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_emp_ofic, NOENTRY;
+  b = FORMONLY.num_reserva, UPSHIFT, AUTONEXT;
+  c = FORMONLY.cod_empresa;
+  d = FORMONLY.num_reserva_e;
+  e = FORMONLY.Cod_item;
+  f = FORMONLY.den_item;
+  g = FORMONLY.des_erro;
+  
+  
+END 
+
+INSTRUCTIONS
+                     
+   SCREEN RECORD sr_reserva[13](cod_empresa THRU des_erro);
+                     
+END 
+

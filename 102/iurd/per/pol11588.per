@@ -1,0 +1,43 @@
+DATABASE logix
+SCREEN
+{
+[a ]                     TEXTOS DO DOCUMENTO
+----------------------------------------------------------------------------
+Num AD:[b     ] Emissão:[c         ] Valor:[d         ] Vencto:[e         ]
+
+Num NF:[f     ]   Série:[g ]   Sub série:[h ]   Empresa origem:[i ]
+----------------------------------------------------------------------------
+ 
+    Opç  Seq    Mensagem do Aprovante        Resposta do Emitente
+    [m] [n ] [o                        ] [p                        ]
+             [o                        ] [p                        ]
+             [o                        ] [p                        ]
+             [o                        ] [p                        ]
+             [o                        ] [p                        ]
+             [o                        ] [p                        ]
+             [o                        ] [p                        ]
+             [o                        ] [p                        ]
+             [o                        ] [p                        ]
+             [o                        ] [p                        ]
+
+             
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, NOENTRY;
+ b = FORMONLY.num_ad,      NOENTRY;
+ c = FORMONLY.dat_emis_nf, NOENTRY;
+ d = FORMONLY.val_tot_nf,  NOENTRY;
+ e = FORMONLY.dat_venc,    NOENTRY;
+ f = FORMONLY.num_nf,      NOENTRY;
+ g = FORMONLY.ser_nf,      NOENTRY;
+ h = FORMONLY.ssr_nf,      NOENTRY;
+ i = FORMONLY.cod_emp_orig,NOENTRY;
+ 
+ m = FORMONLY.ies_controle,  UPSHIFT, INCLUDE=('A','S','I','M','E'),  
+     COMMENTS = 'S=Seguinte  A=Anterior  I=Inclui  M=Modifica  E=Exclui';
+ n = FORMONLY.num_mensag,    NOENTRY;
+ o = FORMONLY.txt_aprovante, UPSHIFT, AUTONEXT, WORDWRAP;
+ p = FORMONLY.txt_emitente,  UPSHIFT, NOENTRY, WORDWRAP;
+ 
+END

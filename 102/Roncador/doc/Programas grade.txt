@@ -1,0 +1,39 @@
+pol1313.4gl	Percentual de radteio mensal - timesheet
+pol1314.4gl	Percentual de radteio por tipo de  despesa
+pol1315.4gl	Cadastro de aprovantes de rateio
+pol1317.4gl	Previsão de rateio de despesas
+pol1318.4gl	Rateio de despesas (geração/estorno de titulos)
+pol1319.4gl	Consulta/Impressão de nota de débito
+  
+func008 - zoom da tabela linha_prod
+func009 - gerar  título no CAP
+func010 - gerar  título no CRE
+func011 - excluir título do CRE
+func012 - excluir título do CAP
+func002 - funções diversas
+
+
+- a verificação de uso de área e linha está sendo feita através
+  da tabela par_cap_pad:
+  SELECT par_ies FROM par_cap_pad WHERE cod_empresa = ?? AND cod_parametro = 'ies_area_linha_neg'
+
+- a verificação se a empresa tem CAP está sendo feita através da tabela emp_orig_destino
+
+- o CRC do contador está sendo buscado da tabela min_par_modulo
+   SELECT parametro_texto FROM min_par_modulo WHERE empresa = ?? AND parametro = 'CRC_DO_CONTADOR'     
+
+- o nome do contador está sendo buscado da tabela min_par_modulo
+   SELECT parametro_texto FROM min_par_modulo WHERE empresa = ?? AND parametro = 'NOME_DO_CONTADOR'     
+
+- para geração da nota de débito é preciso que a empresa destino seja cliente da origem e a origem
+  precisa estar cadastrada como fornecedor da destino.   
+
+- é necessário cadastrar, na log1100, um caminho para os arquivos pgi1317.exe e banco.ini. 
+  antes de mandar para a roncador, é preciso editar o arquivo banco.ini e alterar os campos 
+  password, ID e Source
+
+- no servidor 192.168.1.21 já criei as tabelas no banco oracle e coloquei os programas no menu; 
+  cadastrei o caminho na log1100 e o RPO desse ambiente está atualizado; 
+
+
+  

@@ -1,0 +1,37 @@
+DATABASE logix
+SCREEN
+{
+   Inicio     Ás       Fim        Ás       Boas Refugo Sucata  Estornar?
+ [a         |b       |c         |d       |e     |f    |g    ]     [h]
+ [a         |b       |c         |d       |e     |f    |g    ]     [h]
+ [a         |b       |c         |d       |e     |f    |g    ]     [h]
+ [a         |b       |c         |d       |e     |f    |g    ]     [h]
+ [a         |b       |c         |d       |e     |f    |g    ]     [h]
+ [a         |b       |c         |d       |e     |f    |g    ]     [h]
+                 Total á ser estornado: [i     ][j    ][k    ] 
+ 
+}                
+
+END
+
+ATTRIBUTES
+a = FORMONLY.dat_inicial,  UPSHIFT, NOENTRY, REVERSE, color = yellow;
+b = FORMONLY.hor_inicial,  UPSHIFT, NOENTRY, REVERSE, color = yellow;
+c = FORMONLY.dat_final,    UPSHIFT, NOENTRY, REVERSE, color = yellow;
+d = FORMONLY.hor_final,    UPSHIFT, NOENTRY, REVERSE, color = yellow;   
+e = FORMONLY.qtd_boas,     UPSHIFT, NOENTRY, REVERSE, color = yellow;   
+f = FORMONLY.qtd_refugo,   UPSHIFT, NOENTRY, REVERSE, color = yellow;   
+g = FORMONLY.qtd_sucata,   UPSHIFT, NOENTRY, REVERSE, color = yellow;   
+h = FORMONLY.ies_estornar, UPSHIFT, REVERSE, color = green,
+    INCLUDE = ('S', 'N'),
+    COMMENTS = "S - Estorna o registro atual. N - Não estorna.";   
+i = FORMONLY.tot_boas,     UPSHIFT, NOENTRY, REVERSE, color = blue;
+j = FORMONLY.tot_refugo,   UPSHIFT, NOENTRY, REVERSE, color = blue;
+k = FORMONLY.tot_sucata,   UPSHIFT, NOENTRY, REVERSE, color = blue;
+#l = FORMONLY.tot_geral,    UPSHIFT, NOENTRY, REVERSE, color = red;
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_estorno[6](dat_inicial THRU ies_estornar);
+END 

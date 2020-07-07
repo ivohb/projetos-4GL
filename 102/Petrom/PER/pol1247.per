@@ -1,0 +1,69 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                     TABELA DE PREÇO DE FRETE          
+
+    Transportadora:[b              ]  [c                                  ]
+
+   Tipo de veículo:[d         ]  [dv             ]   Tipo de carga:[e         ]
+
+
+     Cidade origem:[f    ]  [g                                       ]     [w ]
+       Rota origem:[ro   ]  [do                                               ]       
+    Cidade destino:[h    ]  [i                                       ]     [x ]
+      Rota destino:[rd   ]  [dd                                               ]       
+
+  Valor primeira viagem:[j            ]   Valor demais viagem:[k            ]
+   Considerar valor por:[z            ]          Cobrança por:[q             ]
+  
+
+       valor do pedagio:[l            ]       Valor adicional:[m            ]                                          
+     Início da vigencia:[o         ]          Fim da vigencia:[p         ]         
+       Versão da tabela:[v ]   Dat gravação:[dg        ]   Usuário:[cu      ]
+}
+
+TABLES
+   carreta_455,
+   preco_frete_455
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,       NOENTRY;
+ b = preco_frete_455.cod_transpor,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.den_transpor,   NOENTRY;
+ d = carreta_455.cod_tip_veiculo, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ dv= FORMONLY.des_tip_veiculo,   NOENTRY;
+ e = FORMONLY.tip_carga TYPE CHAR, INCLUDE=('S','G')
+     --#, widget='RADIO', config='S Seca G Granel'; 
+ f = preco_frete_455.cod_cidade_orig, UPSHIFT 
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ g = FORMONLY.den_cidade_orig, NOENTRY; 
+ w = FORMONLY.estado_orig, NOENTRY; 
+ ro= preco_frete_455.cod_rota_orig, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ do = FORMONLY.des_rota_orig, NOENTRY; 
+ h = preco_frete_455.cod_cidade_dest, UPSHIFT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ i = FORMONLY.den_cidade_dest, NOENTRY; 
+ x = FORMONLY.estado_dest, NOENTRY; 
+ rd= preco_frete_455.cod_rota_dest, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ dd = FORMONLY.des_rota_dest, NOENTRY; 
+ j = preco_frete_455.val_pri_viagem;  
+ k = preco_frete_455.val_demais_viag; 
+ z = FORMONLY.tip_valor TYPE CHAR, INCLUDE=('T','V')
+     --#, widget='RADIO', config='T Tonelada V Viagem';     
+ q = FORMONLY.tip_cobranca TYPE CHAR, INCLUDE=('N','C')
+     --#, widget='RADIO', config='N Peso da nota C Peso mínimo';     
+ l = preco_frete_455.val_pedagio;     
+ m = preco_frete_455.val_adicional;   
+ v = preco_frete_455.num_versao, NOENTRY;      
+ o = preco_frete_455.dat_ini_vigencia;
+ p = preco_frete_455.dat_fim_vigencia;
+ dg= preco_frete_455.dat_atualiz, NOENTRY;
+ cu= preco_frete_455.cod_usuario, NOENTRY;
+END
+

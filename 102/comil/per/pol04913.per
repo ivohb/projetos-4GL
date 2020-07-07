@@ -1,0 +1,32 @@
+DATABASE FORMONLY
+SCREEN
+{
+-----------------------------------------------------------------------
+  
+                 Tipo           
+                Analise                Descricao
+               ---------     --------------------------------
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+                [a3    ]     [a4                            ]
+
+}
+END
+
+ATTRIBUTES
+a3 = FORMONLY.tip_analise, UPSHIFT, AUTONEXT;
+a4 = FORMONLY.den_analise, UPSHIFT, NOENTRY;
+END 
+
+INSTRUCTIONS
+
+   SCREEN RECORD sr_analise_popup[10](tip_analise THRU den_analise);
+                     
+END 

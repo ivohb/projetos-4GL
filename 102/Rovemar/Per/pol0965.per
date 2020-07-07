@@ -1,0 +1,40 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------------
+
+ [a0]            PARÂMETROS DE AJUSTES NA INTEGRAÇÃO LOGIX x EGA
+        
+    
+% Ajuste Qtd. Necessária: [a2    ]
+          
+Caminho Arqs. Exportados: [a3                                                ]
+   
+ Aponta Equipto/Recurso?: [b         ] 
+ 
+
+     Aponta Ferramental?: [c         ] 
+
+ 
+
+
+
+
+}
+END
+
+TABLES
+   rovpct_ajust_man912
+END
+
+ATTRIBUTES
+a0   = FORMONLY.cod_empresa,     NOENTRY;
+a2   = rovpct_ajust_man912.pct_ajus_insumo, AUTONEXT;
+a3   = rovpct_ajust_man912.nom_caminho, AUTONEXT;
+ b   = FORMONLY.aponta_eqpto_recur TYPE CHAR, INCLUDE=('S','N'),AUTONEXT 
+--#, widget='RADIO', config='S SIM N NÃO';
+ c   = FORMONLY.aponta_ferramenta TYPE CHAR, INCLUDE=('S','N'),AUTONEXT 
+--#, widget='RADIO', config='S SIM N NÃO';
+END
+

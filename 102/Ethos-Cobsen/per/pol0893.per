@@ -1,0 +1,58 @@
+DATABASE LOGIX
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [b0]     GERA ROMANEIO PARA PROGRAMACAO DE ENTREGA - EDIFACT
+ Pedido: [a1    ] Produto: [a2             ]  [b1                            ]
+ Cliente: [a11            ]  [a12                                ]
+ Periodo:[d1        ] a [d2        ]
+  ---  -------------------------- GATILHO ENTREGA ---------------------------         
+  IND   Dt.Entrega    Qtd.Solic    Qtd.Roman.     Estoque    Qtd.prod.   Sem
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]
+  [s]  [a7        ]   [a13     ]   [a9      ]   [a10     ]   [a8     ]  [s11]     
+}
+END
+
+TABLES
+ped_itens_fct_547
+clientes
+END
+
+ATTRIBUTES
+b0 = FORMONLY.cod_empresa,          NOENTRY;
+a1 = ped_itens_fct_547.num_pedido,  AUTONEXT;
+a2 = ped_itens_fct_547.cod_item,    AUTONEXT;
+b1 = FORMONLY.p_cod_item_cliente,   NOENTRY;
+a11= clientes.cod_cliente,          AUTONEXT;
+a12= clientes.nom_cliente,          NOENTRY;
+d1 = FORMONLY.dat_ini,              AUTONEXT;
+d2 = FORMONLY.dat_fim,              AUTONEXT; 
+s  = FORMONLY.ies_func,             UPSHIFT,AUTONEXT,
+     COMMENTS = "INFORME (S)-PARA GERAR ROMANEIO, (C)-PARA CANCELAR PROGRAMACAO OU (N)";
+a7 = FORMONLY.dat_entrega,          NOENTRY;
+a13= FORMONLY.qtd_gatilho,          NOENTRY;
+a9 = ped_itens_fct_547.qtd_solic,   UPSHIFT,AUTONEXT,
+     COMMENTS = "INFORME A QUANTIDADE A FATURAR";
+a10= FORMONLY.qtd_estoque,          NOENTRY;
+a8 = FORMONLY.qtd_produc,           NOENTRY;
+s11= FORMONLY.ies_semana,           NOENTRY;
+END
+
+INSTRUCTIONS
+screen record s_ped_itens_fct_547[10] (FORMONLY.ies_func,
+                                       FORMONLY.dat_entrega,  
+                                       FORMONLY.qtd_gatilho,
+                                       ped_itens_fct_547.qtd_solic,
+                                       FORMONLY.qtd_estoque,       
+                                       FORMONLY.qtd_produc,
+                                       FORMONLY.ies_semana);
+END

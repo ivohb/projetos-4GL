@@ -1,0 +1,39 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+----------------------------------------------------------------------------
+ [a ]               INCONSISTÊNCIAS NO APONTAMENTO           OP:[b         ]
+ 
+ Num Ordem  Máq  Qtd Prod              Descrição do problema
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+[c         |d   |e       |f                                                ]
+ 
+}
+END
+
+ATTRIBUTES 
+ a = FORMONLY.cod_empresa;
+ b = FORMONLY.numordem, UPSHIFT, AUTONEXT;
+END
+
+ATTRIBUTES
+ c = FORMONLY.num_op      --#, OPTIONS="-nolist";
+ d = FORMONLY.cod_maquina --#, OPTIONS="-nolist";
+ e = FORMONLY.qtd_prod    --#, OPTIONS="-nolist";
+ f = FORMONLY.den_critica --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD s_criticas[11] (num_op THRU den_critica);
+END
+

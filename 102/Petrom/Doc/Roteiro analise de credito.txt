@@ -1,0 +1,23 @@
+Jefferson, segue a relação dos programas:
+1)      pol1187: cadastro dos usuários para o módulo de análises 
+                 nesse programa, vocês devem cadastrar o usuário e a função dele, 
+                 podendo ser A (Analista), G (Gerente), V (Vendedor) e P (Aprovador)
+2)      pol1188: cadastro dos  indicadores
+3)      pol1189: vigência (prazo de validade) dos indicadores 
+4)      pol1190: cadastro das perguntas
+5)      pol1191: cadastro de fórmulas para uso nas perguntas calculadas
+6)      pol1192: cadastro de porcentagem para aplicação no faturamento
+7)      pol1193: cadastro de porcentagem para aplicação no faturamento
+8)      pol1194: realização das análises. 
+                 Primeiro, usuário cadastrado no pol1187 com a função de Analista (A), 
+                 precisa gerar (cadastrar) a Analise de crédito (versão 1 da análise). 
+                 Quando tudo estiver ok, esse usuário deverá Concluir a análise. 
+                 Esse processo consiste em gerar a versão 2 da análise, a qual poderá 
+                 ser enxergada pelo Gerente (usuário cadastrado no pol1187 com função G). 
+                 Ao término da avaliação e/ou alteração por parte do Gerente, 
+                 o mesmo deverá concluir a análise, para que a mesma possa ser 
+                 enxergada pelo Vendedor ou Aprovador.
+9)      Pol1195: aprovação de análises. Através desse programa, o Vendedor e o Aprovador
+                 poderão sugerir valores de crédito. Além disso, a análise poderá ser 
+                 aprovada (pelo Aprovador), para ser integrada com o limite 
+                 de crédito do  Logix.

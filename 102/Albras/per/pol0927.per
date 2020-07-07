@@ -1,0 +1,37 @@
+DATABASE logix
+SCREEN
+{
+ -----------------------------------------------------------------------------
+  
+  [a ]                    DEVOLUÇÃO DOS CLIENTES(KITS) 
+  
+ 
+ 
+          
+              AR:[b       ]     NF:[c      ]     Emissão:[d         ]
+            
+      Fornecedor:[e              ] [f                                  ] 
+                
+                    
+ 
+ 
+ 
+
+
+
+}
+
+END
+
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, NOENTRY;
+b = FORMONLY.num_aviso_rec , UPSHIFT, AUTONEXT;
+c = FORMONLY.num_nf, UPSHIFT, AUTONEXT;
+d = FORMONLY.dat_emis_nf, NOENTRY, REVERSE;
+e = FORMONLY.cod_fornecedor, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+f = FORMONLY.raz_social, NOENTRY, REVERSE;
+ 
+
+END 

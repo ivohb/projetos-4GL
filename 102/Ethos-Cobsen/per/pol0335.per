@@ -1,0 +1,35 @@
+DATABASE FORMONLY 
+SCREEN
+{ 
+------------------------------------------------------------------------------
+ [a0]              CONSULTA ARQUIVO CONSISTÊNCIA/CONFIRMAÇÃO           
+
+
+Arquivo: [d                                                                  ]
+
+
+       Data Arquivo: [a         ]                Hora Arquivo: [a1      ]
+
+ Data Processamento: [b         ]          Hora Processamento: [b1      ] 
+ 
+
+             Textos: [c                                       ]
+                     [c1                                      ]
+                     [c2                                      ]
+
+
+
+}   
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, UPSHIFT,  NOENTRY;
+d  = FORMONLY.nom_arquivo, AUTONEXT;
+a  = FORMONLY.dat_movto    TYPE DATE;
+a1 = FORMONLY.hor_movto    TYPE DATETIME HOUR TO SECOND;
+b  = FORMONLY.dat_proces   TYPE DATE; 
+b1 = FORMONLY.hor_proces   TYPE DATETIME HOUR TO SECOND; 
+c  = FORMONLY.texto_1,     UPSHIFT;
+c1 = FORMONLY.texto_2,     UPSHIFT;
+c2 = FORMONLY.texto_3,     UPSHIFT;
+END

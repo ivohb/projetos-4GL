@@ -1,0 +1,132 @@
+--------------------------------------------------------------------------------
+ROVEMAR INDUSTRIA E COM. LTDA              DATA: 09/05/12 - 15:46:54     PAG:  1
+
+POL00903              RELATORIO DE PLANO DE INSPEÇÃO
+--------------------------------------------------------------------------------
+
+
+         Item: 4304536I        - VARAO DE 5/6 VELOCIDADE RE                                                  
+         Operação: 020   - FRESAR                        
+         Numero de seuqncia operacional:     1
+         Roteiro: PADRAO         
+
+         N.COTA              DESCRICAO               UN    NOMINAL   TOTAL+   TOTAL-
+
+                ----------------------------------------   -------   ------   ------
+
+               1     DIMENSAO                        DCS 18,69000 18,94000 18,44000
+                     TEXTO: APROVACAO CONFORME PROGRAMA
+
+               1     DIMENSAO                        CTS 12,66500 12,79000 12,54000
+                     TEXTO: APROVACAO CONFORME PROGRAMA
+
+               1     DIMENSAO                        DCS 17,60000 17,85000 17,35000
+                     TEXTO: APROVACAO CONFORME PROGRAMA
+
+               1     DIMENSAO                        CTS 12,66500 12,79000 12,54000
+                     TEXTO: 
+
+               1     DIMENSAO                        CTS 43,12500 43,25000 43,00000
+                     TEXTO: 
+
+               1     DIMENSAO                        CTS  4,87000  4,92000  4,82000
+                     TEXTO: 
+
+               1     DIMENSAO                        CTS 18,37500 18,50000 18,25000
+                     TEXTO: 
+
+               1     DIMENSAO                        CTS 15,77500 15,85000 15,70000
+                     TEXTO: 
+
+               1     DIMENSAO                        CTS 14,27500 14,35000 14,20000
+                     TEXTO: 
+
+               1     DIMENSAO                        CTS 76,19500 76,27000 76,12000
+                     TEXTO: 
+
+               1     DIMENSAO                        CTS 28,60000 28,75000 28,45000
+                     TEXTO: 
+
+               1     DIMENSAO                        CTS 15,83000 15,88000 15,78000
+                     TEXTO: DISPOSITIVO NI-3478/PADRAO NI-3482
+
+               1     DIMENSAO                        DCS  7,15000  7,40000  6,90000
+                     TEXTO: DIMENSAO DO CHANFRO
+
+               1     DIMENSAO                        MM  58,00000 59,00000 57,00000
+                     TEXTO: 
+
+               3     DIAMETRO INTERNO                CTS  6,10000  6,15000  6,05000
+                     TEXTO: CALIBRADOR TAMPAO NI-1505
+
+               4     RAIO                            CTS  5,58000  5,62000  5,54000
+                     TEXTO: 
+
+
+
+--------------------------------------------------------------------------------
+ROVEMAR INDUSTRIA E COM. LTDA              DATA: 09/05/12 - 15:46:54     PAG:  2
+
+POL00903              RELATORIO DE PLANO DE INSPEÇÃO
+--------------------------------------------------------------------------------
+
+
+               4     RAIO                            DCS  1,50000  2,00000  1,00000
+                     TEXTO: 
+
+               4     RAIO                            CTS  5,58000  5,62000  5,54000
+                     TEXTO: 
+
+               4     RAIO                            DCS  1,30000  1,50000  1,10000
+                     TEXTO: 
+
+               5     ANGULO                          GRA 45,00000 47,00000 43,00000
+                     TEXTO: 
+
+               5     ANGULO                          GRA 45,00000 47,00000 43,00000
+                     TEXTO: 
+
+               5     ANGULO                          GRA 30,00000 32,00000 28,00000
+                     TEXTO: APROVACAO CONF PERFIL FERRAMENTA
+
+              12     PARALELO                        CTS  0,00000  0,05000  0,00000
+                     TEXTO: 
+
+              12     PARALELO                        CTS  0,00000  0,08000  0,00000
+                     TEXTO: 
+
+              16     PERPENDICULAR                   CTS  0,00000  0,10000  0,00000
+                     TEXTO: 
+
+              17     POSICAO                         CTS  0,00000  0,08000  0,00000
+                     TEXTO: DISPOSITIVO NI-3137/PINO NI-3216
+
+              22     ASPECTO VISUAL                  TXT  0,00000  0,00000  0,00000
+                     TEXTO: VERIFICAR GRAVACAO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

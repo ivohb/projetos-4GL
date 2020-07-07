@@ -1,0 +1,32 @@
+Group pol0648
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=2
+         File \Cibrapel\4gl\pol0648.4gl
+             Type=T
+         End
+         File \Cibrapel\Per\pol0648.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

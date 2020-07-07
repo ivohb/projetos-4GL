@@ -1,0 +1,30 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------
+[a0]                  Cadastro de Quantidade Padrao
+ 
+Item    : [a1             ] [a2                                      ]
+
+Item Barra : [a3             ]  Cod.Dap [a4          ]
+
+Qtd. Padrao: [a5           ]
+ 
+}   
+
+END
+
+TABLES
+qtd_padrao_546,
+item  
+END
+
+ATTRIBUTES
+a0   = qtd_padrao_546.cod_empresa, NOENTRY;
+a1   = item.cod_item,  UPSHIFT, AUTONEXT;    
+a2   = item.den_item, NOENTRY; 
+a3   = qtd_padrao_546.cod_item_barra_dig,  NOENTRY;   
+a4   = qtd_padrao_546.cod_dap,  UPSHIFT, AUTONEXT;    
+a5   = qtd_padrao_546.qtd_embal,  UPSHIFT, AUTONEXT;   
+END

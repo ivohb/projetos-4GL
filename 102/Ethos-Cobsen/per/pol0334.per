@@ -1,0 +1,37 @@
+DATABASE FORMONLY 
+SCREEN
+{ 
+------------------------------------------------------------------------------
+ [a0]  ENVIO DE CONFIRMAÇÃO DE RECEBIMENTO DOS MATERIAIS P/ CATERPILLAR       
+     
+ 
+
+   Fornecedor: [a3             ] [a4                                  ]   
+               [a3             ] [a4                                  ]   
+               [a3             ] [a4                                  ]   
+               [a3             ] [a4                                  ]   
+               [a3             ] [a4                                  ]   
+               [a3             ] [a4                                  ]   
+               [a3             ] [a4                                  ]   
+               [a3             ] [a4                                  ]   
+               [a3             ] [a4                                  ]   
+
+
+
+
+}   
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, UPSHIFT,  NOENTRY;
+a3 = FORMONLY.cod_cliente, UPSHIFT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+--#, OPTIONS="-nolist"
+; 
+a4 = FORMONLY.nom_cliente, UPSHIFT, NOENTRY
+--#, OPTIONS="-nolist"
+;
+
+INSTRUCTIONS
+SCREEN RECORD s_clientes[9] (FORMONLY.cod_cliente THRU FORMONLY.nom_cliente);
+END

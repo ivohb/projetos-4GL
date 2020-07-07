@@ -1,0 +1,40 @@
+DATABASE formonly
+SCREEN
+{
+------------------------------------------------------------------------------
+[a0]              SELECAO DE ITENS DE AR'S COM SALDO
+
+ITEM : [a1                                                                 ]
+
+   AR     Sq Descricao                            Estoque   Dispon. Solicit.   
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+[i|a7    |a8|a9                                  |a10     |a11     |a12     ]    
+} 
+END
+
+ATTRIBUTES
+a0 = saldo_ar_dd_885.cod_empresa,     NOENTRY;
+a1 = FORMONLY.den_item,               UPSHIFT, AUTONEXT;
+i  = FORMONLY.ies_sel,                UPSHIFT, AUTONEXT;
+a7 = formonly.num_ar,          NOENTRY;
+a8 = formonly.num_seq,         NOENTRY;
+a9 = formonly.den_item,        NOENTRY;
+a10= FORMONLY.qtd_saldo,              NOENTRY;
+a11= FORMONLY.qtd_dispon,             NOENTRY;
+a12= FORMONLY.qtd_solicit,            AUTONEXT;
+INSTRUCTIONS
+screen record s_ars[10](FORMONLY.ies_sel,
+                        formonly.num_ar,         
+                        formonly.num_seq,         
+                        formonly.den_item,     
+                        FORMONLY.qtd_saldo,                
+                        FORMONLY.qtd_dispon,
+                        FORMONLY.qtd_solicit);

@@ -1,0 +1,101 @@
+Group Codesp
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=25
+         File \Projetos\4GL\102\Codesp\4gl\pol0933.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0934.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0936.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0946.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0947.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0950.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0951.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0952.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0953.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol0963.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol1036.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\4gl\pol1037.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0933.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0934.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0936.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0946.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0947.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0950.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0951.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0952.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0953.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol0963.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol1036.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol1037.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Codesp\Per\pol09341.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

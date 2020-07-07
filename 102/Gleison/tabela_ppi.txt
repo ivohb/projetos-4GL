@@ -1,0 +1,42 @@
+
+
+
+DROP TABLE "informix".ppi_insert_fila;
+
+create table "informix".ppi_insert_fila
+  (
+    cod_arranjo char(30),
+    ordem_producao char(30),
+    operacao_seq char(30),
+    data_inicio char(30),
+    data_fim char(30),
+    sequencia char(30)
+  );
+
+
+SET ISOLATION TO REPEATABLE READ;
+INSERT INTO ppi_insert_fila
+SELECT 
+ord_oper.cod_arranjo AS cod_arranjo,
+man_oper_compl.ordem_producao AS ordem_producao,
+REPLACE(man_oper_compl.operacao||'.'||man_oper_compl.sequencia_operacao,' ','') AS operacao_seq,
+to_char(man_oper_compl.dat_ini_planejada, '%Y%m%d') AS data_inicio,
+to_char(man_oper_compl.dat_trmn_planejada, '%Y%m%d') AS data_fim,
+man_oper_compl.sequencia_operacao AS sequencia
+FROM man_oper_compl
+INNER JOIN ord_oper
+  ON ord_oper.cod_empresa = man_oper_compl.empresa
+  AND ord_oper.num_ordem = man_oper_compl.ordem_producao
+INNER JOIN ordens
+  ON ordens.cod_empresa = man_oper_compl.empresa
+  AND ordens.num_ordem = man_oper_compl.ordem_producao
+WHERE man_oper_compl.dat_ini_planejada >='2019-07-01 00:00:00'
+AND man_oper_compl.empresa = '01'
+AND ordens.ies_situa = '4'
+ORDER BY man_oper_compl.dat_ini_planejada;
+
+
+unload to insert_fila_ppi.txt
+SELECT * , '@' FROM "informix".ppi_insert_fila;
+
+

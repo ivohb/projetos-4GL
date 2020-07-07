@@ -1,0 +1,37 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                   PARÂMETROS PARA CONTROLE DE FRETE
+
+  
+
+           Empresa:[b ]  [c                                  ]
+            
+           Data de corte:[d         ]     
+
+         % de tolerância:[e     ]  
+
+           % do segururo:[f     ]  
+
+
+
+
+
+
+
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.empresa,       NOENTRY;
+ b = FORMONLY.cod_empresa,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.den_empresa,   NOENTRY;
+ d = FORMONLY.dat_corte,     AUTONEXT;
+ e = FORMONLY.pct_tolerancia,AUTONEXT,
+     COMMENTS='Aplicado sobre o valor do frete antes de efetuar o bloqueio';
+ f = FORMONLY.pct_seguro,    AUTONEXT,
+     COMMENTS='P/ o relatório da seguradora';
+END
+

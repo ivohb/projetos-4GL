@@ -1,0 +1,38 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                    TIPO DE NOTA POR CÓDIGO DE OPERAÇÃO
+                             
+                               
+   
+      Cód operação:[b     ]   [c                            ]
+
+                              
+        Tipo da NF:[d]  [e                                                  ]
+ 
+
+
+
+
+
+
+
+
+
+
+
+}
+END
+
+
+ATTRIBUTES
+ 
+   a = FORMONLY.cod_empresa,UPSHIFT, NOENTRY;  
+   b = FORMONLY.cod_operacao, UPSHIFT, AUTONEXT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   c = FORMONLY.den_operacao, UPSHIFT, NOENTRY;
+   d = FORMONLY.cod_status, UPSHIFT, AUTONEXT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   e = FORMONLY.den_status, NOENTRY;
+END 

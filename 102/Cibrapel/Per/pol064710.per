@@ -1,0 +1,41 @@
+DATABASE logix 
+
+SCREEN
+{
+----------------------------------------------------------------------------
+[a ]                    INCONSISTÊNCIAS NO CONSUMOS
+
+
+          Ordem:[b         ]               Cód Máquina:[f   ]
+           Item:[c              ]          Dat Consumo:[g         ]
+           Lote:[d              ]            É refugo?:[h]
+        Consumo:[e          ]                Sequência:[i         ]
+
+         [v                                                       ]
+         [w                                                       ]
+         [x                                                       ]
+         [y                                                       ]
+         [z                                                       ]
+    
+         
+}
+END
+
+ATTRIBUTES 
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.numordem, UPSHIFT, AUTONEXT;
+   c = FORMONLY.coditem, UPSHIFT, AUTONEXT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   d = FORMONLY.numlote, UPSHIFT, AUTONEXT;
+   e = FORMONLY.qtdconsumo, UPSHIFT, AUTONEXT, FORMAT = '######&.&&&';
+   f = FORMONLY.codmaquina, UPSHIFT, AUTONEXT;
+   g = FORMONLY.datconsumo, AUTONEXT, FORMAT = 'dd/mm/yyyy';
+   h = FORMONLY.iesrefugo, UPSHIFT, AUTONEXT, COMMENTS = 'S-Sim N-Não';
+   i = FORMONLY.numsequencia, NOENTRY;
+   v = FORMONLY.critica_1, NOENTRY;
+   w = FORMONLY.critica_2, NOENTRY;
+   x = FORMONLY.critica_3, NOENTRY;
+   y = FORMONLY.critica_4, NOENTRY;
+   z = FORMONLY.critica_5, NOENTRY;
+END
+

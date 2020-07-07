@@ -1,0 +1,10 @@
+
+create table item_refer_petrom 
+  (
+    cod_empresa char(2) not null ,
+    cod_item_petrom char(15) not null ,
+    cod_item char(15) not null 
+  );
+
+create unique index ix_item_refer_1 on item_refer_petrom 
+    (cod_empresa,cod_item_petrom,cod_item);

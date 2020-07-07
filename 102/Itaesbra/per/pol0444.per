@@ -1,0 +1,51 @@
+DATABASE FORMONLY
+SCREEN
+{
+ -----------------------------------------------------------------------------
+   [a ]                 ESTOQUE DA ESTRUTURA DO ITEM
+
+Item: [b              ][c                                                    ]
+
+ 
+    Componente       Descrição     Necessário Disponiv.  No Estoq    Na Fila
+ ---------------  ---------------  ---------  ---------  ---------  ---------
+[j              ][k              ][l        ][m        ][n        ][o        ]
+[j              ][k              ][l        ][m        ][n        ][o        ]
+[j              ][k              ][l        ][m        ][n        ][o        ]
+[j              ][k              ][l        ][m        ][n        ][o        ]
+[j              ][k              ][l        ][m        ][n        ][o        ]
+[j              ][k              ][l        ][m        ][n        ][o        ]
+[j              ][k              ][l        ][m        ][n        ][o        ]
+}
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_empresa, NOENTRY;
+  b = FORMONLY.num_ordem, UPSHIFT;
+  c = FORMONLY.dat_entrega;
+  d = FORMONLY.num_docum, UPSHIFT;
+  e = FORMONLY.dat_liberac;
+  f = FORMONLY.qtd_planej, NOENTRY;
+  g = FORMONLY.ies_situa, UPSHIFT,
+      COMMENTS = 
+      '1-Planejada 2-Firme 3-Aberta 4-Liberada 5-Fechada 9-Cancelada';
+  t = FORMONLY.den_situa, NOENTRY;
+  h = FORMONLY.cod_item, UPSHIFT;
+  i = FORMONLY.den_item, NOENTRY;
+  r = FORMONLY.loc_estoque, UPSHIFT, AUTONEXT, picture = '#'
+ --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;   
+  s = FORMONLY.den_loc_estoque, NOENTRY;
+  j = FORMONLY.cod_item_compon;
+  k = FORMONLY.den_item_reduz;
+  l = FORMONLY.qtd_necessaria;
+  m = FORMONLY.qtd_dispon;
+  n = FORMONLY.qtd_estoque;
+  o = FORMONLY.qtd_fila;
+END 
+
+INSTRUCTIONS
+
+   SCREEN RECORD sr_compon[7](cod_item_compon THRU qtd_fila);
+                     
+END 

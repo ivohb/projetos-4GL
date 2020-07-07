@@ -1,0 +1,1 @@
+\\192.168.1.56\smartclient\TotvsSmartClient.exe -M -Q  -P=sup3760.4gl -C=tcp -E=logix102

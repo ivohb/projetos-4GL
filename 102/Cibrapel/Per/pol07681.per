@@ -1,0 +1,31 @@
+DATABASE logix
+SCREEN
+{
+          CODIGO                    NOME      
+      -----------------   -----------------------------   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+      [a              ]  [b                            ]   
+    
+}
+END
+
+
+ATTRIBUTES
+   a = FORMONLY.cod_veiculo,NOENTRY;
+   b = FORMONLY.den_veiculo,NOENTRY;
+   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_lista[12] (cod_veiculo THRU den_veiculo);
+END 

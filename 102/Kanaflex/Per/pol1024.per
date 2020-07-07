@@ -1,0 +1,45 @@
+DATABASE FORMONLY
+SCREEN
+{
+ -----------------------------------------------------------------------------
+  [a ]                 COMISSÃO POR ITEM DO PEDIDO
+  
+            Pedido: [b     ] Cliente: [c              ][d              ]
+          Carteira: [e ] [f              ]  
+     Representante: [g    ] [h                                   ]
+
+      Seq.      Item             Descrição       Pct. comis.   Pct. meta
+    [i    ][j              ][k                 ][l          ][m          ]
+    [i    ][j              ][k                 ][l          ][m          ]
+    [i    ][j              ][k                 ][l          ][m          ]
+    [i    ][j              ][k                 ][l          ][m          ]
+    [i    ][j              ][k                 ][l          ][m          ]
+    [i    ][j              ][k                 ][l          ][m          ]
+    [i    ][j              ][k                 ][l          ][m          ]
+    [i    ][j              ][k                 ][l          ][m          ]
+    [i    ][j              ][k                 ][l          ][m          ]
+         
+                                                  
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa,      NOENTRY;
+   b = FORMONLY.num_pedido,       UPSHIFT, AUTONEXT;
+   c = FORMONLY.cod_cliente,      NOENTRY, REVERSE;
+   d = FORMONLY.nom_cliente,      NOENTRY, REVERSE;
+   e = FORMONLY.cod_tip_carteira, NOENTRY, REVERSE;
+   f = FORMONLY.den_tip_carteira, NOENTRY, REVERSE;
+   g = FORMONLY.cod_repres,       NOENTRY, REVERSE;
+   h = FORMONLY.raz_social,       NOENTRY, REVERSE;
+   i = FORMONLY.num_seq_item,     NOENTRY;
+   j = FORMONLY.cod_item,         NOENTRY;
+   k = FORMONLY.den_item,         NOENTRY;
+   l = FORMONLY.pct_comis_orig,   UPSHIFT, AUTONEXT;
+   m = FORMONLY.pct_comis_meta,   NOENTRY;
+   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_itens[9](num_seq_item THRU pct_comis_meta);
+END 

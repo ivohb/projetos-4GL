@@ -1,0 +1,86 @@
+Group Ferkit
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=20
+         File \Fontes\Ferkit\pol0918.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0918.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0919.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0919.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0923.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0923.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0927.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0927.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0929.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0929.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0932.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0932.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0935.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0935.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0942.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0942.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0551.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0551.per
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0570.4gl
+             Type=T
+         End
+         File \Fontes\Ferkit\pol0570.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

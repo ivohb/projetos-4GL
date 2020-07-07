@@ -1,0 +1,39 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]             Ordem:[b         ]    Qtd. peças:[c        ]                    
+  
+  Item:[d              ] Usuário:[e       ]         
+       [f                                                                ]           
+
+                                    ERROS                                         
+   [g                                                                     ]
+   [g                                                                     ]
+   [g                                                                     ]
+   [g                                                                     ]
+   [g                                                                     ]
+   [g                                                                     ]
+   [g                                                                     ]
+   [g                                                                     ]
+   [g                                                                     ]     
+ 
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;   
+b = FORMONLY.num_ordem,   UPSHIFT, AUTONEXT, 
+  COMMENTS = "Digite o número da ordem pendente!"
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.qtd_pecas,   NOENTRY, REVERSE, color = red;
+d = FORMONLY.cod_item,    NOENTRY, REVERSE{, color = blue};
+e = FORMONLY.nom_usuario, NOENTRY, REVERSE{, color = blue};
+f = FORMONLY.den_item,    NOENTRY, REVERSE{, color = blue};
+g = FORMONLY.den_erro,    NOENTRY
+  --#, OPTIONS="-nolist";
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_erros[9](den_erro);
+END

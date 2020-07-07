@@ -1,0 +1,30 @@
+DATABASE logix    
+SCREEN
+{
+------------------------------------
+        SELEÇÃO DE CAMPOS
+
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+[d                              ]
+
+}
+
+ATTRIBUTES
+   d = FORMONLY.campo, UPSHIFT, NOENTRY;
+END
+INSTRUCTIONS
+   SCREEN RECORD sr_campo[15](campo);
+END 

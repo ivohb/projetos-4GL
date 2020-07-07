@@ -1,0 +1,22 @@
+program PGI1024;
+
+uses
+  Forms,
+  uPrincipal in 'uPrincipal.pas' {frmPrincipal},
+  Pesq_item in 'Pesq_item.pas' {frmPesq_item_padrao},
+  uDuplicidade in 'uDuplicidade.pas' {frmDuplicidade},
+  uDimensional in 'uDimensional.pas' {frmDimensional},
+  uAguarde in '..\..\..\uAguarde.pas' {frmAguarde},
+  uFuncoes in '..\..\..\uFuncoes.pas',
+  uVersao in '..\..\..\uVersao.pas',
+  uConexao in '..\..\..\uConexao.pas' {dmConexao: TDataModule};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.CreateForm(TfrmAguarde, frmAguarde);
+  Application.CreateForm(TdmConexao, dmConexao);
+  Application.Run;
+end.

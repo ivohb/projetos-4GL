@@ -1,0 +1,15 @@
+
+
+create table tirolez_cli_atendimento 
+
+Name            Null Type     
+--------------- ---- -------- 
+COD_ATENDIMENTO      CHAR(2)  
+DEN_ATENDIMENTO      CHAR(49) 
+
+desc tirolez_atividade 
+Name          Null     Type     
+------------- -------- -------- 
+COD_ATIVIDADE NOT NULL CHAR(2)  
+DEN_ATIVIDADE          CHAR(49)
+

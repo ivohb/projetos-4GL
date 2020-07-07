@@ -1,0 +1,27 @@
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX          ANALISE DE CREDITO        PAG: &&
+POL1195         VIGENCIA: dd/mm/yyyy - dd/mm/yyyy          VALIDADE: dd/mm/yyyy
+-------------------------------------------------------------------------------
+
+     Cliente: xxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                                              CONDICAO PESO  PESO  VALOR
+PERGUNTAS                                TIPO DEBITAR  CAD   INFO  COMP  DEBITAR
+---------------------------------------- ---- -------- ----- ----- ----- -------
+
+
+
+INDICADORES                                 VALOR
+-------- ------------------------------ -------------
+
+
+
+
+
+
+
+
+
+
+
+ VAL CALCULADO   VAL ANALISTA    VAL GERENTE     VAL VENDEDOR   VAL APROVADOR
+###,###,##&.&&  ###,###,##&.&&  ###,###,##&.&&  ###,###,##&.&&  ###,###,##&.&&

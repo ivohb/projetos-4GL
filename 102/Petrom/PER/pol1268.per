@@ -1,0 +1,42 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                   ROTA POR CLIENTE/FORNECEDOR
+
+
+        
+              Cliente/Fornecedor:[b           ]  
+         
+         
+       Código:[c              ]  [d                                        ]
+
+
+         Rota:[e     ]  [f                                                    ]
+
+
+
+
+
+
+
+
+}
+
+TABLES
+   cli_fornec_455
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,       NOENTRY;
+ b = FORMONLY.ies_cli_fornec TYPE CHAR, INCLUDE=('C','F')
+     --#, widget='RADIO', config='C Cliente F Fornecedor'; 
+
+ c = cli_fornec_455.cod_cli_fornec,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ d = FORMONLY.descricao,   NOENTRY;
+ e = cli_fornec_455.cod_rota, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ f = FORMONLY.des_rota,   NOENTRY;  
+END
+

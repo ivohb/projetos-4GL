@@ -1,0 +1,11 @@
+CREATE TABLE erro_critico_405 (
+    cod_empresa  CHAR(02) NOT NULL,
+    nom_usuario  CHAR(08) NOT NULL,
+    num_programa CHAR(50) NOT NULL,
+    dat_process  DATETIME YEAR TO SECOND NOT NULL,
+    cod_erro     CHAR(07) NOT NULL,
+    den_critica  CHAR(80) NOT NULL
+);
+
+CREATE INDEX erro_critico_405 ON
+ erro_critico_405(cod_empresa,cod_erro);

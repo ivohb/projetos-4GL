@@ -1,0 +1,37 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]    UNIDADE FUNCIONAL ADM ISENTA DE SUBSTITUIÇÃU NA APROVAÇÃO DE AR
+
+  
+       Empresa:[b         ] [c                                      ]
+              
+              Cód Unid Func         Descrição
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+              [k         ] [l                              ]
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,       UPSHIFT, NOENTRY;
+ b = FORMONLY.empresa,           AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.den_empresa,       NOENTRY;
+ k = FORMONLY.cod_uni_funcio,    UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
+ l = FORMONLY.den_uni_funcio,    NOENTRY --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_unid[11](cod_uni_funcio THRU den_uni_funcio);
+END 

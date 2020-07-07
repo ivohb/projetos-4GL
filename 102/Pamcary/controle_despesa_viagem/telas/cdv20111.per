@@ -1,0 +1,54 @@
+DATABASE formonly
+SCREEN
+{
+------------------------ APROVAÇÃO ELETRÔNICA VIAGENS ------------------------
+ [zz]                       APONTAMENTO DESPESAS
+
+ Viajante: [a1                                  ]
+ Controle: [a5                ]  Viagem: [a7    ]
+
+Data apont   Atividade              Despesas                R$           Reem
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+[b         ][c                    ][d                     ][e           ][f]
+
+}
+END
+
+ATTRIBUTES
+zz = formonly.empresa, NOENTRY;
+a1 = formonly.viajante, NOENTRY;
+a5 = formonly.controle, NOENTRY;
+a7 = formonly.viagem, NOENTRY;
+b  = formonly.dat_despesa_urbana, NOENTRY
+--#, OPTIONS="-nolist"
+;
+c  = formonly.des_ativ, NOENTRY
+--#, OPTIONS="-nolist"
+;
+d  = formonly.des_tdesp_viagem, NOENTRY
+--#, OPTIONS="-nolist"
+;
+e  = formonly.val_despesa_urbana, NOENTRY
+--#, OPTIONS="-nolist"
+;
+f  = formonly.eh_reembolso, NOENTRY
+--#, OPTIONS="-nolist"
+;
+END
+
+INSTRUCTIONS
+  SCREEN RECORD sr_array_desp[10] (dat_despesa_urbana,
+                                   des_ativ,
+                                   des_tdesp_viagem,
+                                   val_despesa_urbana,
+                                   eh_reembolso)
+END
+

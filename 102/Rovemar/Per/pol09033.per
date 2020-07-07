@@ -1,0 +1,56 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]        CADASTRO PLANO DE INSTUMENTOS PARA ANALISE
+          Item:     [a1             ]   
+          Operação: [a2            ]         Seq.Operação: [a3 ]
+          Roteiro:  [a4          ]
+          N.Cota:   [a5     ]  Sequencia cota:[a7]   Cota: [a6]
+------------------------------------------------------------------------------
+ 									 
+              Instrumento           Descrição              
+          ------------------   -----------------------------  
+          [b1             ]    [c                          ]
+      
+          [b1             ]    [c                          ]
+      
+          [b1             ]    [c                          ]
+      
+          [b1             ]    [c                          ]
+      
+          [b1             ]    [c                          ]
+      
+          [b1             ]    [c                          ]
+      
+}         
+
+
+
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa1,       UPSHIFT; 
+
+a1 = FORMONLY.cod_item,          UPSHIFT;
+
+a2 = FORMONLY.cod_operac,       UPSHIFT;
+
+a3 = FORMONLY.num_seq_operac,    UPSHIFT; 
+     
+a4 = FORMONLY.cod_roteiro,       UPSHIFT;
+ 
+a5 = FORMONLY.num_cota,        UPSHIFT;
+a7 = FORMONLY.sequencia_cota,   UPSHIFT;
+a6 = FORMONLY.cota,             UPSHIFT; 
+
+b1= FORMONLY.meio_inspecao,   UPSHIFT 
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+
+c= FORMONLY.des_meio_inspecao,    UPSHIFT, NOENTRY;
+
+
+INSTRUCTIONS
+SCREEN RECORD s_inst[6] (FORMONLY.meio_inspecao THRU FORMONLY.des_meio_inspecao);
+END

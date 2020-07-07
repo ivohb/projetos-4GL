@@ -192,7 +192,7 @@ public class Pedidos {
     			String nomeArq = cnpj.trim()+" "+bib.dataPesquisa(0);
     			nomeArq = nomeArq.trim()+" "+bib.horaAtual();
     			nomeArq = nomeArq.trim()+".xml";
-    			String path = System.getProperty("catalina.home")+"\\xml\\";
+    			String path = System.getProperty("catalina.home")+"\\xml_recebido\\";
     			log.info(path);
     			nomeArq = path+nomeArq;
     			log.info(nomeArq);

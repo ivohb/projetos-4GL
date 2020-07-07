@@ -1,0 +1,22 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------------------------------
+[a0]                   USUARIOS EXCLUSIVOS EXXON                      
+
+ 
+Cod Usuario :[a1      ] [a2                                  ]
+
+
+}   
+END
+TABLES
+laudo_usu_915
+END
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+a1 = laudo_usu_915.cod_usuario, AUTONEXT,
+     COMMENTS = "Digite o Codigo do Usuario"
+     --#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a2 = FORMONLY.nom_usuario TYPE CHAR, NOENTRY;
+END

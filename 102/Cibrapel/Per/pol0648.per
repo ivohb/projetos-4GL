@@ -1,0 +1,35 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------  
+  [a ]                    CADASTRO DE LARGURA CHAPA
+  
+  
+  
+                Item: [b              ] [c                 ]
+          
+             Largura: [d     ]
+                
+  
+
+ 
+ 
+ 
+ 
+
+
+
+
+
+}
+END
+TABLES
+   largura_chapa_885
+END
+ATTRIBUTES
+a = FORMONLY.cod_empresa, NOENTRY;
+b = FORMONLY.cod_item, UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.den_item_reduz, UPSHIFT, AUTONEXT;
+d = FORMONLY.largura, AUTONEXT;
+END 

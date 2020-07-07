@@ -1,0 +1,29 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------------------------
+[a0]         CENTROS DE CUSTOS NAO TRANSFERIDOS    
+ 
+ Empresa Origem  :[a1][a2                                  ]
+
+ Empresa Destino :[a3][a4                                  ] 
+
+ Centro de custo :[a5        ][a6                          ]
+
+}   
+END
+TABLES
+cc_n_trans
+END
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+a1 = cc_n_trans.cod_empresa_orig, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Codigo da Empresa Origem";
+a2 = FORMONLY.den_empresa_orig TYPE CHAR, UPSHIFT, NOENTRY;
+a3 = cc_n_trans.cod_empresa_dest, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Codigo da Empresa Destino";
+a4 = FORMONLY.den_empresa_dest TYPE CHAR, UPSHIFT, NOENTRY;     
+a5 = cc_n_trans.cod_cent_cust, AUTONEXT,
+     COMMENTS = "Digite o Codigo do Centro de Custo";
+a6 = FORMONLY.den_cent_cust TYPE CHAR, UPSHIFT, NOENTRY;     
+END

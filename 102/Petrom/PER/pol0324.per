@@ -1,0 +1,71 @@
+DATABASE FORMONLY     
+
+SCREEN
+{
+------------------------------------------------------------------------------
+[a0]               DESBLOQUEIA/CONSULTA LAUDOS                Laudo: [a1    ]
+
+ OM : [a2    ] NF: [a3    ] Ser:[sr ] Qtde: [c3           ] Emis: [a6        ] 
+   Item: [a4             ] [a5                                               ]  
+Cliente/Fornecedor: [a7             ] [a8                                    ]   
+Transp.: [a9             ] [a10                                              ]
+Lote/TQ: [b1        ]     Laudo Emitido: [c]     Laudo Bloqueado: [d]  
+   Tipo: [b][b2        ] Usuário Desbl.: [c2      ]  Data Desbl.: [c1        ] 
+ Textos: [d1                                                ] 
+         [d2                                                ] 
+         [d3                                                ] 
+Tipo Análise                        Espec. de   Espec. Até    TV  Resultado    
+[e1                               ][e2         ][e3         ][e5][e4         ]  
+[e1                               ][e2         ][e3         ][e5][e4         ]  
+[e1                               ][e2         ][e3         ][e5][e4         ]  
+[e1                               ][e2         ][e3         ][e5][e4         ]  
+[e1                               ][e2         ][e3         ][e5][e4         ]  
+}                     
+END
+
+ATTRIBUTES
+a0  = FORMONLY.cod_empresa,     NOENTRY;
+a1  = FORMONLY.num_laudo;             
+a2  = FORMONLY.num_om;
+a3  = FORMONLY.num_nff;
+sr  = FORMONLY.ser_nff, NOENTRY;
+c3  = FORMONLY.qtd_laudo; 
+a6  = FORMONLY.dat_emissao;
+a4  = FORMONLY.cod_item_petrom, UPSHIFT;
+a5  = FORMONLY.den_item,        UPSHIFT, NOENTRY;
+a7  = FORMONLY.cod_cliente,     UPSHIFT; 
+a8  = FORMONLY.nom_cliente,     UPSHIFT, NOENTRY; 
+a9  = FORMONLY.cod_transport,   UPSHIFT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+a10 = FORMONLY.den_transport,  UPSHIFT, NOENTRY;
+b1  = FORMONLY.lote_tanque,     UPSHIFT;
+c   = FORMONLY.nota_emitida,    UPSHIFT;
+d   = FORMONLY.laudo_bloqueado, UPSHIFT;
+b   = FORMONLY.tipo;
+b2  = FORMONLY.den_tipo,        UPSHIFT, NOENTRY;
+c1  = FORMONLY.dat_desbloq;
+c2  = FORMONLY.usuario_desbl;
+d1  = FORMONLY.texto_1,         UPSHIFT;
+d2  = FORMONLY.texto_2,         UPSHIFT;
+d3  = FORMONLY.texto_3,         UPSHIFT;
+e1  = FORMONLY.den_analise
+--#, OPTIONS="-nolist"
+;
+e2  = FORMONLY.especificacao_de 
+--#, OPTIONS="-nolist"
+;
+e3  = FORMONLY.especificacao_ate
+--#, OPTIONS="-nolist"
+;
+e5  = FORMONLY.tipo_valor
+--#, OPTIONS="-nolist"
+;
+e4  = FORMONLY.resultado
+--#, OPTIONS="-nolist"
+;
+END
+
+INSTRUCTIONS
+SCREEN RECORD s_laudo[5] (FORMONLY.den_analise THRU FORMONLY.resultado)
+END

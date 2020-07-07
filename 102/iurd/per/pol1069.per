@@ -1,0 +1,44 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                 EVENTOS PARA EMPRÉSTIMOS CONSIGNADOS
+  
+              Cód. banco:[b  ] [c                             ]              
+                                           
+ UF  Evento           Nome            Tipo            Descrição           
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+[d ][e     ] [f                      ][g ] [h                             ]
+
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+b = FORMONLY.cod_banco, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.nom_banco, NOENTRY, REVERSE, color = blue;
+d = FORMONLY.estado, UPSHIFT, AUTONEXT
+  --#, OPTIONS="-nolist";
+e = FORMONLY.cod_evento, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
+f = FORMONLY.den_evento, NOENTRY, color = blue 
+  --#, OPTIONS="-nolist";
+g = FORMONLY.tip_evento, UPSHIFT, AUTONEXT, REVERSE, color = red
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
+h = FORMONLY.den_tipo, NOENTRY, color = blue 
+  --#, OPTIONS="-nolist";
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_eventos[10](estado THRU den_tipo);
+END 

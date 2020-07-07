@@ -1,0 +1,38 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+                       ERROS NO ESTORNO DE APONTAMENTO
+
+  Usuário:[a       ] Produção:[b                   ] Processo:[c         ] 
+
+    Ordem:[d        ]      Qtd apontada:[e         ]
+
+[t                                                                             ]
+[t                                                                             ]
+[t                                                                             ]
+[t                                                                             ]
+[t                                                                             ]
+[t                                                                             ]
+[t                                                                             ]
+[t                                                                             ]
+[t                                                                             ]
+[t                                                                             ]
+
+}
+END
+
+ATTRIBUTES
+  a = FORMONLY.nom_usuario;
+  b = FORMONLY.dat_processo;
+  c = FORMONLY.num_processo;
+  d = FORMONLY.num_ordem;
+  e = FORMONLY.qtd_boas;
+  
+  t = FORMONLY.den_critica;
+END 
+INSTRUCTIONS
+   SCREEN RECORD sr_critica[10](den_critica);
+END 
+
+

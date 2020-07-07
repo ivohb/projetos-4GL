@@ -1,0 +1,37 @@
+DATABASE logix
+SCREEN
+{ 
+------------------------------------------------------------------------------
+ [a0]                   CADASTRO DE TIPOS DE ANÁLISE                     
+                                                                              
+                                                                             
+                                                                            
+        Tipo Análise: [a1    ]                                          
+                                                                             
+ Descrição Português: [a2                                                ]    
+                                                                            
+    Descrição Inglês: [a3                                                ]      
+                                                                          
+                                                                         
+                                                                        
+                                                                       
+                                                                     
+                                                                   
+                                                                  
+                                                                 
+}   
+END
+
+TABLES
+it_analise_petrom
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, UPSHIFT,  NOENTRY;
+a1 = it_analise_petrom.tip_analise,  AUTONEXT,
+     COMMENTS = "Digite o Tipo da Análise.";
+a2 = it_analise_petrom.den_analise,  AUTONEXT,
+     COMMENTS = "Digite a Descrição da análise.";
+a3 = it_analise_petrom.den_analise_ing,       
+     COMMENTS = "Digite a Descrição da análise em inglês";
+END

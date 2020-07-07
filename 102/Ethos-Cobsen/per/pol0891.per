@@ -1,0 +1,52 @@
+DATABASE FORMONLY
+SCREEN
+{
+------------------------------------------------------------------------------
+  [a ]               APONTAMENTO DE ORDEM DE PRODUÇÃO
+
+  Dat Ini Prod: [b         ]          Situação Apontamento: [n    ]
+  Dat Fim Prod: [b1        ]               Código do Turno: [k]
+   Codigo Item: [c             ]             Hora Ini Prod: [l         ]
+     Num Ordem: [c1        ]                 Hora Fim Prod: [m         ]
+  Seq Operação: [o  ]                               Refugo: [p         ] 
+  Cod Operação: [c2   ]                      Cód da Parada: [p1        ]
+ Cent Trabalho: [c3   ]                    Hora Ini Parada: [q         ]
+       Arranjo: [c4   ]                    Hora Fim Parada: [q1        ]
+    Qtd Refugo: [g         ]             Unidade Funcional: [q2        ]
+      Qtd Boas: [h         ]              Data Atualizacao: [q3        ]
+ Tip Movimento: [i]                        Apont Terminado: [s]
+         local: [i1        ]               
+    Qtde horas: [i2         ]              
+  Mat Operador: [j       ]                 
+
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.empresa, NOENTRY;
+   b = FORMONLY.dat_ini_producao, UPSHIFT, AUTONEXT;
+   b1= FORMONLY.dat_fim_producao, UPSHIFT, AUTONEXT;
+   c = FORMONLY.item, UPSHIFT, AUTONEXT;
+   c1= FORMONLY.num_ordem, UPSHIFT, AUTONEXT, NOENTRY;
+   c2= FORMONLY.operacao, UPSHIFT, AUTONEXT;
+   c3= FORMONLY.centro_trabalho, UPSHIFT, AUTONEXT;
+   c4= FORMONLY.arranjo, UPSHIFT, AUTONEXT;
+   g = FORMONLY.qtd_refugo, UPSHIFT, AUTONEXT;
+   h = FORMONLY.qtd_boas, UPSHIFT, AUTONEXT;
+   i = FORMONLY.tip_movto, UPSHIFT, AUTONEXT;
+   i1= FORMONLY.local, UPSHIFT, AUTONEXT;
+   i2= FORMONLY.qtd_hor, UPSHIFT, AUTONEXT;
+   j = FORMONLY.matricula, UPSHIFT, AUTONEXT;
+   k = FORMONLY.turno, UPSHIFT, AUTONEXT;
+   l = FORMONLY.hor_inicial, UPSHIFT, AUTONEXT;
+   m = FORMONLY.hor_fim, UPSHIFT, AUTONEXT;
+   n = FORMONLY.sit_registro_apont, UPSHIFT, AUTONEXT;
+   o = FORMONLY.sequencia_operacao, UPSHIFT, AUTONEXT;
+   p = FORMONLY.refugo, UPSHIFT, AUTONEXT;
+   p1= FORMONLY.parada, UPSHIFT, AUTONEXT;
+   q = FORMONLY.hor_ini_parada, UPSHIFT, AUTONEXT;
+   q1= FORMONLY.hor_fim_parada, UPSHIFT, AUTONEXT;
+   q2= FORMONLY.unid_funcional, UPSHIFT, AUTONEXT;
+   q3= FORMONLY.dat_atualiz, UPSHIFT, AUTONEXT, NOENTRY;   
+   s = FORMONLY.terminado, UPSHIFT, AUTONEXT;   
+END 

@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------------------------------
+                STATUS PARA NOTA FISCAL DE ENTRADA            
+                                    
+Cód                          Descrição                       
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+[a|b                                                           ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_status, NOENTRY
+  --# ,OPTIONS='-nolist';
+b = FORMONLY.den_status, NOENTRY
+  --# ,OPTIONS='-nolist';
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_status[12](cod_status THRU den_status);
+END 

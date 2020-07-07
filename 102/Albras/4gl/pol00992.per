@@ -1,0 +1,30 @@
+DATABASE logix
+
+SCREEN
+{
+EMPRESAS
+--------
+  [a1]
+  [a1]
+  [a1]
+  [a1]
+  [a1]
+  [a1]
+  [a1]
+  [a1]
+  [a1]
+  [a1]
+}
+
+TABLES
+empresa
+END
+
+ATTRIBUTES
+a1   = empresa.cod_empresa, UPSHIFT;
+END
+
+INSTRUCTIONS
+SCREEN RECORD s_empresas[10] (empresa.cod_empresa);
+END
+

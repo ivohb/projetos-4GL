@@ -1,0 +1,38 @@
+DATABASE FORMONLY
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                         APONTAMENTO DE PRODUÇÃO
+                            
+                            
+           Num ordem:[b          ]                  Status da ordem:[c]
+
+            Cód Item:[l              ][m                              ]
+          
+          Num pedido:[d          ] 
+         
+       Qtd planejada:[e          ]              Qtd saldo:[f          ]
+      
+        Apontar boas:[g          ]         Apontar refugo:[h          ]
+          
+                   
+
+
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, NOENTRY;
+ b = FORMONLY.num_ordem, AUTONEXT;
+ c = FORMONLY.ies_situa, NOENTRY, REVERSE;
+ l = FORMONLY.cod_item, NOENTRY, REVERSE;
+ m = FORMONLY.den_item, NOENTRY, REVERSE;
+ d = FORMONLY.num_pedido, NOENTRY, REVERSE;
+ e = FORMONLY.qtd_planej, NOENTRY, REVERSE;
+ f = FORMONLY.qtd_saldo, NOENTRY, REVERSE;
+ g = FORMONLY.qtd_boas, AUTONEXT;
+ h = FORMONLY.qtd_refug, AUTONEXT, NOENTRY, REVERSE;
+END 
+
+ 

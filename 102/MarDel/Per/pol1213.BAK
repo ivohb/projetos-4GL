@@ -1,0 +1,41 @@
+DATABASE FORMONLY 
+SCREEN
+{ 
+------------------------------------------------------------------------------
+ [a ]               EXPORTAÇÃO DE ENTRADAS, SAÍDAS E SALDOS - FIAT                  
+                                                                              
+
+
+                  Período de:[b         ] Até: [c         ]     
+
+
+                  Exportar:  Entrada:[d]     Saída:[e] 
+                             
+                               Saldo:[f         ]
+                              
+                  
+                    
+
+
+
+
+}   
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, UPSHIFT,  NOENTRY; 
+   b = FORMONLY.dat_inicio; 
+   c = FORMONLY.dat_final;
+   d = FORMONLY.entrada, UPSHIFT, AUTONEXT,
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado'
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+   
+   e = FORMONLY.saida, UPSHIFT, AUTONEXT,
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado'
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+
+   f = FORMONLY.saldo TYPE CHAR, INCLUDE=('C','F')
+       --#, widget='RADIO', config='C Contábil F Físico'; 
+
+END
+

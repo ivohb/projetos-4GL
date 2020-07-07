@@ -1,0 +1,43 @@
+DATABASE FORMONLY 
+SCREEN
+{
+----------------------------------------------------------------------------
+[a ]                  BAIXA DE CONSUMO DE BOBINAS
+
+              Boletim:[b      ]       Data do consumo:[c         ]              
+                                
+       Lote           Item            Descrição       Saldo    Peso  Status     
+[d              |e              |f                 |g       |h       ] [i]
+[d              |e              |f                 |g       |h       ] [i]
+[d              |e              |f                 |g       |h       ] [i]
+[d              |e              |f                 |g       |h       ] [i]
+[d              |e              |f                 |g       |h       ] [i]
+[d              |e              |f                 |g       |h       ] [i]
+[d              |e              |f                 |g       |h       ] [i]
+[d              |e              |f                 |g       |h       ] [i]
+
+}
+END
+
+ATTRIBUTES 
+   a = FORMONLY.cod_empresa,    UPSHIFT, NOENTRY;
+   b = FORMONLY.num_boletim,    UPSHIFT, AUTONEXT;
+   c = FORMONLY.dat_consumo,    UPSHIFT, AUTONEXT, FORMAT = "dd/mm/yyyy"; 
+   d = FORMONLY.num_lote,       UPSHIFT, AUTONEXT
+   --#, OPTIONS="-nolist";
+   e = FORMONLY.cod_item,       NOENTRY, REVERSE 
+   --#, OPTIONS="-nolist";
+   f = FORMONLY.den_item_reduz, NOENTRY, REVERSE 
+   --#, OPTIONS="-nolist";
+   g = FORMONLY.qtd_saldo,      NOENTRY, REVERSE 
+   --#, OPTIONS="-nolist";
+   h = FORMONLY.qtd_consumo,    UPSHIFT, AUTONEXT
+   --#, OPTIONS="-nolist";
+   i = FORMONLY.cod_status,     NOENTRY, REVERSE
+   --#, OPTIONS="-nolist";
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_baixar[8](num_lote THRU cod_status);
+END 

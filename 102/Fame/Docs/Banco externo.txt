@@ -1,0 +1,17 @@
+Olá Ivo, bom dia.
+ 
+É  possível sim, desde que este banco esteja configurado corretamente 
+no TOTVS TEC (no arquivo totvsdbaccess.ini).
+ 
+No código fonte fica assim:
+ 
+Para conectar:
+WHENEVER ERROR CONTINUE
+CONNECT TO banco DBTYPE ORACLE (ou MSSQL ou INFORMIX) AS alias USER "usuario" USING "senha"
+WHENEVER ERROR STOP
+ 
+Para definir o banco conectado atual:
+ 
+WHENEVER ERROR CONTINUE
+SET CONNECTION alias
+WHENEVER ERROR STOP

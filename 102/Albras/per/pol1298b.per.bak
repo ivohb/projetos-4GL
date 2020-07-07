@@ -1,0 +1,28 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+[a                                                                           ]
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.msg;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_erro[12](msg);
+END 
+   

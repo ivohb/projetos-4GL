@@ -1,0 +1,43 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                        CONTEÚDO DAS COLUNAS
+  
+      Item:[b              ] [c                                           ]              
+ 
+   Roteiro         Operac  Seq Coluna         Descrição Coluna
+[d|e              |f     |g         |h                                    ]
+[d|e              |f     |g         |h                                    ]
+[d|e              |f     |g         |h                                    ]
+[d|e              |f     |g         |h                                    ]
+[d|e              |f     |g         |h                                    ]
+Linha                       Conteúdo 
+[t|u                                                                          ]                                                              
+[t|u                                                                          ]                                                              
+[t|u                                                                          ]                                                              
+[t|u                                                                          ]                                                              
+[t|u                                                                          ]                                                              
+[t|u                                                                          ]                                                              
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+ b = FORMONLY.cod_item,    UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.den_item, NOENTRY, REVERSE;
+
+ d = FORMONLY.editar,        AUTONEXT, picture = '9', 
+     COMMENTS = '<Enter> = Editar conteúdo';
+ e = FORMONLY.cod_roteiro,   NOENTRY;
+ f = FORMONLY.cod_operac,    NOENTRY;
+ g = FORMONLY.seq_oper,      NOENTRY; 
+ h = FORMONLY.coluna,        NOENTRY;    
+ t = FORMONLY.linha,         NOENTRY;
+ u = FORMONLY.conteudo,      UPSHIFT, AUTONEXT;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_coluna[5](editar THRU coluna);
+   SCREEN RECORD sr_linha[6](linha THRU conteudo);
+END 

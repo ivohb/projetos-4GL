@@ -1,0 +1,45 @@
+DATABASE FORMONLY 
+SCREEN
+{ 
+------------------------------------------------------------------------------
+ [a0]             ENVIO PROGRAMAÇÃO MATERIAIS P/ CATERPILLAR                  
+                                                                              
+      Período de: [a1        ]             Até: [a2        ]     
+
+   Prazo Entrega: [a5        ]
+
+   Programação:   [d] Firme   [e] Req.Materiais   [f] Planejado
+
+         Cliente: [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+                  [a3             ] [a4                                  ]    
+}   
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, UPSHIFT,  NOENTRY;
+a1 = FORMONLY.dat_inicio; 
+a2 = FORMONLY.dat_final;
+a5 = FORMONLY.prz_entrega;
+d  = FORMONLY .ies_firme  TYPE CHAR, UPSHIFT,AUTONEXT, 
+     INCLUDE=("S","N"); 
+e  = FORMONLY.ies_requis  TYPE CHAR, UPSHIFT,AUTONEXT,
+     INCLUDE=("S","N"); 
+f  = FORMONLY.ies_planej  TYPE CHAR, UPSHIFT,AUTONEXT,
+     INCLUDE=("S","N"); 
+a3 = FORMONLY.cod_cliente, UPSHIFT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+--#, OPTIONS="-nolist";
+a4 = FORMONLY.nom_cliente, UPSHIFT, NOENTRY
+--#, OPTIONS="-nolist";
+
+INSTRUCTIONS
+SCREEN RECORD s_clientes[10] (FORMONLY.cod_cliente THRU FORMONLY.nom_cliente);
+END     

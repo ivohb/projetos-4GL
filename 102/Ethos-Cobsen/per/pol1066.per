@@ -1,0 +1,30 @@
+DATABASE LOGIX
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [b0]              QTDE ACUMULADA CARTERPILLAR x ENTREGUE 
+ 
+ 
+   Pedido: [a1    ]   Qtd Acum. RND [a2       ]    Ultima N.F.: [a3    ]    
+ 
+   Qtd atendida [a4       ]       Qtd Dif [a5       ]
+ 
+}
+END
+
+TABLES
+ped_itens 
+END
+
+ATTRIBUTES
+b0  = formonly.cod_empresa,         NOENTRY;
+a1  = ped_itens.num_pedido,         UPSHIFT,AUTONEXT;
+a2  = formonly.qtd_acum,            UPSHIFT,AUTONEXT;
+a3  = formonly.num_ult_nf,          UPSHIFT,AUTONEXT;
+a4  = formonly.qtd_atend,           NOENTRY;          
+a5  = formonly.qtd_dif,             NOENTRY;          
+END
+
+INSTRUCTIONS
+END

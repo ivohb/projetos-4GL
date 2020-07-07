@@ -1,0 +1,48 @@
+Tem como fazer um programinha em 4gl pode ser a versão 10.02 mesmo, 
+para que o usuário informe o numero de um pedido de vendas, ai o programa 
+tem que pegar o código do cliente,  nome do cliente e o conteúdo dos dois 
+campos da tabela CLI_CREDITO (qtd_dias_atr_dupl
+qtd_dias_atr_med) e trazer para tela.
+
+Em seguida tem que ter um botão para limpeza de dados de crédito, se o usuário 
+selecionar esta opção tem que obrigar ele a digitar no campo texto o MOTIVO e  
+limpar os dois campos da tabela CLI_CREDITO, os campos são: 
+
+qtd_dias_atr_dupl
+qtd_dias_atr_med
+
+Uma vez que o usuário conformar gravar a tabela audit_cre_912 com os campos:
+
+Cod_empresa,
+Data_hora_alteracao
+Usuario,
+Pedido,
+qtd_dias_atr_dupl_ant
+qtd_dias_atr_med_ant
+qtd_dias_atr_dupl_atu
+qtd_dias_atr_med_atu
+texto 
+
+Att. 
+
+
+
+Vai precisar criar um programa ou Aba nesse programa para consultar o 
+histórico por pedido para saber quem foram os usuários que mandou 
+limpar os dados de crédito por data e usuário
+
+
+------------------------------------------------------------------------------
+POL1305
+
+1 - converter o pol1305 para o padrão metados
+    com opção de filtros por período, centro de trabalho e código do arranjo. 
+    O período deve iniciar na data do ultimo fechamento e o usuário informará
+    da data final. O Período será obrigatório e o pol1305 deverá exportar
+    todas as ordens liberadas dentro do periodo informado. 
+2 – Exportar o cadastro de ferramental.
+3 - Criar log de erro para as ordens não exportadas (ordens sem operação,
+    ordens liberadas que já possuem apontamentos, etc)
+4 - Desenvolver rotina para exibir os logs de erro
+
+Tempo estimado 18 horas

@@ -1,0 +1,37 @@
+DATABASE logix
+SCREEN
+{
+ -----------------------------------------------------------------------------
+  
+  [a ]                    CADASTRO DE OPERAÇÕES 
+  
+ 
+ 
+          
+          
+           Operação:[b   ]  [c                                           ]
+            
+               Tipo:[d] 
+                
+                    
+ 
+ 
+ 
+
+
+}
+
+END
+TABLES
+   operacao_885
+END
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, NOENTRY;
+b = FORMONLY.cod_operacao, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.den_operacao, NOENTRY, REVERSE;
+d = FORMONLY.ies_tipo, NOENTRY, REVERSE;
+ 
+
+END 

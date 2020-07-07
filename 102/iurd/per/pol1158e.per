@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+[a ]                     ASSINATURAS DO PEDIDO
+-------------------------------------------------------------------------
+
+ Emp Nivel de Aprovação                 Login       Data      Hora 
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+ [b |c  |d                             |e       |f         |g       ]
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa;
+ b = FORMONLY.empresa;
+ c = FORMONLY.cod_nivel;
+ d = FORMONLY.den_nivel;
+ e = FORMONLY.login;
+ f = FORMONLY.data;
+ g = FORMONLY.hora;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_assinatura[12](empresa THRU hora);
+END 

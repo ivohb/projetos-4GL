@@ -82,7 +82,8 @@ DEFINE m_msg           CHAR(150),
        m_dat_atu       DATE,
        m_qtd_erro      INTEGER,
        m_num_transac   INTEGER,
-       m_qtd_item      INTEGER
+       m_qtd_item      INTEGER,
+       m_fat_conver    DECIMAL(7,3)
        
 DEFINE m_den_item      LIKE item.den_item,
        g_den_item      LIKE item.den_item,
@@ -129,7 +130,7 @@ FUNCTION pol1350()#
    SET LOCK MODE TO WAIT 300
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1350-12.00.14  "
+   LET p_versao = "pol1350-12.00.16  "
    CALL func002_versao_prg(p_versao)
    CALL pol1350_menu()
     
@@ -378,9 +379,7 @@ FUNCTION pol1350_checa_item()#
           l_cod_item       CHAR(15)
    
    LET l_lin_atu = _ADVPL_get_property(m_brz_item,"ROW_SELECTED")
-   
-   CALL log0030_mensagem(l_lin_atu,'INFO')
-   
+      
    LET l_cod_item = ma_produto[l_lin_atu].cod_item
    
    IF l_cod_item IS NULL THEN                 
@@ -583,8 +582,7 @@ FUNCTION pol1350_grade_item(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LTEXTFIELD")
     CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","LENGTH",15)
     CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","PICTURE","@!")
-
-    #CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","VALID","pol1350_checa_item")
+    CALL _ADVPL_set_property(l_tabcolumn,"AFTER_EDIT_EVENT","pol1350_checa_item")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER"," ")
@@ -1141,32 +1139,39 @@ FUNCTION pol1350_le_preco()#
    DEFINE l_preco    LIKE aviso_rec.pre_unit_nf,
           l_data     LIKE aviso_rec.dat_inclusao_seq,
           l_tem_nf   SMALLINT,
-          l_num_ar   INTEGER
+          l_num_ar   INTEGER,
+          l_num_oc   INTEGER
 
    LET l_tem_nf = FALSE
-   
+
    DECLARE cq_min CURSOR FOR
-    SELECT dat_inclusao_seq, pre_unit_nf, num_aviso_rec
+    SELECT dat_inclusao_seq, pre_unit_nf, num_aviso_rec, num_oc
      FROM aviso_rec 
     WHERE cod_empresa = p_cod_empresa
       AND dat_inclusao_seq BETWEEN mr_cabec.data_de AND mr_cabec.data_ate
       AND cod_item = m_cod_comp
     ORDER BY pre_unit_nf
    
-   FOREACH cq_min INTO l_data, l_preco, l_num_ar
+   FOREACH cq_min INTO l_data, l_preco, l_num_ar, l_num_oc
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','aviso_rec:preço-minimo')
          RETURN FALSE
       END IF
       LET l_tem_nf = TRUE                  
+      
+      SELECT pre_unit_oc INTO l_preco
+        FROM ordem_sup 
+       WHERE cod_empresa = p_cod_empresa 
+         AND num_oc = l_num_oc
+             
       EXIT FOREACH
       
    END FOREACH
       
    IF l_tem_nf THEN
-      LET ma_compon[m_index].preco_min = l_preco
-      LET ma_compon[m_index].dat_min = l_data
       LET ma_compon[m_index].fornec_min = pol1350_le_fornec(l_num_ar)
+      LET ma_compon[m_index].preco_min = l_preco 
+      LET ma_compon[m_index].dat_min = l_data
    ELSE
       LET ma_compon[m_index].mensagem = 'Item S/ NFE'
       RETURN TRUE
@@ -1175,65 +1180,81 @@ FUNCTION pol1350_le_preco()#
    LET l_tem_nf = FALSE
    
    DECLARE cq_max CURSOR FOR
-    SELECT dat_inclusao_seq, pre_unit_nf, num_aviso_rec
+    SELECT dat_inclusao_seq, pre_unit_nf, num_aviso_rec, num_oc
      FROM aviso_rec WHERE cod_empresa = p_cod_empresa
       AND dat_inclusao_seq BETWEEN mr_cabec.data_de AND mr_cabec.data_ate
       AND cod_item = m_cod_comp 
     ORDER BY 2 DESC
    
-   FOREACH cq_max INTO l_data, l_preco, l_num_ar
+   FOREACH cq_max INTO l_data, l_preco, l_num_ar, l_num_oc
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','aviso_rec:preço-minimo')
          RETURN FALSE
       END IF
       LET l_tem_nf = TRUE
+
+      SELECT pre_unit_oc INTO l_preco
+        FROM ordem_sup 
+       WHERE cod_empresa = p_cod_empresa 
+         AND num_oc = l_num_oc
+      
       EXIT FOREACH
       
    END FOREACH   
    
    IF l_tem_nf THEN
+      LET ma_compon[m_index].fornec_max = pol1350_le_fornec(l_num_ar)
       LET ma_compon[m_index].preco_max = l_preco
       LET ma_compon[m_index].dat_max = l_data
-      LET ma_compon[m_index].fornec_max = pol1350_le_fornec(l_num_ar)
    END IF   
 
    DECLARE cq_ult CURSOR FOR
-    SELECT dat_inclusao_seq, pre_unit_nf, num_aviso_rec 
+    SELECT dat_inclusao_seq, pre_unit_nf, num_aviso_rec, num_oc 
      FROM aviso_rec WHERE cod_empresa = p_cod_empresa
       AND dat_inclusao_seq BETWEEN mr_cabec.data_de AND mr_cabec.data_ate
       AND cod_item = m_cod_comp 
     ORDER BY 1 DESC
    
-   FOREACH cq_ult INTO l_data, l_preco, l_num_ar
+   FOREACH cq_ult INTO l_data, l_preco, l_num_ar, l_num_oc
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','aviso_rec:preço-minimo')
          RETURN FALSE
       END IF
       LET l_tem_nf = TRUE
+
+      SELECT pre_unit_oc INTO l_preco
+        FROM ordem_sup 
+       WHERE cod_empresa = p_cod_empresa 
+         AND num_oc = l_num_oc
+      
       EXIT FOREACH
       
    END FOREACH   
    
    IF l_tem_nf THEN
-      LET ma_compon[m_index].preco_ult = l_preco
-      LET ma_compon[m_index].dat_ult = l_data
       LET ma_compon[m_index].fornec_ult = pol1350_le_fornec(l_num_ar)
+      LET ma_compon[m_index].preco_ult = l_preco 
+      LET ma_compon[m_index].dat_ult = l_data
    END IF   
    
    RETURN TRUE
 
 END FUNCTION
-
+ 
 #-----------------------------------#
 FUNCTION pol1350_le_fornec(l_num_ar)#
 #-----------------------------------#
    
    DEFINE l_raz_social     LIKE fornecedor.raz_social,
+          l_cod_fornecedor LIKE fornecedor.cod_fornecedor,
           l_num_ar         INTEGER,
           l_erro           CHAR(10)
    
-   SELECT raz_social
-     INTO l_raz_social
+   LET m_fat_conver = 1
+   
+   SELECT f.raz_social, f.cod_fornecedor
+     INTO l_raz_social,
+          l_cod_fornecedor
      FROM fornecedor f, nf_sup n
     WHERE f.cod_fornecedor = n.cod_fornecedor
       AND n.cod_empresa = p_cod_empresa
@@ -1242,10 +1263,40 @@ FUNCTION pol1350_le_fornec(l_num_ar)#
    IF STATUS <> 0 THEN
       LET l_erro = STATUS
       LET l_raz_social = 'ERRO ',l_erro CLIPPED, ' LENDO FORNECEDOR'
+   ELSE
+      IF STATUS = 0 THEN
+         CALL pol1350_le_fat_conver(l_cod_fornecedor) RETURNING p_status
+      END IF
    END IF
-   
+      
    RETURN l_raz_social
 
+END FUNCTION
+
+#------------------------------------#
+FUNCTION pol1350_le_fat_conver(l_cod)#
+#------------------------------------#
+   
+   DEFINE l_cod     CHAR(15)
+   
+   SELECT DISTINCT fat_conver_unid      
+     INTO m_fat_conver
+     FROM item_fornec
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_fornecedor = l_cod
+      AND cod_item = m_cod_comp
+
+   IF STATUS = 100 THEN
+      LET m_fat_conver = 1
+   ELSE
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','item_fornec')
+         LET m_fat_conver = 1
+      END IF
+   END IF
+   
+   RETURN TRUE
+   
 END FUNCTION
        
 
@@ -1322,9 +1373,10 @@ FUNCTION pol1350_explode_estrut()#
                IF NOT pol1350_ins_compon() THEN
                   RETURN FALSE
                END IF
-               IF l_ies_tipo MATCHES '[BC]' THEN
-               IF NOT pol1350_ins_it(m_cod_comp) THEN
-                  RETURN FALSE
+               IF l_ies_tipo = 'B' THEN
+                  IF NOT pol1350_ins_it(m_cod_comp) THEN
+                     RETURN FALSE
+                  END IF
                END IF
             ELSE
                IF NOT pol1350_ins_it(m_cod_comp) THEN

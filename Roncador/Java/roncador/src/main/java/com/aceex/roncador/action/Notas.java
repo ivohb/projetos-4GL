@@ -1,9 +1,11 @@
 package main.java.com.aceex.roncador.action;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.List;
-
-import javax.management.RuntimeErrorException;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
@@ -105,6 +107,7 @@ public class Notas {
 			}
 		}
 
+		gravaXmlEnviado(xml);
 	}
 
 	private void notaEmitida() throws Exception {
@@ -117,6 +120,8 @@ public class Notas {
 			return;
 		}
 
+		NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+
 		String retorno = null;
 		String xml = "<NewDataSet>\r\n";
 
@@ -127,6 +132,11 @@ public class Notas {
 			if (nota.getPlaca_veiculo() == null) {
 				nota.setPlaca_veiculo(" ");
 			}
+			
+			String quant = nf.format(nota.getQuant());
+			quant = quant.substring(3);
+			log.info("Quant "+nota.getQuant()+" "+nf.format(nota.getQuant())+" "+quant);
+
 			xml = xml + "<notas>\r\n";
 			xml = xml + "<num_nota>"+nota.getNum_nota()+"</num_nota>\r\n";
 			xml = xml + "<serie>"+nota.getSerie()+"</serie>\r\n";
@@ -135,7 +145,7 @@ public class Notas {
 			xml = xml + "<tipo_operacao>"+nota.getTipo_operacao()+"</tipo_operacao>\r\n";
 			xml = xml + "<num_nota_origem>"+" "+"</num_nota_origem>\r\n";
 			xml = xml + "<serie_origem>"+" "+"</serie_origem>\r\n";
-			xml = xml + "<quant>"+nota.getQuant()+"</quant>\r\n";
+			xml = xml + "<quant>"+quant+"</quant>\r\n";
 			xml = xml + "<placa_veiculo>"+nota.getPlaca_veiculo()+"</placa_veiculo>\r\n";						
 			xml = xml + "</notas>\r\n";
 		}
@@ -151,12 +161,44 @@ public class Notas {
 			}
 		}
 
+		gravaXmlEnviado(xml);
+
 	}
 	
 	private void salva(Nota nota) throws Exception {
 		NotaDao nDao = fd.getNotaDao();
 		log.info("Salvando nota "+nota.getNum_nota());
-		nDao.salva(nota);
+		
+		if (nDao.jaExportou(nota.getEmpresa(), 
+				nota.getTransac(), nota.getSit_nota())) {			
+		} else {
+			nDao.salva(nota);
+		}
+	}
+	
+	private void gravaXmlEnviado(String xml) throws Exception {
+		
+		try {
+			String nomeArq = cnpj.trim()+" "+bib.dataPesquisa(0);
+			nomeArq = nomeArq.trim()+" "+bib.horaAtual();
+			nomeArq = nomeArq.trim()+".xml";
+			String path = System.getProperty("catalina.home")+"\\xml_enviado\\";
+			log.info(path);
+			nomeArq = path+nomeArq;
+			log.info(nomeArq);
+
+		    FileWriter arq = 
+		    		new FileWriter(nomeArq);
+		    PrintWriter gravarArq = new PrintWriter(arq);
+		 
+		    gravarArq.printf(xml.toString());
+		 
+		    arq.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 }
 

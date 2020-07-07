@@ -1,0 +1,48 @@
+DATABASE logix
+SCREEN 
+{
+------------------------------------------------------------------------------
+ [a0]       INCLUSAO DE PEDIDO - ITENS DE REMESSA         Pedido: [f000    ]
+
+           Cliente: [b0             ]
+                    [b1                                  ]
+
+         Sequencia: [f001 ]
+           Produto: [a3             ]
+           
+      Emissao N.F.: [f002      ]        
+  Retorno Previsto: [f003      ]
+    Motivo Remessa: [a1] [c002                          ]
+     Valor Estoque: [f004               ]
+      Area Negocio: [a2 ]  [c004                          ]          
+     Linha Negocio: [f005] [c005                          ]
+             Conta: [f006                   ]
+             Texto: [f007                          ]
+     Pedido Compra: [f09   ]     
+}        
+end
+tables
+ped_itens_rem,item,cidades,clientes,ped_itens
+END 
+attributes
+a0   = ped_itens_rem.cod_empresa,       NOENTRY;
+f000 = ped_itens_rem.num_pedido,        NOENTRY;
+f001 = ped_itens_rem.num_sequencia,     NOENTRY;
+a3   = ped_itens.cod_item,              NOENTRY;
+f002 = ped_itens_rem.dat_emis_nf_usina;
+f003 = ped_itens_rem.dat_retorno_prev;
+a1   = ped_itens_rem.cod_motivo_remessa,UPSHIFT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+c002 = formonly.den_motivo_remessa,     UPSHIFT, NOENTRY;
+f004 = ped_itens_rem.val_estoque;
+a2   = ped_itens_rem.cod_area_negocio,  UPSHIFT;
+c004 = formonly.den_area_negocio,       UPSHIFT, NOENTRY;
+f005 = ped_itens_rem.cod_lin_negocio,   UPSHIFT;
+c005 = formonly.den_lin_negocio,        UPSHIFT, NOENTRY;
+f006 = ped_itens_rem.num_conta,         UPSHIFT;
+f007 = ped_itens_rem.tex_observ,        UPSHIFT;
+b0   = clientes.cod_cliente,            NOENTRY;
+b1   = clientes.nom_cliente,            NOENTRY;
+f09  = ped_itens_rem.num_pedido_compra, UPSHIFT;
+end

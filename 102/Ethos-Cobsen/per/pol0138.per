@@ -1,0 +1,25 @@
+DATABASE logix
+
+SCREEN
+{
+---------------------------------------------------------
+[a0]           LISTAGEM DE ROTEIRO DE PRODUCAO                        
+
+
+             De    [f001      ]
+
+             Ate : [f002      ]
+                                                               
+      
+}
+END
+
+TABLES
+ordens          
+END
+
+ATTRIBUTES
+a0   = FORMONLY.cod_empresa, NOENTRY;                                 
+f001 = formonly.ord_inicial  TYPE DECIMAL, FORMAT = "##########";
+f002 = formonly.ord_final    TYPE DECIMAL, FORMAT = "##########";
+END

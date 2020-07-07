@@ -1,0 +1,14 @@
+
+10.10.0.2 teste
+
+
+10.10.0.8 produção
+
+bu750051
+ivo@1965
+
+Logix10 
+usuario: admlog
+senha: sibradm
+
+Logix12: admlog sibr@dm

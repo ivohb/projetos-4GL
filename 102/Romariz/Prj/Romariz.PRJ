@@ -1,0 +1,131 @@
+Group romariz
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=35
+         File \Projetos\4GL\102\Romariz\PER\pol1111.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1112.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1113.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1113a.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1113b.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1114.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1115.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1116.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1118.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1119.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1120.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1132.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1133.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1262.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol1262a.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol11121.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol11131.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol11141.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol11151.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol11161.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol11162.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol11163.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\PER\pol11164.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1111.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1112.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1113.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1114.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1115.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1116.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1118.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1119.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1120.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1132.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1133.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Romariz\4GL\pol1262.4gl
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

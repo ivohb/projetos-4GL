@@ -1,0 +1,136 @@
+<md-update version="11.0.20">
+<update-info version="11.0.0">
+<name>vdp_aud_it_ped_444</name>
+<type>T</type>
+<date>25/06/2012</date>
+<hour>18:31:28</hour>
+</update-info>
+<content><scripts>
+<script id='1'>DELETE FROM frm_column_legend WHERE table_name = 'vdp_aud_it_ped_444'</script>
+<script id='2'>DELETE FROM frm_column_reference WHERE reference_name IN (SELECT reference_name FROM frm_table_reference WHERE table_name = 'vdp_aud_it_ped_444')</script>
+<script id='3'>DELETE FROM frm_table_reference WHERE table_name = 'vdp_aud_it_ped_444'</script>
+<script id='4'>DELETE FROM frm_index_column WHERE index_name IN (SELECT index_name FROM frm_index WHERE table_name = 'vdp_aud_it_ped_444')</script>
+<script id='5'>DELETE FROM frm_index WHERE table_name = 'vdp_aud_it_ped_444'</script>
+<script id='6'>DELETE FROM frm_column WHERE table_name = 'vdp_aud_it_ped_444'</script>
+<script id='7'>DELETE FROM frm_control_table WHERE table_name = 'vdp_aud_it_ped_444'</script>
+<script id='8'>DELETE FROM frm_table WHERE table_name = 'vdp_aud_it_ped_444'</script>
+</scripts>
+<table table_name='frm_table' id='1' description='tabelas'>
+<columns>
+<column id='1'>table_name</column>
+<column id='2'>table_label</column>
+<column id='3'>table_label_en</column>
+<column id='4'>table_label_es</column>
+<column id='5'>table_version</column>
+<column id='6'>table_release</column>
+<column id='7'>table_modification</column>
+<column id='8'>table_module</column>
+<column id='9'>table_form</column>
+</columns>
+<rows>
+<row id='1'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>Auditoria item pedido</value><value id='5'>11</value><value id='6'>0</value><value id='7'>0</value><value id='8'>66</value></row>
+</rows>
+</table>
+<table table_name='frm_control_table' id='2' description='controles de tabela'>
+<columns>
+<column id='1'>table_name</column>
+<column id='2'>hash_code</column>
+</columns>
+<rows>
+<row id='1'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>29d3cf769e8065d1853f302bd237e743</value></row>
+</rows>
+</table>
+<table table_name='frm_column' id='3' description='colunas de tabela'>
+<columns>
+<column id='1'>table_name</column>
+<column id='2'>column_name</column>
+<column id='3'>column_type</column>
+<column id='4'>column_size</column>
+<column id='5'>column_precision</column>
+<column id='6'>is_primary_key</column>
+<column id='7'>is_not_null</column>
+<column id='8'>column_label</column>
+<column id='9'>column_label_en</column>
+<column id='10'>column_label_es</column>
+<column id='11'>column_help</column>
+<column id='12'>column_help_en</column>
+<column id='13'>column_help_es</column>
+<column id='14'>column_order</column>
+<column id='15'>component_type</column>
+<column id='16'>picture</column>
+<column id='17'>default_value</column>
+</columns>
+<rows>
+<row id='1'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>dat_alteracao</value><value id='3'>6</value><value id='4'>1</value><value id='5'>3</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Data</value><value id='11'>Data de alteração</value><value id='14'>6</value></row>
+<row id='2'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>descricao_motivo</value><value id='3'>1</value><value id='4'>500</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Descrição</value><value id='11'>Descrição do motivo</value><value id='14'>11</value></row>
+<row id='3'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>empresa</value><value id='3'>1</value><value id='4'>2</value><value id='6'>S</value><value id='7'>S</value><value id='8'>Empresa</value><value id='11'>Código da empresa</value><value id='14'>1</value></row>
+<row id='4'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>hor_alteracao</value><value id='3'>1</value><value id='4'>8</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Hora</value><value id='11'>Hora de alteração</value><value id='14'>7</value></row>
+<row id='5'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>item</value><value id='3'>1</value><value id='4'>15</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Item</value><value id='11'>Código do item</value><value id='14'>9</value></row>
+<row id='6'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>pedido</value><value id='3'>3</value><value id='4'>6</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Pedido</value><value id='11'>Número do pedido</value><value id='14'>3</value></row>
+<row id='7'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>perc_adic_item</value><value id='3'>4</value><value id='4'>4</value><value id='5'>2</value><value id='6'>N</value><value id='7'>N</value><value id='8'>Pct Adic Item</value><value id='11'>Percentual adicional do item</value><value id='14'>12</value></row>
+<row id='8'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>prazo_entrega</value><value id='3'>6</value><value id='4'>1</value><value id='5'>3</value><value id='6'>N</value><value id='7'>N</value><value id='8'>Prazo</value><value id='11'>Prazo de entrega</value><value id='14'>15</value></row>
+<row id='9'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>preco_unitario</value><value id='3'>4</value><value id='4'>17</value><value id='5'>6</value><value id='6'>N</value><value id='7'>N</value><value id='8'>Preço</value><value id='11'>Preço unitário</value><value id='14'>13</value></row>
+<row id='10'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>qtd_item</value><value id='3'>4</value><value id='4'>10</value><value id='5'>3</value><value id='6'>N</value><value id='7'>N</value><value id='8'>Quantidade</value><value id='11'>Quantidade do item</value><value id='14'>14</value></row>
+<row id='11'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>seq_item</value><value id='3'>3</value><value id='4'>5</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Sequência</value><value id='11'>Sequência do item</value><value id='14'>4</value></row>
+<row id='12'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>tip_alteracao</value><value id='3'>1</value><value id='4'>1</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Tipo Alteração</value><value id='11'>Tipo Alteração</value><value id='14'>10</value></row>
+<row id='13'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>tip_item</value><value id='3'>1</value><value id='4'>1</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Tipo</value><value id='11'>Tipo do item</value><value id='14'>5</value></row>
+<row id='14'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>transacao</value><value id='3'>8</value><value id='4'>10</value><value id='6'>S</value><value id='7'>S</value><value id='8'>Transação</value><value id='11'>Transação</value><value id='14'>2</value></row>
+<row id='15'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>usuario_alt</value><value id='3'>1</value><value id='4'>8</value><value id='6'>N</value><value id='7'>S</value><value id='8'>Usuário</value><value id='11'>Usuário alteração</value><value id='14'>8</value></row>
+<row id='16'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>val_frete_unitario</value><value id='3'>4</value><value id='4'>17</value><value id='5'>6</value><value id='6'>N</value><value id='7'>N</value><value id='8'>Frete Unitário</value><value id='11'>Valor do frete unitário</value><value id='14'>16</value></row>
+<row id='17'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>val_segr_unitario</value><value id='3'>4</value><value id='4'>17</value><value id='5'>6</value><value id='6'>N</value><value id='7'>N</value><value id='8'>Seguro Unitário</value><value id='11'>Valor do seguro unitário</value><value id='14'>17</value></row>
+</rows>
+</table>
+<table table_name='frm_column_legend' id='4' description='legendas de tabela'>
+<columns>
+<column id='1'>table_name</column>
+<column id='2'>column_name</column>
+<column id='3'>legend_type</column>
+<column id='4'>legend_value</column>
+<column id='5'>legend_text</column>
+<column id='6'>legend_text_en</column>
+<column id='7'>legend_text_es</column>
+<column id='8'>legend_image</column>
+<column id='9'>legend_condition</column>
+<column id='10'>legend_order</column>
+</columns>
+</table>
+<table table_name='frm_table_reference' id='5' description='referências de tabela'>
+<columns>
+<column id='1'>table_name</column>
+<column id='2'>reference_name</column>
+<column id='3'>table_reference</column>
+<column id='4'>reference_type</column>
+</columns>
+</table>
+<table table_name='frm_column_reference' id='6' description='colunas das referências de tabela'>
+<columns>
+<column id='1'>reference_name</column>
+<column id='2'>column_name</column>
+<column id='3'>column_reference</column>
+<column id='4'>column_sequence</column>
+</columns>
+</table>
+<table table_name='frm_index' id='7' description='índices de tabela'>
+<columns>
+<column id='1'>table_name</column>
+<column id='2'>index_name</column>
+<column id='3'>index_type</column>
+</columns>
+<rows>
+<row id='1'><value id='1'>vdp_aud_it_ped_444</value><value id='2'>pk_vdp_aud_it_ped_444</value><value id='3'>3</value></row>
+</rows>
+</table>
+<table table_name='frm_index_column' id='8' description='colunas dos índices de tabela'>
+<columns>
+<column id='1'>index_name</column>
+<column id='2'>column_name</column>
+<column id='3'>is_asc_order</column>
+<column id='4'>column_sequence</column>
+</columns>
+<rows>
+<row id='1'><value id='1'>pk_vdp_aud_it_ped_444</value><value id='2'>empresa</value><value id='3'>S</value><value id='4'>1</value></row>
+<row id='2'><value id='1'>pk_vdp_aud_it_ped_444</value><value id='2'>transacao</value><value id='3'>S</value><value id='4'>2</value></row>
+</rows>
+</table>
+</content>
+</md-update>

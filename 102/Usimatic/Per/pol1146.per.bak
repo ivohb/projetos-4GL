@@ -1,0 +1,22 @@
+DATABASE FORMONLY
+SCREEN
+{
+-------------------------------------------------------
+[c ]                 DEMANDA DE PEDIDO 
+
+                            
+             Data inicial:[a         ] 
+             
+               Data final:[b         ]
+              
+              
+              
+}
+END
+
+ATTRIBUTES
+ c = FORMONLY.cod_empresa, NOENTRY;
+ a = FORMONLY.dat_ini;
+ b = FORMONLY.dat_fim;
+END 
+

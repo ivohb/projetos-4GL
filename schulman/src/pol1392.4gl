@@ -134,7 +134,7 @@ FUNCTION pol1392()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1392-12.00.00  "
+   LET p_versao = "pol1392-12.00.03  "
    CALL func002_versao_prg(p_versao)
    
    LET m_car_func = TRUE
@@ -156,7 +156,7 @@ FUNCTION pol1392_menu()#
            l_label         VARCHAR(10),
            l_titulo        CHAR(80)
 
-    LET l_titulo = 'CADASTROS PARA INREGRAÇÃO SICAL X CONCUR - ',p_versao
+    LET l_titulo = 'CADASTROS PARA INTEGRAÇÃO CONCUR X LOGIX - ',p_versao
     
     LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
     CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)
@@ -370,7 +370,7 @@ FUNCTION pol1392_func_grade(l_container)#
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_func)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Nome")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",300)    
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",400)    
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","raz_social")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_func)
@@ -1039,7 +1039,7 @@ FUNCTION pol1392_desp_grade(l_container)#
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_desp)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",140)    
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",300)    
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_despesa")
     CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
 
@@ -1446,7 +1446,7 @@ FUNCTION pol1392_desp_update()#
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    
-   IF mr_desp.tip_desp_concur IS NULL THEN
+   IF mr_desp.tip_desp_concur IS NULL OR mr_desp.tip_desp_concur = 0 THEN
       LET m_msg = 'Selecione previamente um registro.'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
@@ -1524,7 +1524,7 @@ FUNCTION pol1392_desp_delete()#
    
    DEFINE l_ret   SMALLINT
 
-   IF mr_desp.tip_desp_concur IS NULL THEN
+   IF mr_desp.tip_desp_concur IS NULL OR mr_desp.tip_desp_concur = 0 THEN
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",
              "Selecione um registro para excluir.")
       RETURN FALSE
@@ -1762,7 +1762,7 @@ FUNCTION pol1392_cust_grade(l_container)#
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_cust)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",140)    
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",250)    
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","nom_cent_cust")
     CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
 
@@ -1788,7 +1788,7 @@ FUNCTION pol1392_cust_grade(l_container)#
     
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_cust)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Nome linha")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)    
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",250)    
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","nom_linha_prod")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_cust)
@@ -2270,7 +2270,7 @@ FUNCTION pol1392_cust_update()#
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    
-   IF mr_cust.cod_cc_concor IS NULL THEN
+   IF mr_cust.cod_cc_concor IS NULL OR mr_cust.cod_cc_concor = 0 THEN
       LET m_msg = 'Selecione previamente um registro.'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
@@ -2356,7 +2356,7 @@ FUNCTION pol1392_cust_delete()#
    
    DEFINE l_ret   SMALLINT
 
-   IF mr_cust.cod_cc_concor IS NULL THEN
+   IF mr_cust.cod_cc_concor IS NULL OR mr_cust.cod_cc_concor = 0 THEN
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",
              "Selecione um registro para excluir.")
       RETURN FALSE

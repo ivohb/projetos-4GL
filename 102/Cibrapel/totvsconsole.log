@@ -1,0 +1,403 @@
+
+[INFO ][SERVER] Fim - Programa POL1269.4GL - thread 7340 - 28/03/2015 18:14:42 (administrador,SRVAPLICACAO)
+
+translate: SELECT @@spid
+
+PREPARE
+ SELECT @@spid
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=486 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY3
+  NAME_sql:cu1
+  NATIVE COMMAND:SELECT @@spid
+  COMMAND:SELECT @@spid
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=494 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu1
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=496 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu1
+  COMMAND:SELECT @@spid
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=497 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu1
+  COMMAND:
+  INTO:1
+    t:              INTEGER v:81
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu1
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu1
+  COMMAND:
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.016]
+  4gl source: LOG0010.4GL  line=512 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY4
+  NAME_sql:cu1
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=520 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu1
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=522 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu1
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=523 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu1
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2015-03-28 18:07:53                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu1
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu1
+  COMMAND:
+
+DECLARE
+  Trace - Running time [0.015]
+  4gl source: LOG0010.4GL  line=1998 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  NATIVE COMMAND:SELECT SID,DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin')
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin')
+
+  4gl source: LOG0010.4GL  line=1998 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin')
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=2004 
+  STATUS:    0 ROWS AFFECTED:3
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin')
+  USE:1
+    t:              CHAR(8) v:'admlog  '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=2004 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  COMMAND:
+  INTO:2
+    t:              INTEGER v:81
+    t:             DATETIME v:2015-03-28 18:07:53                                                                                                                                                                                                                                            
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=103 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY5
+  NAME_sql:cu2
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0011.4GL  line=104 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.016]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2015-03-28 18:07:53                                                                                                                                                                                                                                            
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          81
+  INTO:1
+    t:             DATETIME v:2015-03-28 18:07:53                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=2004 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  COMMAND:
+  INTO:2
+    t:              INTEGER v:161
+    t:             DATETIME v:2015-03-28 17:50:21                                                                                                                                                                                                                                            
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         161
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         161
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=103 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY5
+  NAME_sql:cu2
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         161
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         161
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0011.4GL  line=104 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.015]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         161
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2015-03-28 17:50:21                                                                                                                                                                                                                                            
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         161
+  INTO:1
+    t:             DATETIME v:2015-03-28 17:50:21                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=2004 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  COMMAND:
+  INTO:2
+    t:              INTEGER v:89
+    t:             DATETIME v:2015-03-28 18:08:53                                                                                                                                                                                                                                            
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          89
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          89
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=103 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY5
+  NAME_sql:cu2
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          89
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          89
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0011.4GL  line=104 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          89
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          89
+  INTO:1
+    t:             DATETIME v:NULL
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu2
+  COMMAND:
+
+translate: DELETE FROM LOG_DADOS_SESSAO_LOGIX  WHERE SID=? AND DAT_EXECUCAO=?
+  Trace - Running time [0.032]
+  4gl source: LOG0010.4GL  line=2016 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:DELETE FROM LOG_DADOS_SESSAO_LOGIX  WHERE SID=? AND DAT_EXECUCAO=?
+  USE:2
+    t:              INTEGER v:89
+    t:             DATETIME v:2015-03-28 18:08:53                                                                                                                                                                                                                                            
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=2004 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin')
+  INTO:2
+    t:              INTEGER v:89
+    t:             DATETIME v:2015-03-28 18:08:53                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu1
+  COMMAND:
+
+[INFO ][SERVER] Fim Thread - Programa Run4GLProcess.4gl - thread 7340 - 28/03/2015 18:14:42 (administrador,SRVAPLICACAO)

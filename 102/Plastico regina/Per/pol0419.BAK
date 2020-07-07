@@ -1,0 +1,74 @@
+DATABASE logix
+SCREEN                                      
+{
+------------------------------------------------------------------------------
+ [a0]                       FATURAMENTO DE EMBALAGENS                           
+
+    Cliente NF saída:[a              ] [b                                   ]
+       NF's de Saida:[a1    ] [a2    ] [a3    ] [a4    ] [a5    ] [a6    ]
+Cliente NF embalagem:[a7             ] [a8                                  ]
+        Nat Oper: [a9  ]  [a10                           ]
+       Cond Pgto: [a11]   [a12                           ]
+           Texto: [a13]   [a14                           ]
+      Observacao: [a15                                  ]
+  Série NF embal: [s ]            Sub série NF embal:[ss ] 
+Embalagem: [a21                                 ]
+ Emb     Item                 Descricao                  Qtde     Pre.Unit
+[a20|a16            |a17                        |a18           |a19      ]
+[a20|a16            |a17                        |a18           |a19      ]
+[a20|a16            |a17                        |a18           |a19      ]
+[a20|a16            |a17                        |a18           |a19      ]
+[a20|a16            |a17                        |a18           |a19      ]
+}   
+END
+
+
+ATTRIBUTES
+a0  = FORMONLY.cod_empresa,      NOENTRY;
+a   = FORMONLY.cod_cli_nota,     NOENTRY;
+b   = FORMONLY.nom_cli_nota,     NOENTRY;
+a1  = FORMONLY.num_nff1,            AUTONEXT,
+      COMMENTS = "Digite o Nro da Nota Fiscal";
+a2  = FORMONLY.num_nff2,            AUTONEXT,
+      COMMENTS = "Digite o Nro da Nota Fiscal";
+a3  = FORMONLY.num_nff3,            AUTONEXT,
+      COMMENTS = "Digite o Nro da Nota Fiscal";
+a4  = FORMONLY.num_nff4,            AUTONEXT,
+      COMMENTS = "Digite o Nro da Nota Fiscal";
+a5  = FORMONLY.num_nff5,            AUTONEXT,
+      COMMENTS = "Digite o Nro da Nota Fiscal";
+a6  = FORMONLY.num_nff6,            AUTONEXT,
+      COMMENTS = "Digite o Nro da Nota Fiscal";
+a7  = FORMONLY.cod_cliente,         AUTONEXT,
+      COMMENTS = "Digite o Cod do Cliente"
+      --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a8  = FORMONLY.nom_cliente,         NOENTRY;  
+a9  = FORMONLY.cod_nat_oper,     AUTONEXT,
+      COMMENTS = "Digite a Natureza de Operacao"
+      --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a10 = FORMONLY.den_nat_oper,        NOENTRY;
+a11 = FORMONLY.cod_cnd_pgto,     AUTONEXT,
+      COMMENTS = "Digite a Cond de Pagto"
+      --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a12 = FORMONLY.den_cnd_pgto,        NOENTRY;
+a13 = FORMONLY.cod_texto,       AUTONEXT,
+      COMMENTS = "Digite o Texto da N.F."
+      --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a14 = FORMONLY.des_texto,           NOENTRY; 
+a15 = FORMONLY.tex_obs, UPSHIFT,    AUTONEXT,
+      COMMENTS = "Digite a Observacao";
+s   = FORMONLY.ser_nf, UPSHIFT, AUTONEXT;
+ss  = FORMONLY.ssr_nf, UPSHIFT, AUTONEXT;      
+a21 = FORMONLY.den_embal TYPE CHAR, UPSHIFT,  NOENTRY;      
+a20 = FORMONLY.cod_embal, UPSHIFT,  NOENTRY;
+a16 = FORMONLY.cod_item, UPSHIFT,  NOENTRY;
+a17 = FORMONLY.den_item, UPSHIFT,  NOENTRY;
+a18 = FORMONLY.qtd_embal,          NOENTRY;
+a19 = FORMONLY.pre_unit_nf,        AUTONEXT;
+
+END
+
+INSTRUCTIONS
+
+   SCREEN RECORD s_fat_emb[5] (cod_embal THRU pre_unit_nf);
+END

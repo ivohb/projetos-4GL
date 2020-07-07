@@ -1,0 +1,62 @@
+Group aparas
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=12
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0895.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0896.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0888.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0910.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0888.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08881.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08882.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0896.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08961.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0895.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0910.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09101.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

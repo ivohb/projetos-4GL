@@ -1,0 +1,36 @@
+DATABASE FORMONLY
+SCREEN
+{
+---------------------------------------------------------------------------
+[a ]                       ORDENS QUE SERÃO ALTERADAS
+
+   Ordem  Status  Saldo    Componente    Alternativo    Necessidade
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+[j         |k|l         |m              |n              |o         ]
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, NOENTRY;
+ j = FORMONLY.ordem,       NOENTRY;
+ k = FORMONLY.situacao,    NOENTRY;
+ l = FORMONLY.saldo,       NOENTRY;
+ m = FORMONLY.item,        NOENTRY;
+ n = FORMONLY.alterantivo,  NOENTRY;
+ o = FORMONLY.necessidade, NOENTRY;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_ordens[12](ordem THRU necessidade);
+END 
+

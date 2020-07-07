@@ -1,0 +1,12 @@
+url = jdbc:oracle:thin:@192.168.0.8:1521:TRE
+driver = oracle.jdbc.driver.OracleDriver
+user = db_integracao
+password = ga
+
+# parametros de configuração do pool
+
+initialSize = 10
+minIdle	 = 10
+maxTotal = 100
+minIdleTime = 1
+type = oracle 

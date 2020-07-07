@@ -1,0 +1,7 @@
+             from pedidos b,
+                  ped_itens e,
+                  clientes i,
+                  item_vdp k,
+                  grupo_item l,
+                  item m,
+                  linha_prod n

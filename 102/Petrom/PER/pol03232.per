@@ -1,0 +1,31 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------------------------------------
+                                   ITENS
+      
+[a              ]
+[b                                                                           ]
+[a              ]
+[b                                                                           ]
+[a              ]
+[b                                                                           ]
+[a              ]
+[b                                                                           ]
+[a              ]
+[b                                                                           ]
+[a              ]
+[b                                                                           ]
+ 
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_item, NOENTRY, REVERSE;
+ b = FORMONLY.den_item, NOENTRY, REVERSE;
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD s_item[6] (cod_item THRU den_item);
+END

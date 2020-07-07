@@ -1,0 +1,25 @@
+DATABASE FORMONLY
+SCREEN
+{
+-----------------------------
+CONTAS BANCÁRIAS DO PORTADOR
+
+ Agência      Conta        
+[b      ] [c              ]
+[b      ] [c              ]
+[b      ] [c              ]
+[b      ] [c              ]
+[b      ] [c              ]
+
+}
+
+ATTRIBUTES
+b = FORMONLY.cod_agencia;
+c = FORMONLY.num_conta;
+END
+
+INSTRUCTIONS
+                     
+  SCREEN RECORD s_agencia_popup(cod_agencia THRU num_conta);
+                     
+END 

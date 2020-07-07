@@ -1,0 +1,40 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+-------------------------------------------------------------------------------
+[a ]                       RELATORIO DE ERROS
+
+      Tip.Num.Rese.    Item                  Desc. Erro                      
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ] 
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+      [d|k        |e              |f                                     ]
+
+}
+
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_empresa, NOENTRY;
+  d = FORMONLY.tipo_empresa  --#, OPTIONS="-nolist";
+  k = FORMONLY.num_reserva   --#, OPTIONS="-nolist";
+  e = FORMONLY.cod_item      --#, OPTIONS="-nolist";
+  f = FORMONLY.des_erro      --#, OPTIONS="-nolist";
+  g = FORMONLY.num_rsv_relac --#, OPTIONS="-nolist";
+  
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[14](tipo_empresa THRU num_rsv_relac);
+END

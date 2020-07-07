@@ -1,0 +1,27 @@
+DATABASE FORMONLY
+SCREEN
+{
+                EQUIPAMENTOS
+--------------------------------------------------
+ Código            Descrição
+[a              ] [b                             ]
+[a              ] [b                             ]
+[a              ] [b                             ]
+[a              ] [b                             ]
+[a              ] [b                             ]
+[a              ] [b                             ]
+[a              ] [b                             ]
+[a              ] [b                             ]
+[a              ] [b                             ]
+[a              ] [b                             ]
+}
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_compon, NOENTRY;
+  b = FORMONLY.den_compon, NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_equip[10](cod_compon THRU den_compon);
+END 

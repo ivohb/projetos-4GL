@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------------------------
+                     ITENS PARA BENEFICIAMENTO
+
+      Pedido:[f      ] Cliente:[g                             ]
+
+      Item                                           Ordem
+   Beneficiado     Descrição       Componente   TP Componente
+[a              |b              |c              |d|e          ]
+[a              |b              |c              |d|e          ]
+[a              |b              |c              |d|e          ]
+[a              |b              |c              |d|e          ]
+[a              |b              |c              |d|e          ]
+[a              |b              |c              |d|e          ]
+[a              |b              |c              |d|e          ]
+[a              |b              |c              |d|e          ]
+}
+END
+
+ATTRIBUTES
+  f = FORMONLY.num_pedido, AUTONEXT;
+  g = FORMONLY.nom_cliente;
+  a = FORMONLY.cod_item;
+  b = FORMONLY.den_item;
+  c = FORMONLY.cod_compon;
+  d = FORMONLY.tip_compon;
+  e = FORMONLY.num_ordem;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_bene[08](cod_item THRU num_ordem);
+END 

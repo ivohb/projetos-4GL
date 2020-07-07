@@ -1,0 +1,1042 @@
+#-------------------------------------------------------------------#
+# PROGRAMA: pol1213                                                 #
+# OBJETIVO: ENVIO DE PROGRAMAÇÃO PARA FIAT                          #
+# AUTOR...: ACEEX                                                   #
+# DATA....: 16/07/2013                                              #
+#-------------------------------------------------------------------#
+
+DATABASE logix
+
+GLOBALS
+
+   DEFINE p_cod_empresa        LIKE empresa.cod_empresa,
+          p_den_empresa        LIKE empresa.den_empresa,
+          p_user               LIKE usuario.nom_usuario,
+          p_salto              SMALLINT,
+          p_erro_critico       SMALLINT,
+          p_existencia         SMALLINT,
+          p_num_seq            SMALLINT,
+          P_Comprime           CHAR(01),
+          p_descomprime        CHAR(01),
+          p_rowid              INTEGER,
+          p_retorno            SMALLINT,
+          p_status             SMALLINT,
+          p_index              SMALLINT,
+          s_index              SMALLINT,
+          p_ind                SMALLINT,
+          s_ind                SMALLINT,
+          p_count              SMALLINT,
+          p_houve_erro         SMALLINT,
+          comando              CHAR(80),
+          p_ies_impressao      CHAR(01),
+          g_ies_ambiente       CHAR(01),
+          p_versao             CHAR(18),
+          p_nom_arquivo        CHAR(100),
+          p_nom_tela           CHAR(200),
+          p_ies_cons           SMALLINT,
+          p_caminho            CHAR(080),
+          p_6lpp               CHAR(100),
+          p_8lpp               CHAR(100),
+          p_msg                CHAR(500),
+          p_last_row           SMALLINT,
+          p_opcao              CHAR(01),
+          p_erro               CHAR(10)
+
+END GLOBALS
+   
+DEFINE p_tela              RECORD 
+       dat_inicio          DATE,
+       dat_final           DATE,
+       entrada             CHAR(01),
+       saida               CHAR(01),
+       saldo               CHAR(01)
+END RECORD 
+
+DEFINE pr_men              ARRAY[1] OF RECORD    
+       exportando          CHAR(20),
+       item                CHAR(15)
+END RECORD
+
+DEFINE p_cod_fornecedor    CHAR(15),
+       p_num_nf            INTEGER,
+       p_ser_nf            CHAR(03),
+       p_ssr_nf            INTEGER,
+       p_especie           CHAR(03),
+       p_dat_emissao       DATE,
+       p_dat_entrada       DATE,
+       p_num_cnpj          CHAR(20),
+       p_num_ar            INTEGER,
+       p_cfop              CHAR(05),
+       p_cnpj              CHAR(15),
+       p_cod_item          CHAR(15),
+       p_item_cli          CHAR(30),
+       p_quantidade        CHAR(13),
+       p_cod_mardel        CHAR(09),
+       p_cod_min           CHAR(09),
+       p_dat_proces        DATE,
+       p_hor_proces        CHAR(08),
+       p_dat_arq           CHAR(08),
+       p_hor_arq           CHAR(06),
+       p_mensagem          CHAR(800),
+       p_qtd_reg           CHAR(09),
+       p_ident             CHAR(03),
+       p_cod_cliente       CHAR(15),
+       p_num_transac       INTEGER,
+       p_tip_item          CHAR(01),
+       p_qtd_saldo         DECIMAL(10,3),
+       p_item_cliente      CHAR(11)
+       
+
+DEFINE p_nota              RECORD
+       fornecedor          CHAR(09),
+       desenho             CHAR(11),
+       desenho_fab         CHAR(01),
+       dat_Movto           CHAR(08),
+       hor_movto           CHAR(09),
+       num_nf              CHAR(12),
+       ser_nf              CHAR(03),
+       ssr_nf              CHAR(02),
+       dat_emis_nf         CHAR(08),
+       quantidade          CHAR(13),
+       tip_movto           CHAR(03),
+       acao                CHAR(01),
+       cnpj                CHAR(14),
+       cfop                CHAR(04),
+       tip_nf              CHAR(02)
+END RECORD
+
+DEFINE p_saldo             RECORD
+       fornecedor          CHAR(09),
+       desenho             CHAR(11),
+       desenho_fab         CHAR(01),
+       dat_saldo           CHAR(08),
+       saldo               CHAR(18),
+       explodir            CHAR(01)
+END RECORD
+
+MAIN
+   CALL log0180_conecta_usuario()
+   WHENEVER ANY ERROR CONTINUE
+      SET ISOLATION TO DIRTY READ
+      SET LOCK MODE TO WAIT 5
+   DEFER INTERRUPT
+   LET p_versao = "pol1213-10.02.16"
+   OPTIONS 
+      NEXT KEY control-f,
+      INSERT KEY control-i,
+      DELETE KEY control-e,
+      PREVIOUS KEY control-b
+
+   CALL log001_acessa_usuario("ESPEC999","")
+     RETURNING p_status, p_cod_empresa, p_user
+      
+   IF p_status = 0 THEN
+      CALL pol1213_menu()
+   END IF
+   
+END MAIN
+
+#-----------------------#
+ FUNCTION pol1213_menu()#
+#-----------------------#
+
+   CALL log006_exibe_teclas("01",p_versao)
+   INITIALIZE p_nom_tela TO NULL
+   CALL log130_procura_caminho("pol1213") RETURNING p_nom_tela
+   LET  p_nom_tela = p_nom_tela CLIPPED 
+   OPEN WINDOW w_pol1213 AT 2,2 WITH FORM p_nom_tela 
+      ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST)
+ 
+   CALL pol1213_limpa_tela()
+   
+   IF NOT pol1213_cria_temp() THEN
+      RETURN
+   END IF
+   
+   MENU "OPCAO"
+      COMMAND "Informar" "Informa Parâmetros p/ o processamento"
+         CALL pol1213_informar() RETURNING p_status
+         IF NOT p_status THEN
+            ERROR "Operação Cancelada"
+         ELSE
+            ERROR "Operação efetuada com sucesso"
+            NEXT OPTION "Processar"
+         END IF
+      COMMAND "Processar" "Processa a exportação dos dados"
+         IF p_ies_cons THEN
+            CALL pol1213_processar() RETURNING p_status
+            IF NOT p_status THEN
+               ERROR 'Operação cancelada'
+            ELSE
+               CALL log0030_mensagem(p_mensagem,'excla')
+            END IF
+         ELSE
+            ERROR 'Informe previamente os parâmetros'
+            NEXT OPTION "Informar"
+         END IF
+         CURRENT WINDOW IS w_pol1213
+         LET p_ies_cons = FALSE
+      COMMAND KEY ("O") "sObre" "Exibe a versão do programa"
+         CALL pol1213_sobre()
+      COMMAND KEY ("!")
+         PROMPT "Digite o comando : " FOR comando
+         RUN comando
+         PROMPT "\nTece ENTER para continuar" FOR CHAR comando
+         DATABASE logix
+      COMMAND "Fim" "Retorna ao Menu Anterior"
+         EXIT MENU
+   END MENU
+
+   CLOSE WINDOW w_pol1213
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1213_limpa_tela()#
+#----------------------------#
+
+   CLEAR FORM
+   DISPLAY p_cod_empresa TO cod_empresa
+
+END FUNCTION
+
+#-----------------------#
+ FUNCTION pol1213_sobre()
+#-----------------------#
+
+   LET p_msg = p_versao CLIPPED,"\n\n",
+               " Autor: Ivo H Barbosa\n",
+               "ibarbosa@totvs.com.br\n ",
+               " ivohb.me@gmail.com\n\n ",
+               "     GrupoAceex\n",
+               " www.grupoaceex.com.br\n",
+               "   (0xx11) 4991-6667"
+
+  CALL log0030_mensagem(p_msg,'excla')
+                  
+END FUNCTION
+ 
+#---------------------------#
+ FUNCTION pol1213_informar()#
+#---------------------------#
+
+   INITIALIZE p_tela.* TO NULL
+   CALL pol1213_limpa_tela()
+
+   LET INT_FLAG =  FALSE
+   LET p_tela.entrada = 'S'
+   LET p_tela.saida = 'S'
+   LET p_tela.saldo = 'C'
+
+   INPUT BY NAME p_tela.*  WITHOUT DEFAULTS  
+
+      AFTER INPUT
+         IF NOT INT_FLAG THEN
+          IF p_tela.entrada = 'N' AND p_tela.saida = 'N' THEN
+          ELSE
+            IF p_tela.dat_inicio IS NULL OR
+               p_tela.dat_inicio = ' ' THEN
+               ERROR 'Campo de preenchimento obrigatório.'
+               NEXT FIELD dat_inicio
+            END IF
+            IF p_tela.dat_final IS NULL OR
+               p_tela.dat_final = ' ' THEN
+               ERROR 'Campo de preenchimento obrigatório.'
+               NEXT FIELD dat_final
+            END IF
+            IF p_tela.dat_final < p_tela.dat_inicio THEN
+               ERROR 'Período inválido!'
+               NEXT FIELD dat_final
+            END IF
+          END IF
+         END IF
+
+   END INPUT
+
+   IF INT_FLAG THEN
+      CALL pol1213_limpa_tela()
+      LET p_ies_cons = FALSE
+      RETURN FALSE
+   END IF
+
+   LET p_ies_cons = TRUE
+
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1213_exib_mensagem()
+#------------------------------#
+
+   INPUT ARRAY pr_men 
+      WITHOUT DEFAULTS FROM sr_men.*
+      BEFORE INPUT
+         EXIT INPUT
+   END INPUT
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1213_cria_temp()#
+#---------------------------#
+
+   DROP TABLE nota_temp_5054
+   CREATE  TABLE nota_temp_5054 (
+       fornecedor          CHAR(09),
+       desenho             CHAR(11),
+       desenho_fab         CHAR(01),
+       dat_Movto           CHAR(08),
+       hor_movto           CHAR(09),
+       num_nf              CHAR(12),
+       ser_nf              CHAR(03),
+       ssr_nf              CHAR(02),
+       dat_emis_nf         CHAR(08),
+       quantidade          CHAR(13),
+       tip_movto           CHAR(03),
+       acao                CHAR(01),
+       cnpj                CHAR(14),
+       cfop                CHAR(04),
+       tip_nf              CHAR(02)
+   );
+   
+	 IF STATUS <> 0 THEN 
+			CALL log003_err_sql("CRIANDO","nota_temp_5054")
+			RETURN FALSE
+	 END IF
+
+   DROP TABLE mat_temp_5054
+   CREATE  TABLE mat_temp_5054 (
+       fornecedor          CHAR(09),
+       desenho             CHAR(11),
+       desenho_fab         CHAR(01),
+       dat_saldo           CHAR(08),
+       saldo               CHAR(18),
+       explodir            CHAR(01)
+   );
+   
+	 IF STATUS <> 0 THEN 
+			CALL log003_err_sql("CRIANDO","mat_temp_5054")
+			RETURN FALSE
+	 END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#-------------------------------------#
+FUNCTION pol1213_tira_formato(p_campo)#
+#-------------------------------------#
+   
+   DEFINE p_campo    CHAR(20),
+          p_retorno  CHAR(20),
+          p_dig      CHAR(01)
+   
+   LET p_retorno = ''
+   
+   FOR p_ind = 1 TO LENGTH(p_campo)
+       LET p_dig = p_campo[p_ind]
+       IF p_dig MATCHES'[.,/-]' THEN
+       ELSE
+          LET p_retorno = p_retorno CLIPPED, p_dig
+       END IF
+   END FOR
+   
+   RETURN p_retorno
+
+END FUNCTION
+   
+   
+#---------------------------#
+FUNCTION pol1213_processar()#
+#---------------------------#
+
+   INITIALIZE p_nom_tela TO NULL
+   CALL log130_procura_caminho("pol1213a") RETURNING p_nom_tela
+   LET p_nom_tela = p_nom_tela CLIPPED
+   OPEN WINDOW w_pol1213a AT 10,10 WITH FORM p_nom_tela
+      ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST, FORM LINE FIRST)
+   
+   LET p_mensagem = 'RESUMO DO PROCESSAMENTO:                 \n\n'
+   
+   CALL pol1213_exporta() RETURNING p_status
+      
+   CLOSE WINDOW w_pol1213a
+   
+   RETURN p_status
+
+END FUNCTION
+
+
+#-------------------------#
+FUNCTION pol1213_exporta()#
+#-------------------------#
+   
+   SELECT parametro_texto
+     INTO p_cod_mardel
+     FROM min_par_modulo
+    WHERE empresa = p_cod_empresa
+      AND parametro = 'COD_MARDEL_NA_FIAT'
+   
+   IF STATUS <> 0 THEN
+      LET p_msg = 'Erro de status ',STATUS, ' lendo parâmetro\n',
+                  'COD_MARDEL_NA_FIAT na tab min_par_modulo'
+      CALL log0030_mensagem(p_msg,'excla')
+      RETURN FALSE
+   END IF
+   
+   LET p_cod_min = p_cod_mardel
+   LET p_cod_mardel = p_cod_mardel USING '&&&&&&&&&'
+   
+   IF p_tela.entrada = 'S' THEN
+      IF NOT pol1213_exp_entrada() THEN
+         RETURN FALSE
+      END IF
+   END IF
+   
+   IF p_tela.saida = 'S' THEN
+      IF NOT pol1213_exp_saida() THEN
+         RETURN FALSE
+      END IF
+   END IF
+
+   IF NOT pol1213_exp_material() THEN
+      RETURN FALSE
+   END IF
+              
+   RETURN TRUE
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1213_exp_entrada()#
+#-----------------------------#
+   
+   DELETE FROM nota_temp_5054
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE', 'nota_temp_5054')
+      RETURN FALSE
+   END IF
+   
+   LET pr_men[1].exportando = 'Notas de entrada'
+
+   DECLARE cq_nfe CURSOR FOR
+    SELECT n.num_nf,
+           n.ser_nf,
+           n.ssr_nf,
+           n.ies_especie_nf,
+           n.dat_emis_nf,
+           n.dat_entrada_nf,
+           n.num_aviso_rec,
+           n.cod_fornecedor,
+           n.cod_operacao,
+           a.cod_item,
+           sum(a.qtd_recebida)
+      FROM nf_sup n, aviso_rec a, fornec_nf_5054 f, item_cliente_5054 i
+     WHERE n.cod_empresa = p_cod_empresa
+       AND n.dat_entrada_nf >= p_tela.dat_inicio
+       AND n.dat_entrada_nf <= p_tela.dat_final
+       AND n.cod_fornecedor = f.cod_fornecedor
+       AND a.cod_empresa = n.cod_empresa
+       AND a.num_aviso_rec = n.num_aviso_rec
+       AND a.cod_item = i.cod_item
+       AND i.cod_empresa = a.cod_empresa
+       GROUP BY 
+           n.num_nf,
+           n.ser_nf,
+           n.ssr_nf,
+           n.ies_especie_nf,
+           n.dat_emis_nf,
+           n.dat_entrada_nf,
+           n.num_aviso_rec,
+           n.cod_fornecedor,
+           n.cod_operacao,
+           a.cod_item
+       
+       #AND i.tip_item IN ('C','B')
+              
+   FOREACH cq_nfe INTO
+           p_num_nf,
+           p_ser_nf,
+           p_ssr_nf,
+           p_especie,
+           p_dat_emissao,
+           p_dat_entrada,
+           p_num_ar,
+           p_cod_fornecedor,
+           p_cfop,
+           p_cod_item,
+           p_quantidade
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH', 'cq_nfe')
+         RETURN FALSE
+      END IF
+      
+      LET pr_men[1].item  = p_num_nf
+      CALL pol1213_exib_mensagem()
+
+      LET p_nota.fornecedor = p_cod_mardel 
+      LET p_nota.num_nf = p_num_nf USING '&&&&&&&&&&&&'
+      LET p_nota.ser_nf = p_ser_nf USING '&&&'
+      LET p_nota.ssr_nf = p_ssr_nf USING '&&'
+      LET p_nota.desenho_fab = 'E'
+      LET p_nota.dat_Movto = p_dat_entrada USING 'yyyymmdd'
+      LET p_nota.hor_movto = '000000000' 
+      LET p_nota.dat_emis_nf = p_dat_emissao USING 'yyyymmdd'
+      LET p_nota.tip_movto = 'REC'
+      LET p_nota.acao = 'I'
+      LET p_nota.cfop = pol1213_tira_formato(p_cfop)
+      LET p_nota.cfop = p_nota.cfop USING '&&&&'
+      LET p_nota.quantidade = pol1213_tira_formato(p_quantidade) 
+      LET p_nota.quantidade = p_nota.quantidade USING '&&&&&&&&&&&&&'
+
+      SELECT num_cgc_cpf
+        INTO p_num_cnpj
+        FROM fornecedor
+       WHERE cod_fornecedor = p_cod_fornecedor
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT', 'fornecedor')
+         RETURN FALSE
+      END IF
+         
+      LET p_cnpj = pol1213_tira_formato(p_num_cnpj)
+      LET p_nota.cnpj = p_cnpj[2,15]
+                                             
+      SELECT tipo_fiat
+        INTO p_nota.tip_nf
+        FROM tipo_nf_5054
+       WHERE tipo_logix = p_especie
+         AND entrada_saida = 'E'
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT', 'tipo_nf_5054')
+         RETURN FALSE
+      END IF
+         
+      IF NOT pol1213_desenho() THEN
+         RETURN FALSE
+      END IF
+         
+      LET p_nota.desenho = p_item_cliente
+         
+      INSERT INTO nota_temp_5054
+       VALUES(p_nota.*)
+        
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('INSERT', 'nota_temp_5054')
+         RETURN FALSE
+      END IF
+      
+   END FOREACH   
+
+   SELECT COUNT(fornecedor)
+     INTO p_count 
+     FROM nota_temp_5054
+      
+   IF p_count = 0 THEN
+      LET p_mensagem = p_mensagem CLIPPED, 
+          'NOTA DE ENTRADA SEM MOVIMENTO P/ ENVIAR'
+   ELSE
+      IF NOT pol1213_imp_nota('ENT.TXT') THEN
+         RETURN FALSE
+      END IF
+   END IF
+      
+   RETURN TRUE
+
+END FUNCTION
+
+#-------------------------#
+FUNCTION pol1213_desenho()#
+#-------------------------#
+
+   DEFINE p_it_cli CHAR(11)
+   
+   LET p_it_cli = NULL
+         
+   DECLARE cq_desenho CURSOR FOR
+    SELECT cod_item_cliente
+      FROM cliente_item
+     WHERE cod_empresa = p_cod_empresa
+       AND cod_item = p_cod_item
+             
+   FOREACH cq_desenho INTO p_item_cliente            
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH', 'cq_desenho')
+         RETURN FALSE
+      END IF
+            
+      LET p_it_cli = p_item_cliente
+      EXIT FOREACH
+            
+   END FOREACH
+   
+   IF p_it_cli IS NULL THEN 
+      LET p_msg = 'Item ', p_cod_item CLIPPED, ' não encontrado\n',
+                  'na tabela cliente_item'
+      CALL log0030_mensagem(p_msg,'excla')
+      RETURN FALSE
+   END IF
+      
+   LET p_item_cliente = pol1213_zero(p_item_cliente,11)
+   
+   RETURN TRUE
+
+END FUNCTION
+   
+
+#----------------------------------------#
+FUNCTION pol1213_zero(p_campo, p_tamanho)#
+#----------------------------------------#
+
+   DEFINE p_retorno CHAR(80),
+          p_campo   CHAR(80),
+          p_tamanho INTEGER,
+          p_qtd_zero INTEGER
+   
+   LET p_retorno = ''
+   LET p_qtd_zero  = p_tamanho - LENGTH(p_campo)
+   
+   FOR p_ind = 1 TO p_qtd_zero
+       LET p_retorno = p_retorno CLIPPED, '0'
+   END FOR
+   
+   LET p_retorno = p_retorno CLIPPED, p_campo CLIPPED
+   
+   RETURN p_retorno
+
+END FUNCTION
+
+
+
+#---------------------------#
+FUNCTION pol1213_exp_saida()#
+#---------------------------#
+   
+   DEFINE p_hor_emisso CHAR(08),
+          p_dat_hor DATETIME YEAR TO SECOND
+   
+   DELETE FROM nota_temp_5054
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE', 'nota_temp_5054')
+      RETURN FALSE
+   END IF
+   
+   LET pr_men[1].exportando = 'Notas de entrada'
+      
+   DECLARE cq_nfs CURSOR FOR
+    SELECT m.nota_fiscal, 
+           m.serie_nota_fiscal, 
+           m.subserie_nf, 
+           m.espc_nota_fiscal,
+           m.trans_nota_fiscal,
+           m.cliente,
+           f.item,
+           sum(f.qtd_item)
+      FROM fat_nf_mestre m, fat_nf_item f, 
+           cliente_nf_5054 c, item_cliente_5054 i
+     WHERE m.empresa = p_cod_empresa
+       AND DATE(m.dat_hor_emissao) >= p_tela.dat_inicio
+       AND DATE(m.dat_hor_emissao) <= p_tela.dat_final
+       AND m.cliente = c.cod_cliente
+       AND f.empresa = m.empresa
+       AND f.trans_nota_fiscal = m.trans_nota_fiscal
+       AND f.item = i.cod_item
+       AND f.empresa = i.cod_empresa
+       GROUP BY
+           m.nota_fiscal, 
+           m.serie_nota_fiscal, 
+           m.subserie_nf, 
+           m.espc_nota_fiscal,
+           m.trans_nota_fiscal,
+           m.cliente,
+           f.item
+
+   FOREACH cq_nfs INTO
+           p_num_nf,
+           p_ser_nf,
+           p_ssr_nf,
+           p_especie,
+           p_num_transac,
+           p_cod_cliente,
+           p_cod_item,
+           p_quantidade
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH', 'cq_nfs')
+         RETURN FALSE
+      END IF
+
+      SELECT DATE(dat_hor_emissao), 
+             dat_hor_emissao
+        INTO p_dat_emissao,
+             p_dat_hor
+        FROM fat_nf_mestre
+       WHERE empresa = p_cod_empresa
+         AND trans_nota_fiscal = p_num_transac 
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT', 'fat_nf_mestre')
+         RETURN FALSE
+      END IF
+
+      LET pr_men[1].item  = p_num_nf
+      CALL pol1213_exib_mensagem()
+
+      LET p_nota.fornecedor = p_cod_mardel 
+      LET p_nota.num_nf = p_num_nf USING '&&&&&&&&&&&&'
+      LET p_nota.ser_nf = p_ser_nf USING '&&&'
+      LET p_nota.ssr_nf = p_ssr_nf USING '&&'
+      LET p_nota.desenho_fab = 'E'
+      LET p_nota.dat_Movto = p_dat_emissao USING 'yyyymmdd'
+      LET p_hor_emisso = EXTEND(p_dat_hor, HOUR TO SECOND)
+      LET p_nota.hor_movto = p_hor_emisso[1,2], 
+             p_hor_emisso[4,5], p_hor_emisso[7,8], '000'
+      LET p_nota.dat_emis_nf = p_dat_emissao USING 'yyyymmdd'
+      LET p_nota.tip_movto = 'ENV'
+      LET p_nota.acao = 'I'
+      
+      LET p_count = LENGTH(p_quantidade) #BANCO DA MARDEL ESTÁ RETORNANDO QUANTIDADE C/ 6 CASAS DECIMAIS
+      
+      IF p_count > 3 THEN
+         LET p_quantidade = p_quantidade[1,p_count-3] 
+      END IF
+      
+      LET p_nota.quantidade = pol1213_tira_formato(p_quantidade) 
+      LET p_nota.quantidade = p_nota.quantidade USING '&&&&&&&&&&&&&'
+
+
+      SELECT num_cgc
+        INTO p_num_cnpj
+        FROM empresa
+       WHERE cod_empresa = p_cod_empresa
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT', 'empresa')
+         RETURN FALSE
+      END IF
+         
+      LET p_cnpj = pol1213_tira_formato(p_num_cnpj)
+      LET p_nota.cnpj = p_cnpj[2,15]
+         
+      SELECT tipo_fiat
+        INTO p_nota.tip_nf
+        FROM tipo_nf_5054
+       WHERE tipo_logix = p_especie
+         AND entrada_saida = 'S'
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT', 'tipo_nf_5054')
+         RETURN FALSE
+      END IF
+      
+      INITIALIZE p_cfop TO NULL
+      
+      DECLARE cq_pri_cfop CURSOR FOR           
+      SELECT DISTINCT
+             cod_fiscal
+        FROM fat_nf_item_fisc
+       WHERE empresa = p_cod_empresa 
+         AND trans_nota_fiscal = p_num_transac
+
+      FOREACH cq_pri_cfop INTO p_cfop
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('FOREACH', 'cq_pri_cfop')
+            RETURN FALSE
+         END IF
+         
+         EXIT FOREACH
+      
+      END FOREACH
+      
+      IF p_cfop IS NULL THEN
+         LET p_cfop = '0.000'
+      END IF
+         
+      LET p_nota.cfop = pol1213_tira_formato(p_cfop)
+      LET p_nota.cfop = p_nota.cfop USING '&&&&'
+
+      IF NOT pol1213_desenho() THEN
+         RETURN FALSE
+      END IF
+         
+      LET p_nota.desenho = p_item_cliente
+                  
+      INSERT INTO nota_temp_5054
+       VALUES(p_nota.*)
+       
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('INSERT', 'nota_temp_5054')
+         RETURN FALSE
+      END IF
+      
+   END FOREACH
+      
+   SELECT COUNT(fornecedor)
+     INTO p_count 
+     FROM nota_temp_5054
+      
+   IF p_count = 0 THEN
+      LET p_mensagem = p_mensagem CLIPPED, 
+          'NOTA DE SAIDA SEM MOVIMENTO P/ EVIAR'
+   ELSE
+      IF NOT pol1213_imp_nota('SAI.TXT') THEN
+         RETURN FALSE
+      END IF
+   END IF
+   
+   RETURN TRUE
+      
+END FUNCTION
+
+
+#-------------------------------#
+FUNCTION pol1213_imp_nota(p_ext)#
+#-------------------------------#
+
+   DEFINE p_ext CHAR(07)
+   
+   LET p_count = p_count + 1
+   
+   CALL log150_procura_caminho("TXT") RETURNING p_caminho
+   
+   LET p_dat_proces = TODAY 
+   LET p_hor_proces = TIME
+   LET p_dat_arq = p_dat_proces USING 'yyyymmdd'
+   LET p_hor_arq = p_hor_proces[1,2],p_hor_proces[4,5],p_hor_proces[7,8]
+   LET p_qtd_reg = p_count USING '&&&&&&&&&'
+   LET p_ident = 'TOP'
+   
+   LET p_nom_arquivo = p_caminho CLIPPED,
+       'NOTAS_CT_',p_cod_min CLIPPED,'_',p_dat_arq,p_hor_arq,'_',p_ext
+   
+   START REPORT pol1213_relat_nf TO p_nom_arquivo
+   
+   LET p_mensagem = p_mensagem CLIPPED, p_nom_arquivo, '\n'      
+   
+   DECLARE cq_nf_temp CURSOR FOR
+    SELECT * FROM nota_temp_5054
+   
+   FOREACH cq_nf_temp INTO p_nota.*
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH', 'cq_nf_temp')
+         RETURN FALSE
+      END IF
+   
+      OUTPUT TO REPORT pol1213_relat_nf()
+      
+   END FOREACH
+   
+   FINISH REPORT pol1213_relat_nf
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------#
+REPORT pol1213_relat_nf()#
+#------------------------#
+
+   OUTPUT LEFT   MARGIN 0
+          TOP    MARGIN 0
+          BOTTOM MARGIN 0
+          PAGE   LENGTH 1
+   FORMAT
+   
+      FIRST PAGE HEADER  
+         PRINT p_ident, p_cod_mardel, p_dat_arq, p_hor_arq, p_qtd_reg
+      
+      ON EVERY ROW
+         PRINT 
+          p_nota.fornecedor, 
+          p_nota.desenho,    
+          p_nota.desenho_fab,
+          p_nota.dat_Movto,  
+          p_nota.hor_movto,  
+          p_nota.num_nf,     
+          p_nota.ser_nf,     
+          p_nota.ssr_nf,     
+          p_nota.dat_emis_nf,
+          p_nota.quantidade, 
+          p_nota.tip_movto,  
+          p_nota.acao,       
+          p_nota.cnpj,       
+          p_nota.cfop,       
+          p_nota.tip_nf     
+
+END REPORT         
+
+#------------------------------#
+FUNCTION pol1213_exp_material()#
+#------------------------------#
+   
+   DEFINE sql_stmt CHAR(800)
+   
+   DELETE FROM mat_temp_5054
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE', 'mat_temp_5054')
+      RETURN FALSE
+   END IF
+   
+   LET pr_men[1].exportando = 'Notas de entrada'
+
+      
+      IF p_tela.saldo = 'C' THEN
+         LET sql_stmt = 
+             "SELECT cod_item, tip_item FROM item_cliente_5054 ",
+             " WHERE tip_item IN ('C','B') ",
+             "   AND cod_empresa = '",p_cod_empresa,"' ",
+             " ORDER BY cod_item, tip_item "
+      ELSE
+         LET sql_stmt = 
+             "SELECT cod_item, tip_item FROM item_cliente_5054 ",
+             "  WHERE cod_empresa = '",p_cod_empresa,"' ",
+             " ORDER BY cod_item, tip_item "
+      END IF                   
+
+      PREPARE var_query FROM sql_stmt   
+      DECLARE cq_item CURSOR FOR var_query
+      
+      FOREACH cq_item INTO p_cod_item, p_tip_item
+      
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('FOREACH', 'cq_item')
+            RETURN FALSE
+         END IF
+      
+         LET pr_men[1].item  = p_cod_item
+         CALL pol1213_exib_mensagem()
+         
+         SELECT (qtd_liberada + qtd_impedida + qtd_lib_excep)
+           INTO p_qtd_saldo
+           FROM estoque
+          WHERE cod_item = p_cod_item 
+            AND cod_empresa = p_cod_empresa
+
+         IF STATUS = 100 THEN
+            LET p_qtd_saldo = 0
+         ELSE
+            IF STATUS <> 0 THEN
+               CALL log003_err_sql('SELECT', 'estoque')
+               RETURN FALSE
+            END IF
+         END IF
+         
+         LET p_saldo.fornecedor = p_cod_mardel 
+         LET p_saldo.desenho_fab = 'E'
+         LET p_saldo.dat_saldo = TODAY USING 'yyyymmdd'
+         LET p_saldo.saldo = pol1213_tira_formato(p_qtd_saldo) 
+         LET p_saldo.saldo = p_saldo.saldo USING '&&&&&&&&&&&&&&&&&&'
+         
+         IF p_tip_item MATCHES '[PF]' THEN
+            LET p_saldo.explodir = 'S'
+         ELSE
+            LET p_saldo.explodir = 'N'
+         END IF
+
+         IF NOT pol1213_desenho() THEN
+            RETURN FALSE
+         END IF
+         
+         LET p_saldo.desenho = p_item_cliente
+         
+         INSERT INTO mat_temp_5054
+          VALUES(p_saldo.*)
+         
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('INSERT', 'mat_temp_5054')
+            RETURN FALSE
+         END IF
+      
+      END FOREACH
+   
+      SELECT COUNT(desenho)
+        INTO p_count 
+        FROM mat_temp_5054
+      
+      IF p_count = 0 THEN
+         LET p_mensagem = p_mensagem CLIPPED, 
+             'NA HÁ ITENS PARAMETRIZADOS P/ ENVIO DE SALDO\n'
+      ELSE
+         IF NOT pol1213_imp_saldo() THEN
+            RETURN FALSE
+         END IF
+      END IF
+      
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1213_imp_saldo()#
+#---------------------------#
+ 
+   LET p_count = p_count + 2
+   CALL log150_procura_caminho("TXT") RETURNING p_caminho
+   LET p_dat_proces = TODAY 
+   LET p_hor_proces = TIME
+   LET p_dat_arq = p_dat_proces USING 'yyyymmdd'
+   LET p_hor_arq = p_hor_proces[1,2],p_hor_proces[4,5],p_hor_proces[7,8]
+   LET p_qtd_reg = p_count USING '&&&&&&&&&'
+   LET p_ident = 'TOP'
+   
+   LET p_nom_arquivo = p_caminho CLIPPED,
+       'SALDO_CT_',p_cod_min CLIPPED,'_',p_dat_arq,p_hor_arq,'.TXT'
+   
+   START REPORT pol1213_relat_sd TO p_nom_arquivo
+   
+   LET p_mensagem = p_mensagem CLIPPED, p_nom_arquivo, '\n'      
+   
+   DECLARE cq_sd_temp CURSOR FOR
+    SELECT * FROM mat_temp_5054
+   
+   FOREACH cq_sd_temp INTO p_saldo.*
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH', 'cq_sd_temp')
+         RETURN FALSE
+      END IF
+   
+      OUTPUT TO REPORT pol1213_relat_sd()
+      
+   END FOREACH
+   
+   FINISH REPORT pol1213_relat_sd
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------#
+REPORT pol1213_relat_sd()#
+#------------------------#
+
+   OUTPUT LEFT   MARGIN 0
+          TOP    MARGIN 0
+          BOTTOM MARGIN 0
+          PAGE   LENGTH 1
+   FORMAT
+   
+      FIRST PAGE HEADER  
+         PRINT p_ident, p_cod_mardel, p_dat_arq, p_hor_arq, p_qtd_reg, p_tela.saldo
+      
+      ON EVERY ROW
+         PRINT 
+          p_saldo.fornecedor, 
+          p_saldo.desenho,    
+          p_saldo.desenho_fab,
+          p_saldo.dat_saldo,  
+          p_saldo.saldo,  
+          p_saldo.explodir     
+
+      ON LAST ROW
+         PRINT "FOO", p_qtd_reg
+         
+END REPORT         

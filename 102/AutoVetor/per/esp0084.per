@@ -1,0 +1,54 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+            RELACAO DE CHEQUES UTILIZADOS PARA PAGAMENTOS DE AD's           
+
+ Num AD:[a1    ]  Emp.:[a2]  Valor:[b1               ] Data pgto:[v1        ]
+                                                       Data canc:[v2        ]
+ Fornec:[a3             ][c1                                                ]
+==============================================================================
+ Emp Num.Cheque  Banco Agencia  C.Corrente  Valor Cheque   Data Vecto  Dev Exc
+[d0][d1        ][d2  ][d3     ][d4        ][d5           ][d6        ] [d] [e]
+[d0][d1        ][d2  ][d3     ][d4        ][d5           ][d6        ] [d] [e]
+[d0][d1        ][d2  ][d3     ][d4        ][d5           ][d6        ] [d] [e]
+[d0][d1        ][d2  ][d3     ][d4        ][d5           ][d6        ] [d] [e]
+[d0][d1        ][d2  ][d3     ][d4        ][d5           ][d6        ] [d] [e]
+[d0][d1        ][d2  ][d3     ][d4        ][d5           ][d6        ] [d] [e]
+[d0][d1        ][d2  ][d3     ][d4        ][d5           ][d6        ] [d] [e]
+==============================================================================
+  Dinh.:[a4             ]  Cheque:[a5             ]  Total:[t1             ]
+}
+END
+TABLES
+che_ad_vetor_mest,
+che_ad_vetor_item,
+fornecedor,
+ad_mestre 
+END
+ATTRIBUTES
+a1  = che_ad_vetor_mest.num_ad,   AUTONEXT,
+     COMMENTS = "Digite o Nro da AD ";
+a2  = che_ad_vetor_mest.cod_empresa_ad, UPSHIFT, AUTONEXT,
+     COMMENTS = "Empresa Origem ad";
+b1  = ad_mestre.val_saldo_ad, NOENTRY;               
+v1  = che_ad_vetor_mest.dat_pgto, AUTONEXT;
+v2  = che_ad_vetor_mest.dat_cancel, NOENTRY;
+a3  = che_ad_vetor_mest.cod_fornecedor, UPSHIFT,NOENTRY;
+c1  = fornecedor.raz_social, UPSHIFT,NOENTRY;
+d0  = che_ad_vetor_item.cod_empresa_ch, UPSHIFT, AUTONEXT;
+d1  = che_ad_vetor_item.num_cheque, AUTONEXT;
+d2  = che_ad_vetor_item.cod_banco,  UPSHIFT, AUTONEXT;
+d3  = che_ad_vetor_item.cod_agencia,  UPSHIFT, AUTONEXT;
+d4  = che_ad_vetor_item.num_conta,  UPSHIFT, AUTONEXT;
+d5  = che_ad_vetor_item.val_cheque,  UPSHIFT, AUTONEXT;
+d6  = che_ad_vetor_item.dat_vencto, AUTONEXT;
+d   = che_ad_vetor_item.ies_devolvido,  UPSHIFT, AUTONEXT;
+e   = FORMONLY.ies_excluir, UPSHIFT, AUTONEXT, 
+      COMMENTS = "Excluir Cheque da AD";
+a4  = che_ad_vetor_mest.val_tot_dinh,  UPSHIFT, AUTONEXT;
+a5  = che_ad_vetor_mest.val_tot_cheq,  UPSHIFT, NOENTRY;
+t1  = che_ad_vetor_mest.val_total,  UPSHIFT, NOENTRY;
+INSTRUCTIONS
+screen record s_ch_item[7] (che_ad_vetor_item.cod_empresa_ch THRU ies_excluir);
+END

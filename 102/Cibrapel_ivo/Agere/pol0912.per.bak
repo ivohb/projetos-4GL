@@ -1,0 +1,49 @@
+DATABASE FORMONLY
+SCREEN
+{
+ -----------------------------------------------------------------------------
+  [a ]           CONSULTA DE APONTAMENTOS ENVIADOS PELO TRIM PAPEL
+  
+          Num. seq:[y         ]
+        Num. ordem:[b         ]               Cód. item:[c              ]
+         Num. lote:[d              ]       Cód. máquina:[e         ]
+
+        Quantidade:[f              ] [z]  Tipo operação:[g]
+           
+  Tipo apontamento:[n]                           Status:[p ]               
+
+           Largura:[h         ]             Comprimento:[i         ]
+          Diâmetro:[j         ]                  Tubete:[k         ]           
+     Data produção:[l                  ] Tempo produção:[m         ]
+       É devolução:[o]                          Usuário:[q         ]
+
+     Status: 0-Não lido  1-Apontado  2-Criticado 3-Desconsolidado I-Ignorado
+       Tipo de Apontamento: F-Normal  E-Com restrição  R-Refugo  S-Sucata
+}
+
+END
+
+ATTRIBUTES
+a = FORMONLY.codempresa, NOENTRY;
+b = FORMONLY.numordem, UPSHIFT, AUTONEXT;
+c = FORMONLY.coditem, UPSHIFT, AUTONEXT;
+d = FORMONLY.numlote, UPSHIFT, AUTONEXT;
+e = FORMONLY.codmaquina, UPSHIFT, AUTONEXT;
+f = FORMONLY.pesobalanca, UPSHIFT, AUTONEXT;
+g = FORMONLY.estorno, UPSHIFT, AUTONEXT;
+h = FORMONLY.largura, UPSHIFT, AUTONEXT;
+i = FORMONLY.comprimento, UPSHIFT, AUTONEXT;
+j = FORMONLY.diametro, UPSHIFT, AUTONEXT;
+k = FORMONLY.tubete, UPSHIFT, AUTONEXT;
+l = FORMONLY.datproducao, UPSHIFT, AUTONEXT;
+m = FORMONLY.tempoproducao, UPSHIFT, AUTONEXT;
+n = FORMONLY.tipmovto, UPSHIFT, AUTONEXT;
+o = FORMONLY.iesdevolucao, UPSHIFT, AUTONEXT;
+p = FORMONLY.statusregistro, UPSHIFT, AUTONEXT;
+q = FORMONLY.usuario, UPSHIFT, AUTONEXT;
+z = FORMONLY.tip_quantidade, NOENTRY, REVERSE;
+y = FORMONLY.numsequencia, UPSHIFT, AUTONEXT;
+
+END 
+
+  

@@ -1,0 +1,36 @@
+DATABASE FORMONLY
+SCREEN
+{
+--------------------------------------------------------------------------
+[a ]                     DADOS DA INTEGRAÇÃO
+                         
+  
+   Programa:[b                                                       ]
+
+      Ordem:[c         ]                      Produzida:[d         ] 
+
+   Operação:[f    ]  [g                           ] Tempo:[h       ]
+
+ Componente:[i              ]  [j                 ]  Peso:[k         ]
+  
+  
+   
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa,  NOENTRY;
+b = FORMONLY.num_programa, UPSHIFT, NOENTRY;
+c = FORMONLY.num_ordem, AUTONEXT;
+d = FORMONLY.qtd_produzida, AUTONEXT;
+f = FORMONLY.cod_operac, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+g = FORMONLY.den_operac, NOENTRY, REVERSE;
+h = FORMONLY.tempo_unit, AUTONEXT, picture = '##:##:##';
+i = FORMONLY.cod_item_compon, UPSHIFT, AUTONEXT
+  --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+j = FORMONLY.den_item_reduz, NOENTRY, REVERSE;
+k = FORMONLY.pes_unit, AUTONEXT;
+
+END
+ 

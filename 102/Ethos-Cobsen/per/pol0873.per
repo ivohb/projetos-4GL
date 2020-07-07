@@ -1,0 +1,41 @@
+DATABASE logix         
+
+SCREEN
+{
+------------------------------------------------------------------------------
+[a0]                              ITEM KANBAN
+
+        Item:[a2             ] [a3                                      ]
+ 
+         Item Cliente:[a1                            ] 
+
+          Data inicio:[d1        ]  Data Termino:[d2        ]
+
+         Tipo de item:[d3        ]
+
+     Qtd dias entrega:[d4  ]
+
+
+
+
+
+
+}   
+
+END
+
+TABLES
+item_kanban_547,
+item
+END
+
+ATTRIBUTES
+a0   = item_kanban_547.cod_empresa, NOENTRY;
+a1   = item_kanban_547.cod_item_cliente, UPSHIFT, AUTONEXT;    
+a2   = item_kanban_547.cod_item, UPSHIFT, AUTONEXT;
+a3   = item.den_item, NOENTRY; 
+d1   = item_kanban_547.dat_inicio, UPSHIFT, AUTONEXT;    
+d2   = item_kanban_547.dat_termino, UPSHIFT, AUTONEXT;  
+d3   = item_kanban_547.tipo_item, UPSHIFT, AUTONEXT;  
+d4   = item_kanban_547.qtd_dias, UPSHIFT, AUTONEXT;  
+END

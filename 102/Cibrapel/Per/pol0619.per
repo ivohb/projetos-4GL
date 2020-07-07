@@ -1,0 +1,39 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                    ROMANEIOS - INTEGRAÇÃO COM O TRIM
+
+   Romaneio:[b          ]  Status:[c] Opções Disp:[d                        ]
+
+ Seq                    Problemas Encontrados                      Dat Proces
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+[k         |l                                                     |m         ]
+
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.num_roma, AUTONEXT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   c = FORMONLY.cod_status, REVERSE, NOENTRY;
+   d = FORMONLY.den_oper, REVERSE, NOENTRY;
+   k = FORMONLY.num_sequencia --#, OPTIONS="-nolist"; 
+   l = FORMONLY.den_erro      --#, OPTIONS="-nolist";
+   m = FORMONLY.dat_hor       --#, OPTIONS="-nolist";
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD s_romaneios[11] (num_sequencia THRU dat_hor);
+END

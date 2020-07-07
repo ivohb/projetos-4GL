@@ -1,0 +1,31 @@
+DATABASE FORMONLY
+SCREEN
+{
+----------------------------------------------------------
+                SELECIONE O FORNECEDOR
+             
+ Ser Emissao  Num AR Fornecedor        Descrição
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+[a  |b       |c     |d              |e                   ]
+}
+
+ATTRIBUTES
+   a = FORMONLY.ser_nf        --#, OPTIONS="-nolist";
+   b = FORMONLY.dat_emissao,
+        FORMAT = 'dd/mm/yy'   --#, OPTIONS="-nolist";
+   c = FORMONLY.num_ar        --#, OPTIONS="-nolist";
+   d = FORMONLY.cod_companhia --#, OPTIONS="-nolist";
+   e = FORMONLY.den_companhia --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_nf[10] (ser_nf THRU den_companhia);
+END

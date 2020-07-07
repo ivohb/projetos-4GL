@@ -1,0 +1,34 @@
+DATABASE FORMONLY 
+SCREEN
+{
+--------------------------------------------------------------
+                        VEÍCULOS
+                        
+       Código                    Descrição
+[a              ] [b                                       ]
+                 
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+[c              ] [d                                       ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_veiculo,       UPSHIFT, AUTONEXT;
+ b = FORMONLY.den_veiculo,       UPSHIFT, AUTONEXT;
+ c = FORMONLY.cod_veiculo_array, UPSHIFT --#, OPTIONS="-nolist";
+ d = FORMONLY.den_veiculo_array, UPSHIFT --#, OPTIONS="-nolist";
+ 
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_veiculo[10] (cod_veiculo_array THRU den_veiculo_array);
+END
+

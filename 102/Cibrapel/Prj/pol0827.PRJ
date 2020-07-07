@@ -1,0 +1,35 @@
+Group pol0827
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=3
+         File \clientes\Cibrapel\Per\pol0827.per
+             Type=T
+         End
+         File \clientes\Cibrapel\Per\pol08271.per
+             Type=T
+         End
+         File \clientes\Cibrapel\4gl\pol0827.4gl
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

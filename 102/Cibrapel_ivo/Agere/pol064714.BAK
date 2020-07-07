@@ -1,0 +1,42 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+----------------------------------------------------------------------------
+[a ]           ROTEIRO DO PRODUTO CRITICADO       Cód Item:[b              ]
+ 
+       Seq Operação Cód Máq     Setup        Prod/Hora    %Refugo
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+       [e         ] [f    ] [g           ] [h           ] [i     ]
+ 
+}
+END
+
+ATTRIBUTES 
+ a = FORMONLY.cod_empresa;
+ b = FORMONLY.coditem, UPSHIFT, AUTONEXT;
+END
+
+ATTRIBUTES
+ e = FORMONLY.numseqoperac, UPSHIFT, AUTONEXT --#, OPTIONS="-nolist";
+ f = FORMONLY.codmaquina, UPSHIFT, AUTONEXT --#, OPTIONS="-nolist";
+ g = FORMONLY.setup, UPSHIFT, AUTONEXT --#, OPTIONS="-nolist";
+ h = FORMONLY.qtdprodhora, UPSHIFT, AUTONEXT --#, OPTIONS="-nolist";
+ i = FORMONLY.pctrefugo, UPSHIFT, AUTONEXT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD s_roteiro[11] (numseqoperac THRU pctrefugo);
+END
+
+
+

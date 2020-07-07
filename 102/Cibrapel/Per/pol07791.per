@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN 
+{
+       OPERACAO         DESCRICAO DA OPERACAO
+       --------   -------------------------------------  
+      [a       ]  [b                                   ] 
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]  
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ]   
+      [a       ]  [b                                   ] 
+
+    
+}
+END
+
+
+ATTRIBUTES
+   a = FORMONLY.cod_oper_ent_valor,AUTONEXT;
+   b = FORMONLY.den_operac,NOENTRY;
+   
+   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_oper_valor[12] (cod_oper_ent_valor THRU den_operac);
+END 

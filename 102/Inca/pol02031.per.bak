@@ -1,0 +1,39 @@
+DATABASE logix   
+SCREEN
+{
+------------------------------------------------------------------------------ 
+  [a0]                         PEDIDOS EM BATCH       
+   Pedido  Cliente                            Emissao    Representante
+==============================================================================
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+[s|a1    |a2                                 |a3        |a4                  ] 
+
+} 
+END
+TABLES
+pedido_dig_mest 
+END
+
+ATTRIBUTES
+a0   = pedido_dig_mest.cod_empresa, NOENTRY;
+s    = FORMONLY.ies_imprime TYPE CHAR,UPSHIFT,AUTONEXT;
+a1   = pedido_dig_mest.num_pedido, NOENTRY;
+a2   = FORMONLY.nom_cliente, NOENTRY;
+a3   = pedido_dig_mest.dat_emis_repres, NOENTRY;
+a4   = FORMONLY.nom_repres, NOENTRY;
+INSTRUCTIONS
+screen record s_pedidos[11](FORMONLY.ies_imprime, 
+                            pedido_dig_mest.num_pedido, 
+                            FORMONLY.nom_cliente, 
+                            pedido_dig_mest.dat_emis_repres, 
+                            FORMONLY.nom_repres) 
+END

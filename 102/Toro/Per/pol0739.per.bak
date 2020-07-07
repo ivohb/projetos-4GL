@@ -1,0 +1,72 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------------------------------------
+[a ]                 CADASTRO DE FICHA TÉCNICA
+Item          [b                ]      [c                                ]
+Fornecedor    [d                ]      [e                                ]
+Matéria Prima [f                                                         ]
+Comprimento   [g          ] Tolerancia [h              ]          
+Largura       [i          ] Tolerancia [j              ]                                        
+Espessura     [k          ] Tolerancia [l              ]      
+Gramatura     [m          ] Gra. Min   [n        ] Gra. Max   [o         ]
+Peso          [p          ] Peso. Min  [q        ] Peso. Max  [r         ]
+Lado Corte    [s          ]
+Compr. Lamina [t          ] Larg. Lam. [u        ] Batida Hora[v         ]
+Cavidades     [w          ]
+Peças Pacote  [z          ] 
+Area Aplica.  [z1         ] Alt.Aplica [z2       ] 
+Tol. Resina   [z3         ] Cod. Tip. Material [z4    ]  Dias Val. [z6   ]
+Quant.Peças Embal.[x               ]Qtd.Etiq.Peça P/Embalagem[y          ]
+Observacao [z5                                                           ]  
+Material Item [z7          ]
+}
+
+END
+
+ATTRIBUTES
+ 
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY; 
+b = FORMONLY.cod_item,UPSHIFT, AUTONEXT  
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.den_item,UPSHIFT, NOENTRY;   
+d = FORMONLY.cod_fornecedor, UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';   
+e = FORMONLY.raz_social, UPSHIFT, NOENTRY; 
+f = FORMONLY.den_mat_prima,UPSHIFT, AUTONEXT;  
+g = FORMONLY.comprimento,UPSHIFT, AUTONEXT;  
+h = FORMONLY.tol_compr,UPSHIFT, AUTONEXT;  
+i = FORMONLY.largura,UPSHIFT, AUTONEXT;  
+j = FORMONLY.tol_largura,UPSHIFT, AUTONEXT;  
+k = FORMONLY.espessura,UPSHIFT, AUTONEXT;  
+l = FORMONLY.tol_espessura,UPSHIFT, AUTONEXT;  
+m = FORMONLY.gramatura,UPSHIFT, AUTONEXT;  
+n = FORMONLY.gramatura_min,UPSHIFT, AUTONEXT;  
+o = FORMONLY.gramatura_max,UPSHIFT, AUTONEXT;  
+p = FORMONLY.peso,UPSHIFT, AUTONEXT;  
+q = FORMONLY.peso_min,UPSHIFT, AUTONEXT;  
+r = FORMONLY.peso_max,UPSHIFT, AUTONEXT;  
+s = FORMONLY.lado_corte,UPSHIFT, AUTONEXT;  
+t = FORMONLY.compr_lamina,UPSHIFT, AUTONEXT;  
+u = FORMONLY.largura_lamina,UPSHIFT, AUTONEXT;  
+v = FORMONLY.batidas_hora,UPSHIFT, AUTONEXT;  
+w = FORMONLY.cavidade,UPSHIFT, AUTONEXT;  
+x = FORMONLY.qtd_pecas_emb,UPSHIFT, AUTONEXT;  
+y = FORMONLY.qtd_etiq_emb,UPSHIFT, AUTONEXT;  
+z = FORMONLY.pecas_pacote,UPSHIFT, AUTONEXT;  
+z1 = FORMONLY.area_aplicacao,UPSHIFT, AUTONEXT;
+z2 = FORMONLY.alt_aplicacao,UPSHIFT, AUTONEXT;
+z3 = FORMONLY.tol_resina,UPSHIFT, AUTONEXT;
+z4 = FORMONLY.cod_tip_mat,UPSHIFT, AUTONEXT;
+z5 = FORMONLY.observacao,UPSHIFT, AUTONEXT;
+z6 = FORMONLY.dia_validade, UPSHIFT, AUTONEXT;
+z7 = FORMONLY.tipo_material, UPSHIFT, AUTONEXT;
+END 
+
+
+
+
+
+
+
+

@@ -1,0 +1,55 @@
+DATABASE FORMONLY 
+
+SCREEN
+{ 
+------------------------------------------------------------------------------
+[a ]                     NOTA FISCAL DE CONTRATO DE SERVIÇOS 
+
+     AR:[d       ] Nota:[e      ] Espécie:[f  ] Séire:[g ] Sub séire:[h  ]
+Emissão:[i         ] Entrada:[j        ] Valor:[k          ] Sdo:[sd         ]   
+Fornec:[l              ][m                             ] Contrato:[n        ]
+
+ Contrato  Versão     Etapa      Vencto         valor     Baixar  Num OC
+[r       |s       |t        |u            |v              ] [w] [x        ]
+[r       |s       |t        |u            |v              ] [w] [x        ]
+[r       |s       |t        |u            |v              ] [w] [x        ]
+[r       |s       |t        |u            |v              ] [w] [x        ]
+[r       |s       |t        |u            |v              ] [w] [x        ]
+[r       |s       |t        |u            |v              ] [w] [x        ]
+[r       |s       |t        |u            |v              ] [w] [x        ]
+[r       |s       |t        |u            |v              ] [w] [x        ]
+[r       |s       |t        |u            |v              ] [w] [x        ]
+                             Valor total:[z               ]
+}   
+END
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT,  NOENTRY;
+d = FORMONLY.num_aviso_rec, UPSHIFT, AUTONEXT;
+e = FORMONLY.num_nf, UPSHIFT, AUTONEXT, NOENTRY; 
+f = FORMONLY.ies_especie_nf,  UPSHIFT, AUTONEXT, NOENTRY; 
+g = FORMONLY.ser_nf, UPSHIFT, AUTONEXT, NOENTRY;
+h = FORMONLY.ssr_nf, UPSHIFT, AUTONEXT, NOENTRY;
+i = FORMONLY.dat_emis_nf, UPSHIFT, AUTONEXT, NOENTRY; 
+j = FORMONLY.dat_entrada_nf, UPSHIFT, AUTONEXT, NOENTRY; 
+k = FORMONLY.val_tot_nf_d, UPSHIFT, NOENTRY; 
+sd= FORMONLY.saldo_da_nf, UPSHIFT, NOENTRY, REVERSE, color = red; 
+l = FORMONLY.cod_fornecedor, UPSHIFT, AUTONEXT, NOENTRY;
+m = FORMONLY.raz_social, UPSHIFT, NOENTRY, REVERSE;   
+n = FORMONLY.num_contrato, UPSHIFT, AUTONEXT;
+
+r = FORMONLY.contrato_servico, UPSHIFT,  NOENTRY;
+s = FORMONLY.versao_contrato, UPSHIFT,  NOENTRY;
+t = FORMONLY.num_etapa, UPSHIFT,  NOENTRY;
+u = FORMONLY.dat_vencto_etapa, UPSHIFT,  NOENTRY;
+v = FORMONLY.val_etapa, UPSHIFT,  NOENTRY;
+w = FORMONLY.ies_baixar, UPSHIFT, INCLUDE=('S','N'), 
+     COMMENTS='Sim=Marcado Não=Não Marcado'
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+x = FORMONLY.num_oc, UPSHIFT,  NOENTRY;
+z = FORMONLY.val_baixar, UPSHIFT, NOENTRY, REVERSE, color = red;     
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_etapa[09](contrato_servico THRU num_oc);
+END 

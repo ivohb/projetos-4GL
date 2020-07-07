@@ -1,0 +1,31 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                              MRP POR PEDIDO
+
+
+                                Prazo de Entrega
+
+                                De:[b          ] 
+                
+                               Até:[c          ]
+
+
+
+
+
+
+
+
+
+}
+END
+
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,    NOENTRY;
+ b = FORMONLY.data_in,    	  AUTONEXT, FORMAT = 'dd/mm/yyyy';
+ c = FORMONLY.data_fi,    		AUTONEXT, FORMAT = 'dd/mm/yyyy';
+END 
+

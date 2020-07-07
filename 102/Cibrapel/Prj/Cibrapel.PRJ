@@ -1,0 +1,1089 @@
+Group Cibrapel
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=3
+      Folder Progamas
+         VSSPath=Fontes
+         FilesCount=64
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0604.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0605.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0617.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0618.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0635.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0638.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0644.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0647.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0648.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0653.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0654.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0700.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0701.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0702.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0705.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0710.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0725.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0734.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0746.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0748.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0752.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0753.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0768.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0778.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0779.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0800.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0815.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0827.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0830.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0835.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0888.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0895.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0896.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0910.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0911.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0912.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0915.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0938.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1015.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1040.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1062.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1063.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1064.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1065.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1263.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1269.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1269a.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1269b.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1269c.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1269d.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1270.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1270a.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1271.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1272.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1273.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1275.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1277.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1279.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1280.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1281.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1283.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1286.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1287.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol1288.4gl
+             Type=T
+         End
+      End
+      Folder Telas
+         VSSPath=Definições
+         FilesCount=284
+         File \Projetos\4GL\102\Cibrapel\Per\pol0604.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0605.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0617.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0618.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0619.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0627.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0635.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0638.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0644.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0647.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0647a.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0647b.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0647c.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0648.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0653.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0654.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0700.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0701.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0702.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0705.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0710.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0725.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0734.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0746.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0748.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0752.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0753.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0768.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0778.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0779.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0800.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0801.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0802.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0803.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0804.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0805.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0809.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0811.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0814.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0815.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0821.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0824.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0825.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0827.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0828.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0830.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0832.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0835.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0837.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0838.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0839.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0840.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0841.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0842.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0843.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0863.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0864.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0888.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0895.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0896.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0910.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0911.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0912.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0913.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0914.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0915.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0916.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0917.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0921.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0926.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0938.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1015.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1040.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1062.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1063.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1064.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1065.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1263.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1269.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1270.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1271.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1272.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1272a.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1273.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1273a.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1273b.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1273c.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1275.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1275a.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1277.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1277a.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1278.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1279.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1283.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1283a.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1286.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1287.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1288.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1289.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1290.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol1297.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06171.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06191.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06192.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06193.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06194.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06381.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06441.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06451.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06511.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06512.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07001.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07011.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07012.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07013.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07021.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07051.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07071.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07072.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07101.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07251.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07681.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07781.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07782.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07783.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07785.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07791.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08031.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08032.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08071.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08072.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08073.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08074.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08075.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08101.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08271.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08391.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08471.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08501.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08502.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08503.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08504.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08505.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08541.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08651.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08681.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08691.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08701.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08711.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08712.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08881.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08882.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol08961.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09031.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09032.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09033.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09101.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09231.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09232.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09233.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09234.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09251.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09261.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09291.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09321.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09322.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09341.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09431.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09481.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09551.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09571.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09581.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09582.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09591.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09661.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09662.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09671.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09681.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09701.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09711.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09721.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09722.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09771.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09811.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09841.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol9887.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol9888.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09891.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09931.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09932.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09941.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09942.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09943.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09944.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09945.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09946.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09947.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09948.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09949.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09951.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09952.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09953.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09954.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09961.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09962.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09971.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol09972.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol9997.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol9998.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol9999.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10000.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10071.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10121.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10122.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10131.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10141.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10142.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10191.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10291.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10321.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10322.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10323.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10324.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10451.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10471.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10472.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10501.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10502.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10503.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10504.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10505.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10506.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10511.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\POL10512.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10521.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10551.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10552.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10671.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10691.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10692.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10693.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10701.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10711.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10712.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10713.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10714.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10721.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10731.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10741.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10742.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10861.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10871.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10881.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol10961.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol11000.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol11001.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol11002.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol11003.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol11031.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol11032.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol12711.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol12712.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol12713.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol12714.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol12731.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol12891.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol12892.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol12893.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol024501.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol024502.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol024503.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol037411.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol040123.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol064710.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol064711.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol064712.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol064713.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol064714.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol064715.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol064716.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol064717.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol080201.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol080202.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol080203.per
+             Type=T
+         End
+      End
+      Folder Funcoes
+         VSSPath=Nova Pasta3
+         FilesCount=5
+         File \Projetos\4GL\102\Funcoes\4gl\func001.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Funcoes\4gl\func002.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Funcoes\4gl\func003.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Funcoes\4gl\func004.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Funcoes\4gl\func005.4gl
+             Type=T
+         End
+      End
+   End
+End

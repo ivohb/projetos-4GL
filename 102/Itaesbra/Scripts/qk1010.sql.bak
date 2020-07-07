@@ -1,0 +1,78 @@
+
+create table qk1010 
+  (
+    qk1_filial varchar(2) 
+        default '' not null ,
+    qk1_peca varchar(40) 
+        default '' not null ,
+    qk1_rev varchar(2) 
+        default '' not null ,
+    qk1_revinv varchar(2) 
+        default '',
+    qk1_dtrevi varchar(8) 
+        default '',
+    qk1_pccli varchar(40) 
+        default '',
+    qk1_descli varchar(30) 
+        default '',
+    qk1_ppap varchar(40) 
+        default '',
+    qk1_desc varchar(150) 
+        default '',
+    qk1_codcli varchar(6) 
+        default '',
+    qk1_lojcli varchar(2) 
+        default '',
+    qk1_ndes varchar(30) 
+        default '',
+    qk1_revdes varchar(15) 
+        default '',
+    qk1_dtrdes varchar(8) 
+        default '',
+    qk1_projet varchar(40) 
+        default '',
+    qk1_alteng varchar(100) 
+        default '',
+    qk1_dteng varchar(8) 
+        default '',
+    qk1_tplogo varchar(1) 
+        default '',
+    qk1_doc varchar(30) 
+        default '',
+    qk1_codequ varchar(5) 
+        default '',
+    qk1_produt varchar(15) 
+        default '',
+    qk1_revi varchar(2) 
+        default '',
+    qk1_status varchar(1) 
+        default '',
+    qk1_just varchar(50) 
+        default '',
+    qk1_dtence varchar(8) 
+        default '',
+    qk1_dtreab varchar(8) 
+        default '',
+    r_e_c_d_e_l_ float 
+        default 0.0000000000000000 not null ,
+    d_e_l_e_t_ varchar(1) 
+        default '',
+    r_e_c_n_o_ integer 
+        default 0 not null ,
+    primary key (r_e_c_n_o_) 
+  );
+
+
+create index qk10101 on qk1010 (qk1_filial,qk1_peca,
+    qk1_rev,r_e_c_n_o_,d_e_l_e_t_);
+    
+create index qk10102 on qk1010 (qk1_filial,qk1_peca,
+    qk1_revinv,r_e_c_n_o_,d_e_l_e_t_);
+    
+create index qk10103 on qk1010 (qk1_filial,qk1_codcli,
+    qk1_lojcli,qk1_peca,qk1_rev,r_e_c_n_o_,d_e_l_e_t_);
+    
+create unique index .qk1010_unq on qk1010 (qk1_filial,
+    qk1_peca,qk1_rev,r_e_c_d_e_l_);
+
+

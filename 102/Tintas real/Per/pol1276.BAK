@@ -1,0 +1,22 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------
+ [a0]        
+                  
+                  
+                  
+                  
+              PROCESSANDO APONTAMENTOS...    
+                  
+                          
+              
+
+
+}
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+
+END 

@@ -1,0 +1,31 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------------------------------------
+
+                             TEXTOS DO PEDIDO         Buscar do VDP0390?:[a]
+                             
+[b                                                                           ]
+[c                                                                           ]
+[d                                                                           ]
+[e                                                                           ]
+[f                                                                           ]
+
+
+
+
+
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.ies_buscar,   UPSHIFT, AUTONEXT,
+    INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado'
+    --#, widget='CHECK', config='S N { }';
+ b = FORMONLY.den_texto_1,  UPSHIFT, AUTONEXT;
+ c = FORMONLY.den_texto_2,  UPSHIFT, AUTONEXT;
+ d = FORMONLY.den_texto_3,  UPSHIFT, AUTONEXT;
+ e = FORMONLY.den_texto_4,  UPSHIFT, AUTONEXT;
+ f = FORMONLY.den_texto_5,  UPSHIFT, AUTONEXT;
+END

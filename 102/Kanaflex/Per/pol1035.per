@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                REPRESENTANTES QUE ATINGIRAM A META
+  
+          
+          
+              
+
+      Cód. Representante: [b   ] [c                                   ] 
+          
+            
+                     Ano: [d   ] Mês: [e ] [f        ]               
+ 
+ 
+                                        
+    
+
+
+                  
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;   
+b = FORMONLY.cod_repres,  UPSHIFT, AUTONEXT
+ --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.raz_social,  NOENTRY, REVERSE;
+d = FORMONLY.ano,         UPSHIFT, AUTONEXT;
+e = FORMONLY.mes,         UPSHIFT, AUTONEXT;
+f = FORMONLY.den_mes,     NOENTRY, COLOR = red;
+
+END 

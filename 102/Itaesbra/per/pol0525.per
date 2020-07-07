@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+  
+  [a ]                       CADASTRO DE DUNS
+  
+ 
+
+          Cliente: [b              ] [c                                   ]
+
+             Duns: [d              ]
+                
+
+                
+  
+
+ 
+ 
+ 
+ 
+}
+END
+TABLES
+   duns_itaesbra
+END
+ATTRIBUTES
+a = FORMONLY.cod_empresa, NOENTRY;
+b = duns_itaesbra.cod_cliente, UPSHIFT, AUTONEXT
+ --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+c = FORMONLY.nom_cliente, NOENTRY;
+d = duns_itaesbra.num_duns, UPSHIFT, AUTONEXT;
+END 

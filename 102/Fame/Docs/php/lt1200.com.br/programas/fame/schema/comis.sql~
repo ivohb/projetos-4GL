@@ -1,0 +1,11 @@
+create index hac_ano on lt1200_hist_comis (ano_ref) 
+    using btree ;
+create index hac_rep on lt1200_hist_comis (cod_repres) 
+    using btree ;
+create index hac_cord on lt1200_hist_comis (cod_cordenador) 
+    using btree ;
+create index hac_tipo on lt1200_hist_comis (tipo) 
+    using btree ;
+
+
+

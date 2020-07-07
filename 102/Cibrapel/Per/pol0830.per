@@ -1,0 +1,54 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                 APONTAMENTOS CRITICADOS - TRIMPAPEL
+ 
+              Período - de:[b         ]              até:[c         ]
+                     Ordem:[e         ]             Item:[f              ]
+                                                      
+   Ordem         Item      Oper  Dat produçao     TP Qt Produz   Num Bobina
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[q        |r              |s  |t                  |u|w        |x              ]
+[z                                                                             ]
+[z                                                                             ] 
+Ult. Apto:[ua                 ][um                                             ]
+}
+END
+
+ATTRIBUTES 
+ a = FORMONLY.cod_empresa, NOENTRY;
+ b = FORMONLY.dat_ini, AUTONEXT;
+ c = FORMONLY.dat_fim, AUTONEXT;
+ e = FORMONLY.num_ordem, AUTONEXT;
+ f = FORMONLY.cod_item, UPSHIFT, AUTONEXT;
+ 
+ q = FORMONLY.numordem;
+ r = FORMONLY.coditem;
+ s = FORMONLY.codmaquina;
+ t = FORMONLY.datproducao;
+ u = FORMONLY.tipmovto;
+ w = FORMONLY.pesobalanca;
+ x = FORMONLY.numlote;
+ 
+ z = FORMONLY.mensagem, WORDWRAP;
+ 
+ ua= FORMONLY.dat_hor_proces;
+ um= FORMONLY.men_erro;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_inconsist[10] (numordem THRU numlote);
+END
+
+
+

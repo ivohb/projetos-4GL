@@ -1,0 +1,164 @@
+POL0604 - DE-PARA MAQUINA
+#com Marcelo
+
+POL0605 - EXPORTAÇÃO DE CLIENTES P/ O TRIM
+drop table cliente_885;
+drop table loc_entrega_885;
+create table cliente_msg_885 (
+  dat_hor_proces   datetime,
+  mensagem         char(76)
+);
+
+POL0617 - CADASTRO DE GRAMATURAS
+#com Marcelo
+
+POL0618 - EXPORTAÇÃO DE ORDENS P/ O TRIM
+drop table ordens_885;
+create table ordem_erro_885 (
+  num_docum        char(15),
+  mensagem         char(76),
+  dat_hor_proces   datetime
+);
+
+POL0635 - CADASTRO DE TOLERANCIA
+#com Marcelo
+
+POL0638 - CADASTRO DE LISTA DE PRECO
+#com Marcelo
+
+POL0644 - CADASTRO DE GRUPO DE PRODUTO
+#com Marcelo
+POL0647 - APONTAMENTOS CRITICADOS - TRIMBOX 
+dropar e recriar apont_trim_885 e apont_erro_885
+drop table apont_trim_885;
+drop table apont_erro_885;
+recriar apont_trim_885;
+receiar apont_erro_885;
+create table apont_msg_885 (
+  cod_empresa      char(02),
+  dat_hor_proces   datetime,
+  mensagem         char(150)
+);
+
+
+POL0648 - CADASTRO DE LARGURA DE CHAPA
+#com Marcelo
+
+POL0653 - EXPORTAÇÃO DE INSUMOS P/ O TRIM 
+drop table insumo_885;
+recriar insumo_885;
+create table pol0653_msg_885 (
+  dat_hor_proces   datetime,
+  mensagem         char(76)
+);
+
+
+POL0654 - EXPORTAÇÃO DE ORDENS P/ O TRIM PAPEL
+drop table ordens_bob_885;
+recriar ordens_bob_885;
+create table pol0654_msg_885 (
+  dat_hor_proces   datetime,
+  mensagem         char(76)
+);
+
+
+POL0700 - FAMILIAS P/ EXPORTAÇÃO DE INSUMOS
+#com Marcelo
+
+POL0701 - COTAÇÃO DE PREÇO
+alter table cotacao_preco_885 add id_registro    integer;
+alter table cotacao_preco_885 add regiao_lagos   CHAR(01);
+copiar da oh para zero cotacao_preco_885 e audit_cotacao
+
+POL0705 - DE PARA TURNO
+#com marcelo
+
+POL0710 - CADASTRO DE OPERAÇÃO
+#com marcelo
+
+POL0725 - DESCONTO POR NATUREZA DE OPERAÇÃO
+#com marcelo
+
+POL0734 - CÓPIA DE PEDIOS  
+POL0746 - ROTA DE FRETE
+#com marcelo
+
+POL0748 - DESCONTO DE TRANSPORTE
+#com marcelo
+POL0752 - CADASTRO DE GERENTES
+#com marcelo
+POL0753 - CADASTRO DE REPRESENTANTE
+#com marcelo
+POL0768 - CADASTRO DE VEICULO
+#não tem empresa
+
+POL0778 - LISTAGEM P/ PAGAMENTO DE FRETES
+
+POL0779 - CADASTRO DE PARAMETROS
+drop table parametros_885;
+recriar parametros_885;
+
+POL0800 - ENTRADA MANUAL DE SUCATA
+#nada a fazer
+
+POL0830 - APONTAMENTOS CRITICADOS - TRIMPAPEL
+#nada a fazer
+
+POL0888 - EXPORTAÇÃO DE APARAS PARA O TRIM
+POL0895 - LANÇAMENTO DE LOTES DE APARAS
+POL0896 - LANÇAMENTO DE CONTAGEM DE APARAS
+POL0910 - INSPEÇÃO DE APARAS
+
+alter table umd_aparas_885 alter column fat_conversao char(20) not null;
+alter table cont_aparas_885 add num_transac int;
+alter table ar_aparas_885 add ies_financeiro char(01);
+
+
+POL0911 - CADASTRO DE MOTIVOS
+#com Marcelo
+
+POL0938 - CADASTRO DE FAMÍLIAS P/ BAIXA DE CONSUMO
+#com Marcelo
+
+POL1015 - EXPORTAÇÃO DE TEXTO PARA O TRIM
+POL1040 - RELATORIO NOTAS FISCAIS DE APARAS
+POL1062 - CADASTRO DE USUÁRIOS P/ LIBERAÇÃO DE AR
+#com Marcelo
+POL1063 - CADASTRO DE EMAILS DOS REPRESENTANTES
+#com Marcelo
+
+POL1064 - RELATÓRIO P/ PAGAMENTO DE APARAS
+POL1263 - IMPRESSÃO DE DUPLICATAS
+POL1269 - INTEGRAÇÃO DE APONTAMENTO TRIMBOX E LOGIX
+POL1270 - INTEGRAÇÃO DE APONTAMENTO TRIMPAPEL E LOGIX
+POL1271 - INTEGRAÇÃO DE ROMANEIO TRIM E LOGIX
+POL1272 - CADASTRO DE ITEM APARAS ALTERNATIVO
+POL1273 - INTEGRAÇÃO DE CONSUMO TRIMPAPEL E LOGIX
+
+drop table apont_trim_885 
+drop table apont_erro_885 
+drop table man_apont_885
+drop table man_apont_hist_885
+drop table apont_trans_885 
+drop table apont_papel_885 
+drop table insumo_885
+drop table ordens_bob_885 
+
+alter table roma_item_885 add itemorigem  char(15)
+de_para_maq_885
+par_item_885
+cli_tolerancia_885
+gramatura_885
+largura_chapa_885
+familia_insumo_885
+cotacao_preco_885 
+de_para_turno_885
+oper_entrada_885
+desc_nat_oper_912
+frete_rota_885
+desc_transp_885
+ger_com_885
+motivo_885
+familia_baixar_885
+user_liber_ar_885
+repres_email_885

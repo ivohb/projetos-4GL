@@ -1,0 +1,34 @@
+DATABASE logix   
+               
+SCREEN
+{
+------------------------------------------------------------------------------ 
+  [a0]                     EMISSÃO DE CERTIFICADO                                 
+ 
+
+
+                         Impressão em Formulário A5
+
+
+                   Nota fiscal de:[a1     ]  Ate:[a2     ]
+      
+
+                            Número de vias:  [a3]
+
+
+
+
+
+} 
+END
+TABLES
+nf_mestre  
+END 
+
+ATTRIBUTES
+a0   = nf_mestre.cod_empresa, NOENTRY;         
+a1   = formonly.num_nff_ini;         
+a2   = formonly.num_nff_fin;
+a3   = formonly.num_vias;
+
+END

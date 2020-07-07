@@ -1,0 +1,42 @@
+Manuel, ficou ótimo o processo criado para bloqueio de compras com preço maior
+que a última compra.
+Só precisa ser feito um ajuste e me tirar uma dúvida :
+Dúvida :
+Quando as Ocs. são bloqueadas, consigo ver através do POL1227.
+Alí tenho diversas informações, inclusive o valor de compra.
+ONDE VERIFICO O VALOR ANTERIOR PARA SABER O MOTIVO DO BLOQUEIO
+SE É UMA PRIMEIRA COMPRA, OU SE ESTÁ SENDO COMPRADO COM VALOR MAIOR ?
+Não deveria, aparecer para o comprador, na hora de colocar o pedido, que ele deveria
+de informar uma observação para o controller já saber porque precisa de liberação ?
+
+Ajuste : 
+Precisaria fazer de uma forma, que eu pudesse escolher, qual a família dos produtos,
+que desejor ativar o “bloqueio”.
+Usaria a lista de familias do MAN9922.
+
+Boa tarde Evandro, 
+
+Sobre alertar o usuário do motivo do bloqueio quando da inclusão do pedido, não consigo fazer 
+isso pois para tanto teríamos que alterar o programa padrão do Logix de inclusão de pedido e a
+ Totvs não libera os fontes dos programas padrão para alteração.  
+O que podemos fazer é incluir essa mensagem do motivo do bloqueio na tela de liberação da 
+OC – pol1227, só que para isso vamos ter que alterar o programa pol1228 e criar dois tipos
+ de usuários, o COMPRADOR que pode apenas ver o motivo do bloqueio e o do que pode LIBERAR a OC.
+
+Quanto a incluir a permissão pro família, teremos que criar um novo programa para informar 
+quais famílias devem ter os itens bloqueados.
+
+Se concordar fazemos essas alterações.
+
+Manuel, por favor incluir tb. um relatório, contendo os “motivos” e “responsável” pela liberação
+dos bloqueios por período.
+
+Vou solicitar ao Ivo que imprima os dados das OCs pendentes com o motivo para o bloqueio.
+
+
+
+ causa        primeira compra
+              preco maior que ultima compra
+
+
+Atendimento de um emergencia. O preco nao aumentou, mas o fornecedor estva com dificuldade de conseguir a mercadoria e tivemos que paraar mais.

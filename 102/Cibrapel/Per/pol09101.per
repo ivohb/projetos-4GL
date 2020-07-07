@@ -1,0 +1,35 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-----------------------------------------------------------------------
+                           MOTIVO DA REJEIÇÃO
+
+Ar:[a       ] Seq:[b  ] Item:[c              ] Qtd Rejeit:[d           ]
+                                                                              
+                                  Motivo
+     [m                                                           ]
+     [m                                                           ]
+     [m                                                           ]
+     [m                                                           ]
+     [m                                                           ]
+     [m                                                           ]
+     [m                                                           ]
+     [m                                                           ]
+     [m                                                           ]
+     [m                                                           ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.num_aviso_rec, NOENTRY; 
+ b = FORMONLY.num_seq,       NOENTRY;
+ c = FORMONLY.cod_item,      NOENTRY;
+ d = FORMONLY.qtd_rejeit,    NOENTRY;
+ m = FORMONLY.tex_linha_obs, UPSHIFT --#,OPTIONS='-nolist';
+ 
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_texto[10] (tex_linha_obs);
+END
+

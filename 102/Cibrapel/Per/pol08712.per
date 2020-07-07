@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN
+{
+           ESTORNO DE FECHAMENTO DE CONSUMO
+
+   Componente           Descrição          Estornar E/S
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+[k              |l                        |m        |n]
+
+}
+END
+
+ATTRIBUTES
+  k = FORMONLY.cod_compon,   NOENTRY  --#, OPTIONS="-nolist"; 
+  l = FORMONLY.den_compon,   NOENTRY  --#, OPTIONS="-nolist"; 
+  m = FORMONLY.qtd_estornar, NOENTRY  --#, OPTIONS="-nolist"; 
+  n = FORMONLY.tip_ajust,    NOENTRY  --#, OPTIONS="-nolist"; 
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_estorno[13](cod_compon THRU tip_ajust);
+END 

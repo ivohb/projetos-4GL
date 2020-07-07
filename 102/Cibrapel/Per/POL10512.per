@@ -1,0 +1,46 @@
+DATABASE FORMONLY
+  
+SCREEN
+{ 
+------------------------------------------------------------------------------
+ [a0]             ENVIO PROGRAMAÇÃO MATERIAIS PARA WOLKSVAGEN                
+                                                                              
+   Item              Descrição            Prazo Entrega   Um.           Qtd.         
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]   
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]   
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ] 
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]  
+  [a3             ] [a4                ]  [a6        ]   [a7 ]    [a5       ]   
+}   
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,    UPSHIFT, NOENTRY;
+a3 = FORMONLY.cod_item,       UPSHIFT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"     
+--#, OPTIONS="-nolist"
+;
+a4 = FORMONLY.den_item_reduz, UPSHIFT, NOENTRY
+--#, OPTIONS="-nolist"
+;
+a6 = FORMONLY.prz_entrega
+--#, OPTIONS="-nolist"
+;
+a7 = FORMONLY.unid_med,      UPSHIFT, NOENTRY
+--#, OPTIONS="-nolist"
+;
+a5 = FORMONLY.saldo,          AUTONEXT 
+--#, OPTIONS="-nolist"
+;
+INSTRUCTIONS
+SCREEN RECORD s_edi[14] (FORMONLY.cod_item THRU FORMONLY.saldo);
+END     

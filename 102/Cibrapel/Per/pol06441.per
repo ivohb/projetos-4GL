@@ -1,0 +1,28 @@
+DATABASE logix
+SCREEN 
+{
+   COD.GRUPO
+   --------   
+  [a  ]       
+  [a  ]       
+  [a  ]      
+  [a  ]       
+  [a  ]       
+  [a  ]       
+  [a  ]       
+  [a  ]       
+  [a  ]       
+  [a  ]       
+  [a  ]       
+  [a  ]       
+    
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_grupo,NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_grupo[12] (cod_grupo THRU cod_grupo);
+END 

@@ -1,0 +1,36 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                  PORCENTAGEM P/ APLICAÇÃO NO FATURAMENTO
+
+     Indicador de faturamento:[b    ] [c                               ]
+         
+                           Valor de     Valor até    Pct
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+                       [k            |l            |m    ]
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+ b = FORMONLY.cod_indicador, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.descricao, UPSHIFT, NOENTRY;
+ k = FORMONLY.valor_de, UPSHIFT, AUTONEXT     --#, OPTIONS="-nolist"; 
+ l = FORMONLY.valor_ate, UPSHIFT, AUTONEXT    --#, OPTIONS="-nolist";
+ m = FORMONLY.pct_aplicado, UPSHIFT, AUTONEXT --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_percent[12](valor_de THRU pct_aplicado);
+END 

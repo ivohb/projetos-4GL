@@ -1,0 +1,61 @@
+DATABASE logix
+SCREEN
+{ 
+------------------------------------------------------------------------------
+[a ]                      RELAÇÃO DE DOCUMENTOS POR USUÁRIO
+  
+                          Pendentes ou aprovados:[b          ]
+  
+
+  Cód usuário:[e       ] [f                                     ]              
+
+   Imprimir aprovantes?: [i]      Imprimir detalhes?: [j]        	  
+
+             Sumarizar?: [k]    Selecionar empresas?: [l]
+
+      Período:[m         ] - [n         ]
+            
+                             Mensagem
+   [r                                                              ]
+
+
+}
+
+ATTRIBUTES
+  a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+
+  b = FORMONLY.ies_aprovacao  TYPE CHAR, INCLUDE=('P','A')
+      --#, widget='RADIO', config='P Pendentes A Aprovados'; 
+
+  e = FORMONLY.cod_usuario, AUTONEXT 
+      --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+  f = FORMONLY.nom_funcionario,   NOENTRY, color = blue;
+
+  i = FORMONLY.ies_aprovante, UPSHIFT, 
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado '
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+
+  j = FORMONLY.ies_detalhe, UPSHIFT, 
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado '
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+
+  k = FORMONLY.ies_sumarizar, UPSHIFT, 
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado '
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+
+  l = FORMONLY.ies_empresa, UPSHIFT, 
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado '
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+
+  m = FORMONLY.dat_ini, UPSHIFT, AUTONEXT;
+  n = FORMONLY.dat_fim, UPSHIFT, AUTONEXT;
+  
+
+  r = FORMONLY.mensagem, NOENTRY;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_men[01] (mensagem);
+END
+
+

@@ -1,0 +1,40 @@
+DATABASE FORMONLY 
+SCREEN
+{
+----------------------------------------------------------------------------
+[a ]                  ESTORNO DE CONSUMO DE BOBINAS
+
+              Boletim:[b      ]       Data do consumo:[c         ]
+                                
+      Lote            Item            Descrição        Peso     TP  ST Est?
+[d              |e              |f                 |g         ] [h] [i] [j]
+[d              |e              |f                 |g         ] [h] [i] [j]
+[d              |e              |f                 |g         ] [h] [i] [j]
+[d              |e              |f                 |g         ] [h] [i] [j]
+[d              |e              |f                 |g         ] [h] [i] [j]
+[d              |e              |f                 |g         ] [h] [i] [j]
+[d              |e              |f                 |g         ] [h] [i] [j]
+[d              |e              |f                 |g         ] [h] [i] [j]
+
+}
+END
+
+ATTRIBUTES 
+   a = FORMONLY.cod_empresa,    UPSHIFT, NOENTRY;
+   b = FORMONLY.num_boletim,    UPSHIFT, AUTONEXT;
+   c = FORMONLY.dat_consumo,    NOENTRY, REVERSE;
+   d = FORMONLY.num_lote,       NOENTRY, REVERSE   --#, OPTIONS="-nolist";
+   e = FORMONLY.cod_item,       NOENTRY, REVERSE   --#, OPTIONS="-nolist";
+   f = FORMONLY.den_item_reduz, NOENTRY, REVERSE   --#, OPTIONS="-nolist";
+   g = FORMONLY.qtd_consumo,    NOENTRY, REVERSE   --#, OPTIONS="-nolist";
+   h = FORMONLY.tip_operacao,   NOENTRY, REVERSE   --#, OPTIONS="-nolist";
+   i = FORMONLY.cod_status,     NOENTRY, REVERSE   --#, OPTIONS="-nolist";
+   j = FORMONLY.ies_estornar,   UPSHIFT,
+       COMMENTS = "S - Estornar o consumo da bobina   N - Não estornar", 
+       INCLUDE = ('S', 'N')                        --#, OPTIONS="-nolist";
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_estornar[8](num_lote THRU ies_estornar);
+END 

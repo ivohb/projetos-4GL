@@ -1,0 +1,49 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                        CANCELAMENTO DE PEDIDOS
+
+ Pedido:[b      ][c] Cliente:[d              ][e                             ]
+                                                               Comtém
+Seq      Item       Entrega  Qtd Solic     Saldo    Cancelar   OPS OCS
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+[k |l              |m       |n         |o         |p         ] [q] [r]
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,     NOENTRY;
+ b = FORMONLY.num_ped_vend,    UPSHIFT, AUTONEXT;
+ c = FORMONLY.situa_ped_vend,  NOENTRY, REVERSE;
+ d = FORMONLY.cod_cliente,     NOENTRY, REVERSE;
+ e = FORMONLY.nom_cliente,     NOENTRY, REVERSE;
+ 
+ k = FORMONLY.num_sequencia,   NOENTRY, REVERSE --#, OPTIONS='-nolist';
+ l = FORMONLY.cod_item,        NOENTRY, REVERSE --#, OPTIONS='-nolist';
+ m = FORMONLY.dat_entrega,     NOENTRY, REVERSE --#, OPTIONS='-nolist';
+ n = FORMONLY.qtd_solic,       AUTONEXT         --#, OPTIONS='-nolist';
+ o = FORMONLY.qtd_saldo,       NOENTRY, REVERSE --#, OPTIONS='-nolist';
+ p = FORMONLY.qtd_cancelar,    UPSHIFT, AUTONEXT,
+     COMMENTS = 'Ctrl-p = Exibe OPs   Ctrl-o = Exibe OCs' --#, OPTIONS='-nolist';
+ q = FORMONLY.ies_op,          NOENTRY, 
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado'
+     --#, widget='CHECK', config='S N { }', OPTIONS='-nolist';
+ r = FORMONLY.ies_oc,         NOENTRY,
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado'
+     --#, widget='CHECK', config='S N { }', OPTIONS='-nolist';
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_itens[11] (num_sequencia THRU ies_oc);
+END

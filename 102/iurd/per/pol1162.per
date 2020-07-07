@@ -1,0 +1,37 @@
+DATABASE logix
+SCREEN
+{
+-------------------------------------------------------------------------------
+[a ]      ERROS NO PROCESSO DE GERAÇÃO DA GRADE DE APROVACAO P/ NFE
+  
+              Dat proces:[b         ]   Hor proces:[c         ]
+-------------------------------------------------------------------------------              
+Emp UF   AR                         Descrição do erro
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+[k |l |m     |n                                                             ]
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,UPSHIFT, NOENTRY;
+ b = FORMONLY.dat_proces, UPSHIFT, NOENTRY;
+ c = FORMONLY.hor_proces, UPSHIFT, NOENTRY;
+
+ k = FORMONLY.empresa, UPSHIFT, NOENTRY --#, OPTIONS="-nolist";
+ l = FORMONLY.estado,  UPSHIFT, NOENTRY --#, OPTIONS="-nolist";
+ m = FORMONLY.num_ar,  UPSHIFT, NOENTRY --#, OPTIONS="-nolist";
+ n = FORMONLY.den_erro,UPSHIFT, NOENTRY --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_erro[12](empresa THRU den_erro);
+END 

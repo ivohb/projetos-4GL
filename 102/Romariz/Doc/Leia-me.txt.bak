@@ -1,0 +1,67 @@
+Sr Will
+
+Segue um programa de cadastro, para você desenvolver.
+
+- salve o arquivo tabela.sql na pasta c:\Informix
+- execute o atalho ol_logix
+- entre no dbaccess (dbaccess logix)
+- escolha os comandos Query-language depois Choose
+- selecione o arquivo tabela.sql
+- execute o comando Run, para criar as tabelas
+- escolha o comando Choose
+- selecione o arquivo esquema.sql
+- execute o comando Run, para criar o arquivo logix.sch
+- copie o arquivo logix.sch para a pasta c:\??????
+- abra o IDE
+- crie um projeto de nome pol1111
+- compile o projeto
+- entre no Logix execute o men0050, escolha Niveis e cadastre
+  os programas pol1111 e pol1120
+- execute o men0060 e dê autorização, para usar os programas
+- saia do Logix
+- de volta ao IDE, execute o pol1111 e cadastre dois tipos de
+  análises, sendo primeiro com o campo Por validade = N e o 
+  segundo com o campo Por validade = S
+- crie um novo projeto e salve com o nome de pol1120
+- compila e executa o pol1120. você verá que a tela será aberta
+  más nenhuma opção funcionará, pois só desenvolvi até o menu.
+  Comentei o prgrama da inclusão para baixo. Tire a { de comentário
+  e continui o desenvolvimento.
+  
+Obs:
+
+- Na tela de entrada de dados você perceberá alguns popup:
+
+  . Tipo de análise
+    Você deverá desenvolver um popup especial, para exibir
+    somente os tipos com ies_validade = 'S'
+    Use os popups do pol1069 que você mesmo fez
+
+  .Família - use a log009, conforme abaixo:
+
+      WHEN INFIELD(cod_familia)
+         
+         CALL log009_popup(8,25,"FAMILIAS","empresa",
+                     "cod_familia","den_familia","","S","") 
+            RETURNING p_codigo
+         CALL log006_exibe_teclas("01 02 03 07", p_versao)
+         CURRENT WINDOW IS w_pol1120
+         
+         IF p_codigo IS NOT NULL THEN
+            LET p_analise.cod_familia = p_codigo CLIPPED
+            DISPLAY p_codigo TO cod_familia
+         END IF
+  
+  .Item - use o bloco de código abaixo:
+
+      WHEN INFIELD(cod_item)
+         LET p_codigo = min071_popup_item(p_cod_empresa)
+         CALL log006_exibe_teclas("01 02 03 07", p_versao)
+         CURRENT WINDOW IS w_pol1120
+         IF p_codigo IS NOT NULL THEN
+           LET p_analise.cod_item = p_codigo
+           DISPLAY p_codigo TO cod_item
+         END IF
+  
+   
+   

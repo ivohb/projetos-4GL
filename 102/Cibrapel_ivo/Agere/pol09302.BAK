@@ -1,0 +1,43 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                 INCONSISTÊNCIAS NO CONSUMO      Dat Consumo:[b         ]
+ 
+     Dt Consumo     Item             Lote       Qtd Consumo Qtd Estoque 
+    [k         |l              |m              |n          |o          ]
+      [p                                                             ]
+    [k         |l              |m              |n          |o          ]
+      [p                                                             ]
+    [k         |l              |m              |n          |o          ]
+      [p                                                             ]
+    [k         |l              |m              |n          |o          ]
+      [p                                                             ]
+    [k         |l              |m              |n          |o          ]
+      [p                                                             ]
+    [k         |l              |m              |n          |o          ]
+      [p                                                             ]
+}
+END
+
+ATTRIBUTES 
+ a = FORMONLY.cod_empresa;
+ b = FORMONLY.dat_consumo, AUTONEXT, FORMAT = 'dd/mm/yyyy';
+END
+
+ATTRIBUTES
+ k = FORMONLY.datconsumo, NOENTRY --#, OPTIONS="-nolist";
+ l = FORMONLY.coditem,    NOENTRY --#, OPTIONS="-nolist";
+ m = FORMONLY.numlote,    NOENTRY --#, OPTIONS="-nolist";
+ n = FORMONLY.qtdconsumo, NOENTRY --#, OPTIONS="-nolist";
+ o = FORMONLY.qtdestoque, NOENTRY --#, OPTIONS="-nolist";
+ p = FORMONLY.mensagem,   NOENTRY --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD s_incons[6] (datconsumo THRU mensagem);
+END
+
+
+

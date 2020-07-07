@@ -1,0 +1,12 @@
+
+DROP TABLE apont_parada_454;
+CREATE TABLE apont_parada_454
+(
+   cod_empresa           CHAR(02)                 NOT NULL,
+   id_registro           INTEGER                  NOT NULL,
+   dat_inicial           DATE                     NOT NULL,
+   hor_inicial           DATETIME HOUR TO SECOND  NOT NULL, 
+   dat_final             DATE                     NOT NULL,
+   hor_final             DATETIME HOUR TO SECOND  NOT NULL,
+   cod_parada            CHAR(03)                 NOT NULL
+);

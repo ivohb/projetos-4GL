@@ -1,0 +1,56 @@
+DATABASE FORMONLY
+ 
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]                       CADASTRO ESPECIFICAÇÕES                            
+
+
+            Item: [a1             ] 
+[b1                                                                          ]
+         Cliente: [a2             ] [b2                                  ]
+    Tipo Análise: [a3    ] [b3                                               ]                 
+
+
+
+          Método: [a4                  ]     Qtd Casas Dec: [e ]
+         Unidade: [a5             ]
+Especificação de: [a6         ]                        até: [a7         ] 
+        Variação: [a8         ]                 Tipo Valor: [a9]  
+   Calcula Média: [c]                          Item Tanque: [d]
+   Imprime texto: [f]                  
+  Texto Especif: [g                                                           ]
+}
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,     UPSHIFT,  NOENTRY;
+a1 = FORMONLY.cod_item,        UPSHIFT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+b1 = FORMONLY.den_item,        NOENTRY;
+a2 = FORMONLY.cod_cliente,     UPSHIFT,  AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+b2 = FORMONLY.nom_cliente,     UPSHIFT,  NOENTRY;
+a3 = FORMONLY.tip_analise,     AUTONEXT 
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+b3 = FORMONLY.den_analise,     UPSHIFT,  NOENTRY;
+a4 = FORMONLY.metodo,          AUTONEXT;
+e  = FORMONLY.qtd_casas_dec,   AUTONEXT;
+a5 = FORMONLY.unidade,         AUTONEXT;
+a6 = FORMONLY.val_especif_de,  AUTONEXT;
+a7 = FORMONLY.val_especif_ate, AUTONEXT;
+a8 = FORMONLY.variacao,        AUTONEXT;
+a9 = FORMONLY.tipo_valor,      AUTONEXT,
+     COMMENTS = " Valor Especificação:  > ,  >= ,  < ,  <= , <> ";
+c  = FORMONLY.calcula_media,   UPSHIFT,
+     COMMENTS =" Calcula Média: S - Sim   /  N - Não";
+d  = FORMONLY.ies_tanque,      UPSHIFT,
+     COMMENTS = " Item é tanque: S - Sim  /  N - Não ";
+f  = FORMONLY.ies_texto,       UPSHIFT,
+     COMMENTS = " Imprime texto de especificação: S - Sim  /  N - Não ";
+g  = FORMONLY.texto_especific, AUTONEXT;
+END
+

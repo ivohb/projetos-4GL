@@ -1,0 +1,47 @@
+DATABASE FORMONLY
+ 
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]                       ESPECIFICAÇÃO DAS ANÁLISES
+
+
+        Item: [a1             ] [b1                                         ]
+Tipo Análise: [a3    ]          [b3                                         ]                 
+Tipo Granulometria: [b4             ]
+
+                        Método: [a4                  ]     
+                       Unidade: [a5             ]
+              Especificação de: [a6         ]                       
+                           até: [a7         ] 
+                      Variação: [a8         ]                 
+                    Tipo Valor: [a9]  
+                 Qtd Casas Dec: [e ]
+
+
+
+}
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,     UPSHIFT,  NOENTRY;
+a1 = FORMONLY.cod_item,        UPSHIFT 
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+b1 = FORMONLY.den_item,        NOENTRY;
+a3 = FORMONLY.tip_analise,     AUTONEXT 
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+b3 = FORMONLY.den_analise,     UPSHIFT,  NOENTRY;
+b4 = FORMONLY.tipo_granulo,    UPSHIFT,  AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a4 = FORMONLY.metodo,          UPSHIFT;
+e  = FORMONLY.qtd_casas_dec,   AUTONEXT;
+a5 = FORMONLY.unidade,         AUTONEXT;
+a6 = FORMONLY.val_especif_de,  AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a7 = FORMONLY.val_especif_ate, AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a8 = FORMONLY.variacao,        AUTONEXT;
+a9 = FORMONLY.tipo_valor,      AUTONEXT,
+     COMMENTS = " Valor Especificação:  > ,  >= ,  < ,  <= , <> ";
+END
+

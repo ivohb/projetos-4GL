@@ -1,0 +1,40 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+-----------------------------------------------------------------------------
+[a ]                       RELATORIO DE NF
+
+          Av.Receb Num.NF   Data       Fornecedor   Razão Social    
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+          [d     |k      |e         |f              |g         |
+
+}
+
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_empresa, NOENTRY;
+  d = FORMONLY.num_aviso_rec    --#, OPTIONS="-nolist";
+  k = FORMONLY.num_nf           --#, OPTIONS="-nolist";
+  e = FORMONLY.dat_entrada_nf   --#, OPTIONS="-nolist";
+  f = FORMONLY.cod_fornecedor   --#, OPTIONS="-nolist";
+  g = FORMONLY.raz_social_reduz --#, OPTIONS="-nolist";
+  
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[14](num_aviso_rec THRU raz_social_reduz);
+END

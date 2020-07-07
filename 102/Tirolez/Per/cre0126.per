@@ -1,0 +1,74 @@
+DATABASE logix
+
+SCREEN
+{
+--------------------------------------------------------------------------------
+                      COMPLEMENTO CLIENTE (TIROLEZ_CLIENTES)
+
+        Cliente:[a              ] [b                                       ]
+            EAN:[c             ]
+          Setor:[d ]
+           Zona:[e    ]
+        Roteiro:[f  ]
+        Empresa:[g ] [g1                                 ]
+     % Desconto:[h       ]
+  Tipo desconto:[i]
+     Seguimento:[j] [j1                            ]
+  Tipo perueiro:[l] [l1                            ]    
+           EAN1:[m             ]   Aceita Um Terço: [n]      Preço Flag: [o]
+Cód canal venda:[p  ]  [q                                      ]
+  Cód atividade:[r  ]  [s                                      ]
+Cód atendimento:[ca]  [da                                      ]
+    Validar Peso no Coletor:[t]        Pct peso acima do solicitado:[u ]
+     Faixa de produto utilizada para validar os produtos no coletor:[v ]
+  Cliente utiliza EDI (S ou N):[x]  Integração Automática Logística:[z] S/N
+}
+END
+
+TABLES
+tirolez_clientes
+END
+
+ATTRIBUTES
+a = tirolez_clientes.cod_cliente,      UPSHIFT     
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z" 
+;                                                    
+b = FORMONLY.nom_cliente,              NOENTRY;
+c = tirolez_clientes.cod_ean,          UPSHIFT, AUTONEXT;
+d = tirolez_clientes.cod_setor,        UPSHIFT, AUTONEXT;       
+e = tirolez_clientes.cod_zona,         UPSHIFT, AUTONEXT;
+f = tirolez_clientes.cod_roteiro,      UPSHIFT, AUTONEXT;     
+g = tirolez_clientes.cod_empresa,      UPSHIFT, AUTONEXT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+g1= FORMONLY.den_empresa,         		 NOENTRY;
+h = tirolez_clientes.desc_finan,       UPSHIFT, AUTONEXT;      
+i = tirolez_clientes.ies_tip_desc,     UPSHIFT, AUTONEXT; 
+j = tirolez_clientes.cod_seguimento,   UPSHIFT, AUTONEXT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+j1= FORMONLY.den_seguimento,					 NOENTRY;
+l = tirolez_clientes.cod_tip_perueiro, UPSHIFT, AUTONEXT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+l1= FORMONLY.nom_frete,								 NOENTRY;
+m = tirolez_clientes.cod_ean1,         UPSHIFT, AUTONEXT;
+n = tirolez_clientes.aceita_um_terco,  UPSHIFT, AUTONEXT;
+o = tirolez_clientes.preco_flag, 		   UPSHIFT, AUTONEXT;
+
+p = FORMONLY.cod_canal, UPSHIFT, AUTONEXT
+    --#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+q = FORMONLY.den_canal, UPSHIFT, NOENTRY;
+r = FORMONLY.cod_atividade, UPSHIFT, AUTONEXT
+    --#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+s = FORMONLY.den_atividade, UPSHIFT, NOENTRY;
+
+ca= FORMONLY.cod_atendimento, UPSHIFT, AUTONEXT
+    --#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+da= FORMONLY.den_atendimento, UPSHIFT, NOENTRY;
+t = FORMONLY.aceita_peso, UPSHIFT, AUTONEXT;
+u = FORMONLY.pct_peso, UPSHIFT, AUTONEXT;
+v = FORMONLY.faixa_produto, UPSHIFT, AUTONEXT;
+x = FORMONLY.ies_edi, UPSHIFT, AUTONEXT;
+z = FORMONLY.ies_integra, UPSHIFT, AUTONEXT;
+END 

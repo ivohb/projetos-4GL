@@ -1,0 +1,8 @@
+
+create table txt_desbl_petrom 
+  (
+    cod_empresa char(2) not null constraint n5610_43958,
+    num_laudo decimal(6,0) not null constraint n5610_43959,
+    texto char(76),
+    primary key (cod_empresa,num_laudo)  constraint pk_txtdesbl
+  );

@@ -1,0 +1,74 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]                    CADASTRO PLANO DE CONTROLE DE ANALISE
+         Item: [a1             ] [a2                                ]
+      Roteiro: [a6             ] [dr                            ]
+	   Operação: [a3             ] [a4                            ]
+ Seq.Operação: [a5 ]  
+         
+Seq  Cod    Cota      Descrição     UM    Nominal Tol.(-)  Tol.(+)    D Inst
+[c8][c1  ] [c2  |c3                |c4 ] [c5      |c6      |c7      ][d][e]
+    Peças:[g  ] Freq.:[h    ] Texto:[f                                    ] 
+[c8][c1  ] [c2  |c3                |c4 ] [c5      |c6      |c7      ][d][e]
+    Peças:[g  ] Freq.:[h    ] Texto:[f                                    ] 
+[c8][c1  ] [c2  |c3                |c4 ] [c5      |c6      |c7      ][d][e]
+    Peças:[g  ] Freq.:[h    ] Texto:[f                                    ] 
+[c8][c1  ] [c2  |c3                |c4 ] [c5      |c6      |c7      ][d][e]
+    Peças:[g  ] Freq.:[h    ] Texto:[f                                    ] 
+[c8][c1  ] [c2  |c3                |c4 ] [c5      |c6      |c7      ][d][e]
+    Peças:[g  ] Freq.:[h    ] Texto:[f                                    ] 
+
+}         
+
+
+TABLES
+   plan_inspecao_1120
+END
+
+ATTRIBUTES
+a0 = plan_inspecao_1120.cod_empresa,      UPSHIFT,  NOENTRY;
+
+a1 = plan_inspecao_1120.cod_item,         UPSHIFT,AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a2 = FORMONLY.den_item,         					NOENTRY;
+a6 = plan_inspecao_1120.cod_roteiro,      	UPSHIFT, AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+dr = FORMONLY.den_roteiro,       						UPSHIFT, NOENTRY;
+a3 = plan_inspecao_1120.cod_operac,       	UPSHIFT,AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a4 = FORMONLY.den_operac,       						UPSHIFT, NOENTRY;
+
+a5 = plan_inspecao_1120.num_seq_operac,    	UPSHIFT, AUTONEXT;
+
+c8 = plan_inspecao_1120.sequencia_cota,  		NOENTRY, AUTONEXT;
+      
+c1  = plan_inspecao_1120.num_cota,        	AUTONEXT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z", OPTIONS="-nolist";
+c2 = plan_inspecao_1120.cota,   						UPSHIFT, AUTONEXT;
+
+c3 = FORMONLY.den_cota,         						UPSHIFT, NOENTRY;
+
+c4 = plan_inspecao_1120.cod_unid_med,     	UPSHIFT,AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+
+c5 = plan_inspecao_1120.val_nominal,       	AUTONEXT; 
+c6 = plan_inspecao_1120.variacao_menor,    	AUTONEXT; 
+c7 = plan_inspecao_1120.variacao_maior,    	AUTONEXT; 
+
+d  = FORMONLY.imprime_ind, 									UPSHIFT,AUTONEXT,
+     COMMENTS = "Deseja imprimir detalhamento: S - Sim  /  N - Não"; 
+e = FORMONLY.instrumento, 									UPSHIFT,AUTONEXT,
+     COMMENTS = "Aperte control+z para inserir ou altera um instrumento"
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z", OPTIONS="-nolist";
+g= FORMONLY.pecas,      										AUTONEXT;
+h = plan_inspecao_1120.frequencia,       		UPSHIFT, AUTONEXT; 
+f = plan_inspecao_1120.texto,   						UPSHIFT,AUTONEXT;
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD s_itens[5] (sequencia_cota THRU texto);
+END

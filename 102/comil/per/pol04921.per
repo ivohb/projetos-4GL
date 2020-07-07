@@ -1,0 +1,33 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+-----------------------------------------------------------------------
+                              TIPOS DE ANÁLISE                               
+
+   Tipo Análise   Descrição 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+     [a     ]    [c                                                 ] 
+
+}
+END
+
+ATTRIBUTES
+a  = FORMONLY.tip_analise,     NOENTRY
+--#, OPTIONS="-nolist"
+;
+c  = FORMONLY.den_analise,     NOENTRY
+--#, OPTIONS="-nolist"
+;
+
+INSTRUCTIONS
+SCREEN RECORD s_pa[10] (FORMONLY.tip_analise THRU FORMONLY.den_analise);
+END 

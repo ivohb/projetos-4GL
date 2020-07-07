@@ -1,0 +1,41 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]               APROVAÇÃO DE ETAPAS DE CONTRATO DE SERVIÇOS
+  
+Aprovar
+     Contrato Ver Etapa  Fornecedor      Vencto      Valor     Solicitante
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+[h] [i        |j |k   |l              |m         |n           |o         ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa,  UPSHIFT, NOENTRY;
+
+h = FORMONLY.marcado, UPSHIFT, 
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado  -  Ctrl-T Marca/desmarca todas'
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+i = FORMONLY.contrato_servico, NOENTRY --#,OPTIONS='-nolist';
+j = FORMONLY.versao_contrato, NOENTRY --#,OPTIONS='-nolist';
+k = FORMONLY.num_etapa, NOENTRY        --#,OPTIONS='-nolist';
+l = FORMONLY.cod_fornecedor, NOENTRY   --#,OPTIONS='-nolist';
+m = FORMONLY.dat_vencto_etapa, NOENTRY --#,OPTIONS='-nolist';
+n = FORMONLY.val_etapa, NOENTRY        --#,OPTIONS='-nolist';
+o = FORMONLY.solicitante, NOENTRY      --#,OPTIONS='-nolist';
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_aprovar[12](marcado THRU solicitante);
+END 

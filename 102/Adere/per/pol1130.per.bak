@@ -1,0 +1,45 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]            PARÂMETROS DE AJUSTES NA INTEGRAÇÃO LOGIX x PW1
+        
+% Ajuste Qtd. Necessária: [a2    ]         
+          
+Caminho Arqs. Exportados: [a3                                                ]
+   
+ Aponta Equipto/Recurso?: [b] S/N          Programa exportação de OP:[h      ]
+
+     Aponta Ferramental?: [c] S/N          Programa importação de OP:[i      ]
+
+      Finaliza operação?: [d] S/N          Operação para enviao ao PW, nos
+                                             casos em que a OP não possua
+          Aponta refugo?: [e] S/N            as operações de roteiro: [z     ]
+
+    Qtd nível área/linha: [f]
+
+          Aponta parada?: [g] S/N        
+}
+END
+
+TABLES
+   pct_ajust_man912
+END
+
+ATTRIBUTES
+a0   = FORMONLY.cod_empresa,     NOENTRY;
+a2   = pct_ajust_man912.pct_ajus_insumo, AUTONEXT;
+a3   = pct_ajust_man912.nom_caminho, AUTONEXT;
+ b   = pct_ajust_man912.aponta_eqpto_recur, UPSHIFT, AUTONEXT;
+ c   = pct_ajust_man912.aponta_ferramenta, UPSHIFT, AUTONEXT;
+ d   = pct_ajust_man912.finaliza, UPSHIFT, AUTONEXT;
+ e   = pct_ajust_man912.aponta_refugo, UPSHIFT, AUTONEXT;
+ f   = pct_ajust_man912.qtd_nivel_aen, UPSHIFT, AUTONEXT;
+ g   = pct_ajust_man912.aponta_parada, UPSHIFT, AUTONEXT;
+ h   = pct_ajust_man912.prog_export_op, AUTONEXT;
+ i   = pct_ajust_man912.prog_import_op, AUTONEXT;
+ z   = pct_ajust_man912.cod_operac, AUTONEXT
+        --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+END
+

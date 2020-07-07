@@ -1,0 +1,33 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                               TIPOS DE ACERTO
+
+                     Código          Descrição
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+                     [b ]   [c                             ]
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, UPSHIFT,AUTONEXT;
+ b = FORMONLY.cod_tipo,    UPSHIFT,AUTONEXT, picture = '##'  --#, OPTIONS="-nolist";
+ c = FORMONLY.den_tipo,    AUTONEXT                          --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_tipo[13] (cod_tipo THRU den_tipo);
+END

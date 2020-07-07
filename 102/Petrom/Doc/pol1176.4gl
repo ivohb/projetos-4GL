@@ -1,0 +1,1597 @@
+#-------------------------------------------------------------------#
+# PROGRAMA: POL1176                                                 #
+# OBJETIVO: EXPORTA PPAP - INTEGRAÇÃO LOGIX X PROTHEUS              #
+# AUTOR...: IVO (CONVERSÃO PARA 10.02)                              #
+# DATA....: 16/11/2012                                              #
+#-------------------------------------------------------------------#
+
+DATABASE LOGIX102
+
+
+   DEFINE P_COD_EMPRESA        LIKE EMPRESA.COD_EMPRESA,
+          P_USER               LIKE USUARIO.NOM_USUARIO,
+          P_COD_ITEM           LIKE ITEM.COD_ITEM,
+          P_COD_ITEM_COMPON    LIKE ITEM.COD_ITEM,
+          P_COD_USER           LIKE USUARIOS.COD_USUARIO,
+          P_DEN_ITEM           LIKE ITEM.DEN_ITEM_REDUZ,
+          P_QK1_DESC           LIKE ITEM.DEN_ITEM,
+          P_DEN_COMPON         LIKE ITEM.DEN_ITEM,
+          P_COD_COMPON         LIKE ITEM.COD_ITEM,
+          P_SEQ_VERSAO         LIKE CAD_DES.SEQ_VERSAO,
+          P_COD_ARRANJO        LIKE CONSUMO.COD_ARRANJO,
+          P_COD_RECUR          LIKE REC_ARRANJO.COD_RECUR,
+          P_COD_OPERAC         LIKE CONSUMO.COD_OPERAC,
+          P_COD_CENT_TRAB      LIKE CONSUMO.COD_CENT_TRAB, 
+          P_COD_ROTEIRO        LIKE CONSUMO.COD_ROTEIRO,
+          P_IES_TIP_ITEM       LIKE ITEM.IES_TIP_ITEM,
+          P_QTD_NECES          LIKE ESTRUTURA.QTD_NECESSARIA,
+          P_PES_UNIT           LIKE ITEM.PES_UNIT,
+          P_QTD_RECUR          LIKE REC_ARRANJO.QTD_RECUR,
+          P_IES_TIP_RECUR      LIKE RECURSO.IES_TIP_RECUR,
+          P_QTD_PECAS_CICLO    LIKE CONSUMO.QTD_PECAS_CICLO,
+          P_DEN_RECUR          VARCHAR(50),
+          P_COD_NIVEL          INTEGER,
+          P_ACHOU              SMALLINT,
+          P_REVINV             CHAR(02),
+          P_DIG_1              SMALLINT,
+          P_DIG_2              SMALLINT,
+          P_SEQUEN             INTEGER,
+          P_SUB_SEQ            INTEGER,
+          P_SEQUEN_C           CHAR(03),
+          P_SUB_SEQ_C          CHAR(03),
+          P_DAT_REVISAO        CHAR(08),
+          P_DAT_TXT            CHAR(10),
+          P_NUM_SEQ            SMALLINT,
+          P_IND                SMALLINT,
+          P_INPUT              CHAR(01),
+          P_DEN_EMPRESA        CHAR(25), 
+          P_RETORNO            SMALLINT,
+          P_INDEX              SMALLINT,
+          S_INDEX              SMALLINT,
+          P_STATUS             SMALLINT,
+          P_COUNT              SMALLINT,
+          P_HOUVE_ERRO         SMALLINT,
+          COMANDO              CHAR(80),
+          P_IES_IMPRESSAO      CHAR(01),
+          G_IES_AMBIENTE       CHAR(01),
+          P_VERSAO             CHAR(18),
+          P_NOM_ARQUIVO        CHAR(100),
+          P_NOM_TELA           CHAR(200),
+          P_NOM_HELP           CHAR(200),
+          P_IES_CONS           SMALLINT,
+          P_CAMINHO            CHAR(080),
+          SQL_STMT             CHAR(3000),
+          WHERE_CLAUSE         CHAR(300),
+          P_LOOP               SMALLINT,
+          P_MSG                CHAR(500),
+          P_JA_EXPORTOU        SMALLINT,
+		      P_PCSEG              DEC(7,4),
+          P_COD_FILIAL         CHAR(06),
+          P_INSTANCIA          CHAR(30)
+
+   DEFINE P_ITEM_PPAP_5054  RECORD 
+    COD_EMPRESA   CHAR(2),
+    COD_ITEM      CHAR(15),
+    COD_REVISAO   CHAR(2),
+    DAT_REVISAO   DATE,
+    COD_PECA_PPAP CHAR(40)
+   END RECORD
+   
+   DEFINE P_ITEM_PPAP_5054A RECORD
+    COD_EMPRESA   CHAR(2),
+    COD_ITEM      CHAR(15),
+    COD_REVISAO   CHAR(2),
+    DAT_REVISAO   DATE,
+    COD_PECA_PPAP CHAR(40)
+   END RECORD
+   
+   DEFINE P_TELA          RECORD
+          COD_ITEM        LIKE ITEM.COD_ITEM,
+          COD_REVISAO     CHAR(2),
+          DAT_REVISAO     DATE,
+          COD_PECA_PPAP   CHAR(40)     
+   END RECORD
+
+   DEFINE PR_REVINV       ARRAY[10] OF RECORD
+          LETRA           CHAR(01)
+   END RECORD
+    
+   DEFINE PR_COMPON       ARRAY[200] OF RECORD
+          COD_COMPON      LIKE ITEM.COD_ITEM,
+          COD_OPERAC      LIKE OPERACAO.COD_OPERAC,
+          DEN_OPERAC      LIKE OPERACAO.DEN_OPERAC,
+          COD_OPER_P      CHAR(07),
+          COD_SIMBOLO     CHAR(02),
+          DEN_SIMBOLO     CHAR(02)
+   END RECORD
+
+   DEFINE P_QKK010 RECORD
+    QKK_FILIAL VARCHAR(6), 
+    QKK_PECA   VARCHAR(40), 
+    QKK_REV    VARCHAR(2),
+    QKK_REVINV VARCHAR(2), 
+    QKK_NOPE   VARCHAR(7), 
+    QKK_DESC   VARCHAR(80), 
+    QKK_MAQ    VARCHAR(10), 
+    QKK_CHAVE  VARCHAR(8), 
+    QKK_SBOPE  VARCHAR(2), 
+    QKK_TPOPE  VARCHAR(1), 
+    QKK_ITEM   VARCHAR(4), 
+    QKK_AREA   VARCHAR(30), 
+    QKK_FUNC   VARCHAR(50), 
+    D_E_L_E_T_ VARCHAR(1), 
+    R_E_C_N_O_ INTEGER, 
+    R_E_C_D_E_L_ INTEGER 
+   END RECORD
+
+   DEFINE P_QK1010 RECORD
+    QK1_FILIAL VARCHAR(6),
+    QK1_PECA   VARCHAR(40), 
+    QK1_REV    VARCHAR(2), 
+    QK1_REVINV VARCHAR(2), 
+    QK1_DTREVI VARCHAR(8), 
+    QK1_PCCLI  VARCHAR(40), 
+    QK1_DESCLI VARCHAR(30), 
+    QK1_PPAP   VARCHAR(40), 
+    QK1_DESC   VARCHAR(150), 
+    QK1_CODCLI VARCHAR(6), 
+    QK1_LOJCLI VARCHAR(2), 
+    QK1_NOMCLI VARCHAR(40), 
+    QK1_REVDES VARCHAR(15), 
+    QK1_DTRDES VARCHAR(8), 
+    QK1_PROJET VARCHAR(40), 
+    QK1_ALTENG VARCHAR(100), 
+    QK1_DTENG  VARCHAR(8), 
+    QK1_DOC    VARCHAR(30), 
+    QK1_TPLOGO VARCHAR(1), 
+    QK1_CODEQU VARCHAR(5), 
+    QK1_DESEQU VARCHAR(25), 
+    QK1_PRODUT VARCHAR(15), 
+    QK1_REVI   VARCHAR(2), 
+    QK1_JUST   VARCHAR(50), 
+    QK1_STATUS VARCHAR(1), 
+    QK1_DTENCE VARCHAR(8),
+    QK1_DTREAB VARCHAR(8), 
+    QK1_LICPK  VARCHAR(10), #FLOAT, 
+    QK1_LSCPK  VARCHAR(10), #FLOAT, 
+    QK1_ALTDOC VARCHAR(20), 
+    QK1_NALPRJ VARCHAR(1), 
+    QK1_CODVCL VARCHAR(20), 
+    D_E_L_E_T_ VARCHAR(1), 
+    R_E_C_N_O_ INTEGER, 
+    R_E_C_D_E_L_ INTEGER 
+   END RECORD
+
+   DEFINE P_QK2010 RECORD
+    QK2_FILIAL   VARCHAR(6), 
+    QK2_PECA     VARCHAR(40), 
+    QK2_REV      VARCHAR(2), 
+    QK2_REVINV   VARCHAR(2), 
+    QK2_ITEM     VARCHAR(4), 
+    QK2_CODCAR   VARCHAR(8), 
+    QK2_DESC     VARCHAR(50), 
+    QK2_ESPE     VARCHAR(50), 
+    QK2_TPCAR    VARCHAR(1), 
+    QK2_PRODPR   VARCHAR(1), 
+    QK2_PLANOC   VARCHAR(1), 
+    QK2_TOL      VARCHAR(13), 
+    QK2_LIE      VARCHAR(13), 
+    QK2_LSE      VARCHAR(13), 
+    QK2_ESP      VARCHAR(1), 
+    QK2_SIMB     VARCHAR(2), 
+    QK2_UM       VARCHAR(2), 
+    QK2_CHAVE    VARCHAR(08),
+    R_E_C_D_E_L_ INTEGER, 
+    D_E_L_E_T_   VARCHAR(1), 
+    R_E_C_N_O_   INTEGER 
+   END RECORD
+
+MAIN
+   CALL LOG0180_CONECTA_USUARIO()
+   WHENEVER ANY ERROR CONTINUE
+      SET ISOLATION TO DIRTY READ
+      SET LOCK MODE TO WAIT 300 
+   DEFER INTERRUPT
+   LET P_VERSAO = "POL1176-10.02.09"
+   INITIALIZE P_NOM_HELP TO NULL  
+   CALL LOG140_PROCURA_CAMINHO("POL1176.IEM") RETURNING P_NOM_HELP
+   LET P_NOM_HELP = P_NOM_HELP CLIPPED
+   OPTIONS HELP FILE P_NOM_HELP,
+      NEXT KEY CONTROL-F,
+      INSERT KEY CONTROL-I,
+      DELETE KEY CONTROL-E,
+      PREVIOUS KEY CONTROL-B
+
+   CALL LOG001_ACESSA_USUARIO("ESPEC999","")
+      RETURNING P_STATUS, P_COD_EMPRESA, P_USER
+   IF P_STATUS = 0  THEN
+      CALL POL1176_CONTROLE()
+   END IF
+END MAIN
+
+#--------------------------#
+ FUNCTION POL1176_CONTROLE()
+#--------------------------#
+
+   CALL LOG006_EXIBE_TECLAS("01",P_VERSAO)
+   INITIALIZE P_NOM_TELA TO NULL 
+   CALL LOG130_PROCURA_CAMINHO("POL1176") RETURNING P_NOM_TELA
+   LET P_NOM_TELA = P_NOM_TELA CLIPPED 
+   OPEN WINDOW W_POL1176 AT 2,2 WITH FORM P_NOM_TELA
+      ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST)
+   DISPLAY P_COD_EMPRESA TO COD_EMPRESA
+   
+   LET P_COD_FILIAL = '0101'
+   
+   CALL POL1176_CARREGA_LETRA()
+
+   MENU "OPCAO"
+      COMMAND "INCLUIR" "INCLUI DADOS NAS TABELAS"
+         HELP 001
+         MESSAGE ""
+         LET INT_FLAG = 0
+         CALL POL1176_INCLUIR() RETURNING P_STATUS
+         IF P_STATUS THEN
+            MESSAGE "INCLUSÃO DE DADOS EFETUADA C/ SUCESSO !!!"
+               ATTRIBUTE(REVERSE)
+         ELSE
+            MESSAGE "OPERAÇÃO CANCELADA !!!"
+               ATTRIBUTE(REVERSE)
+         END IF      
+         LET P_IES_CONS = FALSE   
+      COMMAND "CONSULTAR" "CONSULTA DADOS DA TABELA"
+         HELP 004
+         MESSAGE "" 
+         LET INT_FLAG = 0
+         CALL POL1176_CONSULTA()
+         IF P_IES_CONS THEN
+            NEXT OPTION "SEGUINTE" 
+         END IF
+      COMMAND "SEGUINTE" "EXIBE O PROXIMO ITEM ENCONTRADO NA CONSULTA"
+         HELP 005
+         MESSAGE ""
+         LET INT_FLAG = 0
+         CALL POL1176_PAGINACAO("SEGUINTE")
+      COMMAND "ANTERIOR" "EXIBE O ITEM ANTERIOR ENCONTRADO NA CONSULTA"
+         HELP 006
+         MESSAGE ""
+         LET INT_FLAG = 0
+         CALL POL1176_PAGINACAO("ANTERIOR")
+      COMMAND KEY ("O") "SOBRE" "EXIBE A VERSÃO DO PROGRAMA"
+         CALL POL1176_SOBRE()
+      COMMAND KEY ("!")
+         PROMPT "DIGITE O COMANDO : " FOR COMANDO
+         RUN COMANDO
+         PROMPT "\TECLE ENTER PARA CONTINUAR" FOR CHAR COMANDO
+         DATABASE LOGIX
+         LET INT_FLAG = 0
+      COMMAND "FIM"       "RETORNA AO MENU ANTERIOR"
+         HELP 008
+         MESSAGE ""
+         EXIT MENU
+   END MENU
+   CLOSE WINDOW W_POL1176
+
+END FUNCTION
+
+#------------------------------#
+FUNCTION POL1176_CARREGA_LETRA()
+#------------------------------#
+
+   LET PR_REVINV[1].LETRA = 'Y'
+   LET PR_REVINV[2].LETRA = 'X'
+   LET PR_REVINV[3].LETRA = 'W'
+   LET PR_REVINV[4].LETRA = 'V'
+   LET PR_REVINV[5].LETRA = 'U'
+   LET PR_REVINV[6].LETRA = 'T'
+   LET PR_REVINV[7].LETRA = 'S'
+   LET PR_REVINV[8].LETRA = 'R'
+   LET PR_REVINV[9].LETRA = 'Q'
+   LET PR_REVINV[10].LETRA = 'P'
+
+END FUNCTION
+
+#-----------------------#
+ FUNCTION POL1176_SOBRE()
+#-----------------------#
+
+   LET P_MSG = P_VERSAO CLIPPED,"\n\n",
+               " AUTOR: IVO H BARBOSA\n",
+               " IVOHB.ME@GMAIL.COM\n ",
+               "IBARBOSA@TOTVS.COM.BR\n\n ",
+               "     LOGIX 10.02\n",
+               " WWW.GRUPOACEEX.COM.BR\n",
+               "   (0XX11) 4991-6667"
+
+   CALL LOG0030_MENSAGEM(P_MSG,'EXCLA')
+                  
+END FUNCTION
+
+#-----------------------#
+FUNCTION POL1176_INCLUIR()
+#-----------------------#
+
+   LET P_RETORNO = FALSE
+   
+   IF POL1176_ACEITA_CHAVE() THEN 
+      IF POL1176_CARREGA_COMPON() THEN
+         IF POL1176_ACEITA_OPERACAO() THEN
+            IF POL1176_GRAVA_ITENS() THEN
+               LET P_RETORNO = TRUE
+            END IF
+         END IF
+      END IF
+   END IF
+   
+   RETURN(P_RETORNO)
+   
+END FUNCTION
+
+#-----------------------------#
+FUNCTION POL1176_ACEITA_CHAVE()
+#-----------------------------#
+
+   CALL LOG006_EXIBE_TECLAS("01 02 07",P_VERSAO)
+   CURRENT WINDOW IS W_POL1176
+   CLEAR FORM
+   DISPLAY P_COD_EMPRESA TO COD_EMPRESA
+   INITIALIZE P_TELA TO NULL
+   LET P_INPUT = 'C'
+   LET P_TELA.COD_REVISAO = '00'
+   LET P_TELA.DAT_REVISAO = TODAY
+   
+   INPUT BY NAME P_TELA.* WITHOUT DEFAULTS  
+
+      AFTER FIELD COD_ITEM
+
+         IF P_TELA.COD_ITEM IS NULL THEN
+            ERROR "CAMPO COM PREENCHIMENTO OBRIGATÓRIO !!!"
+            NEXT FIELD COD_ITEM
+         END IF
+
+         SELECT DEN_ITEM_REDUZ, 
+                DEN_ITEM,
+                IES_TIP_ITEM,
+                PES_UNIT
+           INTO P_DEN_ITEM, 
+                P_QK1_DESC,
+                P_IES_TIP_ITEM,
+                P_PES_UNIT
+           FROM ITEM
+          WHERE COD_EMPRESA = P_COD_EMPRESA
+            AND COD_ITEM    = P_TELA.COD_ITEM
+
+          IF STATUS <> 0 THEN 
+             ERROR "ITEM INEXISTENTE !!!"
+             NEXT FIELD COD_ITEM
+          END IF
+          
+          IF P_IES_TIP_ITEM MATCHES '[FPB]' THEN 
+          ELSE
+             ERROR "INFORME UM ITEM DO TIPO F, P OU B !!!"
+             NEXT FIELD COD_ITEM
+          END IF
+
+          DISPLAY P_DEN_ITEM TO DEN_ITEM
+          
+          LET P_JA_EXPORTOU = FALSE
+          
+          SELECT COD_EMPRESA
+            FROM ITEM_PPAP_5054
+           WHERE COD_EMPRESA = P_COD_EMPRESA
+             AND COD_ITEM    = P_TELA.COD_ITEM
+          IF STATUS = 0 THEN 
+             LET P_JA_EXPORTOU = TRUE
+             LET P_MSG = 'ESSE ITEM JÁ FOI EXPORTADO AO\n ',
+                         'PROTHEUS! DESEJA REEXPORTÁ-LO?'
+             IF LOG0040_CONFIRM(20,25,P_MSG) = TRUE THEN
+             ELSE
+                NEXT FIELD COD_ITEM
+             END IF
+          END IF
+          
+          IF P_TELA.COD_PECA_PPAP IS NULL OR
+             P_TELA.COD_PECA_PPAP = ' ' THEN
+             LET P_TELA.COD_PECA_PPAP = P_TELA.COD_ITEM
+             DISPLAY P_TELA.COD_PECA_PPAP TO COD_PECA_PPAP
+          END IF
+          
+      AFTER INPUT
+      
+         IF INT_FLAG = 0 THEN
+            IF P_TELA.COD_REVISAO IS NULL THEN
+               ERROR 'INFORME O CÓDIGO DA REVISÃO !!!'
+               NEXT FIELD COD_REVISAO
+            END IF
+            
+            IF P_TELA.DAT_REVISAO IS NULL THEN
+               ERROR 'INFORME A DATA DA REVISÃO !!!'
+               NEXT FIELD DAT_REVISAO
+            END IF
+            
+            IF P_TELA.COD_PECA_PPAP IS NULL THEN
+               ERROR 'INFORME A PECA PPAP !!!'
+
+               NEXT FIELD COD_PECA_PPAP
+            END IF
+            
+            INITIALIZE P_DAT_TXT, P_DAT_REVISAO TO NULL
+            LET P_DAT_TXT = P_TELA.DAT_REVISAO
+            LET P_DAT_REVISAO = P_DAT_TXT[7,10], P_DAT_TXT[4,5], P_DAT_TXT[1,2]
+         
+         END IF
+
+      ON KEY (CONTROL-Z)
+         CALL POL1176_POPUP()
+
+   END INPUT 
+
+   IF INT_FLAG = 0 THEN
+      RETURN TRUE
+   ELSE
+      CLEAR FORM
+      DISPLAY P_COD_EMPRESA TO COD_EMPRESA
+      LET INT_FLAG = 0
+      RETURN FALSE
+   END IF
+
+END FUNCTION 
+
+#-----------------------#
+FUNCTION POL1176_POPUP()
+#-----------------------#
+
+   DEFINE P_CODIGO CHAR(15)
+
+   CASE
+
+      WHEN INFIELD(COD_ITEM)
+         LET P_CODIGO = MIN071_POPUP_ITEM(P_COD_EMPRESA)
+         CALL LOG006_EXIBE_TECLAS("01 02 03 07", P_VERSAO)
+         CURRENT WINDOW IS W_POL1176
+         IF P_CODIGO IS NOT NULL THEN
+            IF P_INPUT = 'C' THEN 
+               LET P_TELA.COD_ITEM = P_CODIGO
+               DISPLAY P_CODIGO TO COD_ITEM
+            ELSE
+               LET PR_COMPON[P_INDEX].COD_COMPON = P_CODIGO
+               DISPLAY P_CODIGO TO SR_COMPON[S_INDEX].COD_COMPON
+            END IF
+         END IF
+         
+      WHEN INFIELD(COD_SIMBOLO)
+         CALL LOG009_POPUP(8,25,"SIMBOLOS","SIMBOLO_5054",
+                     "COD_SIMBOLO","DEN_SIMBOLO","POL0376","S","") 
+            RETURNING P_CODIGO
+         CALL LOG006_EXIBE_TECLAS("01 02 03 07", P_VERSAO)
+         CURRENT WINDOW IS W_POL1176
+         IF P_CODIGO IS NOT NULL THEN
+            LET PR_COMPON[P_INDEX].COD_SIMBOLO = P_CODIGO CLIPPED
+            DISPLAY P_CODIGO TO SR_COMPON[S_INDEX].COD_SIMBOLO
+         END IF
+
+   END CASE
+
+END FUNCTION 
+
+#-------------------------------#
+FUNCTION POL1176_CARREGA_COMPON()
+#-------------------------------#
+
+   IF NOT POL1176_CRIA_TEMPS() THEN
+      RETURN FALSE
+   END IF
+   
+   LET P_COD_NIVEL = 0
+   LET P_QTD_NECES = 1
+   
+   INSERT INTO COMPON_1
+      VALUES(P_COD_NIVEL,P_TELA.COD_ITEM,P_QTD_NECES)
+
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("INSERÇÃO","COMPON_1")
+      RETURN FALSE
+   END IF
+   
+   LET P_COD_NIVEL = P_COD_NIVEL + 1
+   
+   DECLARE CQ_COMPON CURSOR FOR
+    SELECT COD_ITEM_COMPON,
+           QTD_NECESSARIA
+      FROM ESTRUTURA
+     WHERE COD_EMPRESA  = P_COD_EMPRESA
+       AND COD_ITEM_PAI = P_TELA.COD_ITEM
+     
+   FOREACH CQ_COMPON INTO P_COD_ITEM_COMPON, P_QTD_NECES
+   
+      SELECT *
+        FROM COMPON_1
+       WHERE COD_COMPON = P_COD_ITEM_COMPON
+
+      IF SQLCA.SQLCODE = NOTFOUND THEN
+
+         INSERT INTO COMPON_1
+            VALUES(P_COD_NIVEL,P_COD_ITEM_COMPON,P_QTD_NECES)
+
+         IF SQLCA.SQLCODE <> 0 THEN 
+            CALL LOG003_ERR_SQL("INSERÇÃO","COMPON_1")
+            RETURN FALSE
+         END IF
+
+      END IF
+      
+   END FOREACH
+
+   LET P_LOOP = TRUE
+   
+   WHILE P_LOOP
+   
+      IF NOT POL0375_CARREGA_COMPON_FILHO() THEN
+         RETURN FALSE
+      END IF
+   
+   END WHILE
+
+   LET P_NUM_SEQ = 0
+   
+   DECLARE CQ_ITEM CURSOR FOR
+    SELECT COD_COMPON
+      FROM COMPON_1
+      
+   FOREACH CQ_ITEM INTO P_COD_ITEM
+   
+      SELECT COD_ROTEIRO
+        INTO P_COD_ROTEIRO
+        FROM ITEM_MAN
+       WHERE COD_EMPRESA = P_COD_EMPRESA
+         AND COD_ITEM    = P_COD_ITEM
+         
+      IF STATUS <> 0 THEN
+         CONTINUE FOREACH
+      END IF
+      
+      DECLARE CQ_OPER CURSOR FOR
+       SELECT COD_OPERAC
+         FROM CONSUMO
+        WHERE COD_EMPRESA = P_COD_EMPRESA
+          AND COD_ITEM    = P_COD_ITEM
+          AND (COD_ROTEIRO = P_COD_ROTEIRO OR 
+               COD_ROTEIRO IS NULL)
+        ORDER BY NUM_SEQ_OPERAC DESC
+      
+      FOREACH CQ_OPER INTO P_COD_OPERAC
+         
+         LET P_NUM_SEQ = P_NUM_SEQ + 1
+         
+         INSERT INTO ITEM_OPER
+            VALUES(P_COD_ITEM, P_COD_OPERAC, P_NUM_SEQ)
+
+         IF SQLCA.SQLCODE <> 0 THEN 
+            CALL LOG003_ERR_SQL("INCLUSÃO","ITEM_OPER")
+            RETURN FALSE
+         END IF
+            
+      END FOREACH
+   
+   END FOREACH
+            
+   RETURN TRUE
+      
+END FUNCTION 
+
+#--------------------------------------#
+FUNCTION POL0375_CARREGA_COMPON_FILHO()
+#--------------------------------------#
+
+   DELETE FROM COMPON_3
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("DELEÇÃO","COMPON_3")
+      RETURN FALSE
+   END IF
+   
+   DECLARE CQ_COMPON_1 CURSOR FOR
+    SELECT A.COD_COMPON
+      FROM COMPON_1 A
+     WHERE A.COD_COMPON NOT IN (SELECT B.COD_COMPON FROM COMPON_2 B)
+   
+   FOREACH CQ_COMPON_1 INTO P_COD_ITEM
+
+      INSERT INTO COMPON_2
+         VALUES(P_COD_ITEM)
+
+      IF SQLCA.SQLCODE <> 0 THEN 
+         CALL LOG003_ERR_SQL("INSERÇÃO","COMPON_2")
+         RETURN FALSE
+      END IF
+
+      DECLARE CQ_ESTRU CURSOR FOR     
+       SELECT COD_ITEM_COMPON,
+              QTD_NECESSARIA
+         FROM ESTRUTURA
+        WHERE COD_EMPRESA  = P_COD_EMPRESA
+          AND COD_ITEM_PAI = P_COD_ITEM
+      
+      FOREACH CQ_ESTRU INTO P_COD_ITEM_COMPON, P_QTD_NECES
+           
+         INSERT INTO COMPON_3
+            VALUES(P_COD_ITEM_COMPON, P_QTD_NECES)
+
+         IF SQLCA.SQLCODE <> 0 THEN 
+            CALL LOG003_ERR_SQL("INSERÇÃO","COMPON_3")
+            RETURN FALSE
+         END IF
+
+      END FOREACH
+      
+   END FOREACH
+   
+   SELECT COUNT(*)
+     INTO P_COUNT
+     FROM COMPON_3
+
+   IF P_COUNT = 0 THEN
+      LET P_LOOP = FALSE
+      RETURN TRUE
+   END IF
+   
+   LET P_COD_NIVEL = P_COD_NIVEL + 1
+   
+   DECLARE CQ_COMPON_3 CURSOR FOR
+    SELECT COD_COMPON,
+           QTD_NECES 
+      FROM COMPON_3
+   
+   FOREACH CQ_COMPON_3 INTO P_COD_ITEM_COMPON, P_QTD_NECES
+      
+      SELECT * 
+        FROM COMPON_1
+       WHERE COD_COMPON = P_COD_ITEM_COMPON
+      
+      IF SQLCA.SQLCODE = NOTFOUND THEN
+        
+         INSERT INTO COMPON_1
+            VALUES(P_COD_NIVEL,P_COD_ITEM_COMPON, P_QTD_NECES)
+
+         IF SQLCA.SQLCODE <> 0 THEN 
+            CALL LOG003_ERR_SQL("INSERÇÃO","COMPON_1")
+            RETURN FALSE
+         END IF
+      END IF
+   
+   END FOREACH
+   
+   RETURN TRUE
+   
+END FUNCTION
+  
+#----------------------------#
+FUNCTION POL1176_CRIA_TEMPS()
+#----------------------------#
+  
+   DROP TABLE COMPON_1;
+   CREATE  TABLE COMPON_1   
+   (
+      COD_NIVEL     INTEGER,
+      COD_COMPON    CHAR(15),
+      QTD_NECES     DECIMAL(14,7)
+   );
+
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("CRIACAO","COMPON_1")
+      RETURN FALSE
+   END IF
+   
+   DROP TABLE COMPON_2;
+   CREATE  TABLE COMPON_2
+   (
+      COD_COMPON    CHAR(15)
+   );
+
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("CRIACAO","COMPON_2")
+      RETURN FALSE
+   END IF
+ 
+   DROP TABLE COMPON_3;
+   CREATE  TABLE COMPON_3
+   (
+      COD_COMPON    CHAR(15),
+      QTD_NECES     DECIMAL(14,7)
+   );
+
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("CRIACAO","COMPON_3")
+      RETURN FALSE
+   END IF
+
+   DROP TABLE ITEM_OPER;
+   CREATE  TABLE ITEM_OPER
+   (
+      COD_COMPON    CHAR(15),
+      COD_OPERAC    CHAR(05),
+      NUM_SEQ       SMALLINT
+   );
+
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("CRIACAO","ITEM_OPER")
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#--------------------------------#
+FUNCTION POL1176_ACEITA_OPERACAO()
+#--------------------------------#
+
+   INITIALIZE PR_COMPON TO NULL
+   
+   DECLARE CQ_OPERACAO CURSOR FOR 
+    SELECT *
+      FROM ITEM_OPER
+     ORDER BY 3 DESC
+   
+   LET P_INDEX = 1
+   
+   FOREACH CQ_OPERACAO INTO 
+           PR_COMPON[P_INDEX].COD_COMPON,
+           PR_COMPON[P_INDEX].COD_OPERAC,
+           P_NUM_SEQ
+ 
+      SELECT DEN_OPERAC
+        INTO PR_COMPON[P_INDEX].DEN_OPERAC
+        FROM OPERACAO
+       WHERE COD_EMPRESA = P_COD_EMPRESA
+         AND COD_OPERAC  = PR_COMPON[P_INDEX].COD_OPERAC
+
+      LET PR_COMPON[P_INDEX].COD_SIMBOLO = 'A3'
+
+      SELECT DEN_SIMBOLO
+        INTO PR_COMPON[P_INDEX].DEN_SIMBOLO
+        FROM SIMBOLO_5054
+       WHERE COD_EMPRESA = P_COD_EMPRESA
+         AND COD_SIMBOLO = PR_COMPON[P_INDEX].COD_SIMBOLO      
+      
+      SELECT NUM_SEQ, NUM_SUB_SEQ
+        INTO P_SEQUEN, P_SUB_SEQ  
+			  FROM CICLO_PECA_5054
+			 WHERE COD_EMPRESA = P_COD_EMPRESA
+			   AND COD_ITEM =PR_COMPON[P_INDEX].COD_COMPON
+
+      LET P_SEQUEN_C = P_SEQUEN USING '&&&'
+      LET P_SUB_SEQ_C = P_SUB_SEQ USING '&&&'
+      LET PR_COMPON[P_INDEX].COD_OPER_P = P_SEQUEN_C,'-',P_SUB_SEQ_C
+      
+      IF PR_COMPON[P_INDEX].COD_OPER_P = '000/000' OR 
+         PR_COMPON[P_INDEX].COD_OPER_P IS NULL THEN
+         LET PR_COMPON[P_INDEX].COD_OPER_P = '999/999'
+      END IF
+      
+      LET P_INDEX = P_INDEX + 1
+
+      IF P_INDEX > 200 THEN
+         ERROR 'LIMITE DE LINHAS ULTRAPASSADO !!!'
+         EXIT FOREACH
+      END IF
+
+   END FOREACH
+   
+   CALL SET_COUNT(P_INDEX - 1)
+   
+   INPUT ARRAY PR_COMPON
+      WITHOUT DEFAULTS FROM SR_COMPON.*
+      ATTRIBUTES(INSERT ROW = FALSE, DELETE ROW = FALSE)
+      
+      BEFORE ROW
+         LET P_INDEX = ARR_CURR()
+         LET S_INDEX = SCR_LINE()  
+         
+         INITIALIZE P_DEN_COMPON TO NULL
+         
+         SELECT DEN_ITEM
+           INTO P_DEN_COMPON
+           FROM ITEM
+          WHERE COD_EMPRESA = P_COD_EMPRESA
+            AND COD_ITEM    = PR_COMPON[P_INDEX].COD_COMPON
+         DISPLAY P_DEN_COMPON TO DEN_COMPON
+         
+      BEFORE FIELD COD_OPER_P
+         
+      AFTER FIELD COD_OPER_P
+         IF FGL_LASTKEY() = FGL_KEYVAL("DOWN") OR
+            FGL_LASTKEY() = FGL_KEYVAL("RETURN") THEN 
+            IF PR_COMPON[P_INDEX+1].COD_COMPON IS NULL THEN
+               NEXT FIELD COD_SIMBOLO
+            END IF
+         END IF
+         IF PR_COMPON[P_INDEX].COD_OPER_P IS NOT NULL THEN
+#            LET P_COD_COMPON = PR_COMPON[P_INDEX].COD_COMPON
+            IF POL1176_REPETIU_COD() THEN
+               ERROR "OPERAÇÃO ",PR_COMPON[P_INDEX].COD_OPER_P," JÁ LANÇADA "
+               NEXT FIELD COD_OPER_P
+            END IF
+         END IF
+
+      AFTER FIELD COD_SIMBOLO
+         IF PR_COMPON[P_INDEX].COD_SIMBOLO IS NOT NULL THEN
+            SELECT DEN_SIMBOLO
+              INTO PR_COMPON[P_INDEX].DEN_SIMBOLO
+              FROM SIMBOLO_5054
+             WHERE COD_EMPRESA = P_COD_EMPRESA
+               AND COD_SIMBOLO = PR_COMPON[P_INDEX].COD_SIMBOLO
+            IF STATUS <> 0 THEN
+               ERROR 'SIMBOLO INEXISTENTE !!!'
+               NEXT FIELD COD_SIMBOLO
+            END IF
+            DISPLAY PR_COMPON[P_INDEX].DEN_SIMBOLO TO SR_COMPON[S_INDEX].DEN_SIMBOLO
+         END IF
+         IF FGL_LASTKEY() = FGL_KEYVAL("DOWN") OR
+            FGL_LASTKEY() = FGL_KEYVAL("RETURN") THEN 
+            IF PR_COMPON[P_INDEX+1].COD_COMPON IS NULL THEN
+               NEXT FIELD COD_OPER_P
+            END IF
+         END IF
+         
+      AFTER INPUT
+         IF NOT INT_FLAG THEN
+            FOR P_IND = 1 TO ARR_COUNT()
+                IF PR_COMPON[P_IND].COD_OPER_P IS NULL THEN
+                   ERROR "A COLUNA OPERAÇÃO PROTHEUS NÃO ESTÁ TOTALMENTE PREENCHIDA !!!"
+                   NEXT FIELD COD_OPER_P
+                END IF
+                IF PR_COMPON[P_IND].COD_SIMBOLO IS NULL THEN
+                   ERROR "A COLUNA SÍMBOLO NÃO ESTÁ TOTALMENTE PREENCHIDA !!!"
+                   NEXT FIELD COD_SIMBOLO
+                END IF
+            END FOR
+         END IF
+                
+      ON KEY (CONTROL-Z)
+         CALL POL1176_POPUP()
+         
+   END INPUT 
+
+   IF INT_FLAG = 0 THEN
+      RETURN TRUE
+   ELSE
+      LET P_RETORNO = FALSE
+      LET INT_FLAG = 0
+      RETURN FALSE
+   END IF   
+   
+END FUNCTION
+
+#-------------------------------#
+FUNCTION POL1176_REPETIU_COD()
+#-------------------------------#
+
+   DEFINE P_IND SMALLINT
+   
+   FOR P_IND = 1 TO ARR_COUNT()
+       IF P_IND = P_INDEX THEN
+          CONTINUE FOR
+       END IF
+       IF PR_COMPON[P_IND].COD_OPER_P = PR_COMPON[P_INDEX].COD_OPER_P THEN
+          RETURN TRUE
+          EXIT FOR
+       END IF
+   END FOR
+   RETURN FALSE
+   
+END FUNCTION
+
+#-----------------------------#
+FUNCTION POL1176_DELETA_ITEM()
+#-----------------------------#
+
+   DELETE FROM COMPON_PPAP_5054
+    WHERE COD_EMPRESA = P_COD_EMPRESA
+      AND COD_ITEM    = P_TELA.COD_ITEM
+
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("DELETANDO","COMPON_PPAP_5054")    
+      RETURN FALSE
+   END IF
+
+   DELETE FROM ITEM_PPAP_5054
+    WHERE COD_EMPRESA = P_COD_EMPRESA
+      AND COD_ITEM    = P_TELA.COD_ITEM
+   
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("DELETANDO","ITEM_PPAP_5054")    
+      RETURN FALSE
+   END IF
+   
+   LET SQL_STMT =
+   "UPDATE ", P_INSTANCIA CLIPPED,"QK1010  ",
+   "   SET D_E_L_E_T_ = '*', R_E_C_D_E_L_= R_E_C_N_O_ ",
+   " WHERE QK1_FILIAL = '",P_COD_FILIAL,"' ",  
+   "   AND QK1_PECA   = '",P_TELA.COD_ITEM,"' ",               
+   "   AND QK1_REV    = '",P_TELA.COD_REVISAO,"' "     
+   
+   PREPARE UPD_QK1010 FROM SQL_STMT CLIPPED
+   EXECUTE UPD_QK1010
+   
+   IF STATUS <> 0 THEN 
+      CALL LOG003_ERR_SQL("UPDATE","QK1010")    
+      RETURN FALSE
+   END IF
+   
+   LET SQL_STMT =
+   "UPDATE ", P_INSTANCIA CLIPPED,"QKK010  ",
+   "   SET D_E_L_E_T_ = '*', R_E_C_D_E_L_= R_E_C_N_O_ ",
+   " WHERE QKK_FILIAL = '",P_COD_FILIAL,"' ",  
+   "   AND QKK_PECA   = '",P_TELA.COD_ITEM,"' ",               
+   "   AND QKK_REV    = '",P_TELA.COD_REVISAO,"' "     
+   
+   PREPARE UPD_QKK010 FROM SQL_STMT CLIPPED
+   EXECUTE UPD_QKK010
+   
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("UPDATE","QKK010")    
+      RETURN FALSE
+   END IF
+     
+   LET SQL_STMT =
+   "UPDATE ", P_INSTANCIA CLIPPED,"QK2010  ",
+   "   SET D_E_L_E_T_ = '*', R_E_C_D_E_L_= R_E_C_N_O_ ",
+   " WHERE QK2_FILIAL = '",P_COD_FILIAL,"' ",  
+   "   AND QK2_PECA   = '",P_TELA.COD_ITEM,"' ",               
+   "   AND QK2_REV    = '",P_TELA.COD_REVISAO,"' "     
+   
+   PREPARE UPD_QK2010 FROM SQL_STMT CLIPPED
+   EXECUTE UPD_QK2010
+   
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("UPDATE","QK2010")    
+      RETURN FALSE
+   END IF 
+   
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION POL1176_GRAVA_ITENS()
+#-----------------------------#
+
+   SELECT PARAMETRO_TEXTO
+     INTO P_INSTANCIA
+     FROM MIN_PAR_MODULO
+    WHERE EMPRESA = '01'
+      AND PARAMETRO = 'INSTANCIA_PROTHEUS'
+   
+   IF STATUS = 100 THEN
+      LET P_INSTANCIA = ''
+   ELSE 
+      IF STATUS <> 0 THEN
+         CALL LOG003_ERR_SQL('SELECT','MIN_PAR_MODULO')
+         RETURN FALSE
+      END IF
+   END IF
+   
+   LET P_INSTANCIA = LOG9900_CONVERSAO_MINUSCULO(P_INSTANCIA)
+   
+   CALL LOG085_TRANSACAO("BEGIN") 
+
+   IF P_JA_EXPORTOU THEN
+      IF NOT POL1176_DELETA_ITEM() THEN
+         CALL LOG085_TRANSACAO("ROLLBACK") 
+         RETURN FALSE
+      END IF
+   END IF
+
+   IF NOT POL1176_INS_PROTHEUS() THEN
+      CALL LOG085_TRANSACAO("ROLLBACK") 
+      RETURN FALSE
+   END IF
+
+   INSERT INTO ITEM_PPAP_5054
+      VALUES(P_COD_EMPRESA,
+             P_TELA.COD_ITEM,
+             P_TELA.COD_REVISAO,
+             P_TELA.DAT_REVISAO,
+             P_TELA.COD_PECA_PPAP)
+
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("INCLUSAO","ITEM_PPAP_5054")    
+      CALL LOG085_TRANSACAO("ROLLBACK") 
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION   
+
+#------------------------------#
+FUNCTION POL1176_INS_PROTHEUS()#
+#------------------------------#
+  
+   INITIALIZE P_QKK010, P_QK1010, P_QK2010 TO NULL
+
+   LET P_DAT_TXT = TODAY      
+          
+   LET  P_QK1010.QK1_FILIAL  =  ' '  
+   LET  P_QK1010.QK1_PECA  =  ' '              
+   LET  P_QK1010.QK1_REV  =  ' '                   
+   LET  P_QK1010.QK1_REVINV  =  ' '                   
+   LET  P_QK1010.QK1_DTREVI  =  ' '                  
+   LET  P_QK1010.QK1_PCCLI  =  ' '                    
+   LET  P_QK1010.QK1_DESCLI  =  ' '              
+   LET  P_QK1010.QK1_PPAP  =  ' '              
+   LET  P_QK1010.QK1_DESC  =  ' '                    
+   LET  P_QK1010.QK1_CODCLI  =  ' '   
+   LET  P_QK1010.QK1_LOJCLI  =  ' '                     
+   LET  P_QK1010.QK1_NOMCLI  =  ' '                                      
+   LET  P_QK1010.QK1_REVDES  =  ' '                   
+   LET  P_QK1010.QK1_DTRDES  =  ' '                   
+   LET  P_QK1010.QK1_PROJET  =  ' '      
+   LET  P_QK1010.QK1_ALTENG  =  ' '                   
+   LET  P_QK1010.QK1_DTENG  =  ' '                    
+   LET  P_QK1010.QK1_DOC  =  ' '                 
+   LET  P_QK1010.QK1_TPLOGO  =  ' '                 
+   LET  P_QK1010.QK1_CODEQU  =  ' '    
+   LET  P_QK1010.QK1_DESEQU  = ' '             
+   LET  P_QK1010.QK1_REVI  =  ' '                    
+   LET  P_QK1010.QK1_JUST  =  ' '                   
+   LET  P_QK1010.QK1_STATUS  =  '1'                   
+   LET  P_QK1010.QK1_DTENCE  =  ' '                  
+   LET  P_QK1010.QK1_DTREAB  =  ' '         
+   LET  P_QK1010.QK1_LICPK   = '1.33'            
+   LET  P_QK1010.QK1_LSCPK   = '1.67'            
+   LET  P_QK1010.QK1_ALTDOC  = ' '          
+   LET  P_QK1010.QK1_NALPRJ  = ' '          
+   LET  P_QK1010.QK1_CODVCL  = ' '  
+   LET  P_QK1010.D_E_L_E_T_  = ' '          
+   LET  P_QK1010.R_E_C_N_O_  = 0           
+   LET  P_QK1010.R_E_C_D_E_L_ = 0           
+                                            
+   LET P_QKK010.QKK_FILIAL  = ' '
+   LET P_QKK010.QKK_PECA    = ' '
+   LET P_QKK010.QKK_REV     = ' '
+   LET P_QKK010.QKK_REVINV  = ' '
+   LET P_QKK010.QKK_NOPE    = ' '
+   LET P_QKK010.QKK_DESC    = ' '
+   LET P_QKK010.QKK_MAQ     = ' '
+   LET P_QKK010.QKK_CHAVE   = ' '
+   LET P_QKK010.QKK_SBOPE   = ' '
+   LET P_QKK010.QKK_TPOPE   = ' '
+   LET P_QKK010.QKK_ITEM    = ' '
+   LET P_QKK010.QKK_AREA    = ' '
+   LET P_QKK010.QKK_FUNC    = ' '
+   LET P_QKK010.D_E_L_E_T_   = ' '
+   LET P_QKK010.R_E_C_N_O_   = 0  
+   LET P_QKK010.R_E_C_D_E_L_ = 0  
+   
+   LET P_QK2010.QK2_FILIAL  =  ' '   
+   LET P_QK2010.QK2_PECA    =  ' '            
+   LET P_QK2010.QK2_REV     =  ' '            
+   LET P_QK2010.QK2_REVINV  =  ' '            
+   LET P_QK2010.QK2_ITEM    =  ' '            
+   LET P_QK2010.QK2_CODCAR  =  ' '            
+   LET P_QK2010.QK2_DESC    =  ' '            
+   LET P_QK2010.QK2_ESPE    =  ' '            
+   LET P_QK2010.QK2_TPCAR   =  ' '            
+   LET P_QK2010.QK2_PRODPR  =  ' '            
+   LET P_QK2010.QK2_PLANOC  =  ' '            
+   LET P_QK2010.QK2_TOL     =  ' '            
+   LET P_QK2010.QK2_LIE     =  ' '            
+   LET P_QK2010.QK2_LSE     =  ' '            
+   LET P_QK2010.QK2_ESP     =  ' '            
+   LET P_QK2010.QK2_SIMB    =  ' '            
+   LET P_QK2010.QK2_UM      =  ' '            
+   LET P_QK2010.QK2_CHAVE   = ' '    
+   LET P_QK2010.D_E_L_E_T_  =  ' '            
+   LET P_QK2010.R_E_C_N_O_  = 0               
+   LET P_QK2010.R_E_C_D_E_L_= 0               
+
+   LET P_DIG_1 = P_TELA.COD_REVISAO[1] + 1
+   LET P_DIG_2 = P_TELA.COD_REVISAO[2] + 1
+   LET P_REVINV[1] = PR_REVINV[P_DIG_1].LETRA
+   LET P_REVINV[2] = PR_REVINV[P_DIG_2].LETRA
+   
+   LET P_ACHOU = FALSE
+
+   LET SQL_STMT = "SELECT R_E_C_N_O_ FROM ", P_INSTANCIA CLIPPED, "QK1010 ORDER BY 1 DESC "
+
+   PREPARE VAR_QK1 FROM SQL_STMT CLIPPED
+   DECLARE CQ_QK1 CURSOR FOR VAR_QK1
+   
+   FOREACH CQ_QK1 INTO P_QK1010.R_E_C_N_O_
+      LET P_ACHOU = TRUE
+      EXIT FOREACH
+   END FOREACH
+   
+   IF NOT P_ACHOU THEN
+      LET P_QK1010.R_E_C_N_O_ = 1
+   ELSE
+      LET P_QK1010.R_E_C_N_O_ = P_QK1010.R_E_C_N_O_ + 1
+   END IF
+
+   LET P_ACHOU = FALSE
+
+   LET SQL_STMT = "SELECT R_E_C_N_O_ FROM ", P_INSTANCIA CLIPPED, "QK2010 ORDER BY 1 DESC "
+
+   PREPARE VAR_QK2 FROM SQL_STMT CLIPPED
+   DECLARE CQ_QK2 CURSOR FOR VAR_QK2
+   
+   FOREACH CQ_QK2 INTO P_QK2010.R_E_C_N_O_
+      LET P_ACHOU = TRUE
+      EXIT FOREACH
+   END FOREACH
+   
+   IF NOT P_ACHOU THEN
+      LET P_QK2010.R_E_C_N_O_ = 1
+   ELSE
+      LET P_QK2010.R_E_C_N_O_ = P_QK2010.R_E_C_N_O_ + 1
+   END IF
+
+   LET P_ACHOU = FALSE
+
+   LET SQL_STMT = "SELECT R_E_C_N_O_ FROM ", P_INSTANCIA CLIPPED, "QKK010 ORDER BY 1 DESC "
+
+   PREPARE VAR_QKK FROM SQL_STMT CLIPPED
+   DECLARE CQ_QKK CURSOR FOR VAR_QKK
+   
+   FOREACH CQ_QKK INTO P_QKK010.R_E_C_N_O_
+      LET P_ACHOU = TRUE
+      EXIT FOREACH
+   END FOREACH
+   
+   IF NOT P_ACHOU THEN
+      LET P_QKK010.R_E_C_N_O_ = 1
+   ELSE
+      LET P_QKK010.R_E_C_N_O_ = P_QKK010.R_E_C_N_O_ + 1
+   END IF
+
+   LET P_QK1010.QK1_FILIAL   = P_COD_FILIAL
+   LET P_QK1010.QK1_PECA     = P_TELA.COD_ITEM #P_TELA.COD_PECA_PPAP
+   LET P_QK1010.QK1_DESC     = P_QK1_DESC
+   LET P_QK1010.QK1_REV      = P_TELA.COD_REVISAO
+   LET P_QK1010.QK1_DTREVI   = P_DAT_REVISAO
+   LET P_QK1010.QK1_REVINV = P_REVINV
+
+   SELECT MAX(SEQ_VERSAO)
+     INTO P_SEQ_VERSAO
+     FROM CAD_DES
+    WHERE COD_EMPRESA = P_COD_EMPRESA
+      AND COD_ITEM    = P_TELA.COD_ITEM
+       
+   IF P_SEQ_VERSAO IS NOT NULL THEN
+      SELECT COD_DESEN,
+             DAT_DESEN
+        INTO P_QK1010.QK1_DESCLI,
+             P_DAT_TXT
+        FROM CAD_DES
+       WHERE COD_EMPRESA = P_COD_EMPRESA
+         AND COD_ITEM    = P_TELA.COD_ITEM
+         AND SEQ_VERSAO  = P_SEQ_VERSAO
+         
+   END IF
+   
+   LET  P_QK1010.QK1_PCCLI = P_TELA.COD_PECA_PPAP
+
+   DECLARE CQ_CLI_ITEM CURSOR FOR
+    SELECT COD_CLIENTE_MATRIZ,
+           COD_ITEM_CLIENTE
+      FROM CLIENTE_ITEM
+     WHERE COD_EMPRESA = P_COD_EMPRESA
+       AND COD_ITEM    = P_TELA.COD_ITEM
+    
+    FOREACH CQ_CLI_ITEM INTO 
+            P_QK1010.QK1_CODCLI,
+            P_QK1010.QK1_PCCLI
+       
+       IF STATUS <> 0 THEN
+          CALL LOG003_ERR_SQL("LENDO","CLIENTE_ITEM")    
+          CALL LOG085_TRANSACAO("ROLLBACK") 
+          RETURN FALSE
+       END IF
+       
+       EXIT FOREACH
+    
+    END FOREACH
+    
+    IF P_QK1010.QK1_CODCLI IS NULL OR
+       P_QK1010.QK1_CODCLI = ' ' THEN
+    ELSE
+       SELECT NOM_CLIENTE
+         INTO P_QK1010.QK1_NOMCLI
+         FROM CLIENTES
+        WHERE COD_CLIENTE = P_QK1010.QK1_CODCLI
+       IF STATUS <> 0 THEN
+          LET P_QK1010.QK1_NOMCLI = ' '
+       END IF
+    END IF
+
+   LET SQL_STMT = " INSERT INTO ", P_INSTANCIA CLIPPED, "QK1010( ",
+   " QK1_FILIAL, QK1_PECA,   QK1_REV,    QK1_REVINV, ",
+   " QK1_DTREVI, QK1_PCCLI,  QK1_DESCLI, QK1_PPAP, ",
+   " QK1_DESC,   QK1_CODCLI, QK1_LOJCLI, QK1_NOMCLI, ",
+   " QK1_REVDES, QK1_DTRDES, QK1_PROJET, ",
+   " QK1_ALTENG, QK1_DTENG,  QK1_DOC,    QK1_TPLOGO, ",
+   " QK1_CODEQU, QK1_REVI,   QK1_JUST, ",
+   " QK1_STATUS, QK1_DTENCE, QK1_DTREAB, QK1_LICPK, ",
+   " QK1_LSCPK,  QK1_ALTDOC, QK1_NALPRJ, QK1_CODVCL, ",
+   " QK1_DESEQU, D_E_L_E_T_, R_E_C_N_O_, R_E_C_D_E_L_) VALUES(",
+   "'",P_QK1010.QK1_FILIAL,"','",P_QK1010.QK1_PECA,"','",P_QK1010.QK1_REV,"','",P_QK1010.QK1_REVINV,"',",
+   "'",P_QK1010.QK1_DTREVI,"','",P_QK1010.QK1_PCCLI,"','",P_QK1010.QK1_DESCLI,"','",P_QK1010.QK1_PPAP,"',",
+   "'",P_QK1010.QK1_DESC,"','",P_QK1010.QK1_CODCLI,"','",P_QK1010.QK1_LOJCLI,"','",P_QK1010.QK1_NOMCLI,"',",
+   "'",P_QK1010.QK1_REVDES,"','",P_QK1010.QK1_DTRDES,"','",P_QK1010.QK1_PROJET,"',",
+   "'",P_QK1010.QK1_ALTENG,"','",P_QK1010.QK1_DTENG,"','",P_QK1010.QK1_DOC,"','",P_QK1010.QK1_TPLOGO,"',",
+   "'",P_QK1010.QK1_CODEQU,"','",P_QK1010.QK1_REVI,"','",P_QK1010.QK1_JUST,"',",
+   "'",P_QK1010.QK1_STATUS,"','",P_QK1010.QK1_DTENCE,"','",P_QK1010.QK1_DTREAB,"','",P_QK1010.QK1_LICPK,"',",
+   "'",P_QK1010.QK1_LSCPK,"','",P_QK1010.QK1_ALTDOC,"','",P_QK1010.QK1_NALPRJ,"','",P_QK1010.QK1_CODVCL,"',",
+   "'",P_QK1010.QK1_DESEQU,"','",P_QK1010.D_E_L_E_T_,"',",P_QK1010.R_E_C_N_O_,",",P_QK1010.R_E_C_D_E_L_,")"
+    
+   PREPARE INC_QK1010 FROM SQL_STMT CLIPPED
+   EXECUTE INC_QK1010
+     
+   IF STATUS <> 0 THEN 
+      CALL LOG003_ERR_SQL("INSERT","QK1010")
+      RETURN FALSE
+   END IF
+   
+   LET P_QK2010.QK2_FILIAL   = P_COD_FILIAL
+   LET P_QK2010.QK2_REV      = P_TELA.COD_REVISAO
+   LET P_QK2010.QK2_PECA     = P_TELA.COD_ITEM #P_TELA.COD_PECA_PPAP
+   LET P_QK2010.QK2_ITEM     = '0001'
+   LET P_QK2010.QK2_CODCAR   = '0001'
+   LET P_QK2010.QK2_DESC     = '0001'
+   LET P_QK2010.QK2_ESPE     = '0001'
+   LET P_QK2010.QK2_TPCAR    = '1'
+   LET P_QK2010.QK2_PRODPR   = '1'
+   LET P_QK2010.QK2_PLANOC   = '2'
+   LET P_QK2010.QK2_TOL      = '100'
+   LET P_QK2010.QK2_LIE      = '-1'
+   LET P_QK2010.QK2_LSE      = '1'
+   LET P_QK2010.QK2_ESP      = '2'
+   LET P_QK2010.QK2_SIMB     = 'F1'
+   LET P_QK2010.QK2_UM       = 'MM'         
+   LET P_QK2010.QK2_REVINV = P_REVINV
+
+   LET SQL_STMT = " INSERT INTO ", P_INSTANCIA CLIPPED, "QK2010( ",
+   " QK2_FILIAL, QK2_PECA,   QK2_REV,    QK2_REVINV, ",
+   " QK2_ITEM,   QK2_CODCAR, QK2_DESC,   QK2_ESPE, ",
+   " QK2_TPCAR,  QK2_PRODPR, QK2_PLANOC, QK2_TOL, ",
+   " QK2_LIE,    QK2_LSE,    QK2_ESP,    QK2_SIMB, ",
+   " QK2_UM,     QK2_CHAVE,  R_E_C_D_E_L_, ",
+   " D_E_L_E_T_, R_E_C_N_O_)  VALUES (",
+   "'",P_QK2010.QK2_FILIAL,"','",P_QK2010.QK2_PECA,"','",P_QK2010.QK2_REV,"','",P_QK2010.QK2_REVINV,"',",
+   "'",P_QK2010.QK2_ITEM,"','",P_QK2010.QK2_CODCAR,"','",P_QK2010.QK2_DESC,"','",P_QK2010.QK2_ESPE,"',",
+   "'",P_QK2010.QK2_TPCAR,"','",P_QK2010.QK2_PRODPR,"','",P_QK2010.QK2_PLANOC,"','",P_QK2010.QK2_TOL,"',",
+   "'",P_QK2010.QK2_LIE,"','",P_QK2010.QK2_LSE,"','",P_QK2010.QK2_ESP,"','",P_QK2010.QK2_SIMB,"',",
+   "'",P_QK2010.QK2_UM,"','",P_QK2010.QK2_CHAVE,"',",P_QK2010.R_E_C_D_E_L_,",",
+   "'",P_QK2010.D_E_L_E_T_,"',",P_QK2010.R_E_C_N_O_,")" 
+
+   PREPARE INC_QK2010 FROM SQL_STMT CLIPPED
+   EXECUTE INC_QK2010
+   
+   IF SQLCA.SQLCODE <> 0 THEN 
+      CALL LOG003_ERR_SQL("INCLUSAO","QK2010")    
+      RETURN FALSE
+   END IF
+   
+   LET P_QKK010.QKK_FILIAL   = P_COD_FILIAL
+   LET P_QKK010.QKK_PECA     = P_TELA.COD_ITEM #P_TELA.COD_PECA_PPAP
+   LET P_QKK010.QKK_REV      = P_TELA.COD_REVISAO
+   LET P_QKK010.QKK_REVINV   = P_REVINV
+         
+   FOR P_IND = 1 TO ARR_COUNT()
+
+       INSERT INTO COMPON_PPAP_5054
+          VALUES(P_COD_EMPRESA,
+                 P_TELA.COD_ITEM,
+                 PR_COMPON[P_IND].COD_COMPON,
+                 PR_COMPON[P_IND].COD_OPERAC,
+                 PR_COMPON[P_IND].COD_OPER_P,
+                 PR_COMPON[P_IND].COD_SIMBOLO)
+
+       IF SQLCA.SQLCODE <> 0 THEN 
+          CALL LOG003_ERR_SQL("INCLUSAO","COMPON_PPAP_5054")    
+          CALL LOG085_TRANSACAO("ROLLBACK") 
+          RETURN FALSE
+       END IF
+       
+       LET P_QKK010.QKK_MAQ =  ' '
+       LET P_QKK010.QKK_DESC = ' '
+       LET P_QKK010.QKK_AREA = ' '
+              
+       SELECT COD_ROTEIRO 
+         INTO P_COD_ROTEIRO
+         FROM ITEM_MAN
+        WHERE COD_EMPRESA = P_COD_EMPRESA
+          AND COD_ITEM    = PR_COMPON[P_IND].COD_COMPON
+       
+        SELECT COD_ARRANJO,
+               COD_OPERAC,
+               COD_CENT_TRAB,
+               QTD_PECAS_CICLO
+          INTO P_COD_ARRANJO,
+               P_COD_OPERAC,
+               P_COD_CENT_TRAB,
+               P_QTD_PECAS_CICLO
+          FROM CONSUMO
+         WHERE COD_EMPRESA = P_COD_EMPRESA
+           AND COD_ITEM    = PR_COMPON[P_IND].COD_COMPON
+           AND (COD_ROTEIRO = P_COD_ROTEIRO OR COD_ROTEIRO IS NULL)
+           
+	      DECLARE CQ_ARR CURSOR FOR                   
+	         SELECT COD_RECUR,
+	                QTD_RECUR                          
+	           FROM REC_ARRANJO                         
+	          WHERE COD_EMPRESA = P_COD_EMPRESA         
+	            AND COD_ARRANJO = P_COD_ARRANJO         
+	          ORDER BY 1                                
+	                                                    
+	      FOREACH CQ_ARR INTO P_COD_RECUR, P_QTD_RECUR            
+	          
+	           SELECT DEN_RECUR,
+	                  IES_TIP_RECUR                        
+	             INTO P_DEN_RECUR,
+	                  P_IES_TIP_RECUR                 
+	             FROM RECURSO                           
+	            WHERE COD_EMPRESA   = P_COD_EMPRESA     
+	              AND COD_RECUR     = P_COD_RECUR   
+             
+             IF P_IES_TIP_RECUR = '2' THEN
+                LET P_QKK010.QKK_MAQ    = P_COD_RECUR
+             ELSE
+             END IF
+	        
+	      END FOREACH                                 
+
+          SELECT DEN_OPERAC
+            INTO P_QKK010.QKK_DESC
+            FROM OPERACAO
+           WHERE COD_EMPRESA = P_COD_EMPRESA
+             AND COD_OPERAC  = P_COD_OPERAC
+              
+          SELECT DEN_CENT_TRAB
+            INTO P_QKK010.QKK_AREA
+            FROM CENT_TRABALHO
+           WHERE COD_EMPRESA    = P_COD_EMPRESA
+             AND COD_CENT_TRAB  = P_COD_CENT_TRAB
+          
+       LET P_QKK010.QKK_TPOPE = 0
+       
+       SELECT COD_TIP_OPER
+         INTO P_QKK010.QKK_TPOPE
+         FROM SIMBOLO_5054
+        WHERE COD_EMPRESA = P_COD_EMPRESA
+          AND COD_SIMBOLO = PR_COMPON[P_IND].COD_SIMBOLO
+              
+       LET P_QKK010.QKK_NOPE     = PR_COMPON[P_IND].COD_OPER_P
+       LET P_QKK010.QKK_SBOPE    = PR_COMPON[P_IND].COD_SIMBOLO
+       
+       LET P_QKK010.QKK_ITEM     = POL1176_FORMATA(P_IND)
+           
+       IF NOT POL1176_INS_QKK010() THEN
+          RETURN FALSE
+       END IF
+
+   END FOR
+   
+   CALL LOG085_TRANSACAO("COMMIT") 
+   RETURN TRUE
+   
+END FUNCTION
+
+#----------------------------#
+FUNCTION POL1176_INS_QKK010()#
+#----------------------------#
+
+   LET SQL_STMT = " INSERT INTO ", P_INSTANCIA CLIPPED, "QKK010( ",
+   " QKK_FILIAL,  QKK_PECA,   QKK_REV, ",
+   " QKK_REVINV,  QKK_NOPE,   QKK_DESC, ",
+   " QKK_MAQ, QKK_CHAVE, QKK_SBOPE, ",
+   " QKK_TPOPE,   QKK_ITEM,   QKK_AREA,   QKK_FUNC, ",
+   " D_E_L_E_T_, R_E_C_N_O_, R_E_C_D_E_L_) VALUES (",
+   "'",P_QKK010.QKK_FILIAL,"','",P_QKK010.QKK_PECA,"','",P_QKK010.QKK_REV,"',",
+   "'",P_QKK010.QKK_REVINV,"','",P_QKK010.QKK_NOPE,"','",P_QKK010.QKK_DESC,"',",
+   "'",P_QKK010.QKK_MAQ,"','",P_QKK010.QKK_CHAVE,"','",P_QKK010.QKK_SBOPE,"',",
+   "'",P_QKK010.QKK_TPOPE,"','",P_QKK010.QKK_ITEM,"','",P_QKK010.QKK_AREA,"','",P_QKK010.QKK_FUNC,"',",
+   "'",P_QKK010.D_E_L_E_T_,"',",P_QKK010.R_E_C_N_O_,",",P_QKK010.R_E_C_D_E_L_,")"
+
+   PREPARE INC_QKK010 FROM SQL_STMT CLIPPED
+   EXECUTE INC_QKK010
+   
+   IF STATUS = 0 THEN
+      LET P_QKK010.R_E_C_N_O_ = P_QKK010.R_E_C_N_O_ + 1
+   ELSE
+      IF STATUS <> -239 THEN 
+         CALL LOG003_ERR_SQL("INCLUSAO","QKK010")    
+         RETURN FALSE
+       END IF
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION
+
+
+#-------------------------------#
+FUNCTION POL1176_FORMATA(P_ITEM)
+#-------------------------------#
+
+   DEFINE P_ITEM     SMALLINT,
+          P_RETORNO  CHAR(04),
+          P_ITEM_TXT CHAR(04)
+          
+   LET P_ITEM_TXT = P_ITEM
+   
+   IF LENGTH(P_ITEM_TXT CLIPPED) = 3 THEN
+      LET P_RETORNO = '0',P_ITEM_TXT CLIPPED
+   ELSE
+      IF LENGTH(P_ITEM_TXT CLIPPED) = 2 THEN
+         LET P_RETORNO = '00',P_ITEM_TXT CLIPPED
+      ELSE
+         IF LENGTH(P_ITEM_TXT CLIPPED) = 1 THEN
+            LET P_RETORNO = '000',P_ITEM_TXT CLIPPED
+         ELSE
+            LET P_RETORNO = P_ITEM_TXT
+         END IF
+      END IF
+   END IF
+   RETURN (P_RETORNO)
+   
+END FUNCTION
+
+#--------------------------#
+ FUNCTION POL1176_CONSULTA()
+#--------------------------#
+   
+   CLEAR FORM
+   DISPLAY P_COD_EMPRESA TO COD_EMPRESA
+   LET P_ITEM_PPAP_5054A.* = P_ITEM_PPAP_5054.*
+   
+   CONSTRUCT BY NAME WHERE_CLAUSE ON 
+      ITEM_PPAP_5054.COD_ITEM,
+      ITEM_PPAP_5054.COD_REVISAO,
+      ITEM_PPAP_5054.DAT_REVISAO,
+      ITEM_PPAP_5054.COD_PECA_PPAP
+
+      ON KEY (CONTROL-Z)
+         CALL LOG009_POPUP(8,25,"ITENS","ITEM_PPAP_5054",
+                     "COD_ITEM","","","S","") 
+            RETURNING P_ITEM_PPAP_5054.COD_ITEM
+         CALL LOG006_EXIBE_TECLAS("01 02 03 07", P_VERSAO)
+         CURRENT WINDOW IS W_POL1176
+         IF P_ITEM_PPAP_5054.COD_ITEM IS NOT NULL THEN
+            DISPLAY P_ITEM_PPAP_5054.COD_ITEM TO COD_ITEM
+         END IF
+         
+   END CONSTRUCT
+
+   CALL LOG006_EXIBE_TECLAS("01",P_VERSAO)
+   CURRENT WINDOW IS W_POL1176
+
+   IF INT_FLAG <> 0 THEN
+      LET INT_FLAG = 0 
+      LET P_ITEM_PPAP_5054.* = P_ITEM_PPAP_5054A.*
+      CALL POL1176_EXIBE_DADOS()
+      ERROR "CONSULTA CANCELADA"
+      RETURN
+   END IF
+
+   LET SQL_STMT = "SELECT * FROM ITEM_PPAP_5054 ",
+                  " WHERE ", WHERE_CLAUSE CLIPPED,                 
+                  "   AND COD_EMPRESA = '",P_COD_EMPRESA,"' ",
+                  "ORDER BY COD_ITEM"
+
+   PREPARE VAR_QUERI FROM SQL_STMT   
+   DECLARE CQ_CONSULTA SCROLL CURSOR WITH HOLD FOR VAR_QUERI
+   OPEN CQ_CONSULTA
+   FETCH CQ_CONSULTA INTO P_ITEM_PPAP_5054.*
+   
+   IF SQLCA.SQLCODE = NOTFOUND THEN
+      ERROR "ARGUMENTOS DE PESQUISA NAO ENCONTRADOS"
+      LET P_IES_CONS = FALSE
+   ELSE 
+      LET P_IES_CONS = TRUE
+      CALL POL1176_EXIBE_DADOS()
+   END IF
+
+END FUNCTION
+
+#-----------------------------------#
+ FUNCTION POL1176_EXIBE_DADOS()
+#-----------------------------------#
+
+   CLEAR FORM
+   INITIALIZE P_DEN_ITEM TO NULL
+   
+   SELECT DEN_ITEM_REDUZ
+     INTO P_DEN_ITEM
+     FROM ITEM
+    WHERE COD_EMPRESA = P_COD_EMPRESA
+      AND COD_ITEM    = P_ITEM_PPAP_5054.COD_ITEM
+  
+   DISPLAY P_COD_EMPRESA TO COD_EMPRESA
+   DISPLAY P_ITEM_PPAP_5054.COD_ITEM TO COD_ITEM
+   DISPLAY P_DEN_ITEM TO DEN_ITEM
+   DISPLAY P_ITEM_PPAP_5054.COD_REVISAO   TO COD_REVISAO
+   DISPLAY P_ITEM_PPAP_5054.DAT_REVISAO   TO DAT_REVISAO
+   DISPLAY P_ITEM_PPAP_5054.COD_PECA_PPAP TO COD_PECA_PPAP
+ 
+   CALL POL1176_EXIBE_COMPON()
+   
+ END FUNCTION
+
+#------------------------------#
+ FUNCTION POL1176_EXIBE_COMPON()
+#------------------------------#
+
+   DECLARE CQ_COMP CURSOR FOR 
+    SELECT COD_COMPON,
+           COD_OPER_LOGIX,
+           COD_OPER_SIGA,
+           COD_SIMBOLO
+      FROM COMPON_PPAP_5054
+     WHERE COD_EMPRESA = P_COD_EMPRESA
+       AND COD_ITEM    = P_ITEM_PPAP_5054.COD_ITEM
+
+   LET P_INDEX = 1
+   
+   FOREACH CQ_COMP INTO 
+           PR_COMPON[P_INDEX].COD_COMPON,
+           PR_COMPON[P_INDEX].COD_OPERAC,
+           PR_COMPON[P_INDEX].COD_OPER_P,
+           PR_COMPON[P_INDEX].COD_SIMBOLO
+           
+      INITIALIZE PR_COMPON[P_INDEX].DEN_OPERAC TO NULL
+
+      SELECT DEN_OPERAC
+        INTO PR_COMPON[P_INDEX].DEN_OPERAC
+        FROM OPERACAO
+       WHERE COD_EMPRESA = P_COD_EMPRESA
+         AND COD_OPERAC  = PR_COMPON[P_INDEX].COD_OPERAC
+
+      SELECT DEN_SIMBOLO
+        INTO PR_COMPON[P_INDEX].DEN_SIMBOLO
+        FROM SIMBOLO_5054
+       WHERE COD_EMPRESA = P_COD_EMPRESA
+         AND COD_SIMBOLO = PR_COMPON[P_INDEX].COD_SIMBOLO      
+          
+      LET P_INDEX = P_INDEX + 1
+
+   END FOREACH
+   
+   CALL SET_COUNT(P_INDEX - 1)
+
+   DISPLAY ARRAY PR_COMPON TO  SR_COMPON.*
+
+END FUNCTION 
+
+#-----------------------------------#
+ FUNCTION POL1176_PAGINACAO(P_FUNCAO)
+#-----------------------------------#
+
+   DEFINE P_FUNCAO CHAR(20)
+
+   IF P_IES_CONS THEN
+      LET P_ITEM_PPAP_5054A.* = P_ITEM_PPAP_5054.*
+      CASE
+         WHEN P_FUNCAO = "SEGUINTE" FETCH NEXT CQ_CONSULTA INTO 
+                         P_ITEM_PPAP_5054.*
+         WHEN P_FUNCAO = "ANTERIOR" FETCH PREVIOUS CQ_CONSULTA INTO 
+                         P_ITEM_PPAP_5054.*
+      END CASE
+
+      IF SQLCA.SQLCODE = NOTFOUND THEN
+         ERROR "NAO EXISTEM MAIS ITENS NESTA DIREÇÃO"
+         LET P_ITEM_PPAP_5054.* = P_ITEM_PPAP_5054A.*
+      ELSE
+         CALL POL1176_EXIBE_DADOS()
+      END IF
+   ELSE
+      ERROR "NAO EXISTE NENHUMA CONSULTA ATIVA"
+   END IF
+
+END FUNCTION
+
+
+
+#-------------------------------- FIM DE PROGRAMA -----------------------------#

@@ -1,0 +1,32 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+  
+[a ]                      DESCONTO DE TRANSPORTE
+  
+              
+   TRANSPORTADORA [b              ]  [c                             ]                
+   
+        DESCONTO  [d       ]   
+                                        
+                
+          
+  
+
+
+       
+
+                       
+
+}
+END
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+b = FORMONLY.cod_transpor, UPSHIFT, AUTONEXT 
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.den_transpor, UPSHIFT, NOENTRY, AUTONEXT;
+d = FORMONLY.pct_desc, UPSHIFT, AUTONEXT;
+
+END 

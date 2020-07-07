@@ -182,4 +182,63 @@ public class ParametrosDao extends Dao {
 		return nos;
 	}
 
+	public NatOperSical getTipoEntrega(Integer natVenda, 
+			Integer natRemessa) throws SQLException {
+
+		log.info("Venda "+natVenda+" Remessa "+natRemessa);
+		
+		NatOperSical nos = null;
+		String query = "select tip_pedido, entrega_furura ";
+		query += "from nat_oper_sical where cod_nat_venda = "+natVenda;
+				
+		if (natRemessa == null) {
+			query += " and cod_nat_remessa is null ";
+		} else {
+			query += " and cod_nat_remessa = "+natRemessa;
+		}
+		
+		PreparedStatement stmt = getConexao().prepareStatement(query);
+		ResultSet rs = stmt.executeQuery();
+
+		if (rs.next()) {
+			nos = new NatOperSical();
+			nos.setTip_pedido(rs.getString(1));
+			nos.setEntrega_furura(rs.getString(2));
+			nos.setCod_nat_venda(natVenda);
+			nos.setCod_nat_remessa(natRemessa);
+			log.info("Tipo "+nos.getTip_pedido());
+			log.info("Entrega "+nos.getEntrega_furura());
+		}
+
+		rs.close();
+		stmt.close();
+
+		return nos;
+	}
+
+	public Integer getNatRemessa(String empresa, Integer pedido) throws SQLException {
+
+		log.info("Pedido logix:"+pedido);
+		Integer codNatOper = null;
+		String query = "";
+		 
+		query += "select cod_nat_oper from ped_item_nat where cod_empresa = ?"
+			  + " and num_pedido = ? and num_sequencia = 0";
+
+		PreparedStatement stmt = getConexao().prepareStatement(query);
+		stmt.setString(1, empresa);
+		stmt.setInt(2, pedido);
+
+		ResultSet rs = stmt.executeQuery();
+
+		if (rs.next()) {
+			codNatOper = rs.getInt("cod_nat_oper");
+		}
+
+		rs.close();
+		stmt.close();
+
+		return codNatOper;
+	}
+
 }

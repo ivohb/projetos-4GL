@@ -1,0 +1,35 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]          DIGITACAO DE PEDIDOS ON-LINE - TOTAL          Pedido: [a1    ]
+
+
+
+               Quantidade           Preco Unitario        %Desc.
+            [a2             ]    [a3             ]       [a5    ]              
+
+                      Valor Bruto           Valor Liquido     
+                   [b1              ]    [b2              ]                           
+
+
+
+
+
+}
+END
+TABLES
+pedido_dig_item
+END
+
+ATTRIBUTES
+a0  = FORMONLY.cod_empresa, UPSHIFT, AUTONEXT;
+a1  = FORMONLY.num_pedido,  UPSHIFT, AUTONEXT;
+a2  = FORMONLY.quantidade,  UPSHIFT, AUTONEXT;
+a3  = FORMONLY.preco,       UPSHIFT, AUTONEXT;
+a5  = FORMONLY.desc_adic,   UPSHIFT, NOENTRY;
+b1  = FORMONLY.total_val_bru ;
+b2  = FORMONLY.total_val_liq ;
+
+END

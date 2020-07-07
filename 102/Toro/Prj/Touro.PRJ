@@ -1,0 +1,122 @@
+Group Touro
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=32
+         File \Clientes\Touro\4gl\pol0737.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0739.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0740.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0741.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0743.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0745.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0769.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0770.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0810.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0816.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0819.4gl
+             Type=T
+         End
+         File \Clientes\Touro\4gl\pol0820.4gl
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0737.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0739.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0740.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0741.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0743.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0745.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0769.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0770.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0810.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0816.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0819.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol0820.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol07371.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol07372.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol07401.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol07421.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol07451.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol07691.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol07701.per
+             Type=T
+         End
+         File \Clientes\Touro\Per\pol08101.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

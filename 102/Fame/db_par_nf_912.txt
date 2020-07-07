@@ -1,0 +1,34 @@
+
+DBSCHEMA Schema Utility       INFORMIX-SQL Version 11.50.FC9
+
+
+
+
+
+
+
+{ TABLE "reinaldo".par_nf_912 row size = 109 number of columns = 14 index size = 
+              0 }
+create table "reinaldo".par_nf_912 
+  (
+    cod_empresa char(2) not null ,
+    cod_param char(15) not null ,
+    den_param char(25) not null ,
+    ser_nff char(2) not null ,
+    cod_nat_oper integer not null ,
+    cod_cnd_pgto decimal(3,0) not null ,
+    cod_tip_carteira char(2) not null ,
+    cod_cliente char(15) not null ,
+    cod_transportador char(15) not null ,
+    ies_finalidade char(1) not null ,
+    cod_texto decimal(3,0),
+    cod_moeda decimal(2,0) not null ,
+    cod_local char(10) not null ,
+    cod_local1 char(10) not null 
+  );
+
+revoke all on "reinaldo".par_nf_912 from "public" as "reinaldo";
+
+
+
+

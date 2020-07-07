@@ -1,0 +1,31 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                INCLUSÃO DE SALDO DE PEDIDOS NA TAB PL_IT_ME      
+
+
+                             De: [b         ] 
+                             
+          
+                            Até: [c         ]
+
+
+
+
+
+
+
+
+
+
+}
+END
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.dat_ini TYPE DATE, FORMAT = 'dd/mm/yyyy', AUTONEXT,
+       COMMENTS = "Digite a Data Inicial";
+   c = FORMONLY.dat_fim TYPE DATE, FORMAT = 'dd/mm/yyyy', AUTONEXT,
+       COMMENTS = "Digite a Data Final";
+END 
+

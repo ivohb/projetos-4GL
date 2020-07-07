@@ -1,0 +1,32 @@
+DATABASE logix
+
+SCREEN
+{
+ PORTADORES
+------------
+Tipo  Codigo
+ [a]  [a1  ]
+ [a]  [a1  ]
+ [a]  [a1  ]
+ [a]  [a1  ]
+ [a]  [a1  ]
+ [a]  [a1  ]
+ [a]  [a1  ]
+ [a]  [a1  ]
+ [a]  [a1  ]
+ [a]  [a1  ]
+}
+
+TABLES
+portador
+END
+
+ATTRIBUTES
+a    = portador.ies_tip_portador, UPSHIFT;
+a1   = portador.cod_portador, UPSHIFT;
+END
+
+INSTRUCTIONS
+SCREEN RECORD s_portadores[10] (portador.ies_tip_portador, portador.cod_portador);
+END
+

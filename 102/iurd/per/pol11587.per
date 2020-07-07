@@ -1,0 +1,52 @@
+DATABASE logix
+SCREEN
+{
+[a ]                   DADOS COMPLEMENTARES DA AD
+----------------------------------------------------------------------------
+       Núm AD:[b      ] [c       ]                     Valor:[d           ] 
+       Núm NF:[j      ]  Emissão:[k         ]  Série:[l ]  Sub série:[m   ]
+   Observação:[e                                                          ]
+    Fonecedor:[f              ] [g                                        ]
+  Tip despesa:[h      ][i                            ]
+----------------------------------------------------------------------------
+      AP  Par    Valor     Vencto   Portador   Descrição
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+   [o     |p |q           |r         |s  |t                       ]
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,       NOENTRY;
+ b = FORMONLY.num_ad,            NOENTRY;
+ c = FORMONLY.sit_ad,            NOENTRY, color = red;
+ d = FORMONLY.val_tot_nf,        NOENTRY;
+ j = FORMONLY.num_nf,            NOENTRY;             
+ k = FORMONLY.dat_emis_nf,       NOENTRY;
+ l = FORMONLY.ser_nf,            NOENTRY;
+ m = FORMONLY.ssr_nf,            NOENTRY;
+ e = FORMONLY.observ,            NOENTRY;
+ f = FORMONLY.cod_fornecedor,    NOENTRY;
+ g = FORMONLY.raz_social,        NOENTRY;
+ h = FORMONLY.cod_tip_despesa,   NOENTRY;
+ i = FORMONLY.nom_tip_despesa,   NOENTRY;
+
+ o = FORMONLY.num_ap,            NOENTRY;
+ p = FORMONLY.num_parcela,       AUTONEXT,
+     COMMENTS = 'Ctrl+S = Suspende/Re-ativa AD'; 
+ q = FORMONLY.val_nom_ap,        NOENTRY;
+ r = FORMONLY.dat_vencto_s_desc, NOENTRY;
+ s = FORMONLY.cod_portador,      NOENTRY;
+ t = FORMONLY.nom_portador,      NOENTRY;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_ap[11](num_ap THRU nom_portador);
+END 

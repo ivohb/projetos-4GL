@@ -1,0 +1,25 @@
+DATABASE FORMONLY                              
+SCREEN
+{
+------------------------------------------------------------------------------
+
+[a0]             IMPRESSAO AVISO DE RECEBIMENTO
+
+
+                 Aviso Rec. Inicial : [a1    ]
+               
+                 Aviso Rec. Final   : [a2    ]
+ 
+ 
+
+
+
+
+
+}                                      
+END                                    
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,      NOENTRY;
+a1 = FORMONLY.p_num_ar_ini,     AUTONEXT;
+a2 = FORMONLY.p_num_ar_fim,     AUTONEXT;
+END

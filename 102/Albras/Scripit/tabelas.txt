@@ -1,0 +1,11 @@
+dbschema -d logix -t pedido_tmp_304 pedido_tmp_304.sql
+dbschema -d logix -t ped_itens_tmp_304 ped_itens_tmp_304.sql
+dbschema -d logix -t estrut_tmp_304 estrut_tmp_304.sql
+dbschema -d logix -t pedido_oc_304 pedido_oc_304.sql
+dbschema -d logix -t pedido_mrp_304 pedido_mrp_304.sql
+dbschema -d logix -t oper_dev_304 oper_dev_304.sql
+dbschema -d logix -t ar_proces_304 ar_proces_304.sql
+dbschema -d logix -t ops_tmp_304 ops_tmp_304.sql
+dbschema -d logix -t estr_tmp_304 estr_tmp_304.sql
+dbschema -d logix -t ocs_tmp_304 ocs_tmp_304.sql
+dbschema -d logix -t fat_conver_albras fat_conver_albras.sql

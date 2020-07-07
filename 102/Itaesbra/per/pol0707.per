@@ -1,0 +1,39 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------------------------------------
+[a ]  
+                         RECURSO POR GRUPO
+  
+              
+ Cod. Grupo   [b     ] [c                                                   ]               
+ 
+ Cod. Recurso [d    ][e                                                   ]             
+          
+        
+                    
+                    
+       
+
+                       
+
+
+
+
+}
+END
+
+ATTRIBUTES
+
+a = FORMONLY.cod_empresa,UPSHIFT, NOENTRY, AUTONEXT; 
+b = FORMONLY.cod_grupo,UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.descricao_grupo, UPSHIFT, NOENTRY;
+d = FORMONLY.cod_recurso, UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+e = FORMONLY.den_recur, UPSHIFT, NOENTRY;
+
+ 
+
+
+END 

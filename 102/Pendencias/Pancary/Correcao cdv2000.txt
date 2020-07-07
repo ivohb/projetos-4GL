@@ -1,0 +1,27 @@
+CDV2000 - LANÇAMENTO DAS DESPESAS DE VIAGENS 
+CDV2001 - ABERTURA DE SOLICIATAÇÃO DE VIAGEM (CDV_SOLIC_VIAG_781)
+
+
+- OK Para NFS não obrigar o CFOP (ver parâmetro na par_sup_pad parametro 'cfop_nfs' se <> S, não obrigar)
+- OK Tela de NF terceiros: ver atualização do campo Tot desp:
+- OK popup cfop (cod_fiscal_sup)
+- OK Valor total NF calcular automaticamente. Não deixaar informar 
+- OK Na tela de cadastro do item da nota, validar o item na item_sup; acescentar coluna p/ pct_ipi
+
+- OK Ver como montar numero da conta quando não tiver na item_sup
+    CENTRO DE CUSTO (4 DIG) + TIPO DESPESA (4 DIG) PREENCHENDO COM ZERO A ESQUERDA
+
+- CONTABILIZAÇÃO DA NOTA SUP1430 QUE CHAMA SUPR6 - BUSCAR CONTA DO SUP1400
+
+- OK CALCULO DO IPI: INCID_IPI VER TIPO DE INCIDENCIA E % DE PARTICIPAÇÃO. VER TAMBEM 
+   TABELA FORNECEDOR.ies_contrib_ipi - dar prioridade p/ pct_ipi da tabela item
+
+
+- GRAVAR NFE_SUP_COMPL.IES_NF_EMIT = 'S', NUM_PROC_IMP_NFS = PROCESSO CDV.
+  (PARA NÃO DEIZAR EXCLUIR A NF)
+- AVISOREC_PROC_IMP
+  
+
+
+
+

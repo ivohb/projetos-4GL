@@ -1,0 +1,31 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------
+              TIPOS DE EVENTOS            
+              
+   Código            Descrição                       
+    [a]  [b                                ]
+    [a]  [b                                ]
+    [a]  [b                                ]
+    [a]  [b                                ]
+    [a]  [b                                ]
+    [a]  [b                                ]
+    [a]  [b                                ]
+    [a]  [b                                ]
+    [a]  [b                                ]
+    [a]  [b                                ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.tip_evento, NOENTRY
+  --# ,OPTIONS='-nolist';
+b = FORMONLY.den_tipo, NOENTRY, REVERSE, color = blue
+  --# ,OPTIONS='-nolist';
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_tip_eventos[10](tip_evento THRU den_tipo);
+END 

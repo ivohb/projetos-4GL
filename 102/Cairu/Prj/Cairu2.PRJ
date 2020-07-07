@@ -1,0 +1,128 @@
+Group cairu
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=34
+         File \Projetos\4GL\102\Cairu\4gl\cto0120.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\cto0130.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\cto0180.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0133.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0134.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0136.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0137.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0156.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0157.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0158.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0159.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol0177.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\4gl\pol1170.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\cto0120.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\cto0130.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0131.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0132.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0133.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0134.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0135.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0137.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0156.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0157.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0158.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0159.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol0177.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol1170.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol01331.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol01332.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol01333.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol01334.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol01335.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol01351.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cairu\Per\pol01581.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

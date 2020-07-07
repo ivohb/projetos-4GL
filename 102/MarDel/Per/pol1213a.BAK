@@ -1,0 +1,25 @@
+DATABASE FORMONLY
+SCREEN
+{
+-------------------------------------------
+
+           Aguarde! Exportando ...
+                            
+ ... [a              ] [b              ] 
+             
+              
+              
+
+
+              
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.exportando,  NOENTRY;
+ b = FORMONLY.item,        NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_men[01] (exportando THRU item);
+END

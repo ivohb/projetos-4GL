@@ -1,0 +1,68 @@
+Group 
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=14
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol0801.4gl
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol0921.4gl
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol1065.4gl
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Agere\x_fontes\age9995_v10.02.02\age9995.4gl
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Agere\x_fontes\age9995_v10.02.02\age9995.per
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Agere\x_fontes\age9995_v10.02.02\age9995a.per
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Agere\x_fontes\age9999_v10.01.02\age9999.4gl
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Agere\x_fontes\age9999_v10.01.02\age9999.per
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol0802.4gl
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol0619.4gl
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol0619.per
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol0802.per
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol06191.per
+             Type=T
+         End
+         File \Documentos\Profissional\AgereTI\Clientes\Cibrapel\fontes\pol0778.4gl
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

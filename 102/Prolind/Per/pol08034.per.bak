@@ -1,0 +1,24 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------------
+      PROCESSOS DE APONTAMENTO EFETUADOS            
+
+            Usuário:[a       ]
+              
+       Processos         Ordem   Quantidade Usuário
+ [p                   |q        |r         |s       ]
+}
+
+ATTRIBUTES
+a = FORMONLY.nom_usuario, NOENTRY --# ,OPTIONS='-nolist';
+p = FORMONLY.dat_processo --# ,OPTIONS='-nolist';
+q = FORMONLY.num_ordem --# ,OPTIONS='-nolist';
+r = FORMONLY.qtd_boas --# ,OPTIONS='-nolist';
+s = FORMONLY.usuario --# ,OPTIONS='-nolist';
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_processo[10](dat_processo THRU usuario);
+END 

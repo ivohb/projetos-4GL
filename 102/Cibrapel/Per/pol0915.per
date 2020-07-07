@@ -1,0 +1,53 @@
+DATABASE FORMONLY
+SCREEN
+{
+-------------------------------------------------------------------------------
+  [a ]               APONTAMENTOS ENVIADOS PELO TRIM BOX
+  
+                 Num seq: [y         ]      Data export: [w                  ]
+               Num ordem: [b         ]       Num pedido: [c                ]
+                Cód item: [d              ]    Num lote: [e                ]                 
+             Cód maquina: [f         ]  Tipo movto:[j] Qtd: [i         ] TQ:[z]
+                                                    Status: [s] 
+      Inicio da produção: [g                  ] 
+         Fim da produção: [h                  ]  
+    
+             Comprimento: [k         ]          Largura: [l         ]
+                Diâmetro: [m         ]           Tubete: [n         ]
+       Consumo de refugo: [o              ]Peso teórico: [p              ]
+               Devolução: [q]                   Usuário: [r         ]
+                 
+             Status: 0-Não lido 1-Apontado 2-Criticado  I-Ignorado
+           Tip movto: F-Apto normal R-Apto de Refugo S-Apto de Sucata
+                  TQ: A-Apontamento E-Estorno 
+                  
+}
+
+END
+
+
+ATTRIBUTES
+a = FORMONLY.codempresa, NOENTRY;
+b = FORMONLY.numordem, UPSHIFT, AUTONEXT;
+w = FORMONLY.datageracao, UPSHIFT, AUTONEXT;
+y = FORMONLY.numsequencia, UPSHIFT, AUTONEXT;
+c = FORMONLY.numpedido, UPSHIFT, AUTONEXT;
+d = FORMONLY.coditem, UPSHIFT, AUTONEXT;
+e = FORMONLY.num_lote, UPSHIFT, AUTONEXT;
+f = FORMONLY.codmaquina, UPSHIFT, AUTONEXT;
+g = FORMONLY.inicio, UPSHIFT, AUTONEXT;
+h = FORMONLY.fim, UPSHIFT, AUTONEXT;
+i = FORMONLY.qtdprod, UPSHIFT, AUTONEXT;
+j = FORMONLY.tipmovto, UPSHIFT, AUTONEXT;
+k = FORMONLY.comprimento, UPSHIFT, AUTONEXT;
+l = FORMONLY.largura, UPSHIFT, AUTONEXT;
+m = FORMONLY.diametro, UPSHIFT, AUTONEXT;
+n = FORMONLY.tubete, UPSHIFT, AUTONEXT;
+o = FORMONLY.consumorefugo, UPSHIFT, AUTONEXT;
+p = FORMONLY.pesoteorico, UPSHIFT, AUTONEXT;
+q = FORMONLY.iesdevolucao, UPSHIFT, AUTONEXT;
+r = FORMONLY.usuario, UPSHIFT, AUTONEXT;
+s = FORMONLY.statusregistro, UPSHIFT, AUTONEXT;
+z = FORMONLY.tip_quantidade, NOENTRY, REVERSE;
+
+END 

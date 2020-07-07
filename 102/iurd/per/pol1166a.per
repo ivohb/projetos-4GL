@@ -1,0 +1,32 @@
+DATABASE logix
+SCREEN 
+{
+                 SELEÇÃO DE EMPRESAS
+
+ S/N  Emp           Descrição
+----------------------------------------------------
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+ [a] [b |c                                      ]
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.ies_select, UPSHIFT, AUTONEXT,
+     COMMENTS = 'S=Seleciona   N=Não';
+ b = FORMONLY.cod_empresa, NOENTRY;
+ c = FORMONLY.den_empresa, NOENTRY;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_empresa[12](ies_select THRU den_empresa);
+END 

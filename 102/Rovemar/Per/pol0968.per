@@ -1,0 +1,39 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+ 
+ [a0]                    CÓDIGOS DE MOVIMENTO EGA x LOGIX
+
+
+                         Código EGA: [a1   ]
+            
+                       Código LOGIX: [a2 ]
+
+                  Libera a Máquina?: [b          ]
+                  
+
+                   Aponta Como Boa?: [c          ]
+
+
+
+
+
+
+}
+END
+TABLES
+   rovmov_ega_man912
+END
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,   UPSHIFT, NOENTRY;
+a1 = rovmov_ega_man912.cod_mov_ega,    UPSHIFT, AUTONEXT;
+a2 = rovmov_ega_man912.cod_mov_logix, AUTONEXT
+ --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z'
+;
+b = FORMONLY.ies_liberar TYPE CHAR, INCLUDE=('S','N')
+--#, widget='RADIO', config='S SIM N NÃO';
+c = FORMONLY.aponta_como_boa TYPE CHAR, INCLUDE=('S','N')
+--#, widget='RADIO', config='S SIM N NÃO';
+
+END

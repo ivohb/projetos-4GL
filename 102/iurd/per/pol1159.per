@@ -1,0 +1,31 @@
+DATABASE logix                     
+SCREEN
+{   
+------------------------------------------------------------------------------
+[a ]               GERAÇÃO DA GRADE DE APROVACAO P/ NFE
+  
+
+       Mensagem:[m                                                   ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,  UPSHIFT, NOENTRY;
+ m = FORMONLY.mensagem,     UPSHIFT;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_men[01] (mensagem);
+END

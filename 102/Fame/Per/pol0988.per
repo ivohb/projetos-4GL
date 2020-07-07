@@ -1,0 +1,64 @@
+DATABASE logix
+
+SCREEN
+{
+----------------------------------------------------------------------
+ [a0]          PARAMETROS PARA CARGA DE CUPONS FISCAIS
+
+
+            Código: [b              ]
+         Descrição: [b1                       ]
+ Serie Nota Fiscal: [c  ]
+  Cód.Nat.Operação: [d      ] [d1                            ]
+    Cond.Pagamento: [e   ] [e1                            ]
+ Cód.Tipo Carteira: [f ] [f1             ]
+       Cód.Cliente: [g              ] [g1                                 ]
+ Cód.Transpordador: [h              ] [h1                                 ]
+         
+        Finalidade: [j                        ]
+        
+        
+         Cód.Texto: [l  ] [l1                                             ]
+             Moeda: [n  ] [n1               ]
+    Asist. Técnica: [m         ]
+         Expedição: [o         ]
+             
+	
+}         
+
+END
+
+ATTRIBUTES
+
+a0= FORMONLY.cod_empresa,				NOENTRY;
+b	= FORMONLY.cod_param,					UPSHIFT,	AUTONEXT;
+b1= FORMONLY.den_param,					UPSHIFT,	AUTONEXT;
+c	= FORMONLY.ser_nff,						UPSHIFT,	AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+d	= FORMONLY.cod_nat_oper,			UPSHIFT,	AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+d1= FORMONLY.den_nat_oper,			UPSHIFT,	NOENTRY;
+e	= FORMONLY.cod_cnd_pgto,			UPSHIFT,	AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+e1= FORMONLY.den_cnd_pgto,			UPSHIFT,	NOENTRY;
+f	= FORMONLY.cod_tip_carteira,	UPSHIFT,	AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+f1= FORMONLY.den_tip_carteira,	UPSHIFT,	NOENTRY;
+g	= FORMONLY.cod_cliente,				UPSHIFT,	AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+g1= FORMONLY.nom_cliente,				UPSHIFT,	NOENTRY;
+h	= FORMONLY.cod_transportador,	UPSHIFT,	AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+h1= FORMONLY.nom_transp,				UPSHIFT,	NOENTRY;
+j	= FORMONLY.ies_finalidade 		TYPE CHAR, INCLUDE=('1','2','3'),AUTONEXT 
+--#, widget='RADIO', config='1 CONTRIBUINTE 2 NÃO-CONTRIBUINTE 3 CONTRIBUINTE-USO';
+l	= FORMONLY.cod_texto,					UPSHIFT,	AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+l1= FORMONLY.des_texto,					UPSHIFT,	NOENTRY;
+n = FORMONLY.cod_moeda,					UPSHIFT,	AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+n1= FORMONLY.den_moeda,					UPSHIFT,	NOENTRY;
+m = FORMONLY.cod_local,					UPSHIFT,	AUTONEXT;
+o = FORMONLY.cod_local1,				UPSHIFT,	AUTONEXT;
+END
+

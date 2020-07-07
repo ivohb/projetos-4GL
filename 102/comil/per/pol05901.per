@@ -1,0 +1,30 @@
+DATABASE logix
+SCREEN
+{
+ Tipo         Descricao Analise
+ ----   ------------------------------
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+ [a  ] [b                             ]
+}
+END
+TABLES
+   it_analise_comil   
+END
+
+ATTRIBUTES
+   a = it_analise_comil.tip_analise, NOENTRY;
+   b = it_analise_comil.den_analise, NOENTRY;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_analise[10] (it_analise_comil.tip_analise,
+                                 it_analise_comil.den_analise);
+END 

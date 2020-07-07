@@ -1,0 +1,30 @@
+DATABASE logix
+
+SCREEN
+{
+-----------------------------------------------------------------
+[b0]              EMITE RELATORIO DE ITENS EM APONTAMENTO
+
+ 
+
+       Referencia             : [b1        ]                                  
+
+
+       Nr. da versao do custo : [b2   ]
+
+ 
+}   
+
+END
+
+TABLES
+apo_cairu,   
+cent_cust_comp
+END
+
+attributes
+b0   = formonly.cod_empresa, NOENTRY;
+b1   = apo_cairu.dat_referencia      , UPSHIFT, AUTONEXT; 
+b2   = cent_cust_comp.num_versao_cus   , UPSHIFT, AUTONEXT; 
+
+END  

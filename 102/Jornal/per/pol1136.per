@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                     IMPORTAÇÃO DE NOTA FISCAL
+
+
+
+                         Data: [b         ]
+ 
+                         Hora: [c    ]
+                              
+                                Arquivos textos
+                        [d                             ]
+
+                        [e                             ]
+
+                        [f                             ]
+
+
+
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY; 
+   b = FORMONLY.data,				 UPSHIFT, AUTONEXT,
+		   COMMENTS = "Informar data da geração do arquivo texto"; 
+   c = FORMONLY.hora, 			 UPSHIFT, AUTONEXT, picture = '##:##',
+		   COMMENTS = "Informar hora da geração do arquivo texto"; 
+   d = FORMONLY.arq_meste,   NOENTRY;
+   e = FORMONLY.arq_itens,   NOENTRY;
+   f = FORMONLY.arq_cli,   NOENTRY;
+END 

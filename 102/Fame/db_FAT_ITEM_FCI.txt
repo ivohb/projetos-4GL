@@ -1,0 +1,13 @@
+
+create table fat_item_fci 
+  (
+    empresa char(2) not null ,
+    trans_nota_fiscal integer not null ,
+    seq_item_nf integer not null ,
+    trans_controle_fci integer not null ,
+    origem_fci char(1) not null ,
+    qtd_item_fci decimal(17,6) not null ,
+    primary key 
+     (empresa,trans_nota_fiscal,seq_item_nf,trans_controle_fci)
+  );
+

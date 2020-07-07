@@ -1,0 +1,41 @@
+DATABASE formonly
+
+SCREEN
+{
+------------------------------------------------------------------------------
+              CONSULTA ERROS DA IMPORTAÇÃO SISTEMA EGA P/ LOGIX
+
+    Ordem   Oper.  Seq                      Mensagem
+ ---------  -----  ---  ---------------------------------------------------
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+[a1       ][a2   ][a3 ][a4                                                 ]
+}
+
+END
+
+ATTRIBUTES
+
+a1 = FORMONLY.num_ordem;
+a2 = FORMONLY.cod_operac,      UPSHIFT;
+a3 = FORMONLY.seq_operac;
+a4 = FORMONLY.msg,             UPSHIFT;
+
+END
+
+INSTRUCTIONS
+
+   SCREEN RECORD s_erro[10](FORMONLY.num_ordem,
+                            FORMONLY.cod_operac,
+                            FORMONLY.seq_operac,
+                            FORMONLY.msg);
+                            
+
+END

@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN
+{
+              OPERAÇÕES DISPONÍVEIS
+----------------------------------------------------
+  Código            Descrição                  E/S
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+  [a   ]  [b                                ]  [c]
+    
+}
+
+END
+
+ATTRIBUTES
+  a = FORMONLY.cod_operacao;
+  b = FORMONLY.Den_operacao;
+  c = FORMONLY.ies_tipo;
+ 
+END 
+
+INSTRUCTIONS
+                     
+   SCREEN RECORD sr_operacao[10](cod_operacao THRU ies_tipo);
+                     
+END 

@@ -1,0 +1,121 @@
+create procedure pr_item_fornec
+(
+t_cod_empresa           char(02),
+t_cod_item              char(15),
+t_cod_fornecedor        char(15),
+t_operacao              char(01)
+)
+
+
+define id_linha         integer;
+define ctrl_esto        char(01);
+define ctrl_lote        char(01);
+
+set isolation to dirty read;
+
+select ies_ctr_estoque,
+       ies_ctr_lote
+  into ctrl_esto,
+       ctrl_lote
+  from item
+ where cod_empresa    = t_cod_empresa
+   and cod_item       = t_cod_item;
+
+if ctrl_esto = "S" and ctrl_lote = "S" then
+
+   --- fornecedor
+
+   select rowid
+     into id_linha
+     from fornecedor
+    where cod_fornecedor = t_cod_fornecedor;
+
+   insert
+     into log_transac_970
+   values ('fornecedor', id_linha, t_operacao,'0');
+
+
+   --- item_fornec
+
+   select rowid
+     into id_linha
+     from item_fornec
+    where cod_empresa    = t_cod_empresa
+      and cod_item       = t_cod_item
+      and cod_fornecedor = t_cod_fornecedor;
+
+   insert
+     into log_transac_970
+   values ('item_fornec', id_linha, t_operacao,'0');
+
+
+end if
+
+end procedure;
+
+
+create trigger tg_item_fornec_ins insert on item_fornec 
+   referencing new as new_rec for each row (
+        execute procedure pr_item_fornec(new_rec.cod_empresa,
+    new_rec.cod_item, new_rec.cod_fornecedor , 'I' ));
+
+create trigger tg_item_fornec_upd update on item_fornec 
+   referencing new as new_rec for each row (
+        execute procedure pr_item_fornec(new_rec.cod_empresa, 
+         new_rec.cod_item, new_rec.cod_fornecedor, 'U' ));
+
+
+
+
+create procedure proc_teste_ins
+(
+   t_codigo         char(02),
+)
+
+   define p_situacao  char(01);
+   set isolation to dirty read;
+
+   select situacao into p_situacao
+     from teste
+    where codigo = t_codigo;
+
+   if p_situacao = 'A' then
+
+      update teste
+         set situacao = 'I'
+       where codigo = t_codigo
+   end if
+
+end procedure;
+
+
+
+
+create procedure upd_teste
+(
+   t_codigo         char(02),
+   t_operacao       char(01)
+)
+
+   define p_situacao  char(01);
+   set isolation to dirty read;
+
+   select situacao into p_situacao
+     from teste
+    where codigo = t_codigo;
+
+   if t_operacao = 'I' and p_situacao = 'A' then
+
+      update teste
+         set situacao = 'I'
+       where codigo = t_codigo
+   end if
+
+   if t_operacao = 'A' and p_situacao = 'I' then
+
+      update teste
+         set situacao = 'A'
+       where codigo = t_codigo
+   end if
+
+end procedure;

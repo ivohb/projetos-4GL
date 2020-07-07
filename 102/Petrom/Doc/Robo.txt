@@ -1,0 +1,104 @@
+•	Integração Logix X Manutenção de Ativos (Protheus)
+
+Quando da abertura de um pedido de compra para atender a uma Manutenção, se informa no programa 
+MANUTENÇÃO DE ATIVOS no campo SERIE, o numero da OC do Logix.  O que se deseja é que ao chegar 
+a nota fiscal, selecionar pela ordem na tabela ORCAMENTO_DESP_NF, o valor da Ordem de compra e 
+gravar no Protheus, via Robô, atenção ao ler essa tabela além do item tem que buscar pelo numero 
+da OS do Protheus, pois tem mais de um item para mesmo AR porém para OSs do Protheus diferente, 
+no Protheus não achamos o campo de Centro de custo para saber qual valor usar. Isso para compras 
+de débito direto.   Para itens de Estoque, tem que pegar do custo médio da 
+tabela ITEM _CUSTO (mais atual) e gravar no Protheus, via Robô.
+
+No caso dos itens de estoque, já poderia trazer o custo da ITEM_CUSTO do Logix, quando se informa 
+o código do item ao invés de atualizar via Robô. 
+
+Ao informar na OS do Protheus um item de estoque, gerar no Logix um empenho de material ( SUP5740), 
+com a Origem tipo ‘O’ de Manutenção de Ativos.
+
+Hoje são utilizados os comandos abaixo para fazer essa integração. 
+
+-- cria conexão entre logix/protheus
+
+-- create database link DB_protheus
+-- connect to protheus identified by pr0th3u5
+-- using 'P11PRD' 
+
+spool l:\prd\fechamento\scripts\mnt_logix.log;
+
+Desenvolvimento em 4GL – Robô Logix:
+
+Carregar todos os itens que controlam estoque no Logix e realizar os updates abaixo no banco do Protheus  
+item a item (Instância do banco de dados separada do Logix):
+
+-- Grava ultimo custo medio calculado na tabela de cadastro de item protheus
+
+para itens logix que não sejam serviço
+
+update SB2010@db_protheus
+   set B2_CM1 = 
+     nvl((Select CUS_UNIT_MEDIO From LOGIX.ITEM_CUSTO 
+           where SB2010.b2_cod = item_custo.cod_item 
+             and SB2010.b2_filial = item_custo.cod_empresa),0)
+ where SB2010.B2_CM1 = 0  
+   and SB2010.B2_cod <> '700001000'; -- acrescentar tab item.ies_ctr_estoq = 'S'
+   
+   crar cadasstro de grupos de ctr est de itens de serviço
+
+-- Grava ultimo custo medio calculado na tabela de OS protheus (custo de manutenção)
+
+update STL010@db_protheus
+   set tl_custo = 
+      nvl((Select CUS_UNIT_MEDIO * stl010.TL_QUANTID
+            From LOGIX.ITEM_CUSTO 
+            where stl010.tl_codigo = item_custo.cod_item 
+              and stl010.tl_filial = item_custo.cod_empresa),0)
+ where stl010.TL_TIPOREG='P'   
+   and stl010.tl_codigo <> '700001000';   
+
+
+--- valorização servicos da OC logix para manutenção de ativos protheus
+
+
+------- zera custo previsto para serviços
+
+Carregar todos os itens no Protheus que são serviço (tipo SV), após carregar todos os itens 
+realizar o updates abaixo:
+
+pegar do logix os itens de serviço e zerar tl_custo do protheus
+
+update STL010@db_protheus
+   set tl_custo = 0
+ where stl010.TL_TIPOREG = 'P' 
+   and STL010.tl_codigo = '700001000' tirar esse filtro.
+   and stl010.TL_SEQRELA = 0 ;
+
+
+
+para serviço
+update STL010@db_protheus
+   set tl_custo = 
+     nvl((select round(sum(D.val_oc * stl010.TL_QUANTID),2)
+            from  orcamento_desp_nf D
+           where D.cod_empresa = stl010.tl_filial 
+             and D.num_oc = stl010.tl_numseri 
+             and D.num_docum = stl010.tl_ordem),0)
+ where stl010.TL_TIPOREG = 'P'  
+   and stl010.tl_numseri > '0'  
+   
+ select * FROM P11PRD@zz2010
+para não serviço
+
+update STL010@db_protheus
+   set tl_custo = 
+     nvl((select round(sum(D.val_oc * stl010.TL_QUANTID),2)
+            from  orcamento_desp_nf D
+           where D.cod_empresa = stl010.tl_filial 
+             and D.num_oc = stl010.tl_numseri 
+             and D.num_docum = stl010.tl_ordem),0)
+ where stl010.TL_TIPOREG = 'P'  
+   and stl010.tl_numseri > '0'  
+   and stl010.tl_custo = 0 ;
+
+commit;
+spool off;
+

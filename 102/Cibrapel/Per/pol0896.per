@@ -1,0 +1,51 @@
+DATABASE FORMONLY 
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                       APARAS - LANÇAMENTO DE PESOS 
+
+  Num AR:[b      ] Status:[h] Autorizado:[i] NF:[c     ] Entrada:[d         ] 
+  Fornec:[f              ][g                                                ]
+                                                                     <Enter>  
+    Seq      Item                      Descrição                      Edita
+   [m |n              |o                                             ] [q]
+   [m |n              |o                                             ] [q]
+   [m |n              |o                                             ] [q]
+   [m |n              |o                                             ] [q]
+   [m |n              |o                                             ] [q]
+                                     Lote        Qtd Fardo   Peso Balança
+                              [r              ] [s        ] [t           ]
+                              [r              ] [s        ] [t           ]
+                              [r              ] [s        ] [t           ]
+                              [r              ] [s        ] [t           ]
+                              [r              ] [s        ] [t           ]
+                                                     Total:[x            ]
+                 
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,    NOENTRY;
+ b = FORMONLY.num_aviso_rec,  AUTONEXT;
+ c = FORMONLY.num_nf,         NOENTRY, REVERSE;
+ d = FORMONLY.dat_entrada,    NOENTRY, REVERSE;
+ f = FORMONLY.cod_fornecedor, NOENTRY, REVERSE;
+ g = FORMONLY.nom_fornecedor, NOENTRY, REVERSE;
+ h = FORMONLY.cod_status,     NOENTRY, UPSHIFT;
+ i = FORMONLY.ies_autorizado, NOENTRY, UPSHIFT;
+ m = FORMONLY.num_seq,        NOENTRY, REVERSE;
+ n = FORMONLY.cod_item,       NOENTRY, REVERSE;
+ o = FORMONLY.den_item,       NOENTRY, REVERSE;
+ #p = FORMONLY.qtd_nf,         NOENTRY, REVERSE;
+ q = FORMONLY.editar,         AUTONEXT, 
+     COMMENTS = '<Enter> Editar Lotes';
+ r = FORMONLY.num_lote,      NOENTRY, REVERSE   --#,OPTIONS='-nolist';
+ s = FORMONLY.qtd_fardo,     NOENTRY, REVERSE   --#,OPTIONS='-nolist';
+ t = FORMONLY.qtd_contagem,  AUTONEXT, UPSHIFT  --#,OPTIONS='-nolist';
+ x = FORMONLY.peso_total,    NOENTRY, REVERSE;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[05] (num_seq THRU editar);
+   SCREEN RECORD sr_lote[05] (num_lote THRU qtd_contagem);
+END

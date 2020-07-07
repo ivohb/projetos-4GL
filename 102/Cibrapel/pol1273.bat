@@ -1,0 +1,1 @@
+\\10.10.0.7\Logix10\TotvsSmartclient.exe -M -Q -P=pol1273.4GL -A=02 -C=tcp -E=prd

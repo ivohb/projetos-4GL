@@ -1,0 +1,38 @@
+DATABASE logix
+SCREEN
+{
+[a ]                     TEXTO DO PEDIDO DE COMPRA
+----------------------------------------------------------------------------
+        Pedido:[b      ]      Versão:[c ]      Emissão:[d         ]
+----------------------------------------------------------------------------
+Seq  Texto
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+[q ] [r                                                             ]                          
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, NOENTRY;
+ b = FORMONLY.num_pedido,  NOENTRY;
+ c = FORMONLY.num_versao,  NOENTRY;
+ d = FORMONLY.dat_emis,    NOENTRY;
+ q = FORMONLY.num_seq,     NOENTRY;
+ r = FORMONLY.texto,       NOENTRY, UPSHIFT;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_texto[15](num_seq THRU texto);
+END 
+

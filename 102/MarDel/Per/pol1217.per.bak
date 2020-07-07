@@ -1,0 +1,37 @@
+DATABASE FORMONLY
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                     EGA - PEÇA CICLO E CICLO PEÇA
+
+
+             Cód item:[b              ] [c                                ]
+             
+             Operação:[f    ] [g                           ]
+                       
+         Seq Operação:[h  ]
+             
+      Ciclos por peça:[d      ]
+             
+      Peças por ciclo:[e      ]
+
+
+
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.cod_item, UPSHIFT, AUTONEXT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   c = FORMONLY.den_item, NOENTRY;
+   f = FORMONLY.cod_operac, UPSHIFT, AUTONEXT
+       --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   g = FORMONLY.den_operac, NOENTRY; 
+   h = FORMONLY.num_seq_operac, NOENTRY;
+   
+   d = FORMONLY.qtd_ciclo_peca, UPSHIFT, AUTONEXT;
+   e = FORMONLY.qtd_peca_ciclo, UPSHIFT, AUTONEXT;
+   
+ 	 
+END 

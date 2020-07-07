@@ -1,0 +1,30 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------
+      RELAÇÃO DE CHEQUES UTILIZADOS PARA PAGAMENTOS DE AD's           
+
+ Fornecedor:[a1             ][a2                                 ]
+ Data pgto :[a3        ] a [a4        ]
+ Num AD    :[a5    ]  Emp.:[a6]  
+ Qtd Copias:[a]
+
+}
+TABLES
+fornecedor
+END
+ATTRIBUTES
+a1  = FORMONLY.cod_fornecedor, UPSHIFT, AUTONEXT,
+      COMMENTS = "Digite o Codigo do Fornecedor";
+a2  = fornecedor.raz_social, UPSHIFT, NOENTRY; 
+a3  = FORMONLY.data_de, AUTONEXT,
+      COMMENTS = "Digite a Data Inicial de Pagto";
+a4  = FORMONLY.data_ate, AUTONEXT,
+      COMMENTS = "Digite a Data Final de Pagto";
+a5  = FORMONLY.num_ad, AUTONEXT,
+      COMMENTS = "Digite o Numero da AD";
+a6  = FORMONLY.cod_empresa_ad, UPSHIFT, AUTONEXT,
+      COMMENTS = "Digite o Codigo da Empresa";
+a   = FORMONLY.qtd_copias TYPE SMALLINT,
+      COMMENTS = "Digite a Qtde de Copias";
+END

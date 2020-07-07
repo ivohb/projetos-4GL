@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                     USUÁRIOS PARA EMAIL NA ABERTURA DE OS
+
+  
+
+            Cód Usuário:[b       ]  [c                                  ]
+            
+             Tipo de OS:[d]   
+                      
+
+
+
+
+
+
+
+
+
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,       UPSHIFT, NOENTRY;
+
+ b = FORMONLY.nom_usuario,   AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ c = FORMONLY.nom_funcionario,   UPSHIFT, NOENTRY;
+
+ d = FORMONLY.ies_tip_os, AUTONEXT, UPSHIFT;
+END
+

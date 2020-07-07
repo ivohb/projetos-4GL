@@ -1,0 +1,35 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------
+[a0]                 TRANSFERENCIA DE ADIANTAMENTO
+
+Num. AD      :[a1    ]    Ser. N.F. :[a2]    SSr N.F. :[a3]
+ 
+Fornec. Ad.  :[a4             ][a5                                      ]
+
+Valor Adiant.:[a6              ] 
+
+Fornec. N.F. :[a7             ][a8                                      ]
+
+}   
+
+END
+
+TABLES
+adiant,
+fornecedor
+END
+
+attributes
+a0   = adiant.cod_empresa, NOENTRY;  
+a1   = formonly.p_num_ad_nf_orig, UPSHIFT, AUTONEXT;    
+a2   = formonly.p_ser_nf, UPSHIFT, AUTONEXT;    
+a3   = formonly.p_ssr_nf, UPSHIFT, AUTONEXT;    
+a4   = formonly.cod_for_ad, NOENTRY; 
+a5   = formonly.nom_for_ad, NOENTRY; 
+a6   = formonly.val_adiant, NOENTRY;    
+a7   = formonly.cod_for_nf,  UPSHIFT, AUTONEXT; 
+a8   = formonly.nom_for_nf,  UPSHIFT, AUTONEXT;
+END

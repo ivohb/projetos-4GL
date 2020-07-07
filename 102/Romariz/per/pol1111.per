@@ -1,0 +1,43 @@
+DATABASE logix
+SCREEN
+{ 
+------------------------------------------------------------------------------
+ [a0]                           TIPOS DE ANÁLISE                     
+                                                                              
+                                                                             
+                                                                            
+        Tipo Análise: [a1    ]                            Por validade:[b]
+                                                                             
+ Descrição Português: [a2                                                ]    
+                                                                            
+    Descrição Inglês: [a3                                                ]      
+                                                                          
+  Descrição Espanhol: [a4                                                ]                                                                               
+                                                                        
+ Imprime texto do resultado:[c]  
+ 
+ Obrigatória para liberação:[d]  
+                                                                    
+                                                                   
+                                                                                                                                 
+}   
+END
+
+TABLES
+it_analise_915
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa, UPSHIFT,  NOENTRY;
+a1 = it_analise_915.tip_analise,  NOENTRY,
+     COMMENTS = "Digite o Tipo da Análise.";
+ b = it_analise_915.ies_validade, UPSHIFT, AUTONEXT, COMMENTS = "S=Sim N=Não";
+a2 = it_analise_915.den_analise_port,  AUTONEXT, 
+     COMMENTS = "Digite a Descrição da análise em português.";
+a3 = it_analise_915.den_analise_ing,   AUTONEXT,     
+     COMMENTS = "Digite a Descrição da análise em inglês";
+a4 = it_analise_915.den_analise_esp,   AUTONEXT,      
+     COMMENTS = "Digite a Descrição da análise em espanhol";
+ c = it_analise_915.ies_texto, UPSHIFT, AUTONEXT, COMMENTS = "S=Sim N=Não";
+ d = it_analise_915.ies_obrigatoria, UPSHIFT, AUTONEXT, COMMENTS = "S=Sim N=Não";
+END

@@ -1,0 +1,38 @@
+Group pol0451
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=4
+         File \Projetos\4GL\102\Itaesbra\4gl\pol0451.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Itaesbra\per\pol0451.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Itaesbra\per\pol04511.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Itaesbra\per\pol04512.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

@@ -1,0 +1,31 @@
+pol0312.4gl	Manutenção da tabela IT_ANALISE_PETROM - Emissor do Laudo de Análise
+pol0337.4gl	Manutenção da Tabela ITEM_PETROM
+pol0313.4gl	Manutenção da tabela ESPECIFIC_PETROM - Emissor do Laudo de Análise
+pol0322.4gl	Manutenção da tabela Tipo Caracter Petrom - Emissor do Laudo de Análise
+pol0320.4gl	Manutenção da tabela de parâmetros de Impressão dos Laudos
+pol0315.4gl	Cadastro dos resultados das análises - Emissor do Laudo de Análise
+pol0323.4gl	Programa para preparar a impressão do Laudo e escolher as PA's p/ média
+pol0324.4gl	 DESBLOQUEAR LAUDOS 
+pol0422.4gl	Manutenção da Tabela laudo_usu_petrom
+
+Na adaptação do modulo de controle de qualidade da petrom para permitir a análise 
+de materia prima, será necessário alterar 4 programas:
+
+- pol0337 - cadastro de itens petrom
+  Criar nesse programa um flag para identificar se o item é de entrada ou saida
+
+- pol0313 - especificações
+  Esse programa permite hoje cadastrar especificações padrões e por cliente. Temos
+  que criar a op~]ao de cadastrar as especificações por fornecedor.
+
+- pol0320 - parâmetros para impressão do laudo
+  Esse programa permite hoje cadastrar parâmetros padrões e por cliente. Temos
+  que criar a op~]ao de cadastrar parâmetros por fornecedor.
+
+- pol0323 - geração do laudo
+  Esse programa permite hoje criar laudo para nota de saida oiu romaneio. Temos que criar 
+  a opção para criar laudo para nota de saida. Como a nota de saida não existira, as consis-
+  tencias que o progama faz para laudo de saida não poderão ser feitas, ou seja, o usuario
+  irá informar a nota de saida, o fornecedor e o item e, dessas 3 informações, a unica que
+  poderá ser consistida é o item que deve estar no cadostro do pol0337.
+  

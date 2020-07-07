@@ -1,0 +1,33 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------
+                         ITENS CORRESPONDENTES                        
+
+ 
+Item Pedido: [a1             ] 
+
+Item Nota  : [a2             ] 
+     
+Qtde Pedid.: [a3             ]     
+
+Qtde Nota  : [a4             ]
+ 
+
+}   
+
+END
+
+TABLES
+item_corresp 
+END
+
+attributes
+a1   = item_corresp.cod_item_ped, UPSHIFT, AUTONEXT  
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";  
+a2   = item_corresp.cod_item_nf, UPSHIFT, AUTONEXT  
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";  
+a3   = qtd_item_ped, UPSHIFT, AUTONEXT;    
+a4   = qtd_item_nf, UPSHIFT, AUTONEXT;    
+END  

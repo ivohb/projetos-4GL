@@ -1,0 +1,32 @@
+DATABASE logix
+SCREEN
+{
+                    ITENS DE ORDEM DE MONTAGEM                     
+
+ Pedido  Seq  Cod Item         Descricao           U.M.      Qtd Reserv
+ ------  ---  ---------------  ------------------  ----      ----------
+[a1    ][a2 ][a3             ][a4                ][a5 ][a6             ]
+[a1    ][a2 ][a3             ][a4                ][a5 ][a6             ]
+[a1    ][a2 ][a3             ][a4                ][a5 ][a6             ]
+[a1    ][a2 ][a3             ][a4                ][a5 ][a6             ]
+[a1    ][a2 ][a3             ][a4                ][a5 ][a6             ]
+[a1    ][a2 ][a3             ][a4                ][a5 ][a6             ]
+[a1    ][a2 ][a3             ][a4                ][a5 ][a6             ]
+[a1    ][a2 ][a3             ][a4                ][a5 ][a6             ]
+}
+END
+TABLES
+ordem_montag_item
+END
+ATTRIBUTES
+a1 = ordem_montag_item.num_pedido, AUTONEXT;
+a2 = ordem_montag_item.num_sequencia, NOENTRY; 
+a3 = ordem_montag_item.cod_item, NOENTRY;
+a4 = FORMONLY.den_item TYPE CHAR, UPSHIFT, NOENTRY; 
+a5 = FORMONLY.cod_unid_med TYPE CHAR, UPSHIFT, NOENTRY; 
+a6 = ordem_montag_item.qtd_reservada, NOENTRY; 
+END
+INSTRUCTIONS
+DELIMITERS " " 
+screen record s_montag_item[8] (num_pedido THRU qtd_reservada);
+END

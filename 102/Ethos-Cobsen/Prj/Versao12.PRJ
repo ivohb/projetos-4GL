@@ -1,0 +1,95 @@
+Group Versao12
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Novo Projeto
+      FoldersCount=2
+      Folder Fontes
+         VSSPath=Fontes
+         FilesCount=23
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol1186.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol1140.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol0961.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol1090.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol1088.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol0873.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol0360.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol0359.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\4GL\pol0289.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol0289.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol0359.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol0360.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol0873.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol0961.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol1088.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol1090.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol1140.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol1186.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol11401.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol11402.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol11403.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol11404.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Ethos-Cobsen\per\pol11405.per
+             Type=T
+         End
+      End
+      Folder Definições
+         VSSPath=Definições
+         FilesCount=0
+      End
+   End
+End

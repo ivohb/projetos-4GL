@@ -1,0 +1,35 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                          CADASTRO DE PERGUNTAS
+  
+
+
+                Código:[b    ]
+
+             Descrição:[c                                        ]
+            
+                  Tipo:[d           ]
+
+
+                  Peso:[e    ]   Valor comparativo:[f            ]
+
+                             Condição para debitar:[g ]
+
+
+
+}
+
+
+ATTRIBUTES
+  a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+  b = FORMONLY.cod_pergunta, UPSHIFT, AUTONEXT;
+  c = FORMONLY.descricao, UPSHIFT, AUTONEXT;
+  d = FORMONLY.tipo  TYPE CHAR, INCLUDE=('R','C')
+      --#, widget='RADIO', config='R Respondida C Calculada'; 
+  e = FORMONLY.pct_peso, UPSHIFT, AUTONEXT;
+  f = FORMONLY.val_comparativo, UPSHIFT, AUTONEXT;
+  g = FORMONLY.condicao_debitar, UPSHIFT, AUTONEXT
+      --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+END

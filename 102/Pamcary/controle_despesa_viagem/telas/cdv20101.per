@@ -1,0 +1,68 @@
+DATABASE FORMONLY
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]                         CONSULTA VIAGENS
+      Viajante: [a1                                ] Saldo geral: [a2        ]
+
+ Emp  Viagem  Stat   Valor      Dat prev   Dat pgto     Despesas    Créditos
+ [a3][a4    ][a5 ][a6        ][a7        ][a8        ][a10       ][a9        ]
+    Controle: [a11      ] TD: [b                     ]Saldo viag: [b1        ]
+Cliente aten: [b2                       ] Viag/contr receb: [b3  ][b4        ]
+ Cliente fat: [c2                       ]Dat par/ret: [c3        ][c4        ]
+
+ [a3][a4    ][a5 ][a6        ][a7        ][a8        ][a10       ][a9        ]
+    Controle: [a11      ] TD: [b                     ]Saldo viag: [b1        ]
+Cliente aten: [b2                       ] Viag/contr receb: [b3  ][b4        ]
+ Cliente fat: [c2                       ]Dat par/ret: [c3        ][c4        ]
+
+ [a3][a4    ][a5 ][a6        ][a7        ][a8        ][a10       ][a9        ]
+    Controle: [a11      ] TD: [b                     ]Saldo viag: [b1        ]
+Cliente aten: [b2                       ] Viag/contr receb: [b3  ][b4        ]
+ Cliente fat: [c2                       ]Dat par/ret: [c3        ][c4        ]
+}
+END
+
+ATTRIBUTES
+a0  = FORMONLY.cod_empresa,  NOENTRY;
+a1  = FORMONLY.viajante, NOENTRY;
+a2  = formonly.saldo_geral, NOENTRY;
+a3  = FORMONLY.empresa, NOENTRY;
+a4  = FORMONLY.viagem, NOENTRY;
+a5  = formonly.status, NOENTRY;
+a6  = FORMONLY.valor, NOENTRY;
+a7  = formonly.dat_prev, NOENTRY;
+a8  = formonly.dat_pagto, NOENTRY;
+a9  = formonly.creditos, NOENTRY;
+a10 = formonly.despesas, NOENTRY;
+a11 = FORMONLY.controle TYPE DECIMAL, NOENTRY;
+b   = FORMONLY.td TYPE CHAR, NOENTRY;
+b1  = formonly.saldo_viag TYPE DECIMAL, NOENTRY;
+b2  = formonly.cliente_aten TYPE CHAR, NOENTRY;
+b3  = formonly.viagem_receb TYPE INTEGER, NOENTRY;
+b4  = formonly.controle_receb TYPE DECIMAL, NOENTRY;
+c2  = formonly.cliente_faturar TYPE CHAR, NOENTRY;
+c3  = formonly.dat_partida TYPE DATE, NOENTRY;
+c4  = formonly.dat_retorno TYPE DATE, NOENTRY;
+END
+
+INSTRUCTIONS
+  SCREEN RECORD sr_cdv2010[03] (empresa,
+                                viagem,
+                                status,
+                                valor,
+                                dat_prev,
+                                dat_pagto,
+                                creditos,
+                                despesas,
+                                controle,
+                                td,
+                                saldo_viag,
+                                cliente_aten,
+                                viagem_receb,
+                                controle_receb,
+                                cliente_faturar,
+                                dat_partida,
+                                dat_retorno)
+END
+

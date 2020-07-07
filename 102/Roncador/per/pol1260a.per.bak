@@ -1,0 +1,41 @@
+DATABASE logix
+SCREEN
+{
+-------------------------------------------------------------------------
+                     PARÂMETROS PARA PESQUISA
+                          
+                  
+ 
+ Nota fiscal:[b             ]  Emissão:[c         ] Entrada:[d         ]
+     
+      
+Fornecedor:[e              ]  [f                                       ]                                                        
+
+    Num AR:[g        ]       Num Nota:[h        ]        Série:[i  ]   
+      
+ Sub série:[j  ]              Espécie:[k  ]               
+      
+      
+                   
+}
+
+END
+
+
+ATTRIBUTES
+ 
+  b = FORMONLY.ies_nota TYPE CHAR, INCLUDE=('T','R')
+      --#, widget='RADIO', config='T Em-trânsito R Recebida'; 
+  c = FORMONLY.dat_emis_nf, FORMAT = 'dd/mm/yyyy', AUTONEXT;
+  d = FORMONLY.dat_entrada_nf, AUTONEXT;
+  e = FORMONLY.cod_fornecedor
+      --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+  f = FORMONLY.raz_social, NOENTRY;  
+  g = FORMONLY.num_aviso_rec;
+  h = FORMONLY.num_nf;
+  i = FORMONLY.ser_nf;
+  j = FORMONLY.ssr_nf;
+  k = FORMONLY.ies_especie_nf;
+
+END 
+

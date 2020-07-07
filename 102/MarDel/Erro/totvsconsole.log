@@ -1,0 +1,3671 @@
+
+DECLARE
+ SELECT DISTINCT T.AREA_APLICACAO, T.SISTEMA, T.COD_PROCESSO, T.DEN_TRANSACAO, T.COD_NIVEL_1, T.COD_NIVEL_2, T.COD_NIVEL_3 FROM ##000126T_MENU_USUARIO T  WHERE T.NOME_PESQUISA LIKE __QUESTION_MARK__ AND COD_PROCESSO!=' ' ORDER BY 1, 2, 5, 6, 7
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=378 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_SEARCH_PROGS
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT DISTINCT T.AREA_APLICACAO, T.SISTEMA, T.COD_PROCESSO, T.DEN_TRANSACAO, T.COD_NIVEL_1, T.COD_NIVEL_2, T.COD_NIVEL_3 FROM ##000126T_MENU_USUARIO T  WHERE T.NOME_PESQUISA LIKE ? AND COD_PROCESSO!=' ' ORDER BY 1, 2, 5, 6, 7
+  COMMAND:SELECT DISTINCT T.AREA_APLICACAO, T.SISTEMA, T.COD_PROCESSO, T.DEN_TRANSACAO, T.COD_NIVEL_1, T.COD_NIVEL_2, T.COD_NIVEL_3 FROM ##000126T_MENU_USUARIO T  WHERE T.NOME_PESQUISA LIKE ? AND COD_PROCESSO!=' ' ORDER BY 1, 2, 5, 6, 7
+
+  4gl source: MENULOGIX.4GL  line=378 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_SEARCH_PROGS
+  NAME_sql:cu0
+  COMMAND:SELECT DISTINCT T.AREA_APLICACAO, T.SISTEMA, T.COD_PROCESSO, T.DEN_TRANSACAO, T.COD_NIVEL_1, T.COD_NIVEL_2, T.COD_NIVEL_3 FROM ##000126T_MENU_USUARIO T  WHERE T.NOME_PESQUISA LIKE ? AND COD_PROCESSO!=' ' ORDER BY 1, 2, 5, 6, 7
+
+OPEN 
+  Trace - Running time [0.016]
+  4gl source: MENULOGIX.4GL  line=396 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:MENULOGIX.CQ_SEARCH_PROGS
+  NAME_sql:cu0
+  COMMAND:SELECT DISTINCT T.AREA_APLICACAO, T.SISTEMA, T.COD_PROCESSO, T.DEN_TRANSACAO, T.COD_NIVEL_1, T.COD_NIVEL_2, T.COD_NIVEL_3 FROM ##000126T_MENU_USUARIO T  WHERE T.NOME_PESQUISA LIKE ? AND COD_PROCESSO!=' ' ORDER BY 1, 2, 5, 6, 7
+  USE:1
+    t:            CHAR(150) v:'%pol1176%                                                                                                                                             '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=396 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_SEARCH_PROGS
+  NAME_sql:cu0
+  COMMAND:
+  INTO:7
+    t:              INTEGER v:1
+    t:              INTEGER v:1
+    t:             CHAR(15) v:'POL1176        '
+    t:             CHAR(50) v:'EXPORTA PPAP - INTEGRA«√O LOGIX X PROTHEUS        '
+    t:              INTEGER v:95
+    t:              INTEGER v:1
+    t:              INTEGER v:1
+
+translate: SELECT DEN_AREA_APLIC FROM AREA_APLICACAO  WHERE COD_AREA_APLIC=?
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: MENULOGIX.4GL  line=643 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_AREA_APLIC FROM AREA_APLICACAO  WHERE COD_AREA_APLIC=?
+  USE:1
+    t:              INTEGER v:1
+  INTO:1
+    t:             CHAR(20) v:'Admin. da produÁ„o  '
+
+translate: SELECT DEN_SISTEMA FROM SISTEMAS_LOGIX  WHERE COD_SISTEMA=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=661 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_SISTEMA FROM SISTEMAS_LOGIX  WHERE COD_SISTEMA=?
+  USE:1
+    t:              INTEGER v:1
+  INTO:1
+    t:             CHAR(25) v:'Engenharia               '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=396 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_SEARCH_PROGS
+  NAME_sql:cu0
+  COMMAND:SELECT DISTINCT T.AREA_APLICACAO, T.SISTEMA, T.COD_PROCESSO, T.DEN_TRANSACAO, T.COD_NIVEL_1, T.COD_NIVEL_2, T.COD_NIVEL_3 FROM ##000126T_MENU_USUARIO T  WHERE T.NOME_PESQUISA LIKE ? AND COD_PROCESSO!=' ' ORDER BY 1, 2, 5, 6, 7
+  INTO:7
+    t:              INTEGER v:NULL
+    t:              INTEGER v:NULL
+    t:             CHAR(15) v:'NULL'
+    t:             CHAR(50) v:'NULL'
+    t:              INTEGER v:NULL
+    t:              INTEGER v:NULL
+    t:              INTEGER v:NULL
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_SEARCH_PROGS
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_SEARCH_PROGS
+  NAME_sql:cu0
+  COMMAND:
+
+translate: SELECT DEN_AREA_APLIC FROM AREA_APLICACAO  WHERE COD_AREA_APLIC=?
+
+EXECUTE
+  Trace - Running time [0.015]
+  4gl source: MENULOGIX.4GL  line=643 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_AREA_APLIC FROM AREA_APLICACAO  WHERE COD_AREA_APLIC=?
+  USE:1
+    t:              INTEGER v:1
+  INTO:1
+    t:             CHAR(20) v:'Admin. da produÁ„o  '
+
+translate: SELECT DEN_SISTEMA FROM SISTEMAS_LOGIX  WHERE COD_SISTEMA=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=661 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_SISTEMA FROM SISTEMAS_LOGIX  WHERE COD_SISTEMA=?
+  USE:1
+    t:              INTEGER v:1
+  INTO:1
+    t:             CHAR(25) v:'Engenharia               '
+
+translate: SELECT DEN_TRANSACAO FROM MENU_LOGIX  WHERE COD_SISTEMA=? AND COD_NIVEL_1=? AND COD_NIVEL_2=? AND COD_NIVEL_3=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_TRANSACAO FROM MENU_LOGIX  WHERE COD_SISTEMA=? AND COD_NIVEL_1=? AND COD_NIVEL_2=? AND COD_NIVEL_3=?
+  USE:4
+    t:              INTEGER v:1
+    t:              INTEGER v:95
+    t:              INTEGER v:0
+    t:              INTEGER v:0
+  INTO:1
+    t:             CHAR(50) v:'INTEGRA«√O PPAP PROTHEUS                          '
+
+translate: SELECT DEN_TRANSACAO FROM MENU_LOGIX  WHERE COD_SISTEMA=? AND COD_NIVEL_1=? AND COD_NIVEL_2=? AND COD_NIVEL_3=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_TRANSACAO FROM MENU_LOGIX  WHERE COD_SISTEMA=? AND COD_NIVEL_1=? AND COD_NIVEL_2=? AND COD_NIVEL_3=?
+  USE:4
+    t:              INTEGER v:1
+    t:              INTEGER v:95
+    t:              INTEGER v:1
+    t:              INTEGER v:0
+  INTO:1
+    t:             CHAR(50) v:'PROGRAMAS DE INTEGRA«AO PPAP                      '
+
+translate: SELECT DEN_TRANSACAO FROM MENU_LOGIX  WHERE COD_SISTEMA=? AND COD_NIVEL_1=? AND COD_NIVEL_2=? AND COD_NIVEL_3=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_TRANSACAO FROM MENU_LOGIX  WHERE COD_SISTEMA=? AND COD_NIVEL_1=? AND COD_NIVEL_2=? AND COD_NIVEL_3=?
+  USE:4
+    t:              INTEGER v:1
+    t:              INTEGER v:95
+    t:              INTEGER v:1
+    t:              INTEGER v:1
+  INTO:1
+    t:             CHAR(50) v:'EXPORTA PPAP - INTEGRA«√O LOGIX X PROTHEUS        '
+
+translate: SELECT QTD_MAX_PROC_USU FROM LOG_USUARIOS_COMPL  WHERE USUARIO=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=2222 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT QTD_MAX_PROC_USU FROM LOG_USUARIOS_COMPL  WHERE USUARIO=?
+  USE:1
+    t:              CHAR(8) v:'bu750100'
+  INTO:1
+    t:              INTEGER v:99
+
+DECLARE
+  Trace - Running time [0.016]
+  4gl source: MENULOGIX.4GL  line=438 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_PROCESS
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT M.COD_PROCESSO,M.COD_TIP_PROCESSO,M.NUM_SEQUENCIA FROM MENU_LOGIX M  WHERE M.COD_SISTEMA=? AND M.COD_NIVEL_1=? AND M.COD_NIVEL_2=? AND M.COD_NIVEL_3=? ORDER BY M.NUM_SEQUENCIA
+  COMMAND:SELECT M.COD_PROCESSO, M.COD_TIP_PROCESSO, M.NUM_SEQUENCIA FROM MENU_LOGIX M  WHERE M.COD_SISTEMA=? AND M.COD_NIVEL_1=? AND M.COD_NIVEL_2=? AND M.COD_NIVEL_3=? ORDER BY M.NUM_SEQUENCIA
+
+  4gl source: MENULOGIX.4GL  line=438 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_PROCESS
+  NAME_sql:cu0
+  COMMAND:SELECT M.COD_PROCESSO, M.COD_TIP_PROCESSO, M.NUM_SEQUENCIA FROM MENU_LOGIX M  WHERE M.COD_SISTEMA=? AND M.COD_NIVEL_1=? AND M.COD_NIVEL_2=? AND M.COD_NIVEL_3=? ORDER BY M.NUM_SEQUENCIA
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=454 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:MENULOGIX.CQ_PROCESS
+  NAME_sql:cu0
+  COMMAND:SELECT M.COD_PROCESSO, M.COD_TIP_PROCESSO, M.NUM_SEQUENCIA FROM MENU_LOGIX M  WHERE M.COD_SISTEMA=? AND M.COD_NIVEL_1=? AND M.COD_NIVEL_2=? AND M.COD_NIVEL_3=? ORDER BY M.NUM_SEQUENCIA
+  USE:4
+    t:              INTEGER v:1
+    t:              INTEGER v:95
+    t:              INTEGER v:1
+    t:              INTEGER v:1
+
+FETCH
+[Thread 4676] Warning DB: TC_GetIsNull returned string with 3 characters and the number of variables is 2.
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=454 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_PROCESS
+  NAME_sql:cu0
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'pol1176        '
+    t:              INTEGER v:1
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=454 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_PROCESS
+  NAME_sql:cu0
+  COMMAND:SELECT M.COD_PROCESSO, M.COD_TIP_PROCESSO, M.NUM_SEQUENCIA FROM MENU_LOGIX M  WHERE M.COD_SISTEMA=? AND M.COD_NIVEL_1=? AND M.COD_NIVEL_2=? AND M.COD_NIVEL_3=? ORDER BY M.NUM_SEQUENCIA
+  INTO:2
+    t:             CHAR(15) v:'NULL'
+    t:              INTEGER v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_PROCESS
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: MENULOGIX.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:MENULOGIX.CQ_PROCESS
+  NAME_sql:cu0
+  COMMAND:
+
+[INFO ][SERVER] [18/12/2012 17:05:00] Iniciando Programa Run4GLProcess.4gl Thread 1948 (Manuel,MANUEL-PC)
+
+translate: ?
+
+EXECUTE
+STATUS:0
+COMMAND:DEFAULT
+
+TOTVSDbAccess Connected on Server [(local)] Database [MSSQL/logixtst] Port [7890] SID [117]
+4gl source: LOG0010.4GL  line=1278 
+
+translate: SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+PREPARE
+ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.016]
+  4gl source: LOG1400.4GL  line=232 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_QUERY
+  NAME_sql:cu0
+  NATIVE COMMAND:SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+  COMMAND:SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=233 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG1400.VAR_QUERY
+  NAME_sql:cu0
+  COMMAND:
+
+translate: SET ISOLATION TO DIRTY READ
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=235 
+  STATUS: -263   TRANSACTION:FALSE
+  NATIVE ERROR:   156 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]SINTAXE INCORRETA PRÛXIMA ‡ PALAVRA-CHAVE 'TO'.  COMMAND:SET ISOLATION TO DIRTY READ
+
+translate: SELECT NUM_CGC FROM EMPRESA  WHERE COD_EMPRESA=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LICLOGIX.4GL  line=270 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT NUM_CGC FROM EMPRESA  WHERE COD_EMPRESA=?
+  USE:1
+    t:              CHAR(2) v:'01'
+  INTO:1
+    t:             CHAR(20) v:'057.580.656/0001-48 '
+[Thread 1948] [LOGIX] [LICENSE] Obtendo licenÁa mÛdulo MANENG (5032) STATUS = 7 (ThreadID 4676 User bu750100 IP 192.168.0.4 Port 4318)
+
+translate: SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: LOG0150.4GL  line=72 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+  USE:1
+    t:             CHAR(50) v:'log_uso_recusa_licenca                            '
+
+translate: INSERT INTO LOG_USO_MODULO (MODULO, EMPRESA, DAT_USO, QTD_USO) VALUES(?, ?, ?, 1)
+  Trace - Running time [0.000]
+  4gl source: LOGUSO.4GL  line=0 
+  STATUS: -239   TRANSACTION:FALSE
+  NATIVE ERROR:  2627 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]VIOLAÁ„O DA RESTRIÁ„O PRIMARY KEY 'PK_LOG_USO_MODULO'. N„O È POSSÌVEL INSERIR A CHAVE DUPLICADA NO OBJETO 'LOGIX.LOG_USO_MODULO'. O VALOR DE CHAVE DUPLICADA È (DEZ 18 2012 12:00AM, MANENG  , 01).  COMMAND:INSERT INTO LOG_USO_MODULO (MODULO, EMPRESA, DAT_USO, QTD_USO) VALUES(?, ?, ?, 1)
+  USE:3
+    t:              CHAR(8) v:'MANENG  '
+    t:              CHAR(2) v:'01'
+    t:                 DATE v:18/12/2012                                                                                                                                                                                                                                                     
+
+translate: UPDATE LOG_USO_MODULO SET LOG_USO_MODULO.QTD_USO=LOG_USO_MODULO.QTD_USO+1 WHERE LOG_USO_MODULO.DAT_USO=? AND LOG_USO_MODULO.MODULO=? AND LOG_USO_MODULO.EMPRESA=?
+  Trace - Running time [0.000]
+  4gl source: LOGUSO.4GL  line=112 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:UPDATE LOG_USO_MODULO SET LOG_USO_MODULO.QTD_USO=LOG_USO_MODULO.QTD_USO+1 WHERE LOG_USO_MODULO.DAT_USO=? AND LOG_USO_MODULO.MODULO=? AND LOG_USO_MODULO.EMPRESA=?
+  USE:3
+    t:                 DATE v:18/12/2012                                                                                                                                                                                                                                                     
+    t:              CHAR(8) v:'MANENG  '
+    t:              CHAR(2) v:'01'
+
+translate: SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG0150.4GL  line=72 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+  USE:1
+    t:             CHAR(50) v:'log_dados_sessao_logix                            '
+
+translate: SELECT @@spid
+
+PREPARE
+ SELECT @@spid
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=457 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY3
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT @@spid
+  COMMAND:SELECT @@spid
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=465 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.015]
+  4gl source: LOG0010.4GL  line=467 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:SELECT @@spid
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=468 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+  INTO:1
+    t:              INTEGER v:117
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=483 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY4
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=491 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=493 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=494 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2012-12-18 17:06:28                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.016]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1776 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT SID,DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND ORIGEM=?
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND ORIGEM=?
+
+  4gl source: LOG0010.4GL  line=1776 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND ORIGEM=?
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1783 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND ORIGEM=?
+  USE:2
+    t:              CHAR(8) v:'NULL'
+    t:            CHAR(100) v:'MANUEL-PC:192.168.0.175                                                                             '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1783 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND ORIGEM=?
+  INTO:2
+    t:              INTEGER v:0
+    t:             DATETIME v:NULL
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:
+
+translate: CLOSE DATABASE
+
+EXECUTE
+STATUS:0
+COMMAND:CLOSE DATABASE
+[Thread 1948]Executando o Programa POL1176.4GL
+
+[INFO ][SERVER] [18/12/2012 17:05:02] Iniciando Programa POL1176.4GL Thread 1948 (Manuel,MANUEL-PC)
+
+translate: LOGIX102
+
+EXECUTE
+STATUS:0
+COMMAND:LOGIX102
+
+TOTVSDbAccess Connected on Server [(local)] Database [MSSQL/logixtst] Port [7890] SID [117]
+4gl source: POL1176.4GL  line=8 
+
+translate: SET ISOLATION TO DIRTY READ
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=263 
+  STATUS: -263   TRANSACTION:FALSE
+  NATIVE ERROR:   156 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]SINTAXE INCORRETA PRÛXIMA ‡ PALAVRA-CHAVE 'TO'.  COMMAND:SET ISOLATION TO DIRTY READ
+
+translate: SET LOCK MODE TO WAIT 300
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=264 
+  STATUS: -263   TRANSACTION:FALSE
+  NATIVE ERROR:   195 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]'LOCK' N„O È UM OPÁ„O SET RECONHECIDO.  COMMAND:SET LOCK MODE TO WAIT 300
+
+translate: SELECT COD_EMPRESA FROM EMPRESA  WHERE COD_EMPRESA=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=140 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COD_EMPRESA FROM EMPRESA  WHERE COD_EMPRESA=?
+  USE:1
+    t:              CHAR(2) v:'01'
+
+translate: SELECT SUBSTRING(PARAMETROS,77,2) FROM PAR_LOGIX  WHERE COD_EMPRESA=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=216 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT SUBSTRING(PARAMETROS,77,2) FROM PAR_LOGIX  WHERE COD_EMPRESA=?
+  USE:1
+    t:              CHAR(2) v:'01'
+  INTO:1
+    t:              CHAR(2) v:'  '
+
+translate: SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+PREPARE
+ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=232 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_QUERY
+  NAME_sql:cu0
+  NATIVE COMMAND:SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+  COMMAND:SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=233 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG1400.VAR_QUERY
+  NAME_sql:cu0
+  COMMAND:
+
+translate: SET ISOLATION TO DIRTY READ
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG1400.4GL  line=235 
+  STATUS: -263   TRANSACTION:FALSE
+  NATIVE ERROR:   156 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]SINTAXE INCORRETA PRÛXIMA ‡ PALAVRA-CHAVE 'TO'.  COMMAND:SET ISOLATION TO DIRTY READ
+
+translate: SELECT FORM_VERSION,FORM_RELEASE,FORM_MODIFICATION FROM FRM_FORM  WHERE FORM_NAME=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1946 
+  STATUS:  100 ROWS AFFECTED:0
+  COMMAND:SELECT FORM_VERSION,FORM_RELEASE,FORM_MODIFICATION FROM FRM_FORM  WHERE FORM_NAME=?
+  USE:1
+    t:             CHAR(15) v:'pol1176        '
+  INTO:3
+    t:              CHAR(2) v:'NULL'
+    t:              CHAR(2) v:'NULL'
+    t:             CHAR(10) v:'NULL'
+[Thread 1948] [LOGIX] AplicaÁ„o: POL1176 Vers„o: ?  Ult. ModificaÁ„o: 2012-12-19 13:19:00
+
+translate: SELECT COD_EMPRESA FROM EMPRESA  WHERE COD_EMPRESA=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=679 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COD_EMPRESA FROM EMPRESA  WHERE COD_EMPRESA=?
+  USE:1
+    t:              CHAR(2) v:'01'
+
+translate: SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG0150.4GL  line=72 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+  USE:1
+    t:             CHAR(50) v:'log_dados_sessao_logix                            '
+
+translate: SELECT @@spid
+
+PREPARE
+ SELECT @@spid
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=457 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY3
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT @@spid
+  COMMAND:SELECT @@spid
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=465 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=467 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:SELECT @@spid
+
+FETCH
+  Trace - Running time [0.015]
+  4gl source: LOG0010.4GL  line=468 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+  INTO:1
+    t:              INTEGER v:117
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=483 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY4
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=491 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=493 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=494 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2012-12-18 17:06:30                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+translate: SELECT @@spid
+
+PREPARE
+ SELECT @@spid
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.016]
+  4gl source: LOG0010.4GL  line=457 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY3
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT @@spid
+  COMMAND:SELECT @@spid
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=465 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=467 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:SELECT @@spid
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=468 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+  INTO:1
+    t:              INTEGER v:117
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu0
+  COMMAND:
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=483 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY4
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=491 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=493 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=494 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2012-12-18 17:06:30                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu0
+  COMMAND:
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1805 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT SID,DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND PROGRAMA=? AND ORIGEM=?
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND PROGRAMA=? AND ORIGEM=?
+
+  4gl source: LOG0010.4GL  line=1805 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND PROGRAMA=? AND ORIGEM=?
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1813 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND PROGRAMA=? AND ORIGEM=?
+  USE:3
+    t:              CHAR(8) v:'bu750100'
+    t:             CHAR(15) v:'pol1176        '
+    t:            CHAR(100) v:'MANUEL-PC:192.168.0.175                                                                             '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1813 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:
+  INTO:2
+    t:              INTEGER v:52
+    t:             DATETIME v:2012-12-18 16:46:15                                                                                                                                                                                                                                            
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          52
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          52
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=103 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY5
+  NAME_sql:cu1
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          52
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          52
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0011.4GL  line=104 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu1
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.016]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu1
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          52
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu1
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2012-12-18 16:46:15                                                                                                                                                                                                                                            
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=107 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu1
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =          52
+  INTO:1
+    t:             DATETIME v:2012-12-18 16:46:15                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu1
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0011.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0011.CQ_VERIFICA_SID_MSV
+  NAME_sql:cu1
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1813 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:SELECT SID, DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE USUARIO IN (?,'newlogin') AND PROGRAMA=? AND ORIGEM=?
+  INTO:2
+    t:              INTEGER v:52
+    t:             DATETIME v:2012-12-18 16:46:15                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_LOG_DADOS_SESSAO_LOGIX
+  NAME_sql:cu0
+  COMMAND:
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1582 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_DEL_MESMO_SID
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE SID=?
+  COMMAND:SELECT DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE SID=?
+
+  4gl source: LOG0010.4GL  line=1582 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_DEL_MESMO_SID
+  NAME_sql:cu0
+  COMMAND:SELECT DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE SID=?
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1587 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_DEL_MESMO_SID
+  NAME_sql:cu0
+  COMMAND:SELECT DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE SID=?
+  USE:1
+    t:              INTEGER v:117
+
+FETCH
+  Trace - Running time [0.016]
+  4gl source: LOG0010.4GL  line=1587 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_DEL_MESMO_SID
+  NAME_sql:cu0
+  COMMAND:SELECT DAT_EXECUCAO FROM LOG_DADOS_SESSAO_LOGIX  WHERE SID=?
+  INTO:1
+    t:             DATETIME v:NULL
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_DEL_MESMO_SID
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CD_DEL_MESMO_SID
+  NAME_sql:cu0
+  COMMAND:
+
+translate: INSERT INTO LOG_DADOS_SESSAO_LOGIX (SID, DAT_EXECUCAO, USUARIO, PROGRAMA, ORIGEM) VALUES(?, ?, ?, ?, ?)
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=1608 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO LOG_DADOS_SESSAO_LOGIX (SID, DAT_EXECUCAO, USUARIO, PROGRAMA, ORIGEM) VALUES(?, ?, ?, ?, ?)
+  USE:5
+    t:              INTEGER v:117
+    t:             DATETIME v:2012-12-18 17:06:30                                                                                                                                                                                                                                            
+    t:              CHAR(8) v:'bu750100'
+    t:             CHAR(15) v:'pol1176        '
+    t:            CHAR(100) v:'MANUEL-PC:192.168.0.175                                                                             '
+
+translate: SELECT 1 FROM USUARIOS  WHERE USUARIOS.COD_USUARIO=?
+
+EXECUTE
+  Trace - Running time [0.015]
+  4gl source: LOGIN.4GL  line=275 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT 1 FROM USUARIOS  WHERE USUARIOS.COD_USUARIO=?
+  USE:1
+    t:              CHAR(8) v:'bu750100'
+
+translate: SELECT LOG_PAR_LOGIN_USU.HOR_INICIAL_ACESSO,LOG_PAR_LOGIN_USU.HOR_FINAL_ACESSO FROM LOG_PAR_LOGIN_USU  WHERE USUARIO=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=330 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT LOG_PAR_LOGIN_USU.HOR_INICIAL_ACESSO,LOG_PAR_LOGIN_USU.HOR_FINAL_ACESSO FROM LOG_PAR_LOGIN_USU  WHERE USUARIO=?
+  USE:1
+    t:              CHAR(8) v:'bu750100'
+  INTO:2
+    t:             DATETIME v:NULL
+    t:             DATETIME v:NULL
+
+translate: DELETE FROM LOG_USU_EXP_LOGIN  WHERE USUARIO=? AND DAT_HOR_LOGIN<?
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=406 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:DELETE FROM LOG_USU_EXP_LOGIN  WHERE USUARIO=? AND DAT_HOR_LOGIN<?
+  USE:2
+    t:              CHAR(8) v:'bu750100'
+    t:             DATETIME v:2012-12-18 17:05:03                                                                                                                                                                                                                                            
+
+translate: SELECT 1 FROM LOG_USU_EXP_LOGIN  WHERE USUARIO=? AND DAT_HOR_LOGIN>=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=413 
+  STATUS:  100 ROWS AFFECTED:0
+  COMMAND:SELECT 1 FROM LOG_USU_EXP_LOGIN  WHERE USUARIO=? AND DAT_HOR_LOGIN>=?
+  USE:2
+    t:              CHAR(8) v:'bu750100'
+    t:             DATETIME v:2012-12-18 17:05:03                                                                                                                                                                                                                                            
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=433 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOGIN.CQ_USUARIO_BLOQUEADO
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT A.SEQUENCIA_BLOQUEIO,A.DAT_INI_BLOQUEIO,A.DAT_FIM_BLOQUEIO,C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B  WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND A.DAT_INI_BLOQUEIO<= CONVERT(VARCHAR,GETDATE() ,112) AND A.DAT_FIM_BLOQUEIO IS NULL AND 1=1 UNION SELECT A.SEQUENCIA_BLOQUEIO,A.DAT_INI_BLOQUEIO,A.DAT_FIM_BLOQUEIO,C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B  WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND  CONVERT(VARCHAR,GETDATE() ,112) BETWEEN A.DAT_INI_BLOQUEIO AND A.DAT_FIM_BLOQUEIO AND 1=1 ORDER BY 1
+  COMMAND:SELECT A.SEQUENCIA_BLOQUEIO, A.DAT_INI_BLOQUEIO, A.DAT_FIM_BLOQUEIO, C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND A.DAT_INI_BLOQUEIO<=convert(VARCHAR, GETDATE(), 112) AND A.DAT_FIM_BLOQUEIO IS NULL AND 1=1 UNION SELECT A.SEQUENCIA_BLOQUEIO, A.DAT_INI_BLOQUEIO, A.DAT_FIM_BLOQUEIO, C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND convert(VARCHAR, GETDATE(), 112) BETWEEN A.DAT_INI_BLOQUEIO AND A.DAT_FIM_BLOQUEIO AND 1=1 ORDER BY 1
+
+  4gl source: LOGIN.4GL  line=433 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOGIN.CQ_USUARIO_BLOQUEADO
+  NAME_sql:cu0
+  COMMAND:SELECT A.SEQUENCIA_BLOQUEIO, A.DAT_INI_BLOQUEIO, A.DAT_FIM_BLOQUEIO, C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND A.DAT_INI_BLOQUEIO<=convert(VARCHAR, GETDATE(), 112) AND A.DAT_FIM_BLOQUEIO IS NULL AND 1=1 UNION SELECT A.SEQUENCIA_BLOQUEIO, A.DAT_INI_BLOQUEIO, A.DAT_FIM_BLOQUEIO, C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND convert(VARCHAR, GETDATE(), 112) BETWEEN A.DAT_INI_BLOQUEIO AND A.DAT_FIM_BLOQUEIO AND 1=1 ORDER BY 1
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=463 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOGIN.CQ_USUARIO_BLOQUEADO
+  NAME_sql:cu0
+  COMMAND:SELECT A.SEQUENCIA_BLOQUEIO, A.DAT_INI_BLOQUEIO, A.DAT_FIM_BLOQUEIO, C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND A.DAT_INI_BLOQUEIO<=convert(VARCHAR, GETDATE(), 112) AND A.DAT_FIM_BLOQUEIO IS NULL AND 1=1 UNION SELECT A.SEQUENCIA_BLOQUEIO, A.DAT_INI_BLOQUEIO, A.DAT_FIM_BLOQUEIO, C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND convert(VARCHAR, GETDATE(), 112) BETWEEN A.DAT_INI_BLOQUEIO AND A.DAT_FIM_BLOQUEIO AND 1=1 ORDER BY 1
+  USE:2
+    t:              CHAR(8) v:'bu750100'
+    t:              CHAR(8) v:'bu750100'
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=463 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:LOGIN.CQ_USUARIO_BLOQUEADO
+  NAME_sql:cu0
+  COMMAND:SELECT A.SEQUENCIA_BLOQUEIO, A.DAT_INI_BLOQUEIO, A.DAT_FIM_BLOQUEIO, C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND A.DAT_INI_BLOQUEIO<=convert(VARCHAR, GETDATE(), 112) AND A.DAT_FIM_BLOQUEIO IS NULL AND 1=1 UNION SELECT A.SEQUENCIA_BLOQUEIO, A.DAT_INI_BLOQUEIO, A.DAT_FIM_BLOQUEIO, C.DES_MOTIVO_BLOQ FROM LOG_USU_BLOQ A LEFT OUTER JOIN LOG_MOTIVOS_BLOQ C ON (A.MOTIVO_BLOQUEIO=C.MOTIVO_BLOQ), LOG_BLOQUEIOS B WHERE A.USUARIO=? AND A.USUARIO=B.USUARIO AND A.SEQUENCIA_BLOQUEIO=B.SEQUENCIA_BLOQUEIO AND convert(VARCHAR, GETDATE(), 112) BETWEEN A.DAT_INI_BLOQUEIO AND A.DAT_FIM_BLOQUEIO AND 1=1 ORDER BY 1
+  INTO:4
+    t:              INTEGER v:0
+    t:                 DATE v:31/12/1899                                                                                                                                                                                                                                                     
+    t:                 DATE v:31/12/1899                                                                                                                                                                                                                                                     
+    t:             CHAR(76) v:'NULL'
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOGIN.CQ_USUARIO_BLOQUEADO
+  NAME_sql:cu0
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOGIN.CQ_USUARIO_BLOQUEADO
+  NAME_sql:cu0
+  COMMAND:
+
+translate: SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+
+EXECUTE
+  Trace - Running time [0.015]
+  4gl source: LOG0150.4GL  line=72 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+  USE:1
+    t:             CHAR(50) v:'men_usuario_login                                 '
+
+translate: SELECT USUARIO_LOGIX FROM MEN_USUARIO_LOGIN  WHERE USU_SIST_OPRC=? AND NOM_MAQUINA=? AND CREDENCIAL=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: SIGNON.4GL  line=21 
+  STATUS:  100 ROWS AFFECTED:0
+  COMMAND:SELECT USUARIO_LOGIX FROM MEN_USUARIO_LOGIN  WHERE USU_SIST_OPRC=? AND NOM_MAQUINA=? AND CREDENCIAL=?
+  USE:3
+    t:             CHAR(50) v:'Manuel                                            '
+    t:             CHAR(50) v:'MANUEL-PC                                         '
+    t:            CHAR(300) v:'S-1-5-21-1888443048-633850574-2064657089-1000                                                                                                                                                                                                                                                               '
+  INTO:1
+    t:              CHAR(8) v:'NULL'
+
+translate: SELECT 1 FROM USUARIO_SENHA  WHERE COD_USUARIO=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=737 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT 1 FROM USUARIO_SENHA  WHERE COD_USUARIO=?
+  USE:1
+    t:              CHAR(8) v:'bu750100'
+
+translate: SELECT 1 FROM USUARIOS  WHERE COD_USUARIO=? AND IND_ADMLOG='S'
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOGIN.4GL  line=2148 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT 1 FROM USUARIOS  WHERE COD_USUARIO=? AND IND_ADMLOG='S'
+  USE:1
+    t:              CHAR(8) v:'bu750100'
+
+translate: SELECT IND_REG_ACESSO,IND_PROGRAMAS FROM LOG_PAR_LOGIN_USU  WHERE USUARIO=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=542 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT IND_REG_ACESSO,IND_PROGRAMAS FROM LOG_PAR_LOGIN_USU  WHERE USUARIO=?
+  USE:1
+    t:              CHAR(8) v:'bu750100'
+  INTO:2
+    t:              CHAR(1) v:'U'
+    t:              CHAR(1) v:'N'
+
+translate: DELETE FROM LOG_ACS_USU_PROG  WHERE USUARIO=? AND EMPRESA=? AND NUM_PROGRAMA=?
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=600 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:DELETE FROM LOG_ACS_USU_PROG  WHERE USUARIO=? AND EMPRESA=? AND NUM_PROGRAMA=?
+  USE:3
+    t:              CHAR(8) v:'bu750100'
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'pol1176        '
+
+translate: INSERT INTO LOG_ACS_USU_PROG (USUARIO, EMPRESA, NUM_PROGRAMA, DAT_HOR_ACESSO) VALUES(?, ?, ?, ?)
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=611 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO LOG_ACS_USU_PROG (USUARIO, EMPRESA, NUM_PROGRAMA, DAT_HOR_ACESSO) VALUES(?, ?, ?, ?)
+  USE:4
+    t:              CHAR(8) v:'bu750100'
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'pol1176        '
+    t:             DATETIME v:2012-12-18 17:05:03                                                                                                                                                                                                                                            
+
+translate: SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG0150.4GL  line=72 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT SYSOBJECTS.NAME FROM SYSOBJECTS  WHERE SYSOBJECTS.NAME=?
+  USE:1
+    t:             CHAR(50) v:'log_uso_recusa_licenca                            '
+
+translate: INSERT INTO LOG_USO_ROTINA (ROTINA, EMPRESA, DAT_USO, QTD_USO) VALUES(?, ?, ?, 1)
+  Trace - Running time [0.000]
+  4gl source: LOGUSO.4GL  line=0 
+  STATUS: -239   TRANSACTION:FALSE
+  NATIVE ERROR:  2627 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]VIOLAÁ„O DA RESTRIÁ„O PRIMARY KEY 'PK_LOG_USO_ROTINA'. N„O È POSSÌVEL INSERIR A CHAVE DUPLICADA NO OBJETO 'LOGIX.LOG_USO_ROTINA'. O VALOR DE CHAVE DUPLICADA È (DEZ 18 2012 12:00AM, POL1176             , 01).  COMMAND:INSERT INTO LOG_USO_ROTINA (ROTINA, EMPRESA, DAT_USO, QTD_USO) VALUES(?, ?, ?, 1)
+  USE:3
+    t:             CHAR(20) v:'POL1176             '
+    t:              CHAR(2) v:'01'
+    t:                 DATE v:18/12/2012                                                                                                                                                                                                                                                     
+
+translate: UPDATE LOG_USO_ROTINA SET LOG_USO_ROTINA.QTD_USO=LOG_USO_ROTINA.QTD_USO+1 WHERE LOG_USO_ROTINA.DAT_USO=? AND LOG_USO_ROTINA.ROTINA=? AND LOG_USO_ROTINA.EMPRESA=?
+  Trace - Running time [0.000]
+  4gl source: LOGUSO.4GL  line=53 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:UPDATE LOG_USO_ROTINA SET LOG_USO_ROTINA.QTD_USO=LOG_USO_ROTINA.QTD_USO+1 WHERE LOG_USO_ROTINA.DAT_USO=? AND LOG_USO_ROTINA.ROTINA=? AND LOG_USO_ROTINA.EMPRESA=?
+  USE:3
+    t:                 DATE v:18/12/2012                                                                                                                                                                                                                                                     
+    t:             CHAR(20) v:'POL1176             '
+    t:              CHAR(2) v:'01'
+
+translate: SELECT DEN_ITEM_REDUZ,DEN_ITEM,IES_TIP_ITEM,PES_UNIT FROM ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=423 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_ITEM_REDUZ,DEN_ITEM,IES_TIP_ITEM,PES_UNIT FROM ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+  INTO:4
+    t:             CHAR(18) v:'FURADO/EXTRUDADO  '
+    t:             CHAR(76) v:'93224453 - REFORCO LATERAL TUNEL LE                                         '
+    t:              CHAR(1) v:'F'
+    t:        DECIMAL(12,5) v:1,5175
+
+translate: SELECT COD_EMPRESA FROM ITEM_PPAP_5054  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=450 
+  STATUS:  100 ROWS AFFECTED:0
+  COMMAND:SELECT COD_EMPRESA FROM ITEM_PPAP_5054  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+
+translate: DROP TABLE COMPON_1
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=742 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:DROP TABLE COMPON_1
+
+translate: CREATE TABLE COMPON_1 (COD_NIVEL INTEGER, COD_COMPON CHAR(15), QTD_NECES DECIMAL(14,7))
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=743 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:CREATE TABLE COMPON_1 (COD_NIVEL INTEGER, COD_COMPON CHAR(15), QTD_NECES DECIMAL(14,7))
+
+translate: DROP TABLE COMPON_2
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=755 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:DROP TABLE COMPON_2
+
+translate: CREATE TABLE COMPON_2 (COD_COMPON CHAR(15))
+
+EXECUTE
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=756 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:CREATE TABLE COMPON_2 (COD_COMPON CHAR(15))
+
+translate: DROP TABLE COMPON_3
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=766 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:DROP TABLE COMPON_3
+
+translate: CREATE TABLE COMPON_3 (COD_COMPON CHAR(15), QTD_NECES DECIMAL(14,7))
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=767 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:CREATE TABLE COMPON_3 (COD_COMPON CHAR(15), QTD_NECES DECIMAL(14,7))
+
+translate: DROP TABLE ITEM_OPER
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=778 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:DROP TABLE ITEM_OPER
+
+translate: CREATE TABLE ITEM_OPER (COD_COMPON CHAR(15), COD_OPERAC CHAR(5), NUM_SEQ SMALLINT)
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=779 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:CREATE TABLE ITEM_OPER (COD_COMPON CHAR(15), COD_OPERAC CHAR(5), NUM_SEQ SMALLINT)
+
+translate: INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  USE:3
+    t:              INTEGER v:0
+    t:             CHAR(15) v:'010010002200   '
+    t:        DECIMAL(14,7) v:1
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=569 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON
+  NAME_sql:cu0
+  NATIVE COMMAND:SELECT COD_ITEM_COMPON,QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+  4gl source: POL1176.4GL  line=569 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON
+  NAME_sql:cu0
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=576 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_COMPON
+  NAME_sql:cu0
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=576 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON
+  NAME_sql:cu0
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'010010002220   '
+    t:        DECIMAL(14,7) v:1
+
+translate: SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=578 
+  STATUS:  100 ROWS AFFECTED:0
+  COMMAND:SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+  USE:1
+    t:             CHAR(15) v:'010010002220   '
+
+translate: INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  USE:3
+    t:              INTEGER v:1
+    t:             CHAR(15) v:'010010002220   '
+    t:        DECIMAL(14,7) v:1
+
+FETCH
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=576 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON
+  NAME_sql:cu0
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  INTO:2
+    t:             CHAR(15) v:'010010002220   '
+    t:        DECIMAL(14,7) v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON
+  NAME_sql:cu0
+  COMMAND:
+
+translate: DELETE FROM COMPON_3 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=657 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:DELETE FROM COMPON_3 
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=663 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  NATIVE COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+  4gl source: POL1176.4GL  line=663 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+OPEN 
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:2
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'010010002200   '
+
+translate: INSERT INTO COMPON_2 VALUES(?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_2 VALUES(?)
+  USE:1
+    t:             CHAR(15) v:'010010002200   '
+
+DECLARE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  NATIVE COMMAND:SELECT COD_ITEM_COMPON,QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'010010002220   '
+    t:        DECIMAL(14,7) v:1
+
+translate: INSERT INTO COMPON_3 VALUES(?, ?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_3 VALUES(?, ?)
+  USE:2
+    t:             CHAR(15) v:'010010002220   '
+    t:        DECIMAL(14,7) v:1
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  INTO:2
+    t:             CHAR(15) v:'010010002220   '
+    t:        DECIMAL(14,7) v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'010010002220   '
+
+translate: INSERT INTO COMPON_2 VALUES(?)
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_2 VALUES(?)
+  USE:1
+    t:             CHAR(15) v:'010010002220   '
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  NATIVE COMMAND:SELECT COD_ITEM_COMPON,QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002220   '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'010010002210   '
+    t:        DECIMAL(14,7) v:1
+
+translate: INSERT INTO COMPON_3 VALUES(?, ?)
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_3 VALUES(?, ?)
+  USE:2
+    t:             CHAR(15) v:'010010002210   '
+    t:        DECIMAL(14,7) v:1
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  INTO:2
+    t:             CHAR(15) v:'010010002210   '
+    t:        DECIMAL(14,7) v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+  INTO:1
+    t:             CHAR(15) v:'010010002220   '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+
+translate: SELECT COUNT (*) FROM COMPON_3 
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=699 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COUNT (*) FROM COMPON_3 
+  INTO:1
+    t:              INTEGER v:2
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=710 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  NATIVE COMMAND:SELECT COD_COMPON,QTD_NECES FROM COMPON_3 
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+  4gl source: POL1176.4GL  line=710 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+OPEN 
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:    0 ROWS AFFECTED:2
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'010010002220   '
+    t:        DECIMAL(14,7) v:1
+
+translate: SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=717 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+  USE:1
+    t:             CHAR(15) v:'010010002220   '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'010010002210   '
+    t:        DECIMAL(14,7) v:1
+
+translate: SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=717 
+  STATUS:  100 ROWS AFFECTED:0
+  COMMAND:SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+  USE:1
+    t:             CHAR(15) v:'010010002210   '
+
+translate: INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  USE:3
+    t:              INTEGER v:2
+    t:             CHAR(15) v:'010010002210   '
+    t:        DECIMAL(14,7) v:1
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+  INTO:2
+    t:             CHAR(15) v:'010010002210   '
+    t:        DECIMAL(14,7) v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+
+translate: DELETE FROM COMPON_3 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=657 
+  STATUS:    0 ROWS AFFECTED:2
+  COMMAND:DELETE FROM COMPON_3 
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=663 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  NATIVE COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+  4gl source: POL1176.4GL  line=663 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+OPEN 
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'010010002210   '
+
+translate: INSERT INTO COMPON_2 VALUES(?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_2 VALUES(?)
+  USE:1
+    t:             CHAR(15) v:'010010002210   '
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  NATIVE COMMAND:SELECT COD_ITEM_COMPON,QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002210   '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'0611600001     '
+    t:        DECIMAL(14,7) v:1,7584000
+
+translate: INSERT INTO COMPON_3 VALUES(?, ?)
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_3 VALUES(?, ?)
+  USE:2
+    t:             CHAR(15) v:'0611600001     '
+    t:        DECIMAL(14,7) v:1,7584000
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  INTO:2
+    t:             CHAR(15) v:'0611600001     '
+    t:        DECIMAL(14,7) v:1,7584000
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+  INTO:1
+    t:             CHAR(15) v:'010010002210   '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+
+translate: SELECT COUNT (*) FROM COMPON_3 
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=699 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COUNT (*) FROM COMPON_3 
+  INTO:1
+    t:              INTEGER v:1
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=710 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  NATIVE COMMAND:SELECT COD_COMPON,QTD_NECES FROM COMPON_3 
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+  4gl source: POL1176.4GL  line=710 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'0611600001     '
+    t:        DECIMAL(14,7) v:1,7584000
+
+translate: SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=717 
+  STATUS:  100 ROWS AFFECTED:0
+  COMMAND:SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+  USE:1
+    t:             CHAR(15) v:'0611600001     '
+
+translate: INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  USE:3
+    t:              INTEGER v:3
+    t:             CHAR(15) v:'0611600001     '
+    t:        DECIMAL(14,7) v:1,7584000
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+  INTO:2
+    t:             CHAR(15) v:'0611600001     '
+    t:        DECIMAL(14,7) v:1,7584000
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+
+translate: DELETE FROM COMPON_3 
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=657 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:DELETE FROM COMPON_3 
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=663 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  NATIVE COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+  4gl source: POL1176.4GL  line=663 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'0611600001     '
+
+translate: INSERT INTO COMPON_2 VALUES(?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_2 VALUES(?)
+  USE:1
+    t:             CHAR(15) v:'0611600001     '
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  NATIVE COMMAND:SELECT COD_ITEM_COMPON,QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'0611600001     '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'0211600005     '
+    t:        DECIMAL(14,7) v:1
+
+translate: INSERT INTO COMPON_3 VALUES(?, ?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_3 VALUES(?, ?)
+  USE:2
+    t:             CHAR(15) v:'0211600005     '
+    t:        DECIMAL(14,7) v:1
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  INTO:2
+    t:             CHAR(15) v:'0211600005     '
+    t:        DECIMAL(14,7) v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+  INTO:1
+    t:             CHAR(15) v:'0611600001     '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+
+translate: SELECT COUNT (*) FROM COMPON_3 
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=699 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COUNT (*) FROM COMPON_3 
+  INTO:1
+    t:              INTEGER v:1
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=710 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  NATIVE COMMAND:SELECT COD_COMPON,QTD_NECES FROM COMPON_3 
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+  4gl source: POL1176.4GL  line=710 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+  INTO:2
+    t:             CHAR(15) v:'0211600005     '
+    t:        DECIMAL(14,7) v:1
+
+translate: SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+
+EXECUTE
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=717 
+  STATUS:  100 ROWS AFFECTED:0
+  COMMAND:SELECT * FROM COMPON_1  WHERE COD_COMPON=?
+  USE:1
+    t:             CHAR(15) v:'0211600005     '
+
+translate: INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_1 VALUES(?, ?, ?)
+  USE:3
+    t:              INTEGER v:4
+    t:             CHAR(15) v:'0211600005     '
+    t:        DECIMAL(14,7) v:1
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=715 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:SELECT COD_COMPON, QTD_NECES FROM COMPON_3
+  INTO:2
+    t:             CHAR(15) v:'0211600005     '
+    t:        DECIMAL(14,7) v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_3
+  NAME_sql:cu3
+  COMMAND:
+
+translate: DELETE FROM COMPON_3 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=657 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:DELETE FROM COMPON_3 
+
+DECLARE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=663 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  NATIVE COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+  4gl source: POL1176.4GL  line=663 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'0211600005     '
+
+translate: INSERT INTO COMPON_2 VALUES(?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO COMPON_2 VALUES(?)
+  USE:1
+    t:             CHAR(15) v:'0211600005     '
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  NATIVE COMMAND:SELECT COD_ITEM_COMPON,QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+  4gl source: POL1176.4GL  line=678 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+
+OPEN 
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'0211600005     '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=685 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:SELECT COD_ITEM_COMPON, QTD_NECESSARIA FROM ESTRUTURA  WHERE COD_EMPRESA=? AND COD_ITEM_PAI=?
+  INTO:2
+    t:             CHAR(15) v:'0211600005     '
+    t:        DECIMAL(14,7) v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ESTRU
+  NAME_sql:cu2
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=668 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:SELECT A.COD_COMPON FROM COMPON_1 A  WHERE A.COD_COMPON NOT IN ((SELECT B.COD_COMPON FROM COMPON_2 B ))
+  INTO:1
+    t:             CHAR(15) v:'0211600005     '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_COMPON_1
+  NAME_sql:cu1
+  COMMAND:
+
+translate: SELECT COUNT (*) FROM COMPON_3 
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=699 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COUNT (*) FROM COMPON_3 
+  INTO:1
+    t:              INTEGER v:0
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=608 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  NATIVE COMMAND:SELECT COD_COMPON FROM COMPON_1 
+  COMMAND:SELECT COD_COMPON FROM COMPON_1
+
+  4gl source: POL1176.4GL  line=608 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:SELECT COD_COMPON FROM COMPON_1
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=612 
+  STATUS:    0 ROWS AFFECTED:5
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:SELECT COD_COMPON FROM COMPON_1
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=612 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'010010002200   '
+
+translate: SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=614 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+  INTO:1
+    t:             CHAR(15) v:'PADRAO         '
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  NATIVE COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+OPEN 
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  USE:3
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+    t:             CHAR(15) v:'PADRAO         '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+  INTO:1
+    t:              CHAR(5) v:'10   '
+
+translate: INSERT INTO ITEM_OPER VALUES(?, ?, ?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO ITEM_OPER VALUES(?, ?, ?)
+  USE:3
+    t:             CHAR(15) v:'010010002200   '
+    t:              CHAR(5) v:'10   '
+    t:              INTEGER v:1
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  INTO:1
+    t:              CHAR(5) v:'10   '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=612 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'010010002220   '
+
+translate: SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=614 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002220   '
+  INTO:1
+    t:             CHAR(15) v:'PADRAO         '
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  NATIVE COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  USE:3
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002220   '
+    t:             CHAR(15) v:'PADRAO         '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+  INTO:1
+    t:              CHAR(5) v:'10   '
+
+translate: INSERT INTO ITEM_OPER VALUES(?, ?, ?)
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO ITEM_OPER VALUES(?, ?, ?)
+  USE:3
+    t:             CHAR(15) v:'010010002220   '
+    t:              CHAR(5) v:'10   '
+    t:              INTEGER v:2
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  INTO:1
+    t:              CHAR(5) v:'10   '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=612 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'010010002210   '
+
+translate: SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=614 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002210   '
+  INTO:1
+    t:             CHAR(15) v:'PADRAO         '
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  NATIVE COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+OPEN 
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  USE:3
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002210   '
+    t:             CHAR(15) v:'PADRAO         '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+  INTO:1
+    t:              CHAR(5) v:'10   '
+
+translate: INSERT INTO ITEM_OPER VALUES(?, ?, ?)
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:INSERT INTO ITEM_OPER VALUES(?, ?, ?)
+  USE:3
+    t:             CHAR(15) v:'010010002210   '
+    t:              CHAR(5) v:'10   '
+    t:              INTEGER v:3
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  INTO:1
+    t:              CHAR(5) v:'10   '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=612 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'0611600001     '
+
+translate: SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=614 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'0611600001     '
+  INTO:1
+    t:             CHAR(15) v:'NULL'
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  NATIVE COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  USE:3
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'0611600001     '
+    t:             CHAR(15) v:'NULL'
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  INTO:1
+    t:              CHAR(5) v:'10   '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=612 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:
+  INTO:1
+    t:             CHAR(15) v:'0211600005     '
+
+translate: SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=614 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT COD_ROTEIRO FROM ITEM_MAN  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'0211600005     '
+  INTO:1
+    t:             CHAR(15) v:'NULL'
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  NATIVE COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+  4gl source: POL1176.4GL  line=624 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  USE:3
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'0211600005     '
+    t:             CHAR(15) v:'NULL'
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=633 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:SELECT COD_OPERAC FROM CONSUMO  WHERE COD_EMPRESA=? AND COD_ITEM=? AND (COD_ROTEIRO=? OR COD_ROTEIRO IS NULL) ORDER BY NUM_SEQ_OPERAC DESC
+  INTO:1
+    t:              CHAR(5) v:'10   '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPER
+  NAME_sql:cu5
+  COMMAND:
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=612 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:SELECT COD_COMPON FROM COMPON_1
+  INTO:1
+    t:             CHAR(15) v:'0211600005     '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_ITEM
+  NAME_sql:cu4
+  COMMAND:
+
+DECLARE
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=801 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPERACAO
+  NAME_sql:cu6
+  NATIVE COMMAND:SELECT * FROM ITEM_OPER  ORDER BY 3 DESC
+  COMMAND:SELECT * FROM ITEM_OPER  ORDER BY 3 DESC
+
+  4gl source: POL1176.4GL  line=801 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPERACAO
+  NAME_sql:cu6
+  COMMAND:SELECT * FROM ITEM_OPER  ORDER BY 3 DESC
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=808 
+  STATUS:    0 ROWS AFFECTED:3
+  NAME_fgl:POL1176.CQ_OPERACAO
+  NAME_sql:cu6
+  COMMAND:SELECT * FROM ITEM_OPER  ORDER BY 3 DESC
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=808 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPERACAO
+  NAME_sql:cu6
+  COMMAND:
+  INTO:3
+    t:             CHAR(15) v:'010010002210   '
+    t:              CHAR(5) v:'10   '
+    t:              INTEGER v:3
+
+translate: SELECT DEN_OPERAC FROM OPERACAO  WHERE COD_EMPRESA=? AND COD_OPERAC=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=813 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_OPERAC FROM OPERACAO  WHERE COD_EMPRESA=? AND COD_OPERAC=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:              CHAR(5) v:'10   '
+  INTO:1
+    t:             CHAR(30) v:'.                             '
+
+translate: SELECT DEN_SIMBOLO FROM SIMBOLO_5054  WHERE COD_EMPRESA=? AND COD_SIMBOLO=?
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=821 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_SIMBOLO FROM SIMBOLO_5054  WHERE COD_EMPRESA=? AND COD_SIMBOLO=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:              CHAR(2) v:'A3'
+  INTO:1
+    t:              CHAR(2) v:'TE'
+
+translate: SELECT  CAST(NUM_SEQ AS  CHAR(3)) +'/'+ CAST(NUM_SUB_SEQ AS  CHAR(3))  FROM CICLO_PECA_5054  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=827 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT  CAST(NUM_SEQ AS  CHAR(3)) +'/'+ CAST(NUM_SUB_SEQ AS  CHAR(3))  FROM CICLO_PECA_5054  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002210   '
+  INTO:1
+    t:              CHAR(5) v:'30 /4'
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=808 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPERACAO
+  NAME_sql:cu6
+  COMMAND:
+  INTO:3
+    t:             CHAR(15) v:'010010002220   '
+    t:              CHAR(5) v:'10   '
+    t:              INTEGER v:2
+
+translate: SELECT DEN_OPERAC FROM OPERACAO  WHERE COD_EMPRESA=? AND COD_OPERAC=?
+
+EXECUTE
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=813 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_OPERAC FROM OPERACAO  WHERE COD_EMPRESA=? AND COD_OPERAC=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:              CHAR(5) v:'10   '
+  INTO:1
+    t:             CHAR(30) v:'.                             '
+
+translate: SELECT DEN_SIMBOLO FROM SIMBOLO_5054  WHERE COD_EMPRESA=? AND COD_SIMBOLO=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=821 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_SIMBOLO FROM SIMBOLO_5054  WHERE COD_EMPRESA=? AND COD_SIMBOLO=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:              CHAR(2) v:'A3'
+  INTO:1
+    t:              CHAR(2) v:'TE'
+
+translate: SELECT  CAST(NUM_SEQ AS  CHAR(3)) +'/'+ CAST(NUM_SUB_SEQ AS  CHAR(3))  FROM CICLO_PECA_5054  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=827 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT  CAST(NUM_SEQ AS  CHAR(3)) +'/'+ CAST(NUM_SUB_SEQ AS  CHAR(3))  FROM CICLO_PECA_5054  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002220   '
+  INTO:1
+    t:              CHAR(5) v:'20 /3'
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=808 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPERACAO
+  NAME_sql:cu6
+  COMMAND:
+  INTO:3
+    t:             CHAR(15) v:'010010002200   '
+    t:              CHAR(5) v:'10   '
+    t:              INTEGER v:1
+
+translate: SELECT DEN_OPERAC FROM OPERACAO  WHERE COD_EMPRESA=? AND COD_OPERAC=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=813 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_OPERAC FROM OPERACAO  WHERE COD_EMPRESA=? AND COD_OPERAC=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:              CHAR(5) v:'10   '
+  INTO:1
+    t:             CHAR(30) v:'.                             '
+
+translate: SELECT DEN_SIMBOLO FROM SIMBOLO_5054  WHERE COD_EMPRESA=? AND COD_SIMBOLO=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=821 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_SIMBOLO FROM SIMBOLO_5054  WHERE COD_EMPRESA=? AND COD_SIMBOLO=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:              CHAR(2) v:'A3'
+  INTO:1
+    t:              CHAR(2) v:'TE'
+
+translate: SELECT  CAST(NUM_SEQ AS  CHAR(3)) +'/'+ CAST(NUM_SUB_SEQ AS  CHAR(3))  FROM CICLO_PECA_5054  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=827 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT  CAST(NUM_SEQ AS  CHAR(3)) +'/'+ CAST(NUM_SUB_SEQ AS  CHAR(3))  FROM CICLO_PECA_5054  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+  INTO:1
+    t:              CHAR(5) v:'10 /2'
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=808 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPERACAO
+  NAME_sql:cu6
+  COMMAND:SELECT * FROM ITEM_OPER  ORDER BY 3 DESC
+  INTO:3
+    t:             CHAR(15) v:'NULL'
+    t:              CHAR(5) v:'NULL'
+    t:              INTEGER v:1
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_OPERACAO
+  NAME_sql:cu6
+  COMMAND:
+
+translate: SELECT DEN_ITEM FROM ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=859 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_ITEM FROM ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002210   '
+  INTO:1
+    t:             CHAR(76) v:'93224453 - REFORCO LATERAL TUNEL LE                                         '
+
+translate: SELECT DEN_SIMBOLO FROM SIMBOLO_5054  WHERE COD_EMPRESA=? AND COD_SIMBOLO=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=885 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT DEN_SIMBOLO FROM SIMBOLO_5054  WHERE COD_EMPRESA=? AND COD_SIMBOLO=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:              CHAR(2) v:'A3'
+  INTO:1
+    t:              CHAR(2) v:'TE'
+
+translate: SELECT PARAMETRO_TEXTO FROM MIN_PAR_MODULO  WHERE EMPRESA='01' AND PARAMETRO='INSTANCIA_PROTHEUS'
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1042 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT PARAMETRO_TEXTO FROM MIN_PAR_MODULO  WHERE EMPRESA='01' AND PARAMETRO='INSTANCIA_PROTHEUS'
+  INTO:1
+    t:             CHAR(30) v:'protheustst.dbo.              '
+
+translate: SELECT @@spid
+
+PREPARE
+ SELECT @@spid
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=457 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY3
+  NAME_sql:cu7
+  NATIVE COMMAND:SELECT @@spid
+  COMMAND:SELECT @@spid
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=465 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu7
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.015]
+  4gl source: LOG0010.4GL  line=467 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu7
+  COMMAND:SELECT @@spid
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=468 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu7
+  COMMAND:
+  INTO:1
+    t:              INTEGER v:117
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu7
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu7
+  COMMAND:
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=483 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY4
+  NAME_sql:cu7
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=491 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu7
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=493 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu7
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=494 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu7
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2012-12-18 17:06:30                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu7
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu7
+  COMMAND:
+[Thread 1948] [LOGIX] BEGIN WORK - SID 117
+
+translate: BEGIN WORK
+  Trace - Running time [0.000]
+  4gl source: LOG0850.4GL  line=40 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:BEGIN WORK
+
+translate: SET IMPLICIT_TRANSACTIONS ON
+
+PREPARE
+ SET IMPLICIT_TRANSACTIONS ON
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0850.4GL  line=201 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_EXEC_MSV_1
+  NAME_sql:cu7
+  NATIVE COMMAND:SET IMPLICIT_TRANSACTIONS ON
+  COMMAND:SET IMPLICIT_TRANSACTIONS ON
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG0850.4GL  line=206 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:SET IMPLICIT_TRANSACTIONS ON
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0850.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0850.VAR_EXEC_MSV_1
+  NAME_sql:cu7
+  COMMAND:
+
+translate: SELECT R_E_C_N_O_ FROM protheustst.dbo.QK1010 ORDER BY 1 DESC
+
+PREPARE
+ SELECT R_E_C_N_O_ FROM protheustst.dbo.QK1010 ORDER BY 1 DESC
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1254 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_QK1
+  NAME_sql:cu7
+  NATIVE COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QK1010 ORDER BY 1 DESC
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QK1010 ORDER BY 1 DESC
+
+DECLARE
+ PREPARED 
+  4gl source: POL1176.4GL  line=1255 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QK1
+  NAME_sql:cu7
+  COMMAND:
+
+OPEN 
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=1257 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QK1
+  NAME_sql:cu7
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QK1010 ORDER BY 1 DESC
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1257 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QK1
+  NAME_sql:cu7
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QK1010 ORDER BY 1 DESC
+  INTO:1
+    t:              INTEGER v:0
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QK1
+  NAME_sql:cu7
+  COMMAND:
+
+translate: SELECT R_E_C_N_O_ FROM protheustst.dbo.QK2010 ORDER BY 1 DESC
+
+PREPARE
+ SELECT R_E_C_N_O_ FROM protheustst.dbo.QK2010 ORDER BY 1 DESC
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1272 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_QK2
+  NAME_sql:cu8
+  NATIVE COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QK2010 ORDER BY 1 DESC
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QK2010 ORDER BY 1 DESC
+
+DECLARE
+ PREPARED 
+  4gl source: POL1176.4GL  line=1273 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QK2
+  NAME_sql:cu8
+  COMMAND:
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1275 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QK2
+  NAME_sql:cu8
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QK2010 ORDER BY 1 DESC
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1275 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QK2
+  NAME_sql:cu8
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QK2010 ORDER BY 1 DESC
+  INTO:1
+    t:              INTEGER v:0
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QK2
+  NAME_sql:cu8
+  COMMAND:
+
+translate: SELECT R_E_C_N_O_ FROM protheustst.dbo.QKK010 ORDER BY 1 DESC
+
+PREPARE
+ SELECT R_E_C_N_O_ FROM protheustst.dbo.QKK010 ORDER BY 1 DESC
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1290 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_QKK
+  NAME_sql:cu9
+  NATIVE COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QKK010 ORDER BY 1 DESC
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QKK010 ORDER BY 1 DESC
+
+DECLARE
+ PREPARED 
+  4gl source: POL1176.4GL  line=1291 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QKK
+  NAME_sql:cu9
+  COMMAND:
+
+OPEN 
+  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=1293 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QKK
+  NAME_sql:cu9
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QKK010 ORDER BY 1 DESC
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1293 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QKK
+  NAME_sql:cu9
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QKK010 ORDER BY 1 DESC
+  INTO:1
+    t:              INTEGER v:0
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QKK
+  NAME_sql:cu9
+  COMMAND:
+
+translate: SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ3010 ORDER BY 1 DESC
+
+PREPARE
+ SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ3010 ORDER BY 1 DESC
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1309 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_QZ3
+  NAME_sql:cu10
+  NATIVE COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ3010 ORDER BY 1 DESC
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ3010 ORDER BY 1 DESC
+
+DECLARE
+ PREPARED 
+  4gl source: POL1176.4GL  line=1310 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QZ3
+  NAME_sql:cu10
+  COMMAND:
+
+OPEN 
+  Trace - Running time [0.000]
+[Thread 1948] TOTVSDBAccess error: SQLCode: -206 query error - [SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ3010 ORDER BY 1 DESC] 
+  4gl source: POL1176.4GL  line=1312 
+  STATUS: -206   TRANSACTION:TRUE
+  NATIVE ERROR:   208 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]NOME DE OBJETO 'PROTHEUSTST.DBO.QZ3010' INV·LIDO.  NAME_fgl:POL1176.CQ_QZ3
+  NAME_sql:cu10
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ3010 ORDER BY 1 DESC
+
+FETCH
+  4gl source: POL1176.4GL  line=1312 
+  STATUS: -400   TRANSACTION:TRUE
+  NATIVE ERROR:     0 - FETCH ATTEMPTED ON UNOPEN CURSOR.
+  NAME_fgl:POL1176.CQ_QZ3
+  NAME_sql:cu10
+  COMMAND:
+  INTO:1
+    t:              INTEGER v:0
+
+CLOSE 
+[Thread 1948] Error - Warning - Close - TOTVSDBAccess error: -24 -   Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS: -404   TRANSACTION:TRUE
+  NATIVE ERROR:     0 - THE CURSOR OR STATEMENT IS NOT AVAILABLE.
+  NAME_fgl:POL1176.CQ_QZ3
+  NAME_sql:cu10
+  COMMAND:
+
+translate: SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ5010 ORDER BY 1 DESC
+
+PREPARE
+ SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ5010 ORDER BY 1 DESC
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.016]
+  4gl source: POL1176.4GL  line=1328 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_QZ5
+  NAME_sql:cu11
+  NATIVE COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ5010 ORDER BY 1 DESC
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ5010 ORDER BY 1 DESC
+
+DECLARE
+ PREPARED 
+  4gl source: POL1176.4GL  line=1329 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_QZ5
+  NAME_sql:cu11
+  COMMAND:
+
+OPEN 
+  Trace - Running time [0.000]
+[Thread 1948] TOTVSDBAccess error: SQLCode: -206 query error - [SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ5010 ORDER BY 1 DESC] 
+  4gl source: POL1176.4GL  line=1331 
+  STATUS: -206   TRANSACTION:TRUE
+  NATIVE ERROR:   208 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]NOME DE OBJETO 'PROTHEUSTST.DBO.QZ5010' INV·LIDO.  NAME_fgl:POL1176.CQ_QZ5
+  NAME_sql:cu11
+  COMMAND:SELECT R_E_C_N_O_ FROM protheustst.dbo.QZ5010 ORDER BY 1 DESC
+
+FETCH
+  4gl source: POL1176.4GL  line=1331 
+  STATUS: -400   TRANSACTION:TRUE
+  NATIVE ERROR:     0 - FETCH ATTEMPTED ON UNOPEN CURSOR.
+  NAME_fgl:POL1176.CQ_QZ5
+  NAME_sql:cu11
+  COMMAND:
+  INTO:1
+    t:              INTEGER v:0
+
+CLOSE 
+[Thread 1948] Error - Warning - Close - TOTVSDBAccess error: -24 -   Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS: -404   TRANSACTION:TRUE
+  NATIVE ERROR:     0 - THE CURSOR OR STATEMENT IS NOT AVAILABLE.
+  NAME_fgl:POL1176.CQ_QZ5
+  NAME_sql:cu11
+  COMMAND:
+
+translate: SELECT MAX(SEQ_VERSAO) FROM CAD_DES  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1349 
+  STATUS:    0 ROWS AFFECTED:1
+  COMMAND:SELECT MAX(SEQ_VERSAO) FROM CAD_DES  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+  INTO:1
+    t:              DECIMAL v:NULL
+
+DECLARE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1374 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_CLI_ITEM
+  NAME_sql:cu12
+  NATIVE COMMAND:SELECT COD_CLIENTE_MATRIZ,COD_ITEM_CLIENTE FROM CLIENTE_ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  COMMAND:SELECT COD_CLIENTE_MATRIZ, COD_ITEM_CLIENTE FROM CLIENTE_ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+  4gl source: POL1176.4GL  line=1374 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_CLI_ITEM
+  NAME_sql:cu12
+  COMMAND:SELECT COD_CLIENTE_MATRIZ, COD_ITEM_CLIENTE FROM CLIENTE_ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+
+OPEN 
+  Trace - Running time [0.015]
+  4gl source: POL1176.4GL  line=1381 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_CLI_ITEM
+  NAME_sql:cu12
+  COMMAND:SELECT COD_CLIENTE_MATRIZ, COD_ITEM_CLIENTE FROM CLIENTE_ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  USE:2
+    t:              CHAR(2) v:'01'
+    t:             CHAR(15) v:'010010002200   '
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1381 
+  STATUS:  100 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_CLI_ITEM
+  NAME_sql:cu12
+  COMMAND:SELECT COD_CLIENTE_MATRIZ, COD_ITEM_CLIENTE FROM CLIENTE_ITEM  WHERE COD_EMPRESA=? AND COD_ITEM=?
+  INTO:2
+    t:           VARCHAR(6) v:' '
+    t:          VARCHAR(40) v:'010010002200                            '
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:POL1176.CQ_CLI_ITEM
+  NAME_sql:cu12
+  COMMAND:
+
+translate: INSERT INTO protheustst.dbo.QK1010(  QK1_FILIAL, QK1_PECA,   QK1_REV,    QK1_REVINV,  QK1_DTREVI, QK1_PCCLI,  QK1_DESCLI, QK1_PPAP,  QK1_DESC,   QK1_CODCLI, QK1_LOJCLI, QK1_NOMCLI,  QK1_NDES,   QK1_REVDES, QK1_DTRDES, QK1_PROJET,  QK1_ALTENG, QK1_DTENG,  QK1_DOC,    QK1_TPLOGO,  QK1_CODEQU, QK1_PRODUT, QK1_REVI,   QK1_JUST,  QK1_STATUS, QK1_DTENCE, QK1_DTREAB, QK1_LICPK,  QK1_LSCPK,  QK1_ALTDOC, QK1_NALPRJ, QK1_CODVCL,  QK1_REVCLI, QK1_DTREVC, QK1_CJTDES, QK1_CJTREV,  QK1_CJREVD, QK1_PESOLI, QK1_CJPESO, QK1_QTDECJ,  QK1_CODIGO, QK1_USUARI, QK1_VISTO,  QK1_TIPO,  QK1_PECSEG, QK1_FLUXO,  QK1_MSBLQL, QK1_DTELAB,  QK1_OKAPRO, QK1_DTVIST, D_E_L_E_T_, R_E_C_N_O_, R_E_C_D_E_L_) VALUES('010101','010010002200   ','01','YX','20121218','010010002200                            ',' ',' ','93224453 - REFORCO LATERAL TUNEL LE                                         ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','1',' ',' ','              1,33','              1,67',' ',' ',' ',' ',' ',' ',' ',' ','              1,52','              0,00','              0,00',' ',' ',' ',' ',' ',' ',' ','20121218',' ',' ',' ','          1','          0')
+
+PREPARE
+ INSERT INTO protheustst.dbo.QK1010(  QK1_FILIAL, QK1_PECA,   QK1_REV,    QK1_REVINV,  QK1_DTREVI, QK1_PCCLI,  QK1_DESCLI, QK1_PPAP,  QK1_DESC,   QK1_CODCLI, QK1_LOJCLI, QK1_NOMCLI,  QK1_NDES,   QK1_REVDES, QK1_DTRDES, QK1_PROJET,  QK1_ALTENG, QK1_DTENG,  QK1_DOC,    QK1_TPLOGO,  QK1_CODEQU, QK1_PRODUT, QK1_REVI,   QK1_JUST,  QK1_STATUS, QK1_DTENCE, QK1_DTREAB, QK1_LICPK,  QK1_LSCPK,  QK1_ALTDOC, QK1_NALPRJ, QK1_CODVCL,  QK1_REVCLI, QK1_DTREVC, QK1_CJTDES, QK1_CJTREV,  QK1_CJREVD, QK1_PESOLI, QK1_CJPESO, QK1_QTDECJ,  QK1_CODIGO, QK1_USUARI, QK1_VISTO,  QK1_TIPO,  QK1_PECSEG, QK1_FLUXO,  QK1_MSBLQL, QK1_DTELAB,  QK1_OKAPRO, QK1_DTVIST, D_E_L_E_T_, R_E_C_N_O_, R_E_C_D_E_L_) VALUES('010101','010010002200   ','01','YX','20121218','010010002200                            ',' ',' ','93224453 - REFORCO LATERAL TUNEL LE                                         ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','1',' ',' ','              1,33','              1,67',' ',' ',' ',' ',' ',' ',' ',' ','              1,52','              0,00','              0,00',' ',' ',' ',' ',' ',' ',' ','20121218',' ',' ',' ','          1','          0')
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1438 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:INC_QK1010
+  NAME_sql:cu13
+  NATIVE COMMAND:INSERT INTO protheustst.dbo.QK1010(  QK1_FILIAL, QK1_PECA,   QK1_REV,    QK1_REVINV,  QK1_DTREVI, QK1_PCCLI,  QK1_DESCLI, QK1_PPAP,  QK1_DESC,   QK1_CODCLI, QK1_LOJCLI, QK1_NOMCLI,  QK1_NDES,   QK1_REVDES, QK1_DTRDES, QK1_PROJET,  QK1_ALTENG, QK1_DTENG,  QK1_DOC,    QK1_TPLOGO,  QK1_CODEQU, QK1_PRODUT, QK1_REVI,   QK1_JUST,  QK1_STATUS, QK1_DTENCE, QK1_DTREAB, QK1_LICPK,  QK1_LSCPK,  QK1_ALTDOC, QK1_NALPRJ, QK1_CODVCL,  QK1_REVCLI, QK1_DTREVC, QK1_CJTDES, QK1_CJTREV,  QK1_CJREVD, QK1_PESOLI, QK1_CJPESO, QK1_QTDECJ,  QK1_CODIGO, QK1_USUARI, QK1_VISTO,  QK1_TIPO,  QK1_PECSEG, QK1_FLUXO,  QK1_MSBLQL, QK1_DTELAB,  QK1_OKAPRO, QK1_DTVIST, D_E_L_E_T_, R_E_C_N_O_, R_E_C_D_E_L_) VALUES('010101','010010002200   ','01','YX','20121218','010010002200                            ',' ',' ','93224453 - REFORCO LATERAL TUNEL LE                                         ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','1',' ',' ','              1,33','              1,67',' ',' ',' ',' ',' ',' ',' ',' ','              1,52','              0,00','              0,00',' ',' ',' ',' ',' ',' ',' ','20121218',' ',' ',' ','          1','          0')
+  COMMAND:INSERT INTO protheustst.dbo.QK1010(  QK1_FILIAL, QK1_PECA,   QK1_REV,    QK1_REVINV,  QK1_DTREVI, QK1_PCCLI,  QK1_DESCLI, QK1_PPAP,  QK1_DESC,   QK1_CODCLI, QK1_LOJCLI, QK1_NOMCLI,  QK1_NDES,   QK1_REVDES, QK1_DTRDES, QK1_PROJET,  QK1_ALTENG, QK1_DTENG,  QK1_DOC,    QK1_TPLOGO,  QK1_CODEQU, QK1_PRODUT, QK1_REVI,   QK1_JUST,  QK1_STATUS, QK1_DTENCE, QK1_DTREAB, QK1_LICPK,  QK1_LSCPK,  QK1_ALTDOC, QK1_NALPRJ, QK1_CODVCL,  QK1_REVCLI, QK1_DTREVC, QK1_CJTDES, QK1_CJTREV,  QK1_CJREVD, QK1_PESOLI, QK1_CJPESO, QK1_QTDECJ,  QK1_CODIGO, QK1_USUARI, QK1_VISTO,  QK1_TIPO,  QK1_PECSEG, QK1_FLUXO,  QK1_MSBLQL, QK1_DTELAB,  QK1_OKAPRO, QK1_DTVIST, D_E_L_E_T_, R_E_C_N_O_, R_E_C_D_E_L_) VALUES('010101','010010002200   ','01','YX','20121218','010010002200                            ',' ',' ','93224453 - REFORCO LATERAL TUNEL LE                                         ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','1',' ',' ','              1,33','              1,67',' ',' ',' ',' ',' ',' ',' ',' ','              1,52','              0,00','              0,00',' ',' ',' ',' ',' ',' ',' ','20121218',' ',' ',' ','          1','          0')
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: POL1176.4GL  line=1439 
+  STATUS: -263   TRANSACTION:TRUE
+  NATIVE ERROR:  8114 - [MICROSOFT][ODBC SQL SERVER DRIVER][SQL SERVER]ERRO AO CONVERTER TIPO DE DADOS VARCHAR EM FLOAT.  COMMAND:INSERT INTO protheustst.dbo.QK1010(  QK1_FILIAL, QK1_PECA,   QK1_REV,    QK1_REVINV,  QK1_DTREVI, QK1_PCCLI,  QK1_DESCLI, QK1_PPAP,  QK1_DESC,   QK1_CODCLI, QK1_LOJCLI, QK1_NOMCLI,  QK1_NDES,   QK1_REVDES, QK1_DTRDES, QK1_PROJET,  QK1_ALTENG, QK1_DTENG,  QK1_DOC,    QK1_TPLOGO,  QK1_CODEQU, QK1_PRODUT, QK1_REVI,   QK1_JUST,  QK1_STATUS, QK1_DTENCE, QK1_DTREAB, QK1_LICPK,  QK1_LSCPK,  QK1_ALTDOC, QK1_NALPRJ, QK1_CODVCL,  QK1_REVCLI, QK1_DTREVC, QK1_CJTDES, QK1_CJTREV,  QK1_CJREVD, QK1_PESOLI, QK1_CJPESO, QK1_QTDECJ,  QK1_CODIGO, QK1_USUARI, QK1_VISTO,  QK1_TIPO,  QK1_PECSEG, QK1_FLUXO,  QK1_MSBLQL, QK1_DTELAB,  QK1_OKAPRO, QK1_DTVIST, D_E_L_E_T_, R_E_C_N_O_, R_E_C_D_E_L_) VALUES('010101','010010002200   ','01','YX','20121218','010010002200                            ',' ',' ','93224453 - REFORCO LATERAL TUNEL LE                                         ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','1',' ',' ','              1,33','              1,67',' ',' ',' ',' ',' ',' ',' ',' ','              1,52','              0,00','              0,00',' ',' ',' ',' ',' ',' ',' ','20121218',' ',' ',' ','          1','          0')
+
+translate: SELECT @@spid
+
+PREPARE
+ SELECT @@spid
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.015]
+  4gl source: LOG0010.4GL  line=457 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY3
+  NAME_sql:cu14
+  NATIVE COMMAND:SELECT @@spid
+  COMMAND:SELECT @@spid
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=465 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu14
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=467 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu14
+  COMMAND:SELECT @@spid
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=468 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu14
+  COMMAND:
+  INTO:1
+    t:              INTEGER v:117
+
+CLOSE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu14
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_SID_MSV
+  NAME_sql:cu14
+  COMMAND:
+
+translate: SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+PREPARE
+ SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=483 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VARQUERY4
+  NAME_sql:cu14
+  NATIVE COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+DECLARE
+ PREPARED 
+  4gl source: LOG0010.4GL  line=491 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu14
+  COMMAND:
+
+FREE 
+
+OPEN 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=493 
+  STATUS:    0 ROWS AFFECTED:1
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu14
+  COMMAND:SELECT login_time FROM master.dbo.sysprocesses WHERE spid =         117
+
+FETCH
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=494 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu14
+  COMMAND:
+  INTO:1
+    t:             DATETIME v:2012-12-18 17:06:30                                                                                                                                                                                                                                            
+
+CLOSE 
+  Trace - Running time [0.016]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu14
+  COMMAND:
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0010.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0010.CQ_LOGIN_TIME
+  NAME_sql:cu14
+  COMMAND:
+[Thread 1948] [LOGIX] ROLLBACK WORK - SID 117
+
+translate: ROLLBACK WORK
+  Trace - Running time [0.000]
+  4gl source: LOG0850.4GL  line=190 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:ROLLBACK WORK
+
+translate: SET IMPLICIT_TRANSACTIONS OFF
+
+PREPARE
+ SET IMPLICIT_TRANSACTIONS OFF
+
+[WARN ][SERVER] RUNTIME PREPARE ERROR! Prepare could not be generated. It can cause error in execution  Trace - Running time [0.000]
+  4gl source: LOG0850.4GL  line=201 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:VAR_EXEC_MSV_1
+  NAME_sql:cu14
+  NATIVE COMMAND:SET IMPLICIT_TRANSACTIONS OFF
+  COMMAND:SET IMPLICIT_TRANSACTIONS OFF
+
+EXECUTE
+  Trace - Running time [0.000]
+  4gl source: LOG0850.4GL  line=206 
+  STATUS:    0 ROWS AFFECTED:0
+  COMMAND:SET IMPLICIT_TRANSACTIONS OFF
+
+FREE 
+  Trace - Running time [0.000]
+  4gl source: LOG0850.4GL  line=0 
+  STATUS:    0 ROWS AFFECTED:0
+  NAME_fgl:LOG0850.VAR_EXEC_MSV_1
+  NAME_sql:cu14
+  COMMAND:

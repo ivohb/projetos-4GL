@@ -1,0 +1,38 @@
+DATABASE FORMONLY
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                       I T E N S  D O  P E D I D O   [b     ]
+
+ Seq     Item         Descrição    Entrega  Sdo Ped   Romanear Und  Sdo Estoq
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+[j |k             |l             |m       |n        |o        |p  |q         ]
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa,   NOENTRY;
+   b = FORMONLY.num_pedido,    NOENTRY;
+   j = FORMONLY.num_sequencia, NOENTRY  --#, OPTIONS="-nolist"; 
+   k = FORMONLY.cod_item,      NOENTRY  --#, OPTIONS="-nolist"; 
+   l = FORMONLY.den_item,      NOENTRY  --#, OPTIONS="-nolist"; 
+   m = FORMONLY.dat_entrega,   FORMAT = 'dd/mm/yy',
+                               NOENTRY  --#, OPTIONS="-nolist"; 
+   n = FORMONLY.sdo_pedido,    NOENTRY  --#, OPTIONS="-nolist"; 
+   o = FORMONLY.qtd_romanear,  NOENTRY  --#, OPTIONS="-nolist"; 
+   p = FORMONLY.cod_unid_med,  NOENTRY  --#, OPTIONS="-nolist"; 
+   q = FORMONLY.sdo_estoque,   NOENTRY  --#, OPTIONS="-nolist"; 
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_itens[11](num_sequencia THRU sdo_estoque);
+END

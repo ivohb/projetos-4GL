@@ -1,0 +1,20 @@
+{ TABLE "toni".par_desc_oper row size = 22 number of columns = 8 index size = 9 }
+create table "toni".par_desc_oper 
+  (
+    cod_emp_ofic char(2) not null constraint "toni".n4081_38680,
+    cod_emp_oper char(2) not null constraint "toni".n4081_38681,
+    max_desc_oper decimal(5,2) not null constraint "toni".n4081_38682,
+    per_jur_dia decimal(5,4) not null constraint "toni".n4081_38683,
+    cod_nat_oper integer not null constraint "toni".n4081_38684,
+    ies_estoque char(1) not null constraint "toni".n4081_38685,
+    ies_pedido char(1) not null constraint "toni".n4081_38686,
+    dat_process date not null constraint "toni".n4081_38687
+  );
+revoke all on "toni".par_desc_oper from "public";
+
+create index "toni".ix_pardes_1 on "toni".par_desc_oper (cod_emp_ofic);
+    
+
+
+
+

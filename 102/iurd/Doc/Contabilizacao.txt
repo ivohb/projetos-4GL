@@ -1,0 +1,276 @@
+Efetuar os seguintes acertos no pol1328
+
+
+Gravar as tabelas de contabilidade do AR para debito e crédito 
+
+
+  
+# --- Lançamento a debito   LANC_CONT_REC 
+
+
+
+insert into    LANC_CONT_REC 
+select a.COD_EMPRESA, 
+       a.NUM_NF, 
+       a.SER_NF, 
+       a.SSR_NF, 
+       a.IES_ESPECIE_nf, 
+       a.COD_FORNECEDOR, 
+       'D', 
+       b.num_conta_deb_desp, 
+       a.val_tot_nf_d, 
+       c.den_conta,
+       0,
+       'S', 
+       null, 
+       a.DAT_entrada_nf, 
+       b.COD_AREA_NEGOCIO, 
+       b.COD_LIN_NEGOCIO, 
+       a.NUM_AVISO_REC, 
+       1,
+       'N', 
+       0, 
+       b.COD_SEG_MERC, 
+       b.COD_CLA_USO,
+       (LANC_CONT_REC_SRL.NEXTVAL+1)
+       
+       FROM NF_SUP a, dest_aviso_rec4 b, plano_contas c
+       where a.cod_empresa='??' 
+       and a.cod_empresa=b.cod_empresa
+       and a.num_aviso_rec=b.num_aviso_rec
+       and b.NUM_CONTA_deb_desp = c.num_conta_reduz
+       and c.cod_empresa='99'
+       and a.num_aviso_rec=??
+   
+   
+   # --- Lançamento a crédito LANC_CONT_REC 
+  
+insert into    LANC_CONT_REC 
+select a.COD_EMPRESA, 
+       a.NUM_NF, 
+       a.SER_NF, 
+       a.SSR_NF, 
+       a.IES_ESPECIE_nf, 
+       a.COD_FORNECEDOR, 
+       'C', 
+       d.NUM_CONTA_CRED, 
+       a.val_tot_nf_d, 
+       c.den_conta,
+       0,
+       'S', 
+       null, 
+       a.DAT_entrada_nf, 
+       b.COD_AREA_NEGOCIO, 
+       b.COD_LIN_NEGOCIO, 
+       a.NUM_AVISO_REC, 
+       1,
+       'N', 
+       0, 
+       b.COD_SEG_MERC, 
+       b.COD_CLA_USO,
+       (LANC_CONT_REC_SRL.NEXTVAL+1)
+       FROM NF_SUP a, dest_aviso_rec4 b, plano_contas c, tipo_despesa d
+       where a.cod_empresa='??' 
+       and a.cod_empresa=b.cod_empresa
+       and a.num_aviso_rec=b.num_aviso_rec
+       and d.cod_empresa='99'
+       and d.cod_tip_despesa=613
+       and d.NUM_CONTA_cred=c.num_conta_reduz
+       and c.cod_empresa='99'
+       and a.num_aviso_rec=??
+   
+   # --- Lançamento a debito   CTB_LANC_CTBL_RECB 
+   
+        
+          
+          SELECT MAX(NUM_RELACIONTO) FROM CTB_LANC_CTBL_RECB  
+  WHERE EMPRESA='??' AND PERIODO_CONTAB=???? AND SEGMTO_PERIODO=?
+   
+   
+   insert into CTB_LANC_CTBL_RECB 
+   select a.COD_EMPRESA,
+      TO_CHAR(DAT_entrada_nf, 'YYYY'),
+      TO_CHAR(DAT_entrada_nf, 'MM'),
+      b.num_conta_deb_desp,
+      0,
+      a.DAT_entrada_nf,
+      null,
+      null,
+      a.val_tot_nf_d, 
+      0,
+      767,
+      'S',
+      b.COD_AREA_NEGOCIO, 
+       b.COD_LIN_NEGOCIO,
+       b.COD_SEG_MERC, 
+       b.COD_CLA_USO,
+       3931,
+       0,
+       0,
+       a.COD_EMPRESA,
+       (CTB_LANC_CTBL_RECB_SRL.NEXTVAL+1),
+       a.NUM_NF, 
+       a.SER_NF, 
+       a.SSR_NF, 
+       a.IES_ESPECIE_nf, 
+       a.COD_FORNECEDOR, 
+       a.NUM_AVISO_REC, 
+       1,
+       1,
+       'N',
+       0,
+       'S',
+       'O'       
+              FROM NF_SUP a, dest_aviso_rec4 b, plano_contas c
+       where a.cod_empresa='??' 
+       and a.cod_empresa=b.cod_empresa
+       and a.num_aviso_rec=b.num_aviso_rec
+       and b.NUM_CONTA_deb_desp=c.num_conta_reduz
+       and c.cod_empresa='99'
+       and a.num_aviso_rec=??
+  
+   # --- Lançamento a crédito CTB_LANC_CTBL_RECB 
+    insert into CTB_LANC_CTBL_RECB 
+select a.COD_EMPRESA,
+      TO_CHAR(DAT_entrada_nf, 'YYYY'),
+      TO_CHAR(DAT_entrada_nf, 'MM'),
+      0, 
+      SUBSTR(d.NUM_CONTA_CRED,1,10), 
+      a.DAT_entrada_nf,
+      null,
+      null,
+      a.val_tot_nf_d, 
+      0,
+      767,
+      'S',
+      b.COD_AREA_NEGOCIO, 
+       b.COD_LIN_NEGOCIO,
+       b.COD_SEG_MERC, 
+       b.COD_CLA_USO,
+       3931,
+       0,
+       0,
+       a.COD_EMPRESA,
+       (CTB_LANC_CTBL_RECB_SRL.NEXTVAL+1),
+       a.NUM_NF, 
+       a.SER_NF, 
+       a.SSR_NF, 
+       a.IES_ESPECIE_nf, 
+       a.COD_FORNECEDOR, 
+       a.NUM_AVISO_REC, 
+       1,
+       1,
+       'N',
+       0,
+       'S',
+       'O'       
+       FROM NF_SUP a, dest_aviso_rec4 b, plano_contas c, tipo_despesa d
+       where a.cod_empresa='??' 
+       and a.cod_empresa=b.cod_empresa
+       and a.num_aviso_rec=b.num_aviso_rec
+       and d.cod_empresa='99'
+       and d.cod_tip_despesa=613
+       and d.NUM_CONTA_cred=c.num_conta_reduz
+       and c.cod_empresa='99'
+       and a.num_aviso_rec=??
+   
+  
+  
+  # --- Lançamento a debito CTB_COMPL_HIST_REC
+  
+  
+  insert into CTB_COMPL_HIST_REC 
+  select a.COD_EMPRESA,
+      'REC',
+      TO_CHAR(DAT_entrada_nf, 'YYYY'),
+      TO_CHAR(DAT_entrada_nf, 'MM'),
+      b.SEQUENCIA_REGISTRO,
+      1,
+      'NF '||a.NUM_NF||' FORNEC '||a.COD_FORNECEDOR||'  AR '||a.NUM_AVISO_REC
+       FROM NF_SUP a, CTB_LANC_CTBL_RECB  b
+       where a.cod_empresa='??' 
+       and a.cod_empresa=b.empresa
+       and a.num_aviso_rec=b.aviso_recebto
+       and b.cta_deb>0
+       and a.num_aviso_rec=??
+     
+     
+     # --- Lançamento a crédito CTB_COMPL_HIST_REC
+  
+  
+  insert into CTB_COMPL_HIST_REC 
+  select a.COD_EMPRESA,
+      'REC',
+      TO_CHAR(DAT_entrada_nf, 'YYYY'),
+      TO_CHAR(DAT_entrada_nf, 'MM'),
+      b.SEQUENCIA_REGISTRO,
+      1,
+      'NF '||a.NUM_NF||' FORNEC '||a.COD_FORNECEDOR||'  AR '||a.NUM_AVISO_REC
+       FROM NF_SUP a, CTB_LANC_CTBL_RECB  b
+       where a.cod_empresa='??' 
+       and a.cod_empresa=b.empresa
+       and a.num_aviso_rec=b.aviso_recebto
+       and b.cta_cre>0
+       and a.num_aviso_rec=??
+
+
+
+------------------------feito------------------------------------------------
+
+
+     # --- ATUALIZA nf_sup
+     
+ Não lançar valor de ICMS  
+
+UPDATE NF_SUP SET 
+IES_NF_COM_ERRO='N', 
+val_tot_icms_nf_d=0,
+val_tot_icms_nf_c=0,
+IES_INCL_CONTAB='N',
+NOM_RESP_ACEITE_ER='admlog' 
+WHERE NF_SUP.COD_EMPRESA='??' 
+AND NF_SUP.NUM_AVISO_REC=??
+
+
+     # --- ATUALIZA aviso_rec
+
+ Não lançar valor de ICMS e deixar o campo ies_incid_icms_ite='I' 
+
+UPDATE aviso_rec SET  
+val_icms_item_d=0,
+val_icms_item_c=0,
+ies_incid_icms_ite='I' 
+WHERE COD_EMPRESA='??' 
+AND NUM_AVISO_REC=??
+
+    
+     # --- delete registro de PIS_COFINS 
+
+
+Não gravar a tabela ar_pis_cofins
+     
+
+
+#----Alterar nf_sup_erro para Não grave 
+
+
+Deixar a tabeloa de erro do Ar assim:
+   
+  update   NF_SUP_ERRO set ies_origem_erro='4', ies_erro_grave='N'  where  empresa='??'  and num_seq=0
+  and num_aviso_rec=??
+  
+  #---- Insere registro de auditoria  
+   
+  Insert into audit_ar 
+  select cod_empresa,
+  num_aviso_rec,
+  1,
+  --max(num_seq +1),  ------->  VERIFICAR O MAISORNUMEOR DE SEQUENCIA ´PARA ESTE AR NA EMPRESA SELECIONADA E SOMAR UM 
+  usuario,
+  today,
+  'POL1328',
+  1
+ FROM NF_SUP 
+       where cod_empresa='??' 
+        and num_aviso_rec=??
+ 

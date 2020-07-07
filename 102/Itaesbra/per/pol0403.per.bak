@@ -1,0 +1,66 @@
+DATABASE FORMONLY    
+
+SCREEN
+{
+-------------------------------------------------------------------------------
+[a0]               SOLICITAÇÃO DE ORDEM DE MONTAGEM/ROMANEIO 
+
+ Pedido     :[a1    ] Usuário:[b       ] Entrega Até:[a2        ] Doca:[d    ]
+ Cliente    :[a3             ][a4                               ]
+ Transp     :[a5             ][a6                               ]
+ Placa      :[a7     ]        
+ Mantem Lote:[a] Lote :[a8    ] Itens Faturados: [a15    ] Selecionados: [a16]
+---------------------------------- Produtos ----------------------------------
+ Item  Dat Entrega Produto             Saldo Item   Qtd Reserv  Qtd Estoque
+[a9  ][a10       ][a11            ]  [a12        ][a13        ][a14        ]  
+[a9  ][a10       ][a11            ]  [a12        ][a13        ][a14        ]  
+[a9  ][a10       ][a11            ]  [a12        ][a13        ][a14        ]  
+[a9  ][a10       ][a11            ]  [a12        ][a13        ][a14        ]  
+[a9  ][a10       ][a11            ]  [a12        ][a13        ][a14        ]  
+[a9  ][a10       ][a11            ]  [a12        ][a13        ][a14        ]  
+[a9  ][a10       ][a11            ]  [a12        ][a13        ][a14        ]  
+[a9  ][a10       ][a11            ]  [a12        ][a13        ][a14        ]  
+
+}
+END
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,       UPSHIFT, NOENTRY;
+a  = FORMONLY.ies_lote TYPE CHAR,UPSHIFT, AUTONEXT,
+     INCLUDE = (S,N);
+a1 = FORMONLY.num_pedido,        AUTONEXT;
+a2 = FORMONLY.entrega_ate,       AUTONEXT,
+     COMMENTS = "Branco Seleciona Todas as Entregas";
+d  = FORMONLY.cod_doca,          UPSHIFT, AUTONEXT;
+a3 = FORMONLY.cod_cliente,       UPSHIFT, NOENTRY;
+a4 = FORMONLY.nom_cliente,       UPSHIFT, NOENTRY;
+a5 = FORMONLY.cod_transpor,      UPSHIFT, AUTONEXT 
+--#,WIDGET="FIELD_BMP",CONFIG="combo.bmp Control-z"
+;
+a6 = FORMONLY.nom_transpor,      UPSHIFT, NOENTRY;
+a7 = FORMONLY.num_placa,         UPSHIFT, AUTONEXT;
+a8 = FORMONLY.num_lote,          AUTONEXT;
+a15= FORMONLY.itens_fat,         NOENTRY;
+a16= FORMONLY.itens_sel,         NOENTRY;
+a9 = FORMONLY.num_sequencia,     NOENTRY, NOENTRY
+--#, OPTIONS="-nolist"
+;
+a10 = FORMONLY.prz_entrega TYPE DATE, FORMAT = "DD/MM/YYYY", NOENTRY
+--#, OPTIONS="-nolist"
+;
+a11 = FORMONLY.cod_item,         UPSHIFT, NOENTRY
+--#, OPTIONS="-nolist"
+;
+a12 = FORMONLY.qtd_saldo,        NOENTRY
+--#, OPTIONS="-nolist"
+;
+a13 = FORMONLY.qtd_reservada,    AUTONEXT
+--#, OPTIONS="-nolist"
+;
+a14 = FORMONLY.qtd_estoque,      NOENTRY
+--#, OPTIONS="-nolist"
+;
+b   = FORMONLY.usuario,          AUTONEXT;
+
+INSTRUCTIONS
+SCREEN RECORD s_om[8] (FORMONLY.num_sequencia THRU FORMONLY.qtd_estoque);
+END

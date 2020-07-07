@@ -1,0 +1,49 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]               SOLICITAÇÃO DE APROVAÇÃO DE ETAPAS
+  
+               Contrato serviço:[b         ] até:[c         ]    
+                          Etapa:[d   ]       até:[e   ]         
+                Data vencimento:[f         ] até:[g         ]
+
+     Solic Contrato Ver Etapa  Fornecedor      Vencto      Valor    
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+      [h] [i        |j |k   |l              |m         |n           ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa,  UPSHIFT, NOENTRY;
+b = FORMONLY.contrato_de,  UPSHIFT, AUTONEXT;
+c = FORMONLY.contrato_ate, UPSHIFT, AUTONEXT;
+d = FORMONLY.etapa_de,     UPSHIFT, AUTONEXT;
+e = FORMONLY.etapa_ate,    UPSHIFT, AUTONEXT;
+f = FORMONLY.data_de,      UPSHIFT, AUTONEXT;
+g = FORMONLY.data_ate,     UPSHIFT, AUTONEXT;
+
+h = FORMONLY.marcado, UPSHIFT, 
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado  -  Ctrl-T Marca/desmarca todas'
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+
+i = FORMONLY.contrato_servico, NOENTRY --#,OPTIONS='-nolist';
+j = FORMONLY.versao_contrato, NOENTRY --#,OPTIONS='-nolist';
+k = FORMONLY.num_etapa, NOENTRY        --#,OPTIONS='-nolist';
+l = FORMONLY.cod_fornecedor, NOENTRY   --#,OPTIONS='-nolist';
+m = FORMONLY.dat_vencto_etapa, NOENTRY --#,OPTIONS='-nolist';
+n = FORMONLY.val_etapa, NOENTRY        --#,OPTIONS='-nolist';
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_solic[10](marcado THRU val_etapa);
+END 

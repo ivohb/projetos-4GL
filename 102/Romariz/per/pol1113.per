@@ -1,0 +1,56 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a0]                        RESULTADO DAS ANÁLISES                                  
+                                                                              
+                Identificador:[ni                            ]
+
+  Item: [a1             ]         Liberado:[l]
+        [a2                                                                  ]   
+     Lote:[a3        ]            P.A.:[a6    ]              Data:[a4        ]                   
+ Qtd Lote:[q1             ]  Qtd Inspecionada:[q2             ]    
+ Responsável: [u       ]  
+
+ Tipo            Descrição                  Método      Resultado   An Ob OK
+[b     |b1                           |b2              |b3         ] [c| d| e]
+[b     |b1                           |b2              |b3         ] [c| d| e]
+[b     |b1                           |b2              |b3         ] [c| d| e]
+[b     |b1                           |b2              |b3         ] [c| d| e]
+[b     |b1                           |b2              |b3         ] [c| d| e]
+[b     |b1                           |b2              |b3         ] [c| d| e]
+[b     |b1                           |b2              |b3         ] [c| d| e]
+[b     |b1                           |b2              |b3         ] [c| d| e]
+}
+
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,   UPSHIFT,  NOENTRY;
+ni = FORMONLY.identif_estoque, UPSHIFT, AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a1 = FORMONLY.cod_item,      upshift
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+l  = FORMONLY.ies_liberado,   NOENTRY;
+a2 = FORMONLY.den_item,       NOENTRY;
+a3 = FORMONLY.lote_tanque,    UPSHIFT;
+a4 = FORMONLY.dat_analise,    NOENTRY;
+a6 = FORMONLY.num_pa,         AUTONEXT; 
+q1 = FORMONLY.qtd_lote,       NOENTRY;
+q2 = FORMONLY.qtd_pa,         AUTONEXT;
+u  = FORMONLY.nom_usuario,    NOENTRY;
+
+b  = FORMONLY.tip_analise,   AUTONEXT, NOENTRY --#, OPTIONS="-nolist";
+b1 = FORMONLY.den_analise_port,   UPSHIFT,  NOENTRY --#, OPTIONS="-nolist";
+b2 = FORMONLY.metodo,        AUTONEXT, NOENTRY --#, OPTIONS="-nolist";
+b3 = FORMONLY.val_analise 
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+c  = FORMONLY.em_analise,      UPSHIFT, NOENTRY  --#, OPTIONS="-nolist";
+d  = FORMONLY.ies_obrigatoria, UPSHIFT, NOENTRY  --#, OPTIONS="-nolist";
+e = FORMONLY.ies_conforme,     UPSHIFT, NOENTRY  --#, OPTIONS="-nolist"
+
+INSTRUCTIONS
+SCREEN RECORD s_itens[8] (FORMONLY.tip_analise THRU FORMONLY.ies_conforme);
+END
+

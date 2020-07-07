@@ -1,0 +1,60 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                            FRETE DE SAÍDA
+
+ Período:[b         ] - [c         ] Transp:[d              ][e              ]
+  Conhec:[f     ][g  ][h ][i       ] Vr:[j        ] Icms:[k        ] Valid:[l]
+Romaneio:[m        ]    Placa:[n      ]   Veículo:[o              ]  Carga:[p]
+V Tab:[q        ] V Contrat:[r        ] V Frete:[s        ] V Comp:[t        ]
+
+    Num NF Vr Frete Vr Compl   Peso      Cliente            Destino 
+  [u     |v        |w        |x        |y              |z                   ]
+  [u     |v        |w        |x        |y              |z                   ]
+  [u     |v        |w        |x        |y              |z                   ]
+  [u     |v        |w        |x        |y              |z                   ]
+  [u     |v        |w        |x        |y              |z                   ]
+  [u     |v        |w        |x        |y              |z                   ]
+  [u     |v        |w        |x        |y              |z                   ]
+  [u     |v        |w        |x        |y              |z                   ]
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, NOENTRY;
+ b = FORMONLY.dat_ini TYPE DATE, FORMAT = 'dd/mm/yyyy', AUTONEXT,
+     COMMENTS = "Digite a Data Inicial";
+ c = FORMONLY.dat_fim TYPE DATE, FORMAT = 'dd/mm/yyyy', AUTONEXT,
+     COMMENTS = "Digite a Data Final";
+ d = FORMONLY.cod_transpor, UPSHIFT, AUTONEXT
+    --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
+ e = FORMONLY.nom_transpor, NOENTRY, REVERSE;
+ f = FORMONLY.num_conhec, AUTONEXT;
+ g = FORMONLY.ser_conhec, NOENTRY, REVERSE;
+ h = FORMONLY.ssr_conhec, NOENTRY, REVERSE;
+ i = FORMONLY.dat_emissao, NOENTRY, REVERSE, FORMAT = 'dd/mm/yy';
+ j = FORMONLY.val_frete_c, NOENTRY, REVERSE;
+ k = FORMONLY.val_icms, NOENTRY, REVERSE;
+ l = FORMONLY.ies_validado, NOENTRY, REVERSE;
+ m = FORMONLY.num_solicit, NOENTRY, REVERSE;
+ n = FORMONLY.num_chapa, NOENTRY, REVERSE;
+ o = FORMONLY.cod_veiculo, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist';
+ p = FORMONLY.cod_tip_carga, UPSHIFT, AUTONEXT,
+     COMMENTS = 'B-Batido P-Paletizado M-Misto';
+ q = FORMONLY.val_frete_tab, AUTONEXT;
+ r = FORMONLY.val_frete, AUTONEXT;
+ s = FORMONLY.val_frete_ofic, AUTONEXT;
+ t = FORMONLY.val_frete_ger, AUTONEXT;
+ u = FORMONLY.num_nff;
+ v = FORMONLY.val_frete_rod;
+ w = FORMONLY.val_compl;
+ x = FORMONLY.pes_nf;
+ y = FORMONLY.nom_cliente;
+ z = FORMONLY.cid_destino;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_conhec[08] (num_nff THRU cid_destino);
+END

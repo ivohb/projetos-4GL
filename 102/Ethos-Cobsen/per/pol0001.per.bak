@@ -1,0 +1,44 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                  CONTATOS/E-MAIL DE CLIENTES          Usuario:[u1      ]
+                                                        Ult.alt.:[u2        ]
+ 
+ 
+   Cliente: [a1             ]   [a2                                  ]
+
+   Nome   : [a3                            ]     Setor : [a4      ]
+
+   Fone   : [a5             ]                    Fax   : [a6             ]
+
+   E-mail : [a7                                                          ]
+
+   Obs    : [a8                                                          ]
+
+
+
+
+}
+END
+
+TABLES
+cli_hayward,   
+clientes
+END
+
+ATTRIBUTES
+ a  = FORMONLY.cod_empresa,       NOENTRY;
+u1  = cli_hayward.nom_usuario,    NOENTRY;
+u2  = cli_hayward.dat_alter,      NOENTRY;
+a1  = cli_hayward.cod_cliente,    AUTONEXT,UPSHIFT
+   --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+a2  = clientes.nom_cliente,        AUTONEXT,UPSHIFT;
+a3  = cli_hayward.nom_contato,    AUTONEXT,UPSHIFT;
+a4  = cli_hayward.set_contato,    AUTONEXT,UPSHIFT;
+a5  = cli_hayward.tel_contato,    AUTONEXT,UPSHIFT;
+a6  = cli_hayward.fax_contato,    AUTONEXT,UPSHIFT;
+a7  = cli_hayward.email_contato,  AUTONEXT;
+a8  = cli_hayward.obs_contato,    AUTONEXT,UPSHIFT;
+END

@@ -1,0 +1,34 @@
+DATABASE FORMONLY
+SCREEN
+{
+ -----------------------------------------------------
+     CONFIRMAÇÃO DAS METAS DOS REPRESENTANTES
+           
+                                             Atingiu
+Código            Representante               Meta?          
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+[a    ][b                                   ]  [c]
+                                                  
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_repres,  NOENTRY--#,OPTIONS='-nolist';
+   b = FORMONLY.raz_social,  NOENTRY--#,OPTIONS='-nolist';
+   c = FORMONLY.ies_meta, UPSHIFT, AUTONEXT,
+       INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado'
+       --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+       
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_representante[10](cod_repres THRU ies_meta);
+END 

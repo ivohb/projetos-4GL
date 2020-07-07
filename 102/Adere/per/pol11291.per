@@ -1,0 +1,25 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------
+           OPERAÇÕES DA ORDEM
+              
+Seq  Código           Descrição                       
+[a  |b     |c                             ]
+[a  |b     |c                             ]
+[a  |b     |c                             ]
+[a  |b     |c                             ]
+[a  |b     |c                             ]
+[a  |b     |c                             ]
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_operac,     NOENTRY  --# ,OPTIONS='-nolist';
+ b = FORMONLY.num_seq_operac, NOENTRY  --# ,OPTIONS='-nolist';
+ c = FORMONLY.den_operac,     NOENTRY  --# ,OPTIONS='-nolist';
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_operacs[6](cod_operac THRU den_operac);
+END 

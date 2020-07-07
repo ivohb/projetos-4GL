@@ -1,0 +1,33 @@
+DATABASE FORMONLY 
+SCREEN
+{
+--------------------------------------------------------------
+                      CADASTRO DE ITENS
+
+Código                              Descrição
+[a              ]  [b                                       ]   
+       
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+[c              ]  [d                                       ]
+}
+END 
+
+ATTRIBUTES
+	a = FORMONLY.cod_item,   UPSHIFT, AUTONEXT;
+	b = FORMONLY.den_item,   UPSHIFT, AUTONEXT;
+	c = FORMONLY.codigo,     UPSHIFT --#, OPTIONS="-nolist";
+	d = FORMONLY.descricao,  UPSHIFT --#, OPTIONS="-nolist"
+END
+
+INSTRUCTIONS
+	SCREEN RECORD sr_item[10] (codigo THRU descricao);
+END
+

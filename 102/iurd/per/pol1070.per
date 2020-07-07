@@ -1,0 +1,43 @@
+DATABASE FORMONLY
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                       LAY-OUT DOS ARQUIVOS DOS BANCOS
+
+           Cód banco:[b  ] [c                                   ] 
+           (*)Código do identificador:[h ]   Posição da data no header:[i  ]
+                                            Posição do banco no header:[j  ]
+                                 Posição Tamanho
+                            Banco:[d  ]   [e ]
+                         Contador:[d  ]   [e ] 
+                 (*)Identificador:[d  ]   [e ]
+                      Funcionário:[d  ]   [e ]       
+                              CPF:[d  ]   [e ]       
+                             Data:[d  ]   [e ]       
+                          Parcela:[d  ]   [e ]       
+                            Prazo:[d  ]   [e ]       
+                      Solicitação:[d  ]   [e ]       
+                       Empréstimo:[d  ]   [e ]       
+                        Prestação:[d  ]   [e ]       
+                         Contrato:[d  ]   [e ]                                                             
+}
+END
+
+ATTRIBUTES
+   a = FORMONLY.cod_empresa, NOENTRY;
+   b = FORMONLY.cod_banco,   UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+   c = FORMONLY.nom_banco,   NOENTRY, REVERSE, color = blue;
+   d = FORMONLY.posicao,     UPSHIFT, AUTONEXT --#, OPTIONS="-nolist";
+   e = FORMONLY.tamanho,     UPSHIFT, AUTONEXT --#, OPTIONS="-nolist";
+   h = FORMONLY.identificador, UPSHIFT, AUTONEXT,
+       COMMENTS = 'CARACTERES QUE IDENTIFICAM OS REGISGTROS DETALHES';   
+   i = FORMONLY.posi_header, UPSHIFT, AUTONEXT,
+       COMMENTS = 'POSIÇÃO DO MES/ANO NO ARQUIVO DO BANCO';   
+   j = FORMONLY.posi_bco_header, UPSHIFT, AUTONEXT,
+       COMMENTS = 'POSIÇÃO DO COD BANCO NO ARQUIVO DO BANCO';   
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_campos[12](posicao THRU tamanho);   
+END 

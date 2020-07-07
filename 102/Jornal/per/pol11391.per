@@ -1,0 +1,56 @@
+DATABASE FORMONLY
+SCREEN
+{
+----------------------------------------------------------------------------
+Empresa:[z ]  [x                             ]                 Tipo NF:[a  ] 
+
+Num NF:[b        ] Sér:[c  ] Cliente:[d              ]  [e                 ]
+
+Emissão:[f         ] Vencto:[g         ] Val bruto:[h           ]
+
+Desc incondic:[i          ]   Val liq:[j         ]  Desc CENP:[k         ]
+
+Val total:[l          ]  Val dupl:[m         ]  Num boleto:[n              ]
+
+Situação NF:[o]    Dat cancelamento:[p         ]  
+
+Tip NF devolução:[q  ]    Num NF origem:[r         ]    Sér NF origem:[s  ]
+
+    Chave acesso:[t                                             ]
+
+Protocolo:[u              ] Dat protocolo:[v         ] Hor protoc:[w       ]
+}
+END
+
+ATTRIBUTES
+ z = FORMONLY.cod_empresa, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ x = FORMONLY.den_empresa, UPSHIFT, NOENTRY;
+ a = FORMONLY.tip_nf, UPSHIFT, AUTONEXT;
+ b = FORMONLY.num_nf, UPSHIFT;
+ c = FORMONLY.ser_nf, UPSHIFT;
+ d = FORMONLY.cod_cliente, UPSHIFT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+ e = FORMONLY.nom_cliente, UPSHIFT, NOENTRY;
+ f = FORMONLY.dat_emissao;
+ g = FORMONLY.dat_vencto;
+ h = FORMONLY.val_bruto_nf, UPSHIFT;
+ i = FORMONLY.val_desc_incond, UPSHIFT;
+ j = FORMONLY.val_liq_nf, UPSHIFT;
+ k = FORMONLY.val_desc_cenp, UPSHIFT;
+ l = FORMONLY.val_tot_nf, UPSHIFT;
+ m = FORMONLY.val_duplicata, UPSHIFT;
+ n = FORMONLY.num_boleto, UPSHIFT;
+ 
+ o = FORMONLY.ies_situa_nf, UPSHIFT, AUTONEXT;
+ p = FORMONLY.dat_cancel;
+ 
+ q = FORMONLY.tip_nf_dev, UPSHIFT, AUTONEXT;
+ r = FORMONLY.num_nf_dev, UPSHIFT;
+ s = FORMONLY.ser_nf_dev, UPSHIFT;
+
+ t = FORMONLY.chave_acesso,  UPSHIFT;
+ u = FORMONLY.protocolo,     UPSHIFT;
+ v = FORMONLY.dat_protocolo;
+ w = FORMONLY.hor_protocolo, UPSHIFT;
+END 

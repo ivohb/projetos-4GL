@@ -1,0 +1,26 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+-------------------------------------------------------------
+                      MOTIVO HORAS
+
+        Motivo: [f1   ]
+
+   Denominação: [f002               ]
+
+    Observação: [g]
+
+}
+END
+
+ATTRIBUTES
+f1   = FORMONLY.motivo      TYPE CHAR, UPSHIFT, AUTONEXT;
+f002 = FORMONLY.des_motivo, UPSHIFT;
+g    = FORMONLY.eh_obs_apont_hor TYPE CHAR, UPSHIFT, AUTONEXT, INCLUDE = ("S","N"),
+     COMMENTS = " S - Sim   N - Não "
+     --#, widget='CHECK', config='S N {}'
+     --#, COMMENTS='Sim (marcado)  Não (desmarcado)'
+;
+END
+

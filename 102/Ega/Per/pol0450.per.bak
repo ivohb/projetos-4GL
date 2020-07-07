@@ -1,0 +1,42 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]            PARÂMETROS DE AJUSTES NA INTEGRAÇÃO LOGIX x EGA
+        
+% Ajuste Qtd. Necessária: [a2    ]
+          
+Caminho Arqs. Exportados: [a3                                                ]
+   
+ Aponta Equipto/Recurso?: [b] S/N          
+
+     Aponta Ferramental?: [c] S/N          
+
+      Finaliza operação?: [d] S/N
+
+          Aponta refugo?: [e] S/N
+
+    Qtd nível área/linha: [f]
+
+          Aponta parada?: [g] S/N    
+}
+END
+
+TABLES
+   pct_ajust_man912
+END
+
+ATTRIBUTES
+a0   = FORMONLY.cod_empresa,     NOENTRY;
+a2   = pct_ajust_man912.pct_ajus_insumo, AUTONEXT;
+a3   = pct_ajust_man912.nom_caminho, AUTONEXT;
+ b   = pct_ajust_man912.aponta_eqpto_recur, UPSHIFT, AUTONEXT;
+ c   = pct_ajust_man912.aponta_ferramenta, UPSHIFT, AUTONEXT;
+ d   = pct_ajust_man912.finaliza, UPSHIFT, AUTONEXT;
+ e   = pct_ajust_man912.aponta_refugo, UPSHIFT, AUTONEXT;
+ f   = pct_ajust_man912.qtd_nivel_aen, UPSHIFT, AUTONEXT;
+ g   = pct_ajust_man912.aponta_parada, UPSHIFT, AUTONEXT;
+ 
+END
+

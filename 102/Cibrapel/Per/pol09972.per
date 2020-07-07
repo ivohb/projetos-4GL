@@ -1,0 +1,33 @@
+DATABASE FORMONLY 
+SCREEN
+{
+--------------------------------------------------------------
+                          TABELAS
+
+       Tabela             Versão          Valor do frete
+     
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+     [a         ]         [b    ]         [c            ]
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.num_tabela,        UPSHIFT --#, OPTIONS="-nolist";
+ b = FORMONLY.num_versao,        UPSHIFT --#, OPTIONS="-nolist";
+ c = FORMONLY.val_frete_unit,    UPSHIFT --#, OPTIONS="-nolist";
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_tabela[10] (num_tabela THRU val_frete_unit);
+END
+

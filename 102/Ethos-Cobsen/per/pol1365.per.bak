@@ -1,0 +1,20 @@
+DATABASE FORMONLY
+SCREEN
+{
+-------------------------------------------
+
+             Aguarde! Apontando ...
+                            
+             Ordem:[a         ] 
+             
+              
+              
+              
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,   NOENTRY;
+ b = FORMONLY.num_ordem,  NOENTRY;
+END 
+

@@ -1,0 +1,31 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+-----------------------------------------------------------
+[a ]               APONTAMENTO DE PRODUÇÃO
+
+                
+                     Ordem:[b            ]
+
+
+         Apontamentos Criticados:[c      ]
+           
+          Apontamentos Efetuados:[d      ]
+           
+              Consumo Criticados:[e      ]
+           
+               Consumo Efetuados:[f      ]
+
+}
+END
+
+ATTRIBUTES 
+   a = FORMONLY.cod_empresa;
+   b = FORMONLY.num_ordem;
+   c = FORMONLY.qtd_erro_inter;
+   d = FORMONLY.qtd_apontado;
+   e = FORMONLY.qtd_erro_consu;
+   f = FORMONLY.qtd_baixa_consu;
+END
+

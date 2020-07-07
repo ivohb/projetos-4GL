@@ -1,0 +1,27 @@
+
+DBSCHEMA Schema Utility       INFORMIX-SQL Version 11.50.FC9
+
+
+
+
+
+
+
+{ TABLE "informix".fiscal_hist row size = 307 number of columns = 6 index size = 
+              8 }
+create table "informix".fiscal_hist 
+  (
+    cod_hist decimal(3,0) not null ,
+    tex_hist_1 char(75),
+    tex_hist_2 char(75),
+    tex_hist_3 char(75),
+    tex_hist_4 char(75),
+    cod_trib_federal decimal(5,0) not null ,
+    primary key (cod_hist)  constraint "informix".pk_fisc_his_1
+  );
+
+revoke all on "informix".fiscal_hist from "public" as "informix";
+
+
+
+

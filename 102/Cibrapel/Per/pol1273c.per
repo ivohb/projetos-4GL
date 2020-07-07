@@ -1,0 +1,33 @@
+DATABASE logix
+SCREEN
+{
+----------------------------------------------------------------------------
+                LISTAGEM DAS BAIXAS ENVIADAS X REALIZADAS
+
+                         
+                         
+                         
+                         
+                       Período:  De:[a         ] 
+       
+                                Até:[b         ]
+
+                             listar:[c                    ]
+
+
+                      Mensagem:[m              ]
+
+
+}
+END
+
+ATTRIBUTES
+
+ a = FORMONLY.dat_ini;
+ b = FORMONLY.dat_fim;
+ c = FORMONLY.listar TYPE CHAR, INCLUDE=('I','O')
+     --#, widget='RADIO', config='I Agrupado-por-item O Detalhado-por-ordem';  
+ m = FORMONLY.mensagem, NOENTRY;
+ 
+END 
+   

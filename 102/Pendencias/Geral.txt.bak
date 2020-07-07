@@ -1,0 +1,43 @@
+
+
+Empresa :ITAESBRA
+
+A/C : Carlos Correa
+
+Data : 08/04/2019
+
+Número : 01DV0401194 (OS01194)
+
+Versão: 01
+
+DEFINIÇÃO DO DESENVOLVIMENTO 
+
+OS01194 – Care - Programa para rejeição de itens.
+
+O objetivo desta proposta é o de permitir efetuar a liberação ou rejeição de itens em inspeção pelo CARE.
+
+1- Descrição da Customização
+
+Conforme discutido entre as partes, será criado um novo programa em 4gl a ser utilizado via TS, para efetuar a movimentação de itens em inspeção pelo departamento CARE. 
+
+O programa deverá efetuar as seguintes operações:
+
+1- Ler o código de barras da Ordem de Produção que contem o numero da OP, com esta informação o programa irá identificar o item da OP e procurar no estoque lotes desse item que estejam pendentes de inspeção. 
+2- Selecionar o Lote e efetuar a liberação ou rejeição total ou parcial de um lote.
+3- Se LIBERAR o programa deve fazer um movimento no estoque desse LOTE/QUANTIDADE com código “LCON” - LIBERADO CONFERIDO,
+4- Se o Lote for REJEITADO, o programa deve fazer um movimento no estoque desse LOTE/QUANTIDADE com código “LCON” - LIBERADO CONFERIDO e em seguida um movimento desse mesmo LOTE/QUANTIDADE com o código de movimento de estoque “AJSR”- AJUSTE SAIDA REJEICAO. Além disso o usuario deverá informar um código de MOTIVO DE REJEIÇÃO.   
+5- Ao final dar mensagem “MOVIMENTO EFETUADO COM SUCESSO” ou se der errado dar mensagem “OCORREU ERRO”, em seguida o usuário tem que dar OK para liberar tela para próximo movimento, dessa forma forçamos o usuário a conferir a operação que foi efetuada.
+
+--------------------------------------------------------------------------------------------------
+Ethos 
+
+1) Ver quais problemas devem gerar ou nao inconsistencia no apontamneto via nest.
+2) Ajustar EDI, para considerar PE5 = PE3, quando não houver PE5.
+
+-------------------------------------------------------------------------------------------------
+
+WEBSERVICE - iurd
+
+atualização da ad_mestre e da lanc_cont_cap = pol1158
+
+------------------------------------------------------------------------------------------------

@@ -1,0 +1,21 @@
+DATABASE logix
+SCREEN
+{
+        Pendências do responsável?
+---------------------------------------------       
+[a         |b                             ]
+[a         |b                             ]
+[a         |b                             ]
+[a         |b                             ]
+[a         |b                             ]
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_usuario,     NOENTRY;
+ b = FORMONLY.nom_funcionario, NOENTRY;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_usuario[05](cod_usuario THRU nom_funcionario);
+END 

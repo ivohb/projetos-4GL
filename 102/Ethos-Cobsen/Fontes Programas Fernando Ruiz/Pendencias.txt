@@ -1,0 +1,25 @@
+A Ethos quer refazer 3 programas, a saber:
+
+1-	Data Limite,
+2-	Local de OP,
+3-	Transcol
+
+Segue abaixo o detalhamento de cada um deles e anexo os fontes, temos que avaliar o esforço em horas para refazer esses programas em 4gl (free form).
+
+1-	Data Limite – Programa Robô- 
+    No MIN0060 se informa o tempo em dias por operação. 
+    Quando gera a ordem de produção ai calcula a data de entrega com base  nos tempos 
+    cadastrados no MIN0060.          
+    
+2-	Local de OP – Programa Robô – Cria local de baixa de componente por OP. 
+    Quando a OP está com status 3-Aberta, o programa não deixa mudar o status para 4 
+    senão tiver todos os componentes , isso é feito via trigger.  
+    Quando todos os componentes tem estoque, o programa robô cria local de baixa por OP, 
+    para as OPs com status 3 e muda nas OPs o local de baixa na Ordem. 
+    
+3-	Transcol – Transfere estoque de OP .   Informa na tela a OP ai o programa apresenta os componentes 
+    da ordem e o estoque disponível ai transfere todos os componentes para os locais criados 
+    pelo programa anterior. Se for necessário para a analise, podemos falar com o Jhoni novamente
+     para obter mais detalhes.
+
+

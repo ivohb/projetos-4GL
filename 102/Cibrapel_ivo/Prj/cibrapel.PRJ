@@ -1,0 +1,325 @@
+Group Cibrapel
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=3
+   Project Cadastro
+      FoldersCount=22
+      Folder pol0604
+         VSSPath=Definições
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0604.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0604.per
+             Type=T
+         End
+      End
+      Folder pol0607
+         VSSPath=Nova Pasta3
+         FilesCount=4
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0607.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0607.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06071.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06072.per
+             Type=T
+         End
+      End
+      Folder pol0617
+         VSSPath=Nova Pasta4
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0617.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0617.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06171.per
+             Type=T
+         End
+      End
+      Folder pol0635
+         VSSPath=Nova Pasta6
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0635.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0635.per
+             Type=T
+         End
+      End
+      Folder pol0638
+         VSSPath=Nova Pasta7
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0638.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06381.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0638.per
+             Type=T
+         End
+      End
+      Folder pol0644
+         VSSPath=Nova Pasta8
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0644.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0644.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol06441.per
+             Type=T
+         End
+      End
+      Folder pol0648
+         VSSPath=Nova Pasta9
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0648.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0648.per
+             Type=T
+         End
+      End
+      Folder pol0700
+         VSSPath=Nova Pasta10
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0700.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0700.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07001.per
+             Type=T
+         End
+      End
+      Folder pol0701
+         VSSPath=Nova Pasta11
+         FilesCount=5
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0701.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0701.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07011.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07012.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07013.per
+             Type=T
+         End
+      End
+      Folder pol0702
+         VSSPath=Nova Pasta12
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0702.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0702.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07021.per
+             Type=T
+         End
+      End
+      Folder pol0705
+         VSSPath=Nova Pasta13
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0705.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0705.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07051.per
+             Type=T
+         End
+      End
+      Folder pol0710
+         VSSPath=Nova Pasta14
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0710.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0710.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07101.per
+             Type=T
+         End
+      End
+      Folder pol0725
+         VSSPath=Nova Pasta15
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0725.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0725.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07251.per
+             Type=T
+         End
+      End
+      Folder pol0731
+         VSSPath=Nova Pasta16
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0731.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0731.per
+             Type=T
+         End
+      End
+      Folder pol0746
+         VSSPath=Nova Pasta17
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0746.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0746.per
+             Type=T
+         End
+      End
+      Folder pol0748
+         VSSPath=Nova Pasta18
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0748.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0748.per
+             Type=T
+         End
+      End
+      Folder pol0768
+         VSSPath=Nova Pasta19
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0768.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0768.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07681.per
+             Type=T
+         End
+      End
+      Folder pol0779
+         VSSPath=Nova Pasta20
+         FilesCount=3
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0779.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0779.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol07791.per
+             Type=T
+         End
+      End
+      Folder pol0752
+         VSSPath=Nova Pasta19
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0752.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0752.per
+             Type=T
+         End
+      End
+      Folder pol0753
+         VSSPath=Nova Pasta20
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0753.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0753.per
+             Type=T
+         End
+      End
+      Folder pol0785
+         VSSPath=Nova Pasta21
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\Per\pol0785.per
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0785.4gl
+             Type=T
+         End
+      End
+      Folder pol0815
+         VSSPath=Nova Pasta22
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0815.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0815.per
+             Type=T
+         End
+      End
+   End
+   Project Processo
+      FoldersCount=2
+      Folder pol0605
+         VSSPath=Nova Pasta1
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0605.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0605.per
+             Type=T
+         End
+      End
+      Folder pol0618
+         VSSPath=Nova Pasta2
+         FilesCount=2
+         File \Projetos\4GL\102\Cibrapel\4gl\pol0618.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Cibrapel\Per\pol0618.per
+             Type=T
+         End
+      End
+   End
+   Project Diversos
+      FoldersCount=1
+      Folder Funcao
+         VSSPath=Nova Pasta1
+         FilesCount=4
+         File \Projetos\4GL\102\Funcoes\4gl\func001.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Funcoes\4gl\func002.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Funcoes\4gl\func003.4gl
+             Type=T
+         End
+         File \Projetos\4GL\102\Funcoes\4gl\func004.4gl
+             Type=T
+         End
+      End
+   End
+End

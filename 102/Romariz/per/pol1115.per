@@ -1,0 +1,41 @@
+DATABASE FORMONLY
+
+SCREEN
+{ 
+------------------------------------------------------------------------------
+ [a0]                           TEXTO DO RESULTADO
+
+
+
+     Tipo Análise : [a1    ] [a2                            ]
+            
+           Cliente: [h              ] 
+              Nome: [i                                                  ]
+
+            Código: [a3 ]
+
+Texto em Português: [a4                                           ] 
+   Texto em Inglês: [a5                                           ] 
+ Texto em Espanhol: [a6                                           ] 
+
+
+
+
+
+}                     
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,  UPSHIFT, NOENTRY;
+a1 = FORMONLY.tip_analise,  AUTONEXT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+a2 = FORMONLY.den_analise_port,  NOENTRY, UPSHIFT; 
+h = FORMONLY.cod_cliente,   UPSHIFT --#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+i = FORMONLY.nom_cliente,   NOENTRY;
+a3 = FORMONLY.val_caracter;
+a4 = FORMONLY.den_caracter; 
+a5 = FORMONLY.den_caracter_ing; 
+a6 = FORMONLY.den_caracter_esp; 
+END
+

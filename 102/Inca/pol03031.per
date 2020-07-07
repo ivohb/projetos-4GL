@@ -1,0 +1,30 @@
+DATABASE logix
+SCREEN
+{
+                     FORNECEDOR                                 
+ 
+ Codigo               Denominacao
+ -------------------  ------------------------------
+[a1                 ][a2                            ]
+[a1                 ][a2                            ]
+[a1                 ][a2                            ]
+[a1                 ][a2                            ]
+[a1                 ][a2                            ]
+[a1                 ][a2                            ]
+[a1                 ][a2                            ]
+[a1                 ][a2                            ]
+
+} 
+END
+TABLES
+fornecedor
+END
+ATTRIBUTES
+a1 = fornecedor.num_cgc_cpf, UPSHIFT, NOENTRY; 
+a2 = fornecedor.raz_social,  UPSHIFT, NOENTRY; 
+END
+INSTRUCTIONS
+SCREEN RECORD s_fornec[8] (fornecedor.num_cgc_cpf, 
+                           fornecedor.raz_social);
+DELIMITERS " " 
+END

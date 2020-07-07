@@ -1,0 +1,32 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                      RECEBIMENTO FÍSICO DE NF ENTRADA 
+                          
+                  
+                
+
+
+    
+    
+   
+      
+      
+      
+
+
+
+
+
+
+      
+}
+END
+
+
+ATTRIBUTES
+ 
+  a = FORMONLY.cod_empresa,UPSHIFT, NOENTRY;  
+
+END 

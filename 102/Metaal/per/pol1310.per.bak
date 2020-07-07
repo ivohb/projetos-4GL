@@ -1,0 +1,28 @@
+DATABASE FORMONLY 
+SCREEN
+{
+-------------------------------------------------------------------------------
+[a ]                       LEITURA E SEPARAÇÃO DE ARQUIVO TEXTO
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+        
+
+
+
+
+   
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa;
+END
+

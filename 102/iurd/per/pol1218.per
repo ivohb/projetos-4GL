@@ -1,0 +1,46 @@
+DATABASE logix   
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                    CONSULTA GRADE DE APROVAÇÃO DE AR
+
+         AR:[b        ] NF:[c      ] Série:[d  ] Sub série:[e   ]  Status:[s]
+ Fornecedor:[f              ] [g                                            ]
+                                          Usuário    Data       Hora
+Hierarq Nivel       Descricao            Aprovador Aprovação  Aprovação
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+  [l  |m   |n                           |o        |p         |q         ]                
+
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,   UPSHIFT, NOENTRY;
+ b = FORMONLY.num_aviso_rec, AUTONEXT;
+ c = FORMONLY.num_nf, NOENTRY;
+ d = FORMONLY.ser_nf, NOENTRY;
+ e = FORMONLY.ssr_nf, NOENTRY;
+ s = FORMONLY.ies_incl_cap, NOENTRY;
+ f = FORMONLY.cod_fornecedor, NOENTRY;
+ g = FORMONLY.raz_social, NOENTRY;
+ 
+ l = FORMONLY.hierarquia, NOENTRY;
+ m = FORMONLY.cod_nivel_autorid, NOENTRY;
+ n = FORMONLY.den_nivel_autorid, NOENTRY;
+ o = FORMONLY.nom_usuario_aprov, NOENTRY;
+ p = FORMONLY.dat_aprovacao, NOENTRY;
+ q = FORMONLY.hor_aprovacao, NOENTRY;
+ 
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_grade[10](hierarquia THRU hor_aprovacao);
+END 

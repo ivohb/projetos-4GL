@@ -1,0 +1,38 @@
+DATABASE logix    
+SCREEN
+{
+--------------------------------------------------------------------------------
+                               SELEÇÃO DE FILTROS
+
+            Tabela                     Campo       Operador    Conteudo
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+[d                        ] [e                   ] [f    ] [g              ]
+
+}
+
+ATTRIBUTES
+ d = FORMONLY.tabela, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';  
+ e = FORMONLY.campo, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';  
+ f = FORMONLY.operador, UPSHIFT, AUTONEXT
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';  
+ g = FORMONLY.conteudo, UPSHIFT, AUTONEXT;
+
+END
+INSTRUCTIONS
+   SCREEN RECORD sr_filtro[15](tabela THRU conteudo);
+END 

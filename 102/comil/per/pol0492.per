@@ -1,0 +1,50 @@
+DATABASE FORMONLY
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [a0]                   PARÂMETROS PARA IMPRESSÃO DO LAUDO
+
+               Item: [a1             ] [a2                                   ]
+            Cliente: [a3             ] [a4                                   ]
+     Granulometria ? [f2]   
+              Texto: [g                                                 ]
+                     [g                                                 ]
+
+      Item Análise    Descrição                      
+        [e     ]     [e1                                                ]
+        [e     ]     [e1                                                ]
+        [e     ]     [e1                                                ]
+        [e     ]     [e1                                                ]
+        [e     ]     [e1                                                ]
+        [e     ]     [e1                                                ]
+        [e     ]     [e1                                                ]
+
+}         
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,     UPSHIFT,  NOENTRY;
+a1 = FORMONLY.cod_item,        UPSHIFT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+a2 = FORMONLY.den_item,        NOENTRY;
+a3 = FORMONLY.cod_cliente,     UPSHIFT
+--#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+;
+a4 = FORMONLY.nom_cliente,     UPSHIFT, NOENTRY;
+f2 = FORMONLY.granulometria,  UPSHIFT, 
+     COMMENTS = " S - Sim / N - Não ";   
+g  = FORMONLY.texto,           UPSHIFT, WORDWRAP;
+e  = FORMONLY.tip_analise,     AUTONEXT
+--#, WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+--#, OPTIONS="-nolist"
+; 
+e1 = FORMONLY.den_analise,     UPSHIFT, NOENTRY
+--#, OPTIONS="-nolist"
+;
+
+INSTRUCTIONS
+SCREEN RECORD s_itens[7] (FORMONLY.tip_analise THRU FORMONLY.den_analise);
+END
+

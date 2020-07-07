@@ -1,0 +1,58 @@
+DATABASE FORMONLY 
+
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                   APONTAMENTOS CRITICADOS - TRIMBOX
+ 
+              Período - de:[b         ]              até:[c         ]
+             Pedido:[d         ] Ordem:[e         ] Item:[f              ]
+                                          Data         Qtd    Consumo Peso
+   Pedido  Ordem         Item      Oper produçao TP   Produz  Refugo  Teórico
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[p        |q       |r             |s  |t         |u|w        |x       |y     ]
+[z                                                                           ]
+[z                                                                           ] 
+[z                                                                           ] 
+Ult. Apto:[ua                 ][um                                             ]
+}
+END
+
+ATTRIBUTES 
+ a = FORMONLY.cod_empresa, NOENTRY;
+ b = FORMONLY.dat_ini, AUTONEXT;
+ c = FORMONLY.dat_fim, AUTONEXT;
+ d = FORMONLY.num_pedido, AUTONEXT;
+ e = FORMONLY.num_ordem, AUTONEXT;
+ f = FORMONLY.cod_item, UPSHIFT, AUTONEXT;
+ 
+ p = FORMONLY.numpedido, 
+      COMMENTS = 'Ctrl+Z = Exibe apontamento enviado  - Ctrl+A = Altera consumo';
+ q = FORMONLY.numordem;
+ r = FORMONLY.coditem;
+ s = FORMONLY.codmaquina;
+ t = FORMONLY.inicio;
+ u = FORMONLY.tipmovto;
+ w = FORMONLY.qtdprod;
+ x = FORMONLY.consumorefugo;
+ y = FORMONLY.pesoteorico;
+ 
+ z = FORMONLY.mensagem, WORDWRAP;
+ 
+ ua= FORMONLY.dat_hor_proces;
+ um= FORMONLY.men_erro;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_inconsist[09] (numpedido THRU pesoteorico);
+END
+
+
+

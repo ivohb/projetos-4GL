@@ -1,0 +1,51 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------------------------------------------------------------------
+[a ]   Mapa de Suprimentos                
+                                     |---------------- P E R Í O D O S ---------------------------------------------------------------------
+      Item          Descrição     Alt|  01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+[b              |c                 |d|e    |f    |g    |h    |i    |j    |k    |l    |m    |n    |o    |p    |q    |r    |e    |t    |u    ]
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY; 
+ b = FORMONLY.cod_item,    UPSHIFT,  NOENTRY; 
+ c = FORMONLY.den_item,    UPSHIFT,  NOENTRY; 
+ d = FORMONLY.ies_alt,     UPSHIFT,  NOENTRY; 
+ e = FORMONLY.periodo01;
+ f = FORMONLY.periodo02;
+ g = FORMONLY.periodo03;
+ h = FORMONLY.periodo04;
+ i = FORMONLY.periodo05;
+ j = FORMONLY.periodo06;
+ k = FORMONLY.periodo07;
+ l = FORMONLY.periodo08;
+ m = FORMONLY.periodo09;
+ n = FORMONLY.periodo10;
+ o = FORMONLY.periodo11;
+ p = FORMONLY.periodo12;
+ q = FORMONLY.periodo13;
+ r = FORMONLY.periodo14;
+ s = FORMONLY.periodo15;
+ t = FORMONLY.periodo16;
+ u = FORMONLY.periodo17;
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[10](cod_item THRU periodo17)
+END 

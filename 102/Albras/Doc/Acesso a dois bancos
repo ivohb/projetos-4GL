@@ -1,0 +1,15 @@
+ -Instalar o client do informix na maquina do sqlserver
+-Executar o sql coledbp.sql que fica na pasta etc do client do informix
+- criar o linked server com a string abaixo:
+Provider=Ifxoledbc.3;Password=dados;Persist Security Info=True;User ID=informix;Data Source=protheus@prd_b;DB_LOCALE=en_US.CP1252;CLIENT_LOCALE=en_US.CP1252;Extended Properties="Protocol=olsoctcp";
+[09:06:04] Alessandro Munerato: no caso ai no exemplo ele está conectando no banco Protheus na estancia prd_b
+lá na albras deve ficar logix@albras10
+
+ Alessandro Munerato: vou quebrar seu galho
+
+Provider=Ifxoledbc.3;Password=logix;Persist Security Info=True;User ID=informix;Data Source=logix@albras10;DB_LOCALE=en_US.819;CLIENT_LOCALE=en_US.819;Extended Properties="Protocol=olsoctcp";
+
+só pede para o Marcio configurar o client do Informix no servidor do sqlserver
+
+qq coisa da uma procurada na internet como configurar olhe provider informix
+

@@ -1,0 +1,26 @@
+DATABASE FORMONLY
+SCREEN 
+{
+------------------------------------------------------------------------------
+ [a ]                    RELATORIO COMISSAO VENDEDORES                       
+
+        
+                        Emissão NF de: [f001      ]
+                       Emissão NF até: [f002      ]
+
+              Todos os Representantes? [c]
+
+
+
+
+
+                      
+}
+END
+
+ATTRIBUTES
+f001 = FORMONLY.dat_de;
+f002 = FORMONLY.dat_ate;
+c    = FORMONLY.ies_repres, UPSHIFT,INCLUDE=("S","N"),COMMENTS=" Processar todas os Representantes?  Sim  ou  Nao "
+--#, WIDGET='CHECK', CONFIG='S N { }', OPTIONS='-nolist';
+END

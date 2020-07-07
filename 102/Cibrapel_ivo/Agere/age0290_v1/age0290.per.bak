@@ -1,0 +1,26 @@
+DATABASE FORMONLY
+SCREEN 
+{
+------------------------------------------------------------------------------
+ [a ]      RELATORIO DE CLICHES E SALDOS PARA LIBERACAO DE COMISSOES               
+
+        
+           Vendedor:[b   ] [b1                                       ]
+           
+               Item:[c              ] [c1                            ]
+
+
+
+
+
+                      
+}
+END
+
+ATTRIBUTES
+a    = FORMONLY.cod_empresa,NOENTRY;
+b    = FORMONLY.cod_repres TYPE INTEGER;
+b1   = FORMONLY.raz_social, NOENTRY;
+c    = FORMONLY.cod_item TYPE CHAR,UPSHIFT;
+c1   = FORMONLY.den_item, NOENTRY;
+END

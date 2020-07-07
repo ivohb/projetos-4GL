@@ -1,0 +1,37 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+  
+  [a ]                     TEXTO POR TIPO DE ANALISE
+ 
+
+          Tipo Analise: [b     ] [c                             ]
+          
+         Cod.Resultado:    [d  ] [e                             ]
+
+
+                
+  
+
+ 
+ 
+ 
+ 
+}
+END
+TABLES
+   result_analise741
+END
+ATTRIBUTES
+a = FORMONLY.cod_empresa, NOENTRY;
+b = FORMONLY.tip_analise, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Tipo de Analise"
+     --# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z',OPTIONS='-nolist'
+     ;
+c = FORMONLY.den_analise, UPSHIFT,NOENTRY;
+d = result_analise741.cod_result, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite o Codigo do Resultado";
+e = result_analise741.den_result, UPSHIFT, AUTONEXT,
+     COMMENTS = "Digite a Descricao do Resultado";
+END 

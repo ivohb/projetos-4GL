@@ -1,0 +1,25 @@
+DATABASE FORMONLY
+SCREEN
+{
+---------------------------------------------------------------------------
+  [a ]       RELAÇÃO DE PAGAMENTOS DE EMPRESTIMOS CONSIGNADOS
+
+          Banco          : [c  ] [f                                     ] 
+          Mês/Ano        : [g      ] 
+          Data Repasse   : [h         ] 
+
+}
+END
+
+
+ATTRIBUTES
+	a = FORMONLY.cod_empresa, NOENTRY;
+	c = FORMONLY.cod_banco, UPSHIFT, AUTONEXT,
+    	COMMENTS = 'Preenchimento obrigatório'
+	--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+  f = FORMONLY.nom_banco TYPE CHAR, NOENTRY; 
+	g = FORMONLY.mesano, AUTONEXT, picture = '##/####',
+    	COMMENTS = 'Preenchimento obrigatório';
+	h = FORMONLY.data_rep, AUTONEXT, picture = '##/##/####',
+    	COMMENTS = 'Preenchimento obrigatório';
+END 

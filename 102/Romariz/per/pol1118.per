@@ -1,0 +1,47 @@
+DATABASE FORMONLY 
+SCREEN
+{ 
+------------------------------------------------------------------------------
+[a0]                          ITENS PARA ANÁLISES                      
+                                                                              
+ Item análise :[a1             ]                                              
+Desc português:[a2                                                           ] 
+   Desc inglês:[a3                                                           ]
+ Desc espanhol:[a4                                                           ]                                          
+
+ Item             Descrição
+[e              ] [e1                                                        ]
+[e              ] [e1                                                        ]
+[e              ] [e1                                                        ]
+[e              ] [e1                                                        ]
+[e              ] [e1                                                        ]
+[e              ] [e1                                                        ]
+[e              ] [e1                                                        ]
+[e              ] [e1                                                        ]
+[e              ] [e1                                                        ]
+}   
+END
+
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,         UPSHIFT, NOENTRY;
+a1 = FORMONLY.cod_item_analise,    UPSHIFT, AUTONEXT
+     --#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z";
+a2 = FORMONLY.den_item_poRtugues,  UPSHIFT, AUTONEXT;
+a3 = FORMONLY.den_item_ingles,     UPSHIFT, AUTONEXT;
+a4 = FORMONLY.den_item_espanhol,   UPSHIFT, AUTONEXT;
+#f  = FORMONLY.qtd_dia_validade,    UPSHIFT, AUTONEXT;
+#g  = FORMONLY.ies_indeterminada,   UPSHIFT, AUTONEXT;
+
+e  = FORMONLY.cod_item,            UPSHIFT, AUTONEXT
+     --#,WIDGET="FIELD_BMP", CONFIG="combo.bmp Control-z"
+     --#, OPTIONS="-nolist";
+e1 = FORMONLY.den_item,            UPSHIFT, NOENTRY
+     --#, OPTIONS="-nolist";
+end
+
+INSTRUCTIONS
+   SCREEN RECORD s_itens[09] (FORMONLY.cod_item THRU FORMONLY.den_item);
+END
+
+
+#Validade:[f         ] É indeterminada?:[g]

@@ -1,0 +1,43 @@
+DATABASE logix
+SCREEN
+{
+[a ]                        TEXTO DO CONTRATO
+----------------------------------------------------------------------------
+     Nota:[b      ]    Emissão:[c         ]     AR:[d       ] 
+     
+ Contrato:[e     ]   Versão:[f  ] Situação:[g]  Serviço:[h               ] 
+----------------------------------------------------------------------------
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+[r                                                                     ]
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,NOENTRY;
+ b = FORMONLY.num_nf,     NOENTRY;
+ c = FORMONLY.dat_emis,   NOENTRY;
+ d = FORMONLY.num_ar,     NOENTRY;
+
+ e = FORMONLY.contrato_servico, NOENTRY;
+ f = FORMONLY.versao_contrato, NOENTRY;
+ g = FORMONLY.sit_contrato, NOENTRY;
+ h = FORMONLY.servico, NOENTRY;
+
+ r = FORMONLY.texto, NOENTRY, UPSHIFT;
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_texto[14](texto);
+END 
+

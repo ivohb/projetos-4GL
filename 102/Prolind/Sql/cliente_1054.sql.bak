@@ -1,0 +1,9 @@
+
+create table cliente_1054 
+  (
+    cod_cliente char(15) not null 
+  );
+
+create index ix_cliente_1054 on cliente_1054 (cod_cliente);
+
+

@@ -1,0 +1,17 @@
+DATABASE logix
+SCREEN
+{
+------------------------
+   RECEBIMENTO FÍSICO
+         
+   Data: [a         ]
+  
+  
+
+}
+END
+
+ATTRIBUTES
+  a = FORMONLY.dat_receb, UPSHIFT, AUTONEXT;  
+END 
+

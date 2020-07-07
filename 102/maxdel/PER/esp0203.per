@@ -1,0 +1,36 @@
+DATABASE logix
+
+SCREEN
+{
+------------------------------------------------------------------------
+             DESCONTO POR NATUREZA DE OPERACAO E CLIENTE
+
+ 
+Cliente   : [a1             ] [a2                                      ]
+
+Nat. Oper : [a3  ]  [a4                                     ]
+
+Pct. Valor: [a5        ]             Pct. Quantid:  [a6        ]
+
+pct. Opera: [a7        ]
+ 
+}   
+
+END
+
+TABLES
+desc_nat_oper,
+clientes,
+nat_operacao     
+END
+
+attributes
+a1   = FORMONLY.cod_cliente, UPSHIFT, AUTONEXT;    
+a2   = clientes.nom_cliente, NOENTRY; 
+a3   = desc_nat_oper.cod_nat_oper, UPSHIFT, AUTONEXT;    
+a4   = nat_operacao.den_nat_oper, NOENTRY; 
+a5   = desc_nat_oper.pct_desc_valor, UPSHIFT, AUTONEXT;    
+a6   = desc_nat_oper.pct_desc_qtd, UPSHIFT, AUTONEXT;    
+a7   = desc_nat_oper.pct_desc_oper, UPSHIFT, AUTONEXT;    
+
+END

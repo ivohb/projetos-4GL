@@ -1,0 +1,34 @@
+DATABASE logix
+SCREEN
+{
+---------------------------------------------------------------------------
+                          ERROS DA EXPORTAÇÃO
+
+     Peça principal     Saldo      Peça gêmea      Saldo    Diferença
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+    [a              |b         |c              |d         |e         ]
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_peca_princ   --#, OPTIONS="-nolist";
+ b = FORMONLY.sdo_princ        --#, OPTIONS="-nolist"; 
+ c = FORMONLY.cod_peca_gemea   --#, OPTIONS="-nolist"; 
+ d = FORMONLY.sdo_gemea        --#, OPTIONS="-nolist"; 
+ e = FORMONLY.qtd_difer        --#, OPTIONS="-nolist"; 
+END 
+
+INSTRUCTIONS
+
+   SCREEN RECORD sr_criticas[10](cod_peca_princ THRU qtd_difer);
+                     
+END 

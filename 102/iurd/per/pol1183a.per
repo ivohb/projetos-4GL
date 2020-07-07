@@ -1,0 +1,30 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------
+       NOTAS COM PAGAMENTO EM ABERTO
+
+   Nota      Entrada            Fornecedor              
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+[a         |b         |c                             ]
+}
+
+ATTRIBUTES
+ a = FORMONLY.num_nota --# ,OPTIONS='-nolist';
+ b = FORMONLY.dat_entrada, NOENTRY, REVERSE, color = blue --# ,OPTIONS='-nolist';
+ c = FORMONLY.fornecedor --# ,OPTIONS='-nolist';
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_notas[10](num_nota THRU fornecedor);
+END 

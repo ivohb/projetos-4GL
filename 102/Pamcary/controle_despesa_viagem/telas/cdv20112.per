@@ -1,0 +1,52 @@
+DATABASE formonly
+SCREEN
+{
+------------------------ APROVAÇÃO ELETRÔNICA VIAGENS ------------------------
+ [zz]                          APONTAMENTO KM
+
+     Viajante: [a10                                ]
+     Controle: [a5                ] Viagem: [a7    ]
+ Tipo veículo: [a11               ]  Placa: [a12     ]
+
+Data/Ativ    KM inicial   KM fim/Traje Qtd KM       R$
+[b         ] [d         ] [e         ] [f         ] [h             ]
+[c                      ] [g                                       ]
+[b         ] [d         ] [e         ] [f         ] [h             ]
+[c                      ] [g                                       ]
+[b         ] [d         ] [e         ] [f         ] [h             ]
+[c                      ] [g                                       ]
+[b         ] [d         ] [e         ] [f         ] [h             ]
+[c                      ] [g                                       ]
+[b         ] [d         ] [e         ] [f         ] [h             ]
+[c                      ] [g                                       ]
+
+}
+END
+
+ATTRIBUTES
+zz  = formonly.empresa, NOENTRY;
+a5  = formonly.controle, NOENTRY;
+a7  = formonly.viagem, NOENTRY;
+a10 = formonly.viajante, NOENTRY;
+a11 = formonly.tipo_veiculo TYPE CHAR;
+a12 = formonly.placa, NOENTRY;
+b   = formonly.dat_despesa_km, NOENTRY;
+c   = formonly.des_ativ, NOENTRY;
+d   = formonly.km_inicial, NOENTRY;
+e   = formonly.km_final, NOENTRY;
+f   = formonly.qtd_km, NOENTRY;
+g   = formonly.trajeto, NOENTRY;
+h   = formonly.val_km, NOENTRY;
+
+END
+
+INSTRUCTIONS
+  SCREEN RECORD sr_array_desp_km[05] (dat_despesa_km,
+                                      des_ativ,
+                                      km_inicial,
+                                      km_final,
+                                      qtd_km,
+                                      trajeto,
+                                      val_km)
+END
+

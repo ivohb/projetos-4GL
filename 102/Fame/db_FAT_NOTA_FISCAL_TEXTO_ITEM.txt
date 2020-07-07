@@ -1,0 +1,28 @@
+
+DBSCHEMA Schema Utility       INFORMIX-SQL Version 11.50.FC9
+
+
+
+
+
+
+
+{ TABLE "informix".fat_nota_fiscal_texto_item row size = 314 number of columns = 
+              6 index size = 17 }
+create table "informix".fat_nota_fiscal_texto_item 
+  (
+    empresa char(2) not null ,
+    trans_nota_fiscal integer not null ,
+    sequencia_item_nota_fiscal integer not null ,
+    sequencia_texto smallint not null ,
+    texto smallint not null ,
+    descricao_texto char(300) not null ,
+    primary key (empresa,trans_nota_fiscal,sequencia_item_nota_fiscal,sequencia_texto) 
+               constraint "informix".pk_fat_nota_fiscal_texto_item
+  );
+
+revoke all on "informix".fat_nota_fiscal_texto_item from "public" as "informix";
+
+
+
+

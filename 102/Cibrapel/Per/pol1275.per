@@ -1,0 +1,47 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------------
+[a ]                    BAIXAS PENDENTES DE ITENS COMPRADOS
+
+    Período de:[b         ]  Até:[c         ]  Item:[d              ]
+
+ Produção  Num Ordem    Componente     Descrição       Und  Quantidad Excluir
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+[i       |j         |k              |l                 |m  |n          |o]
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa, NOENTRY; 
+ b = FORMONLY.dat_ini, AUTONEXT;
+ c = FORMONLY.dat_fim, AUTONEXT;
+ d = FORMONLY.cod_item, UPSHIFT, AUTONEXT;
+ i = FORMONLY.producao, NOENTRY, FORMAT = 'dd/mm/yy', NOENTRY;
+ j = FORMONLY.ordem, NOENTRY;
+ k = FORMONLY.item, NOENTRY;
+ l = FORMONLY.descricao, NOENTRY;
+ m = FORMONLY.unidade, NOENTRY;
+ n = FORMONLY.quantidade, NOENTRY;
+ O = FORMONLY.ies_deletar, UPSHIFT, AUTONEXT,
+     INCLUDE=('S','N'), COMMENTS='S-Marcado N-Não Marcado'
+     --#,OPTIONS='-nolist', widget='CHECK', config='S N { }';
+
+END 
+
+INSTRUCTIONS
+   SCREEN RECORD sr_item[13](producao THRU ies_deletar);
+END 
+   

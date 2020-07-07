@@ -1,0 +1,22 @@
+DATABASE LOGIX
+
+SCREEN
+{
+------------------------------------------------------------------------------
+ [b0]                    CANCELA ROMANEIO - EDIFACT
+
+ 
+                ROMANEIO  DE : [a1    ]  ATE : [a2    ]
+                
+}
+END
+
+TABLES
+ordem_montag_mest
+END
+
+ATTRIBUTES
+b0 = FORMONLY.cod_empresa,          NOENTRY;
+a1 = FORMONLY.num_om_ini,           AUTONEXT;
+a2 = FORMONLY.num_om_fim,           AUTONEXT;
+END

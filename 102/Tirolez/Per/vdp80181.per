@@ -1,0 +1,29 @@
+DATABASE formonly
+
+SCREEN
+{
+ CARTEIRAS DO USUARIO
+
+[a1] [a2             ]
+[a1] [a2             ]
+[a1] [a2             ]
+[a1] [a2             ]
+[a1] [a2             ]
+[a1] [a2             ]
+[a1] [a2             ]
+[a1] [a2             ]
+[a1] [a2             ]
+[a1] [a2             ]
+}
+END
+
+ATTRIBUTES
+a1 = formonly.cod_tip_carteira, UPSHIFT, AUTONEXT;
+a2 = formonly.den_tip_carteira, NOENTRY;
+END
+
+INSTRUCTIONS
+SCREEN RECORD s_array[10] (formonly.cod_tip_carteira,
+                           formonly.den_tip_carteira);
+END
+

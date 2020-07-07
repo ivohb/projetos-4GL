@@ -1,0 +1,30 @@
+DATABASE logix
+SCREEN
+{
+--------------------------------------------------------------------------
+                        DIVERGÊNCIAS ENCONTRADAS            
+              
+                    [a                 ]
+[b                                                                     ]
+                    [a                 ]
+[b                                                                     ]
+                    [a                 ]
+[b                                                                     ]
+                    [a                 ]
+[b                                                                     ]
+                    [a                 ]
+[b                                                                     ]
+                    [a                 ]
+[b                                                                     ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.num_bobina, REVERSE, color = red  --# ,OPTIONS='-nolist';
+b = FORMONLY.mensagem  --# ,OPTIONS='-nolist';
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_div[06](num_bobina THRU mensagem);
+END 

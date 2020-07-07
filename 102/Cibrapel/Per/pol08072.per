@@ -1,0 +1,23 @@
+DATABASE logix
+SCREEN
+{
+-----------------------------------------
+                  PRIORIDAS            
+              
+Código            Descrição                       
+[a   ]  [b                             ]
+[a   ]  [b                             ]
+[a   ]  [b                             ]
+[a   ]  [b                             ]
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_prior, NOENTRY, REVERSE, color = red  --# ,OPTIONS='-nolist';
+b = FORMONLY.nom_prior, NOENTRY, REVERSE, color = blue --# ,OPTIONS='-nolist';
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_prior[4](cod_prior THRU nom_prior);
+END 

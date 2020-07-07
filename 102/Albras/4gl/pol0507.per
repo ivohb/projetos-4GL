@@ -1,0 +1,29 @@
+DATABASE FORMONLY                             {pol0507}
+SCREEN
+{
+------------------------------------------------------------------------------
+
+[a0]                       NOTAS FISCAIS FATURA - ENTRADA
+
+                           Aviso Rec. Inicial : [a1    ]
+             
+                           Aviso Rec. Final   : [a2    ]
+
+                           Data ultimo fatur. : [a3        ]
+
+
+
+
+
+
+
+
+
+}                                      
+END                                    
+ATTRIBUTES
+a0 = FORMONLY.cod_empresa,      NOENTRY;
+a1 = FORMONLY.p_num_ar_ini,     AUTONEXT;
+a2 = FORMONLY.p_num_ar_fim,     AUTONEXT;
+a3 = FORMONLY.p_dat_fat_numero  TYPE DATE, AUTONEXT; 
+END

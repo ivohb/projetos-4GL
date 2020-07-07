@@ -1,0 +1,323 @@
+ 
+            <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+               <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+                  <xs:complexType>
+                     <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="login">
+                           <xs:complexType>
+                              <xs:sequence>
+                                 <xs:element name="retorno" type="xs:string" minOccurs="0"/>
+                              </xs:sequence>
+                           </xs:complexType>
+                        </xs:element>
+                        <xs:element name="pedidos">
+                           <xs:complexType>
+                              <xs:sequence>
+                                 <xs:element name="num_pedido" type="xs:int" minOccurs="0"/>
+                                 <xs:element name="tipo_pedido" type="xs:unsignedByte" minOccurs="0"/>
+                                 <xs:element name="dt_emissao" type="xs:dateTime" minOccurs="0"/>
+                                 <xs:element name="CNPJ_CPF_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="IE_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="nome_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="nome_fantasia_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="endereco_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="num_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="comp_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="bairro_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="cod_mun_cliente" type="xs:int" minOccurs="0"/>
+                                 <xs:element name="desc_mun_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="UF_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="CEP_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="IS_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="cliente_cons_final" type="xs:unsignedByte" minOccurs="0"/>
+                                 <xs:element name="fone_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="fax_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="contato_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="fone_contato_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="email_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="endereco_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="num_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="comp_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="bairro_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="cod_mun_cobranca_cliente" type="xs:int" minOccurs="0"/>
+                                 <xs:element name="desc_mun_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="UF_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="CEP_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="fone_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="fax_cobranca_cliente" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="CNPJ_CPF_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="nome_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="endereco_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="bairro_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="cod_mun_vendedor" type="xs:int" minOccurs="0"/>
+                                 <xs:element name="desc_mun_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="UF_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="CEP_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="fone_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="fax_vendedor" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="cod_cond_pagto" type="xs:int" minOccurs="0"/>
+                                 <xs:element name="desc_cond_pagto" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="cod_portador" type="xs:short" minOccurs="0"/>
+                                 <xs:element name="desc_portador" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="total_pedido" type="xs:double" minOccurs="0"/>
+                                 <xs:element name="obs" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="obs_nota_fiscal" type="xs:string" minOccurs="0"/>
+                                 <xs:element name="entrega_futura" type="xs:unsignedByte" minOccurs="0"/>
+                                 <xs:element name="dt_cancelada" type="xs:dateTime" minOccurs="0"/>
+                              </xs:sequence>
+                           </xs:complexType>
+                        </xs:element>
+                        <xs:element name="pedidos_i">
+                           <xs:complexType>
+                              <xs:sequence>
+                                 <xs:element name="num_pedido" type="xs:int" minOccurs="0"/>
+                                 <xs:element name="cod_produto" type="xs:int" minOccurs="0"/>
+                                 <xs:element name="quant" type="xs:double" minOccurs="0"/>
+                                 <xs:element name="quant_cancelada" type="xs:double" minOccurs="0"/>
+                                 <xs:element name="preco_tabela" type="xs:double" minOccurs="0"/>
+                                 <xs:element name="perc_desc" type="xs:decimal" minOccurs="0"/>
+                                 <xs:element name="preco_unitario" type="xs:double" minOccurs="0"/>
+                                 <xs:element name="total_bruto" type="xs:decimal" minOccurs="0"/>
+                                 <xs:element name="total_liquido" type="xs:double" minOccurs="0"/>
+                              </xs:sequence>
+                           </xs:complexType>
+                        </xs:element>
+                     </xs:choice>
+                  </xs:complexType>
+               </xs:element>
+            </xs:schema>
+            <diffgr:diffgram xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:diffgr="urn:schemas-microsoft-com:xml-diffgram-v1">
+               <NewDataSet xmlns="">
+                  <login diffgr:id="login1" msdata:rowOrder="0" diffgr:hasChanges="modified">
+                     <retorno>Acesso liberado.</retorno>
+                  </login>
+                  <pedidos diffgr:id="pedidos1" msdata:rowOrder="0">
+                     <num_pedido>12910</num_pedido>
+                     <tipo_pedido>1</tipo_pedido>
+                     <dt_emissao>2020-03-20T00:00:00-03:00</dt_emissao>
+                     <CNPJ_CPF_cliente>03144060000176</CNPJ_CPF_cliente>
+                     <IE_cliente>132836696</IE_cliente>
+                     <nome_cliente>AGROPECUARIA RONCADOR S.A.</nome_cliente>
+                     <nome_fantasia_cliente>FAZENDA RONCADOR</nome_fantasia_cliente>
+                     <endereco_cliente>FAZENDA RONCADOR S/Nº</endereco_cliente>
+                     <num_cliente/>
+                     <comp_cliente/>
+                     <bairro_cliente>ZONA RURAL</bairro_cliente>
+                     <cod_mun_cliente>2398</cod_mun_cliente>
+                     <desc_mun_cliente>QUERENCIA</desc_mun_cliente>
+                     <UF_cliente>MT</UF_cliente>
+                     <CEP_cliente>78643000</CEP_cliente>
+                     <IS_cliente/>
+                     <cliente_cons_final>1</cliente_cons_final>
+                     <fone_cliente>6635291197</fone_cliente>
+                     <fax_cliente/>
+                     <contato_cliente>DANILO</contato_cliente>
+                     <fone_contato_cliente/>
+                     <email_cliente>matheus.gonzales@gruporoncador.com.br</email_cliente>
+                     <endereco_cobranca_cliente>CAIXA POSTAL</endereco_cobranca_cliente>
+                     <num_cobranca_cliente>97</num_cobranca_cliente>
+                     <comp_cobranca_cliente/>
+                     <bairro_cobranca_cliente>CX. POSTAL  - CORREIOS</bairro_cobranca_cliente>
+                     <cod_mun_cobranca_cliente>2398</cod_mun_cobranca_cliente>
+                     <desc_mun_cobranca_cliente>QUERENCIA</desc_mun_cobranca_cliente>
+                     <UF_cobranca_cliente>MT</UF_cobranca_cliente>
+                     <CEP_cobranca_cliente>78643000</CEP_cobranca_cliente>
+                     <fone_cobranca_cliente>6635291197</fone_cobranca_cliente>
+                     <fax_cobranca_cliente/>
+                     <CNPJ_CPF_vendedor>12678803000189</CNPJ_CPF_vendedor>
+                     <nome_vendedor>SRCAL MATRIZ</nome_vendedor>
+                     <endereco_vendedor>RUA 03</endereco_vendedor>
+                     <bairro_vendedor>CENTRO</bairro_vendedor>
+                     <cod_mun_vendedor>5100201</cod_mun_vendedor>
+                     <desc_mun_vendedor>AGUA BOA</desc_mun_vendedor>
+                     <UF_vendedor>MT</UF_vendedor>
+                     <CEP_vendedor>78635000</CEP_vendedor>
+                     <fone_vendedor>6634683912</fone_vendedor>
+                     <fax_vendedor>6634683912</fax_vendedor>
+                     <cod_cond_pagto>2</cod_cond_pagto>
+                     <desc_cond_pagto>DEPOSITO A VISTA</desc_cond_pagto>
+                     <cod_portador>0</cod_portador>
+                     <desc_portador xml:space="preserve"></desc_portador>
+                     <total_pedido>494370</total_pedido>
+                     <obs>VENDA RONCADOR - DOLOMITICO (FECHAMNETO FINANCEIRO ] EM SP)</obs>
+                     <obs_nota_fiscal>PECUÁRIA EXPANSÃO Nº  ORDEM 041198</obs_nota_fiscal>
+                     <entrega_futura>0</entrega_futura>
+                  </pedidos>
+                  <pedidos diffgr:id="pedidos2" msdata:rowOrder="1">
+                     <num_pedido>12911</num_pedido>
+                     <tipo_pedido>1</tipo_pedido>
+                     <dt_emissao>2020-03-20T00:00:00-03:00</dt_emissao>
+                     <CNPJ_CPF_cliente>03144060000176</CNPJ_CPF_cliente>
+                     <IE_cliente>132836696</IE_cliente>
+                     <nome_cliente>AGROPECUARIA RONCADOR S.A.</nome_cliente>
+                     <nome_fantasia_cliente>FAZENDA RONCADOR</nome_fantasia_cliente>
+                     <endereco_cliente>FAZENDA RONCADOR S/Nº</endereco_cliente>
+                     <num_cliente/>
+                     <comp_cliente/>
+                     <bairro_cliente>ZONA RURAL</bairro_cliente>
+                     <cod_mun_cliente>2398</cod_mun_cliente>
+                     <desc_mun_cliente>QUERENCIA</desc_mun_cliente>
+                     <UF_cliente>MT</UF_cliente>
+                     <CEP_cliente>78643000</CEP_cliente>
+                     <IS_cliente/>
+                     <cliente_cons_final>1</cliente_cons_final>
+                     <fone_cliente>6635291197</fone_cliente>
+                     <fax_cliente/>
+                     <contato_cliente>DANILO</contato_cliente>
+                     <fone_contato_cliente/>
+                     <email_cliente>matheus.gonzales@gruporoncador.com.br</email_cliente>
+                     <endereco_cobranca_cliente>CAIXA POSTAL</endereco_cobranca_cliente>
+                     <num_cobranca_cliente>97</num_cobranca_cliente>
+                     <comp_cobranca_cliente/>
+                     <bairro_cobranca_cliente>CX. POSTAL  - CORREIOS</bairro_cobranca_cliente>
+                     <cod_mun_cobranca_cliente>2398</cod_mun_cobranca_cliente>
+                     <desc_mun_cobranca_cliente>QUERENCIA</desc_mun_cobranca_cliente>
+                     <UF_cobranca_cliente>MT</UF_cobranca_cliente>
+                     <CEP_cobranca_cliente>78643000</CEP_cobranca_cliente>
+                     <fone_cobranca_cliente>6635291197</fone_cobranca_cliente>
+                     <fax_cobranca_cliente/>
+                     <CNPJ_CPF_vendedor>12678803000189</CNPJ_CPF_vendedor>
+                     <nome_vendedor>SRCAL MATRIZ</nome_vendedor>
+                     <endereco_vendedor>RUA 03</endereco_vendedor>
+                     <bairro_vendedor>CENTRO</bairro_vendedor>
+                     <cod_mun_vendedor>5100201</cod_mun_vendedor>
+                     <desc_mun_vendedor>AGUA BOA</desc_mun_vendedor>
+                     <UF_vendedor>MT</UF_vendedor>
+                     <CEP_vendedor>78635000</CEP_vendedor>
+                     <fone_vendedor>6634683912</fone_vendedor>
+                     <fax_vendedor>6634683912</fax_vendedor>
+                     <cod_cond_pagto>2</cod_cond_pagto>
+                     <desc_cond_pagto>DEPOSITO A VISTA</desc_cond_pagto>
+                     <cod_portador>0</cod_portador>
+                     <desc_portador xml:space="preserve"></desc_portador>
+                     <total_pedido>164790</total_pedido>
+                     <obs>VENDA RONCADOR - DOLOMITICO(FECHAMENTO FINANCEIRO EM SP)</obs>
+                     <obs_nota_fiscal>PECUÁRIA EXPANSÃO Nº ORDEM 041198</obs_nota_fiscal>
+                     <entrega_futura>0</entrega_futura>
+                  </pedidos>
+                  <pedidos diffgr:id="pedidos3" msdata:rowOrder="2">
+                     <num_pedido>13355</num_pedido>
+                     <tipo_pedido>1</tipo_pedido>
+                     <dt_emissao>2020-04-22T14:16:34-03:00</dt_emissao>
+                     <CNPJ_CPF_cliente>07859554020</CNPJ_CPF_cliente>
+                     <IE_cliente>132626543</IE_cliente>
+                     <nome_cliente>CELIO FRIES</nome_cliente>
+                     <nome_fantasia_cliente>FAZENDA AGUA BOA I</nome_fantasia_cliente>
+                     <endereco_cliente>MARG. DIREITA DA MT 240 18 KM DA SEDE</endereco_cliente>
+                     <num_cliente>SN</num_cliente>
+                     <comp_cliente/>
+                     <bairro_cliente>ZONA RURAL</bairro_cliente>
+                     <cod_mun_cliente>5100201</cod_mun_cliente>
+                     <desc_mun_cliente>AGUA BOA</desc_mun_cliente>
+                     <UF_cliente>MT</UF_cliente>
+                     <CEP_cliente>78635000</CEP_cliente>
+                     <IS_cliente/>
+                     <cliente_cons_final>1</cliente_cons_final>
+                     <fone_cliente>6699712461</fone_cliente>
+                     <fax_cliente>6634681254</fax_cliente>
+                     <contato_cliente/>
+                     <fone_contato_cliente/>
+                     <email_cliente>NAO TEM</email_cliente>
+                     <endereco_cobranca_cliente>AV: ARAGUAIA ESQ. 14</endereco_cobranca_cliente>
+                     <num_cobranca_cliente>787</num_cobranca_cliente>
+                     <comp_cobranca_cliente/>
+                     <bairro_cobranca_cliente>CENTRO</bairro_cobranca_cliente>
+                     <cod_mun_cobranca_cliente>5100201</cod_mun_cobranca_cliente>
+                     <desc_mun_cobranca_cliente>AGUA BOA</desc_mun_cobranca_cliente>
+                     <UF_cobranca_cliente>MT</UF_cobranca_cliente>
+                     <CEP_cobranca_cliente>78635000</CEP_cobranca_cliente>
+                     <fone_cobranca_cliente/>
+                     <fax_cobranca_cliente/>
+                     <CNPJ_CPF_vendedor>98151886153</CNPJ_CPF_vendedor>
+                     <nome_vendedor>ANDREA MARTINS DE SOUZA</nome_vendedor>
+                     <endereco_vendedor/>
+                     <bairro_vendedor/>
+                     <cod_mun_vendedor>5100201</cod_mun_vendedor>
+                     <desc_mun_vendedor>AGUA BOA</desc_mun_vendedor>
+                     <UF_vendedor>MT</UF_vendedor>
+                     <CEP_vendedor>78635000</CEP_vendedor>
+                     <fone_vendedor/>
+                     <fax_vendedor/>
+                     <cod_cond_pagto>6</cod_cond_pagto>
+                     <desc_cond_pagto>CHEQUE A VISTA</desc_cond_pagto>
+                     <cod_portador>0</cod_portador>
+                     <desc_portador xml:space="preserve"></desc_portador>
+                     <total_pedido>7489.38</total_pedido>
+                     <obs>CHEQUE A VISTA</obs>
+                     <obs_nota_fiscal xml:space="preserve"></obs_nota_fiscal>
+                     <entrega_futura>0</entrega_futura>
+                  </pedidos>
+                  <pedidos_i diffgr:id="pedidos_i1" msdata:rowOrder="0" diffgr:hasChanges="modified">
+                     <num_pedido>12910</num_pedido>
+                     <cod_produto>46</cod_produto>
+                     <quant>9000</quant>
+                     <quant_cancelada>0</quant_cancelada>
+                     <preco_tabela>56.5</preco_tabela>
+                     <perc_desc>2.7787611</perc_desc>
+                     <preco_unitario>54.93</preco_unitario>
+                     <total_bruto>508500</total_bruto>
+                     <total_liquido>494370</total_liquido>
+                  </pedidos_i>
+                  <pedidos_i diffgr:id="pedidos_i2" msdata:rowOrder="1" diffgr:hasChanges="modified">
+                     <num_pedido>12911</num_pedido>
+                     <cod_produto>46</cod_produto>
+                     <quant>3000</quant>
+                     <quant_cancelada>0</quant_cancelada>
+                     <preco_tabela>56.5</preco_tabela>
+                     <perc_desc>2.7787611</perc_desc>
+                     <preco_unitario>54.93</preco_unitario>
+                     <total_bruto>169500</total_bruto>
+                     <total_liquido>164790</total_liquido>
+                  </pedidos_i>
+                  <pedidos_i diffgr:id="pedidos_i3" msdata:rowOrder="2" diffgr:hasChanges="modified">
+                     <num_pedido>13355</num_pedido>
+                     <cod_produto>46</cod_produto>
+                     <quant>119.83</quant>
+                     <quant_cancelada>0</quant_cancelada>
+                     <preco_tabela>62.5</preco_tabela>
+                     <perc_desc>0.0000000</perc_desc>
+                     <preco_unitario>62.5</preco_unitario>
+                     <total_bruto>7489.375</total_bruto>
+                     <total_liquido>7489.38</total_liquido>
+                  </pedidos_i>
+               </NewDataSet>
+               <diffgr:before>
+                  <login diffgr:id="login1" msdata:rowOrder="0" xmlns="">
+                     <retorno>Acesso liberado.</retorno>
+                  </login>
+                  <pedidos_i diffgr:id="pedidos_i1" msdata:rowOrder="0" xmlns="">
+                     <num_pedido>12910</num_pedido>
+                     <cod_produto>46</cod_produto>
+                     <quant>9000</quant>
+                     <quant_cancelada>0</quant_cancelada>
+                     <preco_tabela>56.5</preco_tabela>
+                     <perc_desc>0.0000000</perc_desc>
+                     <preco_unitario>54.93</preco_unitario>
+                     <total_bruto>0.00</total_bruto>
+                     <total_liquido>494370</total_liquido>
+                  </pedidos_i>
+                  <pedidos_i diffgr:id="pedidos_i2" msdata:rowOrder="1" xmlns="">
+                     <num_pedido>12911</num_pedido>
+                     <cod_produto>46</cod_produto>
+                     <quant>3000</quant>
+                     <quant_cancelada>0</quant_cancelada>
+                     <preco_tabela>56.5</preco_tabela>
+                     <perc_desc>0.0000000</perc_desc>
+                     <preco_unitario>54.93</preco_unitario>
+                     <total_bruto>0.00</total_bruto>
+                     <total_liquido>164790</total_liquido>
+                  </pedidos_i>
+                  <pedidos_i diffgr:id="pedidos_i3" msdata:rowOrder="2" xmlns="">
+                     <num_pedido>13355</num_pedido>
+                     <cod_produto>46</cod_produto>
+                     <quant>119.83</quant>
+                     <quant_cancelada>0</quant_cancelada>
+                     <preco_tabela>62.5</preco_tabela>
+                     <perc_desc>0.0000000</perc_desc>
+                     <preco_unitario>62.5</preco_unitario>
+                     <total_bruto>0.00</total_bruto>
+                     <total_liquido>7489.38</total_liquido>
+                  </pedidos_i>
+               </diffgr:before>
+            </diffgr:diffgram>
+  

@@ -1,0 +1,59 @@
+DATABASE logix
+SCREEN
+{
+[a ]                   DADOS COMPLEMENTARES DA NOTA
+------------------------------------------------------------------------------
+NF:[b      ] Sér:[h  ] AR:[c      ][y ] Emis:[d         ] Valor:[e         ]
+ Fonecedor:[f              ][g                                             ]
+  Contrato:[i     ]   Versão:[j  ] Situação:[k]  Serviço:[l                ] 
+------------------------------------------------------------------------------
+Seq     Item            Descrição     UM   Quant  Pre Unit Vr Item  Usuário
+[p |q              |r                |s  |t      |u      |v        |o      ] 
+[p |q              |r                |s  |t      |u      |v        |o      ] 
+[p |q              |r                |s  |t      |u      |v        |o      ] 
+[p |q              |r                |s  |t      |u      |v        |o      ] 
+[p |q              |r                |s  |t      |u      |v        |o      ] 
+[p |q              |r                |s  |t      |u      |v        |o      ] 
+             Docum        Vencto               Valor
+          [x        ]     [w         ]      [z               ]
+          [x        ]     [w         ]      [z               ]
+          [x        ]     [w         ]      [z               ]
+          [x        ]     [w         ]      [z               ]
+          [x        ]     [w         ]      [z               ]
+          [x        ]     [w         ]      [z               ]
+}
+
+ATTRIBUTES
+ a = FORMONLY.cod_empresa,     NOENTRY;
+ b = FORMONLY.num_nf,          NOENTRY;
+ h = FORMONLY.ser_nf,          NOENTRY;
+ c = FORMONLY.num_aviso_rec,   NOENTRY;
+ y = FORMONLY.tip_docum,       NOENTRY;
+ d = FORMONLY.dat_emis_nf,     NOENTRY;
+ e = FORMONLY.val_tot_nf,      NOENTRY;
+ f = FORMONLY.cod_fornecedor,  NOENTRY;
+ g = FORMONLY.nom_fornecedor,  NOENTRY;
+
+ i = FORMONLY.contrato_servico,NOENTRY;
+ j = FORMONLY.versao_contrato, NOENTRY;
+ k = FORMONLY.sit_contrato,    NOENTRY;
+ l = FORMONLY.servico,         NOENTRY;
+ 
+ p = FORMONLY.num_seq, FORMAT = '#';
+ q = FORMONLY.cod_item,        NOENTRY;
+ r = FORMONLY.den_item,        NOENTRY;
+ s = FORMONLY.cod_unid_med,    NOENTRY;
+ t = FORMONLY.qtd_declarad_nf, NOENTRY;
+ u = FORMONLY.pre_unit_nf,     NOENTRY;
+ v = FORMONLY.val_liquido_item,NOENTRY;
+ o = FORMONLY.nom_usuario, NOENTRY;
+  
+ x = FORMONLY.num_parcela --#, OPTIONS="-nolist";
+ w = FORMONLY.dat_vencto  --#, OPTIONS="-nolist";
+ z = FORMONLY.val_parcela --#, OPTIONS="-nolist";
+END
+
+INSTRUCTIONS
+   SCREEN RECORD sr_ar[06](num_seq THRU nom_usuario);
+   SCREEN RECORD sr_vencto[06](num_parcela THRU val_parcela);
+END 

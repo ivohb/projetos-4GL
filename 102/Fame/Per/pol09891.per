@@ -1,0 +1,24 @@
+DATABASE FORMONLY
+SCREEN
+{
+----------------------------------------------------------------------------
+ [a0]                   Relatorio de Itens Pendentes                                
+
+
+            Nota Fiscal: [a     ] 
+
+                  Serie: [b ]
+           
+                   Data: [c         ]
+
+
+}
+END
+
+ATTRIBUTES
+	a0 = FORMONLY.cod_empresa,	UPSHIFT, NOENTRY;
+	a = FORMONLY.num_nff,	    	UPSHIFT, AUTONEXT;
+	b = FORMONLY.ser_nff,				UPSHIFT, AUTONEXT;
+	c = FORMONLY.dat_emis,			UPSHIFT, AUTONEXT;
+
+END

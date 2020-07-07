@@ -1,0 +1,30 @@
+DATABASE FORMONLY
+SCREEN
+{
+------------------------------------------------------------------------------
+
+[e ]                    NOTAS FISCAIS FATURA - SAIDA          
+
+
+
+                          Re-impressao: [a]
+
+                          N.F. Inicial: [f0    ]
+
+                            N.F. Final: [f1    ]
+
+
+                      Processando N.F.: [f2    ]
+
+
+
+
+}
+END
+ATTRIBUTES
+e  = FORMONLY.cod_empresa, NOENTRY;
+a  = FORMONLY.reimpressao TYPE CHAR, UPSHIFT, AUTONEXT;
+f0 = FORMONLY.num_nff_ini TYPE DECIMAL, AUTONEXT;
+f1 = FORMONLY.num_nff_fim TYPE DECIMAL, AUTONEXT;
+f2 = FORMONLY.num_nff_proces, NOENTRY;
+END

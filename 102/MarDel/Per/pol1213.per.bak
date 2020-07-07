@@ -1,0 +1,25 @@
+DATABASE FORMONLY
+SCREEN
+{
+-------------------------------------------
+                      
+           Aguarde! Exportando ...
+           
+      Entrada: [a          ]
+                            
+        Saáda: [b          ]
+             
+        Saldo: [c          ]
+              
+              
+
+
+              
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.entrada,  NOENTRY;
+ b = FORMONLY.saida,    NOENTRY;
+ c = FORMONLY.item,    NOENTRY;
+END 

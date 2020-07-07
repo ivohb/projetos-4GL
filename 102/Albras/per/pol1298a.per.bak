@@ -1,0 +1,21 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------
+   Aguarde... 
+
+      ... processando:[a         ]
+
+
+
+------------------------------------------
+
+
+}
+END
+
+ATTRIBUTES
+ a = FORMONLY.num_oc, NOENTRY;
+END 
+
+   

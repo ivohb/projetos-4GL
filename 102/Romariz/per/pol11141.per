@@ -1,0 +1,29 @@
+DATABASE FORMONLY 
+SCREEN
+{
+------------------------------------------------
+             TIPOS DE ANÁLISES
+      
+   [a     |b                             ]
+   [a     |b                             ]
+   [a     |b                             ]
+   [a     |b                             ]
+   [a     |b                             ]
+   [a     |b                             ]
+   [a     |b                             ]
+   [a     |b                             ]
+   [a     |b                             ]
+   [a     |b                             ]
+
+}
+END 
+
+ATTRIBUTES
+ a = FORMONLY.tip_analise, NOENTRY, REVERSE;
+ b = FORMONLY.den_analise_port, NOENTRY, REVERSE;
+
+END
+
+INSTRUCTIONS
+   SCREEN RECORD s_pa[10] (tip_analise THRU den_analise_port);
+END

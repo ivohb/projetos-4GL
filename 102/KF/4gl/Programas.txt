@@ -1,0 +1,18 @@
+
+pol1051.4gl	Envio de programação consumo de itens consignados WV
+pol1052.4gl	CADASTRO PARA IDENTIFICAR CLIENTE ERICSSON
+pol1053.4gl	Manutenção da tabela item_prog_kf_1099
+pol1054.4gl	Manutenção da tabela unimed_edi_1099
+pol1102.4gl	Cadastro de Caminho
+pol1121.4gl	Integração ProdWin x Logix
+pol1122.4gl	Apontamento de produção via PW1
+pol1123.4gl	cadastro de equipamentos pw1
+pol1124.4gl	Consulta erros do apontamento PW1
+pol1125.4gl	CADASTRO DE OPERAÇÕES PW1  - DESATIVADO
+pol1126.4gl	Exporta Ops do Logix para o PW!
+
+pol1135.4gl	Cadastro de area e linha para integração de apontamento
+pol1148.4gl	Inspeção de entrada de materiais
+pol1149.4gl	Cadastro de simbolos Protheus - Qualidade
+pol1150.4gl	Exporta PPAP - Integração Logix x Protheus
+pol1151.4gl	Cadastro de ciclo x peça

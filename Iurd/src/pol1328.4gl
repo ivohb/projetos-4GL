@@ -135,7 +135,8 @@ DEFINE mr_nota                      RECORD
        dt_emissao                   DATE,
        num_nf_dig                   decimal(9,0),
        cod_tipo_obrigacao           INTEGER,
-       cod_operacao                 CHAR(05)
+       cod_operacao                 CHAR(05),
+       cod_obrig_lcc   	            DECIMAL(7,0)
 END RECORD
 
 DEFINE mr_gi_aen                   RECORD
@@ -234,7 +235,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.109 "
+   LET p_versao = "pol1328-12.00.110 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -4238,7 +4239,8 @@ FUNCTION pol1328_insere_ap()#
           l_data        LIKE audit_cap.data_manut,
           l_num_seq     LIKE audit_cap.num_seq,
           l_status      SMALLINT,
-          l_dat_hor     CHAR(19)
+          l_dat_hor     CHAR(19),
+          l_contrato    CHAR(50)
           
 
     IF NOT pol1328_le_par_ap() THEN 
@@ -4306,6 +4308,8 @@ FUNCTION pol1328_insere_ap()#
     LET mr_ap.dat_ret           = NULL
     LET mr_ap.status_rem        = 0
     LET mr_ap.ies_form_pgto_escr= NULL
+    LET mr_ap.num_duplicata     = mr_nota.cod_obrig_lcc
+
    
    INSERT INTO ap
       VALUES(mr_ap.*)
@@ -4317,11 +4321,14 @@ FUNCTION pol1328_insere_ap()#
       RETURN FALSE                                                                                      
    END IF
    
+   LET l_contrato = 'AP INCLUIDA PELO GI CONTRATO DE ALUGUEL ', mr_nota.cod_contrato USING '<<<<<<<'
+   
+   
    INSERT INTO ap_obser
     VALUES(mr_ap.cod_empresa,
            mr_ap.num_ap,
            1,
-           'AP INCLUIDA PELO GI CONTRATO DE ALUGUEL')
+           l_contrato)
 
    IF STATUS <> 0 THEN
       LET m_erro = STATUS USING '<<<<<'                                                                 

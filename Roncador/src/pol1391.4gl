@@ -22,18 +22,15 @@ DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
        m_folder          VARCHAR(10),
        m_fold_item       VARCHAR(10),
-       m_fold_pgto       VARCHAR(10),
        m_fold_oper       VARCHAR(10),
        m_fold_erro       VARCHAR(10),
        m_construct       VARCHAR(10)
 
 DEFINE m_pan_item        VARCHAR(10),
-       m_pan_pgto        VARCHAR(10),
        m_pan_oper        VARCHAR(10),
        m_pan_erro        VARCHAR(10)
 
 DEFINE m_brz_item        VARCHAR(10),
-       m_brz_pgto        VARCHAR(10),
        m_brz_oper        VARCHAR(10),
        m_brz_erro        VARCHAR(10)
        
@@ -56,15 +53,16 @@ DEFINE m_zoom_item       VARCHAR(10),
        m_zoom_operr      VARCHAR(10),
        m_lupa_operv      VARCHAR(10),
        m_lupa_operr      VARCHAR(10),
-       m_zoom_pgto       VARCHAR(10),
-       m_lupa_pgto       VARCHAR(10),
        m_pgto_sical      VARCHAR(10),
        m_pgto_logix      VARCHAR(10),
        m_tip_pedido      VARCHAR(10),
        m_entrega         VARCHAR(10),
        m_nat_venda       VARCHAR(10),
-       m_nat_remessa     VARCHAR(10)
-
+       m_nat_remessa     VARCHAR(10),
+       m_empresa         VARCHAR(10),
+       m_emis_de         VARCHAR(10),
+       m_emis_ate        VARCHAR(10)
+       
 DEFINE mr_item          RECORD
        cod_sical        LIKE item.cod_item,
        cod_logix        LIKE item.cod_item,
@@ -81,17 +79,23 @@ END RECORD
 DEFINE m_den_item       CHAR(76),
        m_den_pgto       CHAR(30)
 
-DEFINE mr_pgto          RECORD
-       cod_sical        LIKE cond_pgto.cod_cnd_pgto,
-       cod_logix        LIKE cond_pgto.cod_cnd_pgto,
-       den_pgto         LIKE cond_pgto.den_cnd_pgto
+DEFINE mr_erro          RECORD
+       empresa          VARCHAR(02),
+       pedido_sical     VARCHAR(15),
+       cnpj_cliente     VARCHAR(20),
+       dat_de           DATE,
+       dat_ate          DATE
 END RECORD
 
-DEFINE ma_pgto          ARRAY[200] OF RECORD
-       cod_sical        LIKE cond_pgto.cod_cnd_pgto,
-       cod_logix        LIKE cond_pgto.cod_cnd_pgto,
-       den_pgto         LIKE cond_pgto.den_cnd_pgto,
-       filler           CHAR(01)
+DEFINE ma_erro          ARRAY[2000] OF RECORD
+       empresa          VARCHAR(02),
+       pedido_sical     VARCHAR(15),
+       cnpj_cliente     VARCHAR(20),
+       dat_emissao      VARCHAR(30),
+       cod_produto      VARCHAR(15),
+       qtd_item         VARCHAR(12),
+       pre_unit         VARCHAR(15),
+       mensagem         VARCHAR(120)
 END RECORD
 
 DEFINE mr_oper          RECORD
@@ -112,7 +116,9 @@ DEFINE ma_oper          ARRAY[10] OF RECORD
        den_nat_remessa       char(30),
        filler                CHAR(01)
 END RECORD
-             
+
+DEFINE m_query          VARCHAR(1200)
+            
 #-----------------#
 FUNCTION pol1391()#
 #-----------------#
@@ -130,6 +136,9 @@ FUNCTION pol1391()#
    
    LET m_car_item = TRUE
    LET m_car_oper = TRUE
+   INITIALIZE mr_item.* TO NULL
+   INITIALIZE mr_oper.* TO NULL
+   INITIALIZE mr_erro.* TO NULL
    
    CALL pol1391_menu()
 
@@ -172,17 +181,11 @@ FUNCTION pol1391_menu()#
     CALL pol1391_oper(m_fold_oper)
 
     # FOLDER erros
-{
+
     LET m_fold_erro = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
-    CALL _ADVPL_set_property(m_fold_erro,"TITLE","Erro")
-    #CALL pol1391_erro(m_fold_erro)
+    CALL _ADVPL_set_property(m_fold_erro,"TITLE","Erros de na integração")
+    CALL pol1391_erro(m_fold_erro)
 
-    # FOLDER cnd pgto 
-
-    LET m_fold_pgto = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
-    CALL _ADVPL_set_property(m_fold_pgto,"TITLE","Cond pgto")
-    #CALL pol1391_pgto(m_fold_pgto)
-}
     CALL _ADVPL_set_property(m_folder,"FOLDER_SELECTED",1)
     CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
 
@@ -205,20 +208,13 @@ FUNCTION pol1391_desativa_folder(l_folder)#
    CASE l_folder
         WHEN '1' 
            CALL _ADVPL_set_property(m_fold_oper,"ENABLE",FALSE)
-           #CALL _ADVPL_set_property(m_fold_erro,"ENABLE",FALSE)        
-           #CALL _ADVPL_set_property(m_fold_pgto,"ENABLE",FALSE)        
+           CALL _ADVPL_set_property(m_fold_erro,"ENABLE",FALSE)        
         WHEN '2' 
            CALL _ADVPL_set_property(m_fold_item,"ENABLE",FALSE)   
-           #CALL _ADVPL_set_property(m_fold_erro,"ENABLE",FALSE)      
-           #CALL _ADVPL_set_property(m_fold_pgto,"ENABLE",FALSE)
+           CALL _ADVPL_set_property(m_fold_erro,"ENABLE",FALSE)      
         WHEN '3' 
            CALL _ADVPL_set_property(m_fold_item,"ENABLE",FALSE)
            CALL _ADVPL_set_property(m_fold_oper,"ENABLE",FALSE)
-           #CALL _ADVPL_set_property(m_fold_pgto,"ENABLE",FALSE)
-        WHEN '4' 
-           CALL _ADVPL_set_property(m_fold_item,"ENABLE",FALSE)
-           CALL _ADVPL_set_property(m_fold_oper,"ENABLE",FALSE) 
-           #CALL _ADVPL_set_property(m_fold_erro,"ENABLE",FALSE)      
    END CASE
    
 END FUNCTION
@@ -229,8 +225,7 @@ FUNCTION pol1391_ativa_folder()#
 
    CALL _ADVPL_set_property(m_fold_item,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_fold_oper,"ENABLE",TRUE)
-   #CALL _ADVPL_set_property(m_fold_erro,"ENABLE",TRUE) 
-   #CALL _ADVPL_set_property(m_fold_pgto,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_fold_erro,"ENABLE",TRUE) 
 
 END FUNCTION
 
@@ -919,7 +914,7 @@ FUNCTION pol1391_oper(l_fpanel)#
     CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
 
     LET l_find = _ADVPL_create_component(NULL,"LFINDBUTTON",l_menubar)
-    CALL _ADVPL_set_property(l_find,"TYPE","NO_CONFIRM")
+    CALL _ADVPL_set_property(l_find,"TYPE","CONFIRM")
     CALL _ADVPL_set_property(l_find,"EVENT","pol1391_oper_find")
 
     LET l_create = _ADVPL_create_component(NULL,"LCREATEBUTTON",l_menubar)
@@ -1673,4 +1668,346 @@ FUNCTION pol1391_oper_delete()#
    
    RETURN l_ret
         
+END FUNCTION
+
+#---Rotinas para exibir os erros ----#
+
+#------------------------------#
+FUNCTION pol1391_erro(l_fpanel)#
+#------------------------------#
+
+    DEFINE l_fpanel    VARCHAR(10),
+           l_menubar   VARCHAR(10),
+           l_panel     VARCHAR(10),
+           l_inform    VARCHAR(10),
+           l_update    VARCHAR(10),
+           l_delete    VARCHAR(10),
+           l_fechar    VARCHAR(10),
+           l_find      VARCHAR(10),
+           l_create    VARCHAR(10)
+        
+    LET l_menubar = _ADVPL_create_component(NULL,"LMENUBAR",l_fpanel)
+    CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
+
+    LET l_find = _ADVPL_create_component(NULL,"LFINDBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_find,"TYPE","CONFIRM")
+    CALL _ADVPL_set_property(l_find,"EVENT","pol1391_erro_find")
+    CALL _ADVPL_set_property(l_find,"CONFIRM_EVENT","pol1391_erro_find_conf")
+    CALL _ADVPL_set_property(l_find,"CANCEL_EVENT","pol1391_erro_find_canc")
+
+    LET l_fechar = _ADVPL_create_component(NULL,"LQUITBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_fechar,"EVENT","pol1391_fechar")
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",l_fpanel)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")   
+    
+    CALL pol1391_erro_campo(l_panel)
+    CALL pol1391_erro_grade(l_panel)
+    
+END FUNCTION
+
+#---------------------------------------#
+FUNCTION pol1391_erro_campo(l_container)#
+#---------------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_label           VARCHAR(10),
+           l_caixa           VARCHAR(10),
+           l_panel           VARCHAR(10)
+
+    LET m_pan_erro = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(m_pan_erro,"ALIGN","TOP")
+    CALL _ADVPL_set_property(m_pan_erro,"HEIGHT",40)
+    CALL _ADVPL_set_property(m_pan_erro,"ENABLE",FALSE)
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_erro)
+    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
+    CALL _ADVPL_set_property(l_label,"POSITION",10,10)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Cod empresa:")    
+
+    LET m_empresa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_erro)     
+    CALL _ADVPL_set_property(m_empresa,"POSITION",80,10) 
+    CALL _ADVPL_set_property(m_empresa,"LENGTH",2,0)    
+    CALL _ADVPL_set_property(m_empresa,"VARIABLE",mr_erro,"empresa")
+              
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_erro)
+    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
+    CALL _ADVPL_set_property(l_label,"POSITION",140,10)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Pedido sical:")    
+
+    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_erro)     
+    CALL _ADVPL_set_property(l_caixa,"POSITION",200,10) 
+    CALL _ADVPL_set_property(l_caixa,"LENGTH",15,0)    
+    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_erro,"pedido_sical")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_erro)
+    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
+    CALL _ADVPL_set_property(l_label,"POSITION",355,10)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Cnpj cliente:")    
+
+    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_erro)     
+    CALL _ADVPL_set_property(l_caixa,"POSITION",420,10) 
+    CALL _ADVPL_set_property(l_caixa,"LENGTH",15,0)    
+    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_erro,"cnpj_cliente")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_erro)
+    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
+    CALL _ADVPL_set_property(l_label,"POSITION",600,10)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Dat emissão de:")    
+
+    LET m_emis_de = _ADVPL_create_component(NULL,"LDATEFIELD",m_pan_erro)     
+    CALL _ADVPL_set_property(m_emis_de,"POSITION",680,10)     
+    CALL _ADVPL_set_property(m_emis_de,"VARIABLE",mr_erro,"dat_de")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_erro)
+    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
+    CALL _ADVPL_set_property(l_label,"POSITION",800,10)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Dat emissão até:")    
+
+    LET m_emis_ate = _ADVPL_create_component(NULL,"LDATEFIELD",m_pan_erro)     
+    CALL _ADVPL_set_property(m_emis_ate,"POSITION",880,10)     
+    CALL _ADVPL_set_property(m_emis_ate,"VARIABLE",mr_erro,"dat_ate")
+
+    CALL _ADVPL_set_property(m_pan_oper,"ENABLE",FALSE)
+
+END FUNCTION
+
+#----------------------------------------#
+FUNCTION pol1391_erro_grade(l_container)#
+#----------------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_tabcolumn       VARCHAR(10),
+           l_panel           VARCHAR(10)
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",l_panel)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",1) 
+    CALL _ADVPL_set_property(l_layout,"EXPANSIBLE",TRUE)
+   
+    LET m_brz_erro = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
+    CALL _ADVPL_set_property(m_brz_erro,"ALIGN","CENTER")
+    
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_erro)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Empresa")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","empresa")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+    
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_erro)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Pedido sical")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","pedido_sical")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_erro)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Cnpj cliente")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cnpj_cliente")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_erro)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Emissão")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",150)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","dat_emissao")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_erro)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Produto")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_produto")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_erro)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Quantidade")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","qtd_item")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_erro)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Preço unit")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","pre_unit")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_erro)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Mensagem")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","mensagem")
+
+    CALL _ADVPL_set_property(m_brz_erro,"SET_ROWS",ma_erro,1)
+    CALL _ADVPL_set_property(m_brz_erro,"EDITABLE",FALSE)
+    CALL _ADVPL_set_property(m_brz_erro,"CAN_ADD_ROW",FALSE)
+    CALL _ADVPL_set_property(m_brz_erro,"CAN_REMOVE_ROW",FALSE)
+   
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1391_erro_find()#
+#---------------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   INITIALIZE mr_erro.*, ma_erro TO NULL
+   CALL _ADVPL_set_property(m_brz_erro,"CLEAR")
+   CALL _ADVPL_set_property(m_pan_erro,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_empresa,"GET_FOCUS")
+   
+   RETURN TRUE
+
+END FUNCTION
+   
+#--------------------------------#
+FUNCTION pol1391_erro_find_canc()#
+#--------------------------------#
+
+   INITIALIZE mr_erro.*, ma_erro TO NULL
+   CALL _ADVPL_set_property(m_pan_erro,"ENABLE",FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1391_erro_find_conf()#
+#--------------------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   CALL pol1391_monta_select()
+   LET m_msg = NULL
+   
+   IF NOT pol1391_exec_select() THEN
+      IF m_msg IS NOT NULL THEN
+         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      END IF
+      RETURN FALSE
+   END IF
+   
+   LET p_status = LOG_progresspopup_start(
+          "Integração com PGI...","pol1391_exibe_dados","PROCESS")  
+          
+   CALL _ADVPL_set_property(m_pan_erro,"ENABLE",FALSE)
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1391_monta_select()#
+#------------------------------#
+   
+   DEFINE l_dat_de         VARCHAR(10),
+          l_dat_ate        VARCHAR(10)
+   
+   LET m_query = "select ",
+       " e.cod_empresa, p.pedido_sical, p.cnpj_cpf_cliente, ",
+       " p.dt_emissao, i.cod_produto, i.qtd_prod_tonelada, ",                       
+       " i.preco_unit_liquido, m.mensagem ",                                       
+       " from cnpj_empresa e, pedido_erro_sical m, ",
+       " pedido_sical p, ped_item_sical i ",
+       " where e.num_cnpj = m.cnpj_empresa AND e.num_cnpj = i.cnpj_empresa ",
+       " AND e.num_cnpj = p.cnpj_empresa AND p.situacao = 'C' AND p.versao_atual = 'S' ",
+       " AND p.num_versao = m.num_versao AND p.pedido_sical = m.pedido_sical ",
+       " AND p.num_versao = i.num_versao AND p.pedido_sical = i.pedido_sical "
+                            
+    IF mr_erro.empresa IS NOT NULL THEN
+       LET m_query = m_query, " AND e.cod_empresa = '",mr_erro.empresa,"' "
+    END IF
+
+    IF mr_erro.pedido_sical IS NOT NULL THEN
+       LET m_query = m_query, " AND p.pedido_sical = '",mr_erro.pedido_sical,"' "
+    END IF
+
+    IF mr_erro.cnpj_cliente IS NOT NULL THEN
+       LET m_query = m_query, " AND p.cnpj_cpf_cliente = '",mr_erro.cnpj_cliente,"' "
+    END IF
+
+    IF mr_erro.dat_de IS NOT NULL THEN
+       LET l_dat_de = EXTEND(mr_erro.dat_de, YEAR TO DAY)
+       LET m_query = m_query, " AND p.dt_emissao[1,10] >= '",l_dat_de,"' "
+    END IF
+
+    IF mr_erro.dat_ate IS NOT NULL THEN
+       LET l_dat_ate = EXTEND(mr_erro.dat_ate, YEAR TO DAY)
+       LET m_query = m_query, " AND p.dt_emissao[1,10] <= '",l_dat_ate,"' "
+    END IF
+    
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1391_exec_select()#
+#-----------------------------#
+
+   PREPARE var_pesquisa FROM m_query
+    
+   IF  Status <> 0 THEN
+       CALL log003_err_sql("PREPARE SQL","prepare:var_pesquisa")
+       RETURN FALSE
+   END IF   
+
+   DECLARE cq_cons CURSOR FOR var_pesquisa
+
+   IF  Status <> 0 THEN
+       CALL log003_err_sql("DECLARE CURSOR","cq_cons")
+       RETURN FALSE
+   END IF
+
+   FREE var_pesquisa
+
+   OPEN cq_cons
+
+   IF  STATUS <> 0 THEN
+       CALL log003_err_sql("OPEN CURSOR","cq_cons")
+       RETURN FALSE
+   END IF
+
+   FETCH cq_cons INTO ma_erro[1].*
+
+   IF STATUS <> 0 THEN
+      IF STATUS <> 100 THEN
+         CALL log003_err_sql("FETCH CURSOR","cq_cons")
+      ELSE
+         LET m_msg = 'Não a dados, para os argumentos informados.'
+         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      END IF
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1391_exibe_dados()#
+#-----------------------------#
+
+   DEFINE l_progres   SMALLINT,
+          l_ind       INTEGER
+
+   CALL LOG_progresspopup_set_total("PROCESS",1000)
+
+   CALL _ADVPL_set_property(m_brz_erro,"CLEAR")
+   
+   LET l_ind = 1
+      
+   FOREACH cq_cons INTO ma_erro[l_ind].*
+   
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH','cq_cons:exibe_dados')
+         RETURN FALSE
+      END IF
+
+      LET l_progres = LOG_progresspopup_increment("PROCESS")
+      
+      LET l_ind = l_ind + 1
+      
+      IF l_ind > 2000 THEN
+         LET m_msg = 'Limite previsto de itens ultrapassou'
+         CALL log0030_mensagem(m_msg,'info')
+         RETURN FALSE
+      END IF
+   
+   END FOREACH
+   
+   LET l_ind = l_ind - 1 
+   CALL _ADVPL_set_property(m_brz_erro,"ITEM_COUNT", l_ind)
+   
+   RETURN TRUE
+
 END FUNCTION

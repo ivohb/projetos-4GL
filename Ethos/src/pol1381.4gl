@@ -66,13 +66,21 @@ DEFINE m_ies_info        SMALLINT,
        m_cod_embal       CHAR(15),
        m_cod_compon      CHAR(15),
        m_qtd_embal       INTEGER,
-       m_qtd_ant         INTEGER
+       m_qtd_ant         INTEGER,
+       m_ind_relat       INTEGER,
+       m_ir              INTEGER,
+       m_page_length     INTEGER,
+       m_den_empresa     VARCHAR(36)
        
 DEFINE mr_campos         RECORD
        cod_cliente       LIKE clientes.cod_cliente,
        nom_cliente       LIKE clientes.nom_cliente,
        cod_item          LIKE item.cod_item,
        den_item          LIKE item.den_item,
+       dat_prev_ini      DATE,
+       dat_prev_fim      DATE,
+       dat_apur_ini      DATE,
+       dat_apur_fim      DATE,
        dat_inicial       DATE,
        dat_final         DATE
 END RECORD
@@ -102,7 +110,8 @@ END RECORD
 
 DEFINE ma_sintetico      ARRAY[1000] OF RECORD
        cod_item_compon   CHAR(15),
-       descricao         VARCHAR(50),
+       cod_item_cliente  CHAR(15),
+       descricao         VARCHAR(18),
        saldo_atual       INTEGER,
        neces_per_pre     INTEGER,
        saldo_per_aval    INTEGER,
@@ -150,8 +159,8 @@ FUNCTION pol1381()#
    LET l_per_pre = m_dat_prev_ini, ' - ',m_dat_prev_fim
    LET l_per_atu = m_dat_aval_ini, ' - ',m_dat_aval_fim
    
-   LET m_desc_pre = 'Neces periodo ',l_per_pre
-   LET m_desc_atu = 'Neces periodo ',l_per_atu
+   LET m_desc_pre = 'Neces periodo prévio '
+   LET m_desc_atu = 'Neces periodo de apuração '
           
    IF LOG_initApp("PADRAO") <> 0 THEN
       RETURN
@@ -179,7 +188,8 @@ FUNCTION pol1381_menu()#
     DEFINE l_menubar,
            l_panel,
            l_inform,
-           l_titulo           VARCHAR(80)
+           l_titulo,
+           l_print           VARCHAR(80)
     
     LET l_titulo = "EMBALAGEM - APURAÇÃO DAS NECESSIDADES - ",p_versao
     
@@ -211,6 +221,9 @@ FUNCTION pol1381_menu()#
     CALL _ADVPL_set_property(m_menu_sinte,"TYPE","NO_CONFIRM")    
     CALL _ADVPL_set_property(m_menu_sinte,"EVENT","pol1381_sintetica")
 
+    LET l_print = _ADVPL_create_component(NULL,"LPRINTBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_print,"EVENT","pol1381_print")
+
     CALL _ADVPL_create_component(NULL,"LQUITBUTTON",l_menubar)
 
     LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_dialog)
@@ -234,7 +247,8 @@ FUNCTION pol1381_cria_campos(l_container)#
     DEFINE l_container       VARCHAR(10),
            l_panel           VARCHAR(10),
            l_layout          VARCHAR(10),
-           l_label           VARCHAR(10)
+           l_label           VARCHAR(10),
+           l_caixa           VARCHAR(10)
 
     LET m_pnl_info = _ADVPL_create_component(NULL,"LTITLEDPANELEX",l_container)
     CALL _ADVPL_set_property(m_pnl_info,"ALIGN","TOP")
@@ -261,7 +275,7 @@ FUNCTION pol1381_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_lupa_cliente,"CLICK_EVENT","pol1381_zoom_cliente")
 
     LET m_nom_cliente = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
-    CALL _ADVPL_set_property(m_nom_cliente,"LENGTH",50) 
+    CALL _ADVPL_set_property(m_nom_cliente,"LENGTH",30) 
     CALL _ADVPL_set_property(m_nom_cliente,"EDITABLE",FALSE) 
     CALL _ADVPL_set_property(m_nom_cliente,"VARIABLE",mr_campos,"nom_cliente")
     CALL _ADVPL_set_property(m_nom_cliente,"CAN_GOT_FOCUS",FALSE)
@@ -287,11 +301,27 @@ FUNCTION pol1381_cria_campos(l_container)#
     CALL _ADVPL_set_property(m_descricao,"CAN_GOT_FOCUS",FALSE)
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
-    CALL _ADVPL_set_property(l_label,"TEXT","Período de:")    
+    CALL _ADVPL_set_property(l_label,"TEXT"," Período prévio de:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET l_caixa = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
+    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_campos,"dat_prev_ini")
+    CALL _ADVPL_set_property(l_caixa,"EDITABLE",FALSE) 
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+    CALL _ADVPL_set_property(l_label,"TEXT","Até:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET l_caixa = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
+    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_campos,"dat_prev_fim")
+    CALL _ADVPL_set_property(l_caixa,"EDITABLE",FALSE) 
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
+    CALL _ADVPL_set_property(l_label,"TEXT","Período apuração de:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_dat_ini = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
-    CALL _ADVPL_set_property(m_dat_ini,"VARIABLE",mr_campos,"dat_inicial")
+    CALL _ADVPL_set_property(m_dat_ini,"VARIABLE",mr_campos,"dat_apur_ini")
     CALL _ADVPL_set_property(m_dat_ini,"EDITABLE",FALSE) 
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
@@ -299,8 +329,9 @@ FUNCTION pol1381_cria_campos(l_container)#
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_dat_fim = _ADVPL_create_component(NULL,"LDATEFIELD",l_layout)
-    CALL _ADVPL_set_property(m_dat_fim,"VARIABLE",mr_campos,"dat_final")
-    CALL _ADVPL_set_property(m_dat_fim,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(m_dat_fim,"VARIABLE",mr_campos,"dat_apur_fim")
+    CALL _ADVPL_set_property(m_dat_fim,"ENABLE",FALSE) 
+    CALL _ADVPL_set_property(m_dat_fim,"VALID","pol1381_valida_periodo")
 
 END FUNCTION
 
@@ -477,13 +508,13 @@ FUNCTION pol1381_panel_sintetico(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","neces_per_pre")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sintetico)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Saldo periodo aval")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Saldo projetado")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","saldo_per_aval")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sintetico)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER",m_desc_atu)
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",130)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","neces_per_aval")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sintetico)
@@ -640,6 +671,7 @@ FUNCTION pol1381_valida_item()#
    RETURN TRUE
 
 END FUNCTION
+
 #---------------------------#
 FUNCTION pol1381_zoom_item()#
 #---------------------------#
@@ -699,6 +731,28 @@ FUNCTION pol1381_le_item(l_cod)#
    RETURN TRUE
 
 END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1381_valida_periodo()#
+#--------------------------------#
+    
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
+        
+   IF mr_campos.dat_apur_fim IS NULL THEN
+      LET m_msg = 'Informe a data final de apuração'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   IF mr_campos.dat_apur_fim < mr_campos.dat_apur_ini THEN
+      LET m_msg = 'Data final de apuração inválida.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
    
 #----------------------------------------#
 FUNCTION pol1381_ativa_desativa(l_status)#
@@ -730,12 +784,20 @@ END FUNCTION
 #--------------------------#
 FUNCTION pol1381_informar()#
 #--------------------------#
-      
+   
+   LET m_ind_relat = 0
    CALL pol1381_limpa_campos()
    CALL pol1381_ativa_desativa(TRUE)
    LET m_ies_info = FALSE
    LET m_proc_analitic = FALSE
    LET m_proc_sintetic = FALSE
+
+   LET mr_campos.dat_prev_ini = m_dat_prev_ini 
+   LET mr_campos.dat_prev_fim = m_dat_prev_fim 
+   LET mr_campos.dat_apur_ini = m_dat_aval_ini
+   LET mr_campos.dat_apur_fim = m_dat_aval_fim
+
+   CALL _ADVPL_set_property(m_dat_fim,"ENABLE",TRUE) 
       
    CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
 
@@ -750,7 +812,7 @@ FUNCTION pol1381_cancelar()#
    CALL pol1381_limpa_campos()
    CALL pol1381_ativa_desativa(FALSE)
    LET m_carregando = FALSE
-   
+   CALL _ADVPL_set_property(m_dat_fim,"ENABLE",FALSE) 
    RETURN TRUE
 
 END FUNCTION
@@ -763,10 +825,10 @@ FUNCTION pol1381_confirmar()#
    
    DELETE FROM fat_pre_periodo_405
    DELETE FROM fat_real_periodo_405
-      
-   LET mr_campos.dat_inicial = m_dat_prev_ini #m_dat_aval_ini
-   LET mr_campos.dat_final = m_dat_prev_fim #m_dat_aval_fim
-   
+
+   LET mr_campos.dat_inicial = mr_campos.dat_prev_ini
+   LET mr_campos.dat_final = mr_campos.dat_prev_fim
+         
    LET p_status = LOG_progresspopup_start(
      "Pesquisando...","pol1381_le_pedidos","PROCESS") 
 
@@ -781,8 +843,8 @@ FUNCTION pol1381_confirmar()#
       RETURN FALSE
    END IF
    
-   LET mr_campos.dat_inicial = m_dat_aval_ini
-   LET mr_campos.dat_final = m_dat_aval_fim
+   LET mr_campos.dat_inicial = mr_campos.dat_apur_ini
+   LET mr_campos.dat_final = mr_campos.dat_apur_fim
 
    LET p_status = LOG_progresspopup_start(
      "Pesquisando...","pol1381_le_pedidos","PROCESS") 
@@ -813,6 +875,8 @@ FUNCTION pol1381_confirmar()#
    END IF
    
    LET m_ies_info = TRUE
+   CALL _ADVPL_set_property(m_dat_fim,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_pnl_info,"ENABLE",FALSE)
    
    RETURN TRUE
 
@@ -1234,6 +1298,7 @@ FUNCTION pol1381_sintetica()#
    
    DEFINE l_count     INTEGER
    
+   LET m_ind_relat = 0
    CALL _ADVPL_set_property(m_pnl_anali,"VISIBLE",FALSE)
    CALL _ADVPL_set_property(m_pnl_sinte,"VISIBLE",TRUE)
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
@@ -1366,6 +1431,22 @@ FUNCTION pol1381_proc_sintetic()#
       CALL pol1381_le_item(ma_sintetico[m_index].cod_item_compon) RETURNING l_status
       LET ma_sintetico[m_index].descricao = m_den_item_reduz
 
+    SELECT cod_item_cliente
+      INTO ma_sintetico[m_index].cod_item_cliente                                                 
+      FROM cliente_item                                             
+     WHERE cod_empresa = p_cod_empresa                              
+       AND cod_item = ma_sintetico[m_index].cod_item_compon                        
+       AND cod_cliente_matriz = mr_campos.cod_cliente                       
+
+      IF STATUS = 100 THEN
+         LET ma_sintetico[m_index].cod_item_cliente = ''
+      ELSE
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('INSERT','embal_compon_405:cq_estrut')
+            RETURN FALSE
+         END IF
+      END IF
+      
       SELECT SUM(qtd_saldo) INTO l_qtd_saldo
         FROM estoque_lote
        WHERE cod_empresa = p_cod_empresa
@@ -1410,9 +1491,147 @@ FUNCTION pol1381_proc_sintetic()#
    END FOREACH   
 
    LET m_index = m_index - 1
-   
+   LET m_ind_relat = m_index
    CALL _ADVPL_set_property(m_brz_sintetico,"ITEM_COUNT", m_index)
    
    RETURN TRUE
    
 END FUNCTION
+
+#-----------------------#
+FUNCTION pol1381_print()#
+#-----------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+
+   IF m_ind_relat = 0 THEN
+      LET m_msg = 'Gere o resumo previamente.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   LET m_msg = NULL
+   
+   LET p_status = LOG_progresspopup_start(
+       "Imprimindo...","pol1381_imprime","PROCESS")  
+
+   IF NOT p_status THEN
+      LET m_msg = "Impressão cancelada."
+   ELSE
+   
+   END IF
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", m_msg)
+      
+   RETURN TRUE
+
+END FUNCTION
+
+#-------------------------#
+FUNCTION pol1381_imprime()#
+#-------------------------#
+   
+   DEFINE l_status   SMALLINT
+   
+   LET l_status = StartReport(
+       "pol1381_relatorio","pol1381","RESUMO PARA PEDIDO DE EMBALAGEM",88,TRUE,TRUE)
+
+   
+   RETURN l_status
+
+END FUNCTION
+
+#-----------------------------------#
+FUNCTION pol1381_relatorio(l_report)#
+#-----------------------------------#
+   
+   DEFINE l_report    CHAR(300),
+          l_progres   SMALLINT,
+          l_status    SMALLINT,
+          l_grupo     CHAR(15)
+   
+   LET l_grupo = '01'
+   LET l_status = TRUE   
+   LET m_page_length = ReportPageLength("pol1381")
+       
+   START REPORT pol1381_relat TO l_report
+
+   CALL pol1381_le_den_empresa() RETURNING l_status
+   
+   CALL LOG_progresspopup_set_total("PROCESS",m_ind_relat)
+
+   FOR m_ir = 1 TO m_ind_relat
+   
+      LET l_progres = LOG_progresspopup_increment("PROCESS") 
+
+      OUTPUT TO REPORT pol1381_relat(l_grupo)
+   
+   END FOR
+
+   FINISH REPORT pol1381_relat
+
+   CALL FinishReport("pol1381")
+   
+   RETURN l_status
+   
+END FUNCTION
+
+#--------------------------------#
+ FUNCTION pol1381_le_den_empresa()
+#--------------------------------#
+
+   SELECT den_empresa
+     INTO m_den_empresa
+     FROM empresa
+    WHERE cod_empresa = p_cod_empresa
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('Lendo','empresa')
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+   
+END FUNCTION
+   
+#----------------------------#
+REPORT pol1381_relat(l_grupo)#
+#----------------------------#
+
+   DEFINE l_grupo     VARCHAR(15)
+
+    OUTPUT
+        TOP    MARGIN 0
+        LEFT   MARGIN 0
+        RIGHT  MARGIN 0
+        BOTTOM MARGIN 0
+        PAGE   LENGTH m_page_length
+   
+       ORDER EXTERNAL BY l_grupo
+
+    FORMAT
+
+    PAGE HEADER
+
+      CALL ReportPageHeader("pol1381")
+
+      SKIP 1 LINE
+
+   BEFORE GROUP OF l_grupo
+      SKIP TO TOP OF PAGE
+      SKIP 1 LINE
+           
+      PRINT COLUMN 001, 'ITEM CLIENTE    ITEM LOGIX      DESCRICAO          SALDO    NECESSID SOLICITAR PESO'
+      PRINT COLUMN 001, '--------------- --------------- ------------------ -------- -------- --------- --------'
+
+    ON EVERY ROW 
+        PRINT COLUMN 001, ma_sintetico[m_ir].cod_item_cliente,     
+              COLUMN 017, ma_sintetico[m_ir].cod_item_compon,
+              COLUMN 033, ma_sintetico[m_ir].descricao,
+              COLUMN 052, ma_sintetico[m_ir].saldo_per_aval USING '########',
+              COLUMN 061, ma_sintetico[m_ir].neces_per_aval USING '#########',
+              COLUMN 070, ma_sintetico[m_ir].qtd_solicitar USING '#########',
+              COLUMN 080, ma_sintetico[m_ir].peso_total USING '########'
+END REPORT
+
+

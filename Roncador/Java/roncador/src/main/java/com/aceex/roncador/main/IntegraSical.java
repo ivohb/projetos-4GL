@@ -23,7 +23,7 @@ public class IntegraSical implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent event) {
  
-		log.info("Integraçao Logix x Sical V 1.035");
+		log.info("Integraçao Logix x Sical V 1.036");
 		Propriedade prop = new Propriedade();		
 		int tempo_minuto = prop.getTempo();
 		

@@ -194,7 +194,8 @@ public class ParametrosDao extends Dao {
 		if (natRemessa == null) {
 			query += " and cod_nat_remessa is null ";
 		} else {
-			query += " and cod_nat_remessa = "+natRemessa;
+			query += " and cod_nat_remessa = '"+natRemessa+"' ";
+			log.info(query);
 		}
 		
 		PreparedStatement stmt = getConexao().prepareStatement(query);

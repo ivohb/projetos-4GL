@@ -96,11 +96,22 @@ public class NotaDao extends Dao {
 			Integer natVenda = rs.getInt("oper_vend");
 			log.info("Pedido logix:"+pedLog);
 			Integer natRemessa = paramDao.getNatRemessa(codEmpresa, pedLog);
-			NatOperSical nos = paramDao.getTipoEntrega(natVenda, natRemessa);
+			NatOperSical nos = null;
+			
+			try {
+				nos = paramDao.getTipoEntrega(natVenda, natRemessa);
+			} catch (Exception e) {
+				log.info(""+e.getMessage()+" "+e.getCause());
+			}
 
-			String tipo = nos.getTip_pedido();
-			String entrega = nos.getEntrega_furura();
 			Integer operacao = 0;
+			String tipo = "1";
+			String entrega = "0";
+
+			if (nos != null) {
+				tipo = nos.getTip_pedido();
+				entrega = nos.getEntrega_furura();
+			}
 				
 			if (tipo.equalsIgnoreCase("1")) {
 				if (entrega.equalsIgnoreCase("0")) {

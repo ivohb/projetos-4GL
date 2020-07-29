@@ -257,7 +257,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 15
    DEFER INTERRUPT
-   LET p_versao = "pol1158-10.02.68"
+   LET p_versao = "pol1158-10.02.69"
    OPTIONS 
       NEXT KEY control-f,
       INSERT KEY control-i,
@@ -4069,56 +4069,10 @@ FUNCTION pol1158_atu_nf_sup()#
       CALL log003_err_sql('Atualizando','nf_sup')
       RETURN FALSE
    END IF
-   
-   {SELECT cod_uni_funcio
-     INTO p_cod_unidade
-     FROM uni_funcio_adm_265
-    WHERE cod_uni_feder = pr_docum[p_ind].estado
 
-   IF STATUS = 100 THEN
-      LET p_msg = 'Unidade funcional administrativa\n',
-                  'não cadastrada no POL1207, para\n',
-                  'o estado ', pr_docum[p_ind].estado
-      CALL log0030_mensagem(p_msg,'excla')
+   IF NOT pol1158_atu_integ(pr_docum[p_ind].empresa, pr_docum[p_ind].num_docum) THEN
       RETURN FALSE
-   ELSE   
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','uni_funcio_adm_265')
-         RETURN FALSE
-      END IF
-   END IF
-  
-   SELECT aviso_recebto
-     FROM sup_par_ar
-    WHERE empresa = pr_docum[p_ind].empresa
-      AND aviso_recebto = pr_docum[p_ind].num_docum
-      AND seq_aviso_recebto = 0
-      AND parametro = 'secao_resp_aprov'
-
-                  
-   IF STATUS = 100 THEN
-      LET p_msg = 'Aviso de recebimento ', pr_docum[p_ind].num_docum, ' não\n',
-                  'encontrado na tabela sup_par_ar'
-      CALL log0030_mensagem(p_msg,'excla')
-      RETURN FALSE
-   ELSE
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','sup_par_ar')
-         RETURN FALSE
-      END IF
-   END IF   
-   
-   UPDATE sup_par_ar
-      SET parametro_texto = p_cod_unidade	
-    WHERE empresa = pr_docum[p_ind].empresa
-      AND aviso_recebto = pr_docum[p_ind].num_docum
-      AND seq_aviso_recebto = 0
-      AND parametro = 'secao_resp_aprov'
-
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('UPDATE','sup_par_ar')
-      RETURN FALSE
-   END IF }
+   END IF 
    
    LET p_msg = 'LIBERACAO DO AR ', p_campo_txt CLIPPED,
                ' P/ INTEGRACAO COM O CAP '
@@ -4130,12 +4084,66 @@ FUNCTION pol1158_atu_nf_sup()#
     WHERE cod_empresa = pr_docum[p_ind].empresa
    
    IF STATUS <> 0 THEN
-      #CALL log003_err_sql('LENDO','empresa_proces_265')
       LET p_user_para = NULL
    END IF
       
    RETURN TRUE
          
+END FUNCTION
+
+#----------------------------------------------#
+FUNCTION pol1158_atu_integ(l_cod_emp, l_num_ar)#
+#----------------------------------------------#
+   
+   DEFINE l_cod_emp        LIKE nf_sup.cod_empresa,
+          l_num_ar         LIKE nf_sup.num_aviso_rec,
+          l_num_nf         LIKE nf_sup.num_nf,        
+          l_ser_nf         LIKE nf_sup.ser_nf,        
+          l_ssr_nf         LIKE nf_sup.ssr_nf,        
+          l_cod_fornecedor LIKE nf_sup.cod_fornecedor 
+   
+   SELECT num_nf, 
+          ser_nf, 
+          ssr_nf, 
+          cod_fornecedor
+    INTO  l_num_nf,        
+          l_ser_nf,        
+          l_ssr_nf,        
+          l_cod_fornecedor
+    FROM nf_sup
+    WHERE cod_empresa = l_cod_emp
+      AND num_aviso_rec = l_num_ar
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','nf_sup - atu_integ')
+      RETURN FALSE
+   END IF
+   
+   SELECT num_ad
+     FROM integ_cos_logix 
+    WHERE cod_empresa = 'ZZ' 
+      AND num_nf = l_num_nf
+      AND ser_nf = l_ser_nf
+      AND ssr_nf = l_ssr_nf
+      AND cod_fornecedor = l_cod_fornecedor
+   
+   IF STATUS = 0 THEN   
+      UPDATE integ_cos_logix 
+         SET cod_empresa = l_cod_emp
+       WHERE cod_empresa = 'ZZ' 
+         AND num_nf = l_num_nf
+         AND ser_nf = l_ser_nf
+         AND ssr_nf = l_ssr_nf
+         AND cod_fornecedor = l_cod_fornecedor
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('UPDATE','integ_cos_logix - atu_integ')
+         RETURN FALSE
+      END IF
+   END IF
+   
+   RETURN TRUE
+
 END FUNCTION
 
 #----------------------------------#

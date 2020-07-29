@@ -94,6 +94,9 @@ DEFINE p_parametro     RECORD
        num_programa  LIKE audit_logix.num_programa,
        usuario       LIKE audit_logix.usuario
 END RECORD
+
+DEFINE m_cod_empresa  CHAR(02), 
+       m_num_ar       INTEGER
   
 MAIN
    CALL log0180_conecta_usuario()
@@ -101,8 +104,8 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 60
    DEFER INTERRUPT
-   LET p_versao = "pol1159-10.02.48"
-   LET p_ver_prog = "10.02.48"
+   LET p_versao = "pol1159-10.02.52"
+   LET p_ver_prog = "10.02.52"
    OPTIONS 
       NEXT KEY control-f,
       INSERT KEY control-i,
@@ -226,6 +229,40 @@ END FUNCTION
       COMMIT WORK
       #CALL log085_transacao("COMMIT")
    END IF
+   
+   DECLARE cq_corrige CURSOR FOR
+    SELECT cod_empresa, num_aviso_rec
+      FROM nf_sup a  
+     WHERE a.ies_incl_cap='N' 
+       AND a.num_aviso_rec IN (
+           SELECT b.num_aviso_rec 
+             FROM aprov_ar_265 b 
+            WHERE a.cod_empresa = b.cod_empresa 
+              AND a.num_aviso_rec = b.num_aviso_rec
+              AND b.dat_aprovacao IS NULL )
+   FOREACH cq_corrige INTO p_cod_empresa, p_num_ar
+
+      IF STATUS <> 0 THEN   
+         LET p_erro = STATUS
+         LET p_msg = 'ERRO ',p_erro CLIPPED, ' LENDO CURSOR cq_corrige'
+         LET p_num_ar = NULL
+         CALL pol1159_guarda_erro() 
+         RETURN FALSE
+      END IF
+      
+      UPDATE nf_sup
+         SET ies_incl_cap = 'X'
+       WHERE cod_empresa = p_cod_empresa
+         AND num_aviso_rec = p_num_ar
+      
+      IF STATUS <> 0 THEN
+         LET p_erro = STATUS
+         LET p_msg = 'ERRO ',p_erro CLIPPED, ' ATUALIZANDO TABELA NF_SUP COM X'
+         CALL pol1159_guarda_erro() 
+         RETURN FALSE
+      END IF
+      
+   END FOREACH
 
    CALL pol1159_grava_erro()
    
@@ -450,9 +487,6 @@ FUNCTION pol1159_processa()#
                AND c.num_aviso_rec = a.num_aviso_rec)
        AND b.cnd_pgto_nf NOT IN 
            (SELECT cnd_pgto FROM cond_pgto_cap WHERE ies_pagamento = '3')
-       AND a.num_aviso_rec NOT IN
-           (SELECT g.num_ar FROM gi_ad_912 g WHERE g.cod_empresa = a.cod_empresa
-               AND g.cod_situacao = 'S')
         
    FOREACH cq_proces INTO 
            p_num_ar, p_cod_empresa, p_ies_incl_cap, p_ies_nf_aguard_nfe
@@ -835,7 +869,7 @@ FUNCTION pol1159_atualiza_nf_sup(p_ies_incl_cap)#
    LET p_erro = p_num_ar
    LET p_texto = 'AR:', p_erro
    LET p_texto = 'AR: ', p_texto CLIPPED, 
-                 '. ATUALIZACAO DO CAMPO NF_SUP.IES_INCL_CAP PARA ', p_ies_incl_cap
+                 '. ATUALIZACAO DO CAMPO NF_SUP.IES_INCL_CAP PARA ', p_ies_incl_cap   
    
    INSERT INTO audit_logix
     VALUES(p_cod_empresa,
@@ -849,6 +883,82 @@ FUNCTION pol1159_atualiza_nf_sup(p_ies_incl_cap)#
       LET p_erro = STATUS
       LET p_msg = 'ERRO ',p_erro CLIPPED, ' INSERINDO TA AUDIT_LOGIX'
       CALL pol1159_guarda_erro() 
+   END IF
+   
+   IF p_ies_incl_cap = 'X' THEN
+      IF NOT pol1159_atu_integ() THEN
+         RETURN FALSE
+      END IF
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1159_atu_integ()#
+#---------------------------#
+   
+   DEFINE l_num_nf         LIKE nf_sup.num_nf,        
+          l_ser_nf         LIKE nf_sup.ser_nf,        
+          l_ssr_nf         LIKE nf_sup.ssr_nf,        
+          l_cod_fornecedor LIKE nf_sup.cod_fornecedor 
+   
+   SELECT num_nf, 
+          ser_nf, 
+          ssr_nf, 
+          cod_fornecedor
+    INTO  l_num_nf,        
+          l_ser_nf,        
+          l_ssr_nf,        
+          l_cod_fornecedor
+    FROM nf_sup
+    WHERE cod_empresa = p_cod_empresa
+      AND num_aviso_rec = p_num_ar
+
+   IF STATUS <> 0 THEN
+      LET p_erro = STATUS
+      LET p_msg = 'ERRO ',p_erro CLIPPED, ' LENDO DADOS DA NF_SUP P/ AR ', p_num_ar
+      CALL pol1159_guarda_erro() 
+      RETURN FALSE
+   END IF
+   
+   SELECT num_ad
+     FROM integ_cos_logix 
+    WHERE cod_empresa = p_cod_empresa 
+      AND num_nf = l_num_nf
+      AND ser_nf = l_ser_nf
+      AND ssr_nf = l_ssr_nf
+      AND cod_fornecedor = l_cod_fornecedor
+   
+   IF STATUS = 0 THEN   
+      DELETE FROM integ_cos_logix
+       WHERE cod_empresa = 'ZZ' 
+         AND num_nf = l_num_nf
+         AND ser_nf = l_ser_nf
+         AND ssr_nf = l_ssr_nf
+         AND cod_fornecedor = l_cod_fornecedor
+      
+      UPDATE integ_cos_logix SET cod_empresa = 'ZZ'
+       WHERE cod_empresa = p_cod_empresa 
+         AND num_nf = l_num_nf
+         AND ser_nf = l_ser_nf
+         AND ssr_nf = l_ssr_nf
+         AND cod_fornecedor = l_cod_fornecedor
+
+      IF STATUS <> 0 THEN
+         LET p_erro = STATUS
+         LET p_msg = 'ERRO ',p_erro CLIPPED, ' ATUALIZANDO DADOS DA INTEG_COS_LOGIX'
+         CALL pol1159_guarda_erro() 
+         RETURN FALSE
+      END IF
+   ELSE
+      IF STATUS <> 100 THEN
+         LET p_erro = STATUS
+         LET p_msg = 'ERRO ',p_erro CLIPPED, ' LENDO DADOS DA INTEG_COS_LOGIX'
+         CALL pol1159_guarda_erro() 
+         RETURN FALSE
+      END IF
    END IF
    
    RETURN TRUE

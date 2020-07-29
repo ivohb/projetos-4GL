@@ -235,7 +235,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.109 "
+   LET p_versao = "pol1328-12.00.116 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -857,6 +857,25 @@ END FUNCTION
             CONTINUE FOREACH
          END IF
       END IF            
+      
+      IF mr_nota.ies_gera_nota MATCHES '[FS]' THEN                                                   
+         SELECT COUNT(*) INTO l_count                                                                
+           FROM ad_mestre                                                                            
+          WHERE cod_empresa = p_cod_empresa                                                          
+            AND num_nf = l_num_nf                                                                    
+            AND ser_nf = mr_nota.ser_nf                                                              
+            AND ssr_nf = mr_nota.ssr_nf                                                              
+            AND cod_fornecedor = mr_nota.cod_fornecedor                                              
+                                                                                                     
+         IF l_count > 0 THEN                                                                         
+            LET m_msg = 'Já existe uma AD para a mesma empresa, nota, serie, sub serie e fornecedor '
+            IF NOT pol1328_grava_erro() THEN                                                         
+               RETURN FALSE                                                                          
+            END IF                                                                                   
+            CALL pol1328_gra_gi_ad()                                                                 
+            CONTINUE FOREACH                                                                         
+         END IF                                                                                      
+      END IF                                                                                         
       
       SELECT COUNT(*) INTO l_count 
         FROM gi_ad_erro_912
@@ -3519,9 +3538,25 @@ FUNCTION pol1328_insere_ad()#
       LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela ad_mestre '
       RETURN FALSE                                                       
    END IF                                                                
-                                                                         
+
+{   DELETE FROM cap_obs_ad
+    WHERE empresa = p_cod_empresa
+      AND apropriacao_desp = m_num_ad
+}
+ 
    LET l_manut = 'POL1328 - INCLUSAO DA AD No. ', mr_ad_mestre.num_ad USING '<<<<<<<'
-                                                                         
+
+{   INSERT INTO cap_obs_ad(empresa, apropriacao_desp, seql_obs_ad, obs_ad)
+    VALUES(p_cod_empresa, m_num_ad, 1, l_manut)
+
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'                                                                 
+      LET m_msg = 'Erro de status: ',m_erro                                                             
+      LET m_msg = m_msg CLIPPED, ' inserindo conta credito na tabela cap_obs_ad.'                    
+      RETURN FALSE                                                                                      
+   END IF
+ }         
+                                                                                                                                         
    LET l_data = TODAY
    LET l_hora = TIME
 
@@ -4240,7 +4275,7 @@ FUNCTION pol1328_insere_ap()#
           l_num_seq     LIKE audit_cap.num_seq,
           l_status      SMALLINT,
           l_dat_hor     CHAR(19),
-          l_contrato    CHAR(50)
+          l_contrato    CHAR(40)
           
 
     IF NOT pol1328_le_par_ap() THEN 
@@ -4320,8 +4355,8 @@ FUNCTION pol1328_insere_ap()#
       LET m_msg = m_msg CLIPPED, ' inserindo conta credito na tabela ap.'                    
       RETURN FALSE                                                                                      
    END IF
-   
-   LET l_contrato = 'AP INCLUIDA PELO GI CONTRATO DE ALUGUEL ', mr_nota.cod_contrato USING '<<<<<<<'
+     
+   LET l_contrato =  'AP INCLUIDA PELO GI CONTRATO  ', mr_nota.cod_contrato USING '<<<<<<<'
    
    
    INSERT INTO ap_obser
@@ -4667,7 +4702,7 @@ FUNCTION pol1328_ins_irrf_pg()#
    LET mr_reten_irrf_pg.ies_especie_nf = m_ies_especie_nf   
    LET mr_reten_irrf_pg.cod_fornecedor = mr_ad_mestre.cod_fornecedor   
    LET mr_reten_irrf_pg.cod_tip_val = m_cod_tip_val  
-   LET mr_reten_irrf_pg.val_base_calc = mr_ad_mestre.val_tot_nf 
+   LET mr_reten_irrf_pg.val_base_calc = m_val_base 
    LET mr_reten_irrf_pg.val_pensao = 0   
    LET mr_reten_irrf_pg.val_inss = 0     
    LET mr_reten_irrf_pg.val_depend = m_val_desc_tot   
@@ -4689,6 +4724,51 @@ FUNCTION pol1328_ins_irrf_pg()#
       RETURN FALSE
    END IF
 
+   DELETE FROM cap_irrf_aluguel  
+    WHERE empresa = mr_reten_irrf_pg.cod_empresa 
+      AND apropr_desp = mr_reten_irrf_pg.num_ad
+      
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' deletando registro na tabela cap_irrf_aluguel.'
+      RETURN FALSE
+   END IF
+     
+   INSERT INTO cap_irrf_aluguel(
+     empresa, fornecedor, apropr_desp, val_bas_calc, val_irrf) 
+   VALUES(mr_reten_irrf_pg.cod_empresa,
+          mr_reten_irrf_pg.cod_fornecedor,
+          mr_reten_irrf_pg.num_ad,
+          m_val_base,
+          m_val_irrf)
+  
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela cap_irrf_aluguel.'
+      RETURN FALSE
+   END IF
+
+   DELETE FROM cap_imposto_complementar  
+    WHERE empresa = mr_ad_mestre.cod_empresa 
+      AND ad_ap_nf_origem = mr_ad_mestre.num_ad 
+
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' deletando registro na tabela cap_imposto_complementar.'
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1328_ins_cap_imposto('tipo_isencao', 'Tipo de isenção de rendimentos') THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1328_ins_cap_imposto('desc_rend_isento', 'Descrição do rendimento isento/Não tributado') THEN
+      RETURN FALSE
+   END IF
+    
    LET m_pct_irrf = m_val_irrf / mr_ad_mestre.val_tot_nf
    LET m_pct_desc = m_val_desc_tot / mr_ad_mestre.val_tot_nf
    LET m_ies_ir_ap = TRUE
@@ -4697,13 +4777,62 @@ FUNCTION pol1328_ins_irrf_pg()#
                                       
 END FUNCTION
 
+#------------------------------------------------#
+FUNCTION pol1328_ins_cap_imposto(l_param, l_desc)#
+#------------------------------------------------#
+   
+   DEFINE l_param    VARCHAR(20),
+          l_desc     VARCHAR(50)
+          
+   INSERT INTO cap_imposto_complementar (
+      empresa, 
+      ad_ap_nf_origem, 
+      ind_ad_ap_nota_fiscal_origem, 
+      serie_nota_fiscal, 
+      subserie_nota_fiscal, 
+      especie_nota_fiscal, 
+      fornecedor, 
+      tip_imposto, 
+      dat_ocorrencia, 
+      parametro, 
+      descricao_parametro, 
+      parametro_dat) 
+   VALUES(mr_ad_mestre.cod_empresa,
+          mr_ad_mestre.num_ad,
+          mr_ad_mestre.num_nf, 
+          mr_ad_mestre.ser_nf, 
+          mr_ad_mestre.ssr_nf, 
+          m_ies_especie_nf,    
+          mr_ad_mestre.cod_fornecedor,
+          'IRRF',
+          m_dat_emissao,
+          l_param,
+          l_desc,
+          m_dat_emissao)
+           
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela cap_imposto_complementar.'
+      RETURN FALSE
+   END IF
+      
+   RETURN TRUE
+
+END FUNCTION   
+
 #-----------------------------#
 FUNCTION pol1328_ins_irrf_ap()#
 #-----------------------------#
    
    DEFINE l_val_ap          DECIMAL(12,2),
           l_versao          INTEGER, 
-          l_sequencia       INTEGER
+          l_sequencia       INTEGER,
+          l_cod_tip_val     LIKE ap_valores.cod_tip_val,
+          l_valor           LIKE ap_valores.valor,
+          l_ies_tipo        CHAR(01),
+          l_val_juros       DECIMAL(12,2)
+
    
    IF m_val_sem_ir > 0 THEN
       LET m_val_acres = m_val_sem_ir * (mr_gi_ap.val_nom_ap / m_val_com_ir)
@@ -4711,7 +4840,48 @@ FUNCTION pol1328_ins_irrf_ap()#
       LET m_val_acres = 0 
    END IF
    
-   LET l_val_ap = mr_gi_ap.val_nom_ap + m_val_acres
+   LET l_val_juros = 0
+   
+   DECLARE cq_valor CURSOR FOR                                            
+    SELECT cod_tip_val, valor                                                
+      FROM ap_valores                                                        
+     WHERE cod_empresa = mr_ap.cod_empresa                                   
+       AND num_ap = mr_ap.num_ap                                             
+       AND ies_versao_atual = 'S'                                            
+                                                                          
+   FOREACH cq_valor INTO l_cod_tip_val, l_valor                              
+                                                                          
+      IF STATUS <> 0 THEN                                                    
+         LET m_erro = STATUS USING '<<<<<'                                   
+         LET m_msg = 'Erro de status: ',m_erro                               
+         LET m_msg = m_msg CLIPPED, ' lendo dados da tabela ap_valores'      
+         RETURN FALSE                                                        
+      END IF                                                                 
+                                                                             
+      SELECT ies_alt_val_pag                                                 
+        INTO l_ies_tipo                                                      
+        FROM tipo_valor                                                      
+       WHERE cod_empresa = mr_ap.cod_empresa                                     
+         AND cod_tip_val = l_cod_tip_val                                     
+         AND ies_juros = 'S'                                                 
+         AND ies_ad_ap = '2'                                                 
+                                                                          
+      IF STATUS = 0 THEN                                                     
+         IF l_ies_tipo = '+' THEN                                            
+            LET l_val_juros = l_val_juros + l_valor              
+         END IF                                                              
+      ELSE                                                                   
+         IF STATUS <> 100 THEN                                               
+            LET m_erro = STATUS USING '<<<<<'                                
+            LET m_msg = 'Erro de status: ',m_erro                            
+            LET m_msg = m_msg CLIPPED, ' lendo dados da tabela tipo_valor'   
+            RETURN FALSE                                                     
+         END IF                                                              
+      END IF                                                                 
+                                                                             
+   END FOREACH                                                               
+                                                                            
+   LET l_val_ap = mr_gi_ap.val_nom_ap + m_val_acres + l_val_juros
    LET m_val_irrf = l_val_ap * m_pct_irrf
    LET m_val_desc_tot = l_val_ap * m_pct_desc   
    LET m_val_base = l_val_ap - m_val_desc_tot
@@ -4766,30 +4936,7 @@ FUNCTION pol1328_ins_irrf_ap()#
    END IF
    
    LET l_sequencia = l_sequencia + 1
-   
-   {INSERT INTO ap_valores (                                                   
-    cod_empresa,                                                                 
-    num_ap,                                                                      
-    num_versao,                                                                  
-    ies_versao_atual,                                                            
-    num_seq,                                                                     
-    cod_tip_val,                                                                 
-    valor)                                                                       
-   VALUES(mr_ap.cod_empresa,                                                     
-          mr_ap.num_ap,                                                          
-          l_versao,                                                              
-          'S',                                                                   
-          l_sequencia,                                                           
-          m_cod_tip_val,                                                         
-          m_val_irrf)                                                            
-                                                                              
-   IF STATUS <> 0 THEN                                                           
-      LET m_erro = STATUS USING '<<<<<'                                          
-      LET m_msg = 'Erro de status: ',m_erro                                      
-      LET m_msg = m_msg CLIPPED, ' inserindo tipo de valor na tab ap_valores.'   
-      RETURN FALSE                                                               
-   END IF   }                                                                     
-   
+      
    RETURN TRUE
                                       
 END FUNCTION

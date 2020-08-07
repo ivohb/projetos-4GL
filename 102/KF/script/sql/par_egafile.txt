@@ -1,8 +1,0 @@
-INSERT INTO ifx_desenv.par_egafile (cod_parametro, val_parametro, den_parametro, cod_empresa)
-VALUES (1, 'c:\ega', NULL, '01');
-
-INSERT INTO ifx_desenv.par_egafile (cod_parametro, val_parametro, den_parametro, cod_empresa)
-VALUES (2, 'c:\ega\lidos', NULL, '01');
-
-INSERT INTO ifx_desenv.par_egafile (cod_parametro, val_parametro, den_parametro, cod_empresa)
-VALUES (3, 'c:\ega\bat\pol1110.bat', NULL, '01');

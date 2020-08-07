@@ -1,9 +1,0 @@
-SG_IURD_TST =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = bdprd-cluster-scan)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = SG_IURD)
-    )
-  )
-sgiurd_tst/sgiurd_tst@SG_IURD_TST

@@ -1,8 +1,0 @@
-CREATE  TABLE tempo_proces912(
- dat_proces   datetime year to second,
- operacao     char(120),
- hor_ini      datetime hour to second,
- hor_fim      datetime hour to second,
- primary key(dat_proces)
-);
-

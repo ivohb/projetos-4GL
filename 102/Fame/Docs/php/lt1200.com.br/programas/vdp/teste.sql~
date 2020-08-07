@@ -1,7 +1,0 @@
-select sum(val_evento) as valor 
-                  from hist_movto
-                   where cod_empresa='".$emp_acerta."'
-                     and num_matricula='".$matricula_acerta."'
-                     and dat_referencia='".$mes_ano_acerta."'
-                     and cod_evento in (1,15,93,42)
-                     and cod_tip_proc=1 

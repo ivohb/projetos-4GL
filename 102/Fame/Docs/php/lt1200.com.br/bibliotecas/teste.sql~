@@ -1,5 +1,0 @@
-            select 'admlog',b.cdped,a.cod_palm,a.dt_import
-                from logix:vnimpped a,logix:vnxeorca b,logix:pedidos c
-                    where a.cod_item='000'
-                      and b.cod=a.cod_crm
-                      and c.num_pedido=b.cdped

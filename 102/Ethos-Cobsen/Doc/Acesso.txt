@@ -1,8 +1,0 @@
-IP: 189.108.224.52:1120
-
-User: Administrator@ETHOS
-
-senha: #Fa062012#
-
-User: admlog
-Senha: mecc16

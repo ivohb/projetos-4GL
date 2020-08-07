@@ -1,5 +1,0 @@
-pol1196.4gl	Caminho para geração do EDI VW
-pol1197.4gl	Materiais para o EDI da VW
-pol1198.4gl	Unidades de Medida para o EDI VW
-pol1199.4gl	Geração do EDI VW
-pol1200.4gl	Fornecedores VW para EDI

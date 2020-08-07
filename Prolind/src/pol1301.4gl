@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------#
 
 DATABASE logix
-
+ 
 GLOBALS
     DEFINE p_cod_empresa   LIKE empresa.cod_empresa,
            p_user          LIKE usuarios.cod_usuario,

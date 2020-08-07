@@ -1,7 +1,0 @@
-
-create table pa_laudo_petrom 
-  (
-    cod_empresa char(2) not null ,
-    num_laudo decimal(6,0) not null ,
-    num_pa decimal(6,0) not null 
-  );

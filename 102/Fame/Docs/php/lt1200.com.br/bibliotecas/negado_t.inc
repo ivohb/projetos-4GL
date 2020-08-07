@@ -1,2 +1,0 @@
-programa,base,tabela)
-programabaNetabellt1200

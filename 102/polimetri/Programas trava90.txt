@@ -1,8 +1,0 @@
-pol1229.4gl	Usuário para desbloqueio de oc
-pol1230.4gl	Liberação/Cancelamento/Exclusão de ordens bloqueadas
-pol1231.4gl	Consulta de auditoria
-pol1232.4gl	Cadastro das regras do trava90
-pol1233.4gl	Inclusão de ordens de compra
-pol1234.pgl	Bloqueio de ordens de compra (Trava90)
-pol1235.4gl	Contas contábeis para análise do trava90
-pol1236.4gl	Alteração da programação da OC

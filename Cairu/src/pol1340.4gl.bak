@@ -19,6 +19,7 @@ END GLOBALS
 DEFINE  m_id_registro   INTEGER,
         a_id_registro   INTEGER
 
+
 DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
        m_cod_cliente     VARCHAR(10),

@@ -235,7 +235,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.118 "
+   LET p_versao = "pol1328-12.00.120 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -4828,13 +4828,11 @@ FUNCTION pol1328_ins_irrf_ap()#
 #-----------------------------#
    
    DEFINE l_val_ap          DECIMAL(12,2),
-          l_versao          INTEGER, 
-          l_sequencia       INTEGER,
+          l_base_calc       DECIMAL(12,2),
           l_cod_tip_val     LIKE ap_valores.cod_tip_val,
           l_valor           LIKE ap_valores.valor,
           l_ies_tipo        CHAR(01),
           l_val_juros       DECIMAL(12,2)
-
    
    IF m_val_sem_ir > 0 THEN
       LET m_val_acres = m_val_sem_ir * (mr_gi_ap.val_nom_ap / m_val_com_ir)
@@ -4844,7 +4842,7 @@ FUNCTION pol1328_ins_irrf_ap()#
    
    LET l_val_juros = 0
    
-   DECLARE cq_valor CURSOR FOR                                            
+   {DECLARE cq_valor CURSOR FOR                                            
     SELECT cod_tip_val, valor                                                
       FROM ap_valores                                                        
      WHERE cod_empresa = mr_ap.cod_empresa                                   
@@ -4881,10 +4879,11 @@ FUNCTION pol1328_ins_irrf_ap()#
          END IF                                                              
       END IF                                                                 
                                                                              
-   END FOREACH                                                               
+   END FOREACH    }                                                           
                                                                             
-   LET l_val_ap = mr_gi_ap.val_nom_ap + m_val_acres + l_val_juros
-   LET m_val_irrf = l_val_ap * m_pct_irrf
+   LET l_val_ap = mr_gi_ap.val_nom_ap + m_val_acres 
+   LET l_base_calc = l_val_ap + l_val_juros
+   LET m_val_irrf = l_base_calc * m_pct_irrf
    LET m_val_desc_tot = l_val_ap * m_pct_desc   
    LET m_val_base = l_val_ap - m_val_desc_tot
    
@@ -4909,35 +4908,6 @@ FUNCTION pol1328_ins_irrf_ap()#
       LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela reten_irrf_ap.'
       RETURN FALSE
    END IF
-   
-   IF m_val_irrf <= 0 THEN
-      RETURN TRUE
-   END IF
-   
-   SELECT num_versao, MAX(num_seq) 
-     INTO l_versao, l_sequencia
-     FROM ap_valores 
-    WHERE cod_empresa = mr_ap.cod_empresa
-      AND num_ap = mr_ap.num_ap
-      AND ies_versao_atual = 'S'
-    GROUP BY num_versao
-    
-    IF STATUS <> 0 AND STATUS <> 100 THEN
-      LET m_erro = STATUS USING '<<<<<'
-      LET m_msg = 'Erro de status: ',m_erro
-      LET m_msg = m_msg CLIPPED, ' lendo registro da tabela ap_valores.'
-      RETURN FALSE
-   END IF
-   
-   IF l_versao IS NULL OR l_versao = 0 THEN
-      LET l_versao = 1
-   END IF
-
-   IF l_sequencia IS NULL THEN
-      LET l_sequencia = 0
-   END IF
-   
-   LET l_sequencia = l_sequencia + 1
       
    RETURN TRUE
                                       

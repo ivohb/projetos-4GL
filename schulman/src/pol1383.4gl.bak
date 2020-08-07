@@ -112,7 +112,6 @@ FUNCTION pol1383_menu()#
     LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
     CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)
     CALL _ADVPL_set_property(m_dialog,"TITLE",l_titulo)
-    CALL _ADVPL_set_property(m_dialog,"FORM_NAME",p_versao)
     CALL _ADVPL_set_property(m_dialog,"ENABLE_ESC_CLOSE",FALSE)
     
     LET m_statusbar = _ADVPL_create_component(NULL,"LSTATUSBAR",m_dialog)

@@ -91,7 +91,7 @@ DEFINE p_nom_destinatario        CHAR(36),
        p_den_comando             CHAR(110),
        p_assunto                 CHAR(30),
        p_num_docum               CHAR(15),       
-       p_dat_vencto              DATE,
+       p_dat_vencto              CHAR(10),
        p_valor                   CHAR(12),
        p_total                   DECIMAL(12,2),
        p_num_nf                  CHAR(09),
@@ -394,7 +394,7 @@ FUNCTION pol1341_executa()#
       AND ies_enviado = 'N'
 
    LET m_dat_agora = TODAY  
-   LET m_dat_corte = '01/01/2017'   #a pedido da Sandra      
+   LET m_dat_corte = '01/12/2019'   #a pedido da Sandra      
 
    DECLARE cq_docum CURSOR FOR
     SELECT num_docum, 
@@ -692,7 +692,7 @@ FUNCTION pol1341_envia_email()#
       IF NOT pol1341_email_para() THEN
          RETURN FALSE
       END IF
-
+      
       IF p_email_destinatario IS NULL THEN
          LET m_msg = 'Email do cliente ', p_cod_cliente, ' esta nulo no logix'
          CALL pol1341_ins_mensagem() RETURNING l_ret
@@ -703,8 +703,8 @@ FUNCTION pol1341_envia_email()#
       LET p_titulo2 = 'Não identificamos em nosso sistema o pagamento dos seguintes documentos:'
          
       LET p_arquivo = p_cod_cliente CLIPPED,l_dat_atu,'.lst'
-      LET p_den_comando = p_caminho CLIPPED, p_arquivo CLIPPED                  
-         
+      LET p_den_comando = p_caminho CLIPPED, p_arquivo CLIPPED   
+               
       START REPORT pol1341_relat TO p_den_comando
       LET p_total = 0
      
@@ -724,7 +724,11 @@ FUNCTION pol1341_envia_email()#
                 ' lendo titulos  da tabela titulo_cobrado_912:cq_le_docs'
             RETURN FALSE
          END IF
-
+                  
+         IF p_dat_vencto[3,3] MATCHES '[0123456789]' THEN 
+            LET p_dat_vencto = p_dat_vencto[9,10],'/',p_dat_vencto[6,7],'/',p_dat_vencto[1,4]
+         END IF
+         
          DISPLAY p_cod_cliente TO cod_cliente
          DISPLAY p_num_docum TO num_docum
          #lds CALL LOG_refresh_display()
@@ -762,7 +766,7 @@ FUNCTION pol1341_envia_email()#
          LET p_imp_linha[18,42] = l_docum
          LET p_imp_linha[45,61] = l_valor
          LET p_imp_linha[65,86] = l_vencto
-                                
+         
          OUTPUT TO REPORT pol1341_relat() 
       
       END FOREACH
@@ -784,8 +788,8 @@ FUNCTION pol1341_envia_email()#
       LET m_msg = p_email_destinatario CLIPPED,'-',
             p_cod_cliente CLIPPED,'-',p_nom_destinatario CLIPPED
       CALL pol1341_ins_mensagem() RETURNING l_ret
-            
-      CALL log5600_envia_email(p_email_remetente, p_email_destinatario, p_assunto, p_den_comando, 2)
+      
+      #CALL log5600_envia_email(p_email_remetente, p_email_destinatario, p_assunto, p_den_comando, 2)
 
       IF NOT pol1341_atu_cliente() THEN
          RETURN FALSE

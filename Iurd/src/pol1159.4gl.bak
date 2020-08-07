@@ -105,7 +105,7 @@ MAIN
       SET LOCK MODE TO WAIT 60
    DEFER INTERRUPT
    LET p_versao = "pol1159-10.02.53"
-   LET p_ver_prog = "10.02.53"
+   LET p_ver_prog = "10.02.52"
    OPTIONS 
       NEXT KEY control-f,
       INSERT KEY control-i,

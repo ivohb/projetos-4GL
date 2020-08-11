@@ -2515,7 +2515,7 @@ FUNCTION pol1158_dados_ad()#
    INITIALIZE p_nom_tela TO NULL
    CALL log130_procura_caminho("pol11587") RETURNING p_nom_tela
    LET p_nom_tela = p_nom_tela CLIPPED
-   OPEN WINDOW w_pol11587 AT 02,03 WITH FORM p_nom_tela
+   OPEN WINDOW w_pol11587 AT 02,01 WITH FORM p_nom_tela
       ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST, FORM LINE FIRST)
 
    CALL pol1158_exibe_ad()
@@ -2626,33 +2626,7 @@ FUNCTION pol1158_exibe_ad()#
       END IF
       
       IF p_seq_txt = 1 THEN
-         DISPLAY p_observ TO observ1
-      END IF
-
-      IF p_seq_txt = 2 THEN
-         DISPLAY p_observ TO observ2
-      END IF
-
-      IF p_seq_txt = 3 THEN
-         DISPLAY p_observ TO observ3
-      END IF
-
-      IF p_seq_txt = 4 THEN
-         DISPLAY p_observ TO observ4
-      END IF
-
-      IF p_seq_txt = 5 THEN
-         DISPLAY p_observ TO observ5
-      END IF
-
-      IF p_seq_txt = 6 THEN
-         DISPLAY p_observ TO observ6
-      END IF
-
-      IF p_seq_txt = 7 THEN
-         DISPLAY p_observ TO observ7
-      END IF
-         
+      
    END FOREACH
    
    DISPLAY p_cod_fornecedor TO cod_fornecedor  

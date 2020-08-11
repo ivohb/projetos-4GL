@@ -600,7 +600,9 @@ FUNCTION pol1390_le_prog_efetiv()#
       ELSE
          LET ma_itens[m_ind].amostra = NULL
       END IF
-            
+      
+      SELECT * from info_tecnicas where cod_empresa = '01' and cod_pdr_info_tec = 980 and cod_compon = '20-000-00101F'
+      
       SELECT des_inf_tecnica 
         INTO l_cap_dia_fab
         FROM info_tecnicas

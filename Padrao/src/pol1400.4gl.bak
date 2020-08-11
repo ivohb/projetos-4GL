@@ -7,13 +7,17 @@
 # AUTOR...: IVO                                                     #
 # DATA....: 03/08/20                                                #
 #-------------------------------------------------------------------#
+# OBS: Os emails dos clientes devem estar cadastrados no POL1399 ou #
+#      no VDP1325                                                   #
+#-------------------------------------------------------------------#
 
 DATABASE logix
 
 GLOBALS
     DEFINE p_user          LIKE usuarios.cod_usuario,
            p_status        SMALLINT,
-           p_versao        CHAR(18)
+           p_versao        CHAR(18),
+           p_cod_empresa   CHAR(02)
 END GLOBALS
 
 DEFINE m_den_empresa     CHAR(02),
@@ -95,6 +99,38 @@ DEFINE mr_param                  RECORD
        email3_cliente       VARCHAR(50)   
 END RECORD                
 
+MAIN   
+
+   IF NUM_ARGS() > 0  THEN
+      LET p_cod_empresa = ARG_VAL(1)
+      LET p_user = ARG_VAL(2)
+      
+      IF LOG_connectDatabase("DEFAULT") THEN
+         #CALL pol1396_proc_consistencia()
+      END IF
+      RETURN
+   END IF
+   
+   CALL log0180_conecta_usuario()
+   
+   #CALL pol1396_exibe_tela()
+         
+   CALL log001_acessa_usuario("ESPEC999","")
+        RETURNING p_status, p_cod_empresa, p_user
+   CALL log0030_mensagem(p_cod_empresa, 'info')
+   CALL log0030_mensagem(p_user, 'info')
+
+      LET m_msg = 'Exwcucao manual.'
+      CALL pol1400_ins_mensagem() RETURNING p_status      
+   
+   IF p_status = 0 THEN    
+      #CALL pol1400_job()
+   END IF
+
+   #CLOSE WINDOW w_pol1396
+         
+END MAIN
+
 #------------------------------#
 FUNCTION pol1400_job(l_rotina) #
 #------------------------------#
@@ -112,13 +148,22 @@ FUNCTION pol1400_job(l_rotina) #
 
    LET m_dat_envio = TODAY
    LET m_hor_envio = TIME
-
+   
+   CALL log0030_mensagem(p_cod_empresa,'info')
+   
    LET m_cod_empresa = l_param1_empresa
+   CALL log0030_mensagem(m_cod_empresa,'info')
+   
    LET p_user = l_param2_user
-            
+   CALL log0030_mensagem(p_user,'info')
+   
    IF p_user IS NULL THEN
       LET p_user = 'admlog'
    END IF
+
+      LET m_msg = 'Execucao pela JOB0003.'
+      CALL pol1400_ins_mensagem() RETURNING p_status      
+RETURN
 
    IF m_cod_empresa IS NULL THEN
       LET m_msg = 'Empresa não parametrizada na JOB0003.'
@@ -141,8 +186,8 @@ END FUNCTION
 FUNCTION pol1400_processa()#
 #--------------------------#
    
-   LET l_dat_agora      DATE,
-       l_dat_corte      DATE
+   DEFINE l_dat_agora      DATE,
+          l_dat_corte      DATE
        
    DELETE FROM docum_enviado_912 
     WHERE cod_empresa = m_cod_empresa
@@ -317,7 +362,10 @@ END FUNCTION
 #-------------------------------#
 FUNCTION pol1400_set_mensa_cob()#
 #-------------------------------#
-
+Não identificamos em nosso sistema o pagamento dos seguintes documentos: seguintes documentos dfd dd
+Não identificamos em nosso sistema o pagamento dos seguintes documentos: segui fasdf fadfa daf fddd
+Caso o(s) pagamento(s) tenham sido efetuado(s), solicitamos a gentileza de nos enviar o(s) comprovante(s) por e-mail.
+Parâmetros padrões a serem usados em todos os clientes que não estejam cadastrad
    LET p_titulo2 = 'Não identificamos em nosso sistema o pagamento dos seguintes documentos:'
    LET p_mensa_1 = 'Caso o(s) pagamento(s) tenham sido efetuado(s), solicitamos a gentileza de nos enviar o(s) comprovante(s) por e-mail.'
    LET p_mensa_2 = 'Caso ainda estejam em aberto, favor entrar em contato para negociação do(s)  débito(s)  através dos  telefones'       

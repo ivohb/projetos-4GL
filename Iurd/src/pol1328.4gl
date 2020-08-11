@@ -68,7 +68,8 @@ DEFINE    m_msg                  CHAR(255),
           p_num_nf               DECIMAL(7,0),
           m_le_ap                SMALLINT,
           m_val_tol              DECIMAL(12,2),
-          m_sem_ap               INTEGER        
+          m_sem_ap               INTEGER,
+          m_seq_txt              INTEGER     
 
 DEFINE    m_cod_item             LIKE item.cod_item,
           m_num_nf               LIKE nf_sup.num_nf,
@@ -235,7 +236,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.120 "
+   LET p_versao = "pol1328-12.00.121 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -3538,27 +3539,17 @@ FUNCTION pol1328_insere_ad()#
       LET m_msg = m_msg CLIPPED, ' inserindo registro na tabela ad_mestre '
       RETURN FALSE                                                       
    END IF                                                                
-
-   DELETE FROM cap_obs_ad
-    WHERE empresa = p_cod_empresa
-      AND apropriacao_desp = m_num_ad
- 
-   LET l_manut = 'POL1328 - INCLUSAO DA AD No. ', mr_ad_mestre.num_ad USING '<<<<<<<'
-
-{   INSERT INTO cap_obs_ad(empresa, apropriacao_desp, seql_obs_ad, obs_ad)
-    VALUES(p_cod_empresa, m_num_ad, 1, l_manut)
-
-   IF STATUS <> 0 THEN
-      LET m_erro = STATUS USING '<<<<<'                                                                 
-      LET m_msg = 'Erro de status: ',m_erro                                                             
-      LET m_msg = m_msg CLIPPED, ' inserindo conta credito na tabela cap_obs_ad.'                    
-      RETURN FALSE                                                                                      
+   
+   IF mr_nota.den_observacao IS NOT NULL THEN
+      IF NOT pol1328_grv_texto() THEN
+         RETURN FALSE
+      END IF
    END IF
- }         
                                                                                                                                          
    LET l_data = TODAY
    LET l_hora = TIME
 
+   LET l_manut = 'POL1328 - INCLUSAO DA AD No. ', mr_ad_mestre.num_ad USING '<<<<<<<'
    LET l_num_seq = pol1328_le_audit(mr_ad_mestre.cod_empresa, mr_ad_mestre.num_ad, '1')
 
    INSERT INTO audit_cap
@@ -3587,6 +3578,97 @@ FUNCTION pol1328_insere_ad()#
 
    RETURN TRUE
 
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1328_grv_texto()#
+#---------------------------#
+
+   DEFINE l_parametro  RECORD 
+          texto      VARCHAR(255),
+          tam_linha  SMALLINT,
+          qtd_linha  SMALLINT,
+          justificar CHAR(01)
+   END RECORD
+
+   DEFINE 
+          l_ret_1      VARCHAR(40),
+          l_ret_2      VARCHAR(40),
+          l_ret_3      VARCHAR(40),
+          l_ret_4      VARCHAR(40),
+          l_ret_5      VARCHAR(40),
+          l_ret_6      VARCHAR(40),
+          l_ret_7      VARCHAR(40)
+
+   LET l_parametro.texto = mr_nota.den_observacao
+   LET l_parametro.tam_linha = 40
+   LET l_parametro.qtd_linha = 7
+   LET l_parametro.justificar = 'N'
+ 
+   CALL func001_quebrar_texto(l_parametro) RETURNING l_ret_1,l_ret_2,l_ret_3,l_ret_4,l_ret_5,l_ret_6,l_ret_7
+
+   DELETE FROM cap_obs_ad
+    WHERE empresa = p_cod_empresa
+      AND apropriacao_desp = m_num_ad
+
+   LET m_seq_txt = 0
+   
+   IF NOT pol1328_grv_cap_obs(l_ret_1) THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1328_grv_cap_obs(l_ret_2) THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1328_grv_cap_obs(l_ret_3) THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1328_grv_cap_obs(l_ret_4) THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1328_grv_cap_obs(l_ret_5) THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1328_grv_cap_obs(l_ret_6) THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1328_grv_cap_obs(l_ret_7) THEN
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+   
+#------------------------------------#
+FUNCTION pol1328_grv_cap_obs(l_texto)#
+#------------------------------------#
+
+   DEFINE l_texto VARCHAR(40)
+   
+   IF l_texto IS NULL THEN
+      RETURN TRUE
+   END IF
+   
+   LET m_seq_txt = m_seq_txt + 1
+   
+   INSERT INTO cap_obs_ad(empresa, apropriacao_desp, seql_obs_ad, obs_ad)
+    VALUES(p_cod_empresa, m_num_ad, m_seq_txt, l_texto)
+
+   IF STATUS <> 0 THEN
+      LET m_erro = STATUS USING '<<<<<'                                                                 
+      LET m_msg = 'Erro de status: ',m_erro                                                             
+      LET m_msg = m_msg CLIPPED, ' inserindo conta credito na tabela cap_obs_ad.'                    
+      RETURN FALSE                                                                                      
+   END IF
+   
+   RETURN TRUE
+   
 END FUNCTION
 
 #----------------------------#

@@ -70,7 +70,7 @@ FUNCTION pol1396_exibe_tela()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 60
 
-   LET p_versao = "pol1396-12.00.01  "
+   LET p_versao = "pol1396-12.00.04  "
    CALL func002_versao_prg(p_versao)
 
    INITIALIZE l_nom_tela TO NULL 
@@ -162,7 +162,7 @@ FUNCTION pol1396_consiste()#
     SELECT num_pedido
       FROM pedidos 
      WHERE cod_empresa = p_cod_empresa
-       AND (ies_sit_pedido = 'E')
+       AND (ies_sit_pedido = 'E' OR ies_sit_pedido = 'B')
    FOREACH cq_ped_cons INTO m_num_pedido       
       
       IF STATUS <> 0 THEN
@@ -181,7 +181,6 @@ FUNCTION pol1396_consiste()#
       
       IF m_msg IS NOT NULL THEN
          CALL pol1396_ins_erro()
-         RETURN FALSE
       ELSE
          LET m_msg = 'Pedido consistido: ', m_num_pedido
          CALL pol1396_ins_erro()      
@@ -198,7 +197,7 @@ FUNCTION pol1396_cria_tab_erro()#
 #-------------------------------#
 
    CREATE TABLE erro_consite_pedidos (
-      cod_empresa            INTEGER,
+      cod_empresa            CHAR(02),
       num_pedido             INTEGER,
       dat_proces             VARCHAR(19),
       erro                   VARCHAR(120)
@@ -301,6 +300,14 @@ FUNCTION pol1396_processa()#
 
 END FUNCTION
     
+#LOG1700
+#-------------------------------#
+ FUNCTION pol1396_version_info()
+#-------------------------------#
+
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/pol1396.4gl $|$Revision: 04 $|$Date: 11/08/2020 11:12 $|$Modtime: 11/08/2020 10:00 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+
+ END FUNCTION
 
 {
 

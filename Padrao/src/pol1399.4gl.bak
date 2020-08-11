@@ -55,7 +55,11 @@ DEFINE m_dialog          VARCHAR(10),
        m_limite          VARCHAR(10),
        m_obs             VARCHAR(10),
        m_browse          VARCHAR(10),
-       m_erro_construct  VARCHAR(10)
+       m_erro_construct  VARCHAR(10),
+       m_grupo           VARCHAR(10),
+       m_cobrar          VARCHAR(10),
+       m_cabec           VARCHAR(10),
+       m_rodape          VARCHAR(10)
 
 DEFINE m_ies_info        SMALLINT,
        m_ies_cobranca    SMALLINT,
@@ -83,11 +87,14 @@ DEFINE mr_param             RECORD
        vencer_ate           DECIMAL(3,0), 
        emitente_email       VARCHAR(08),  
        nom_emitente         VARCHAR(30),  
-       grupo_email          DECIMAL(3,0),
        email1_cliente       VARCHAR(50),  
        email2_cliente       VARCHAR(50),  
        email3_cliente       VARCHAR(50),  
-       observacao           VARCHAR(120)
+       observacao           VARCHAR(120),
+       grupo_env_email      DECIMAL(3,0),
+       em_exec_judicial     VARCHAR(01), 
+       cabec_email          VARCHAR(120),
+       rodape_email         VARCHAR(360)
 END RECORD
 
 DEFINE mr_cobranca       RECORD
@@ -671,11 +678,58 @@ FUNCTION pol1399_dados_parametro()#
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cab_param)
     CALL _ADVPL_set_property(l_label,"POSITION",10,250)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Grupo envio email:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET m_grupo = _ADVPL_create_component(NULL,"LNUMERICFIELD",m_pnl_cab_param)
+    CALL _ADVPL_set_property(m_grupo,"POSITION",120,250)  
+    CALL _ADVPL_set_property(m_grupo,"LENGTH",5)
+    CALL _ADVPL_set_property(m_grupo,"VARIABLE",mr_param,"grupo_env_email")
+    CALL _ADVPL_set_property(m_grupo,"PICTURE","@E ###")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cab_param)
+    CALL _ADVPL_set_property(l_label,"POSITION",200,250)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Cobrar titulo em execução judicial:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET m_cobrar = _ADVPL_create_component(NULL,"LCHECKBOX",m_pnl_cab_param)
+    CALL _ADVPL_set_property(m_cobrar,"POSITION",390,250)  
+    CALL _ADVPL_set_property(m_cobrar,"VALUE_CHECKED","S")     
+    CALL _ADVPL_set_property(m_cobrar,"VALUE_NCHECKED","N")     
+    CALL _ADVPL_set_property(m_cobrar,"VARIABLE",mr_param,"em_exec_judicial")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cab_param)
+    CALL _ADVPL_set_property(l_label,"POSITION",10,280)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Texto do cabeçalho:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET m_cabec = _ADVPL_create_component(NULL,"LTEXTAREA",m_pnl_cab_param)
+    CALL _ADVPL_set_property(m_cabec,"POSITION",120,280)  
+    CALL _ADVPL_set_property(m_cabec,"SIZE",650,30) 
+    CALL _ADVPL_set_property(m_cabec,"VARIABLE",mr_param,"cabec_email")
+    CALL _ADVPL_set_property(m_cabec,"GOT_FOCUS_EVENT","pol1399_ve_cliente") 
+    CALL _ADVPL_set_property(m_cabec,"ENABLE",FALSE)
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cab_param)
+    CALL _ADVPL_set_property(l_label,"POSITION",10,320)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Texto do rodapé:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET m_rodape = _ADVPL_create_component(NULL,"LTEXTAREA",m_pnl_cab_param)
+    CALL _ADVPL_set_property(m_rodape,"POSITION",120,320)  
+    CALL _ADVPL_set_property(m_rodape,"SIZE",650,60)     #comprimento x altura
+    CALL _ADVPL_set_property(m_rodape,"WORD_WRAP",TRUE)  
+    CALL _ADVPL_set_property(m_rodape,"VARIABLE",mr_param,"rodape_email")
+    CALL _ADVPL_set_property(m_rodape,"GOT_FOCUS_EVENT","pol1399_ve_cliente") 
+    CALL _ADVPL_set_property(m_rodape,"ENABLE",FALSE)
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cab_param)
+    CALL _ADVPL_set_property(l_label,"POSITION",10,390)  
     CALL _ADVPL_set_property(l_label,"TEXT","Observação:")    
 
-    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pnl_cab_param)
-    CALL _ADVPL_set_property(l_caixa,"POSITION",90,250)  
-    CALL _ADVPL_set_property(l_caixa,"LENGTH",80)
+    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTAREA",m_pnl_cab_param)
+    CALL _ADVPL_set_property(l_caixa,"POSITION",120,390)  
+    CALL _ADVPL_set_property(l_caixa,"SIZE",650,30) 
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_param,"observacao")
 
 END FUNCTION
@@ -708,11 +762,17 @@ END FUNCTION
 FUNCTION pol1399_ativa_email(l_status)#
 #-------------------------------------#
    
-   DEFINE l_status      SMALLINT
+   DEFINE l_status      SMALLINT,
+          l_texto       SMALLINT
+          
+   LET l_texto = NOT l_status
    
    CALL _ADVPL_set_property(m_email1_cliente,"ENABLE",l_status)
    CALL _ADVPL_set_property(m_email2_cliente,"ENABLE",l_status)
    CALL _ADVPL_set_property(m_email3_cliente,"ENABLE",l_status)
+
+   CALL _ADVPL_set_property(m_cabec,"ENABLE",l_texto)
+   CALL _ADVPL_set_property(m_rodape,"ENABLE",l_texto)
 
 END FUNCTION
 
@@ -996,8 +1056,11 @@ FUNCTION pol1399_create_confirm()
       email1_cliente,         
       email2_cliente,         
       email3_cliente,   
-      observacao)      
-                    
+      observacao,
+      grupo_env_email, 
+      em_exec_judicial,
+      cabec_email,     
+      rodape_email)                        
    VALUES(m_id_registro,
           mr_param.cod_cliente,      
           mr_param.vencidos_de,       
@@ -1014,7 +1077,11 @@ FUNCTION pol1399_create_confirm()
           mr_param.email1_cliente,    
           mr_param.email2_cliente,    
           mr_param.email3_cliente,    
-          mr_param.observacao)        
+          mr_param.observacao,
+          mr_param.grupo_env_email, 
+          mr_param.em_exec_judicial,
+          mr_param.cabec_email,     
+          mr_param.rodape_email)    
     
    IF STATUS <> 0 THEN
       CALL log003_err_sql('INSERT','param_cobranca_912')
@@ -1081,6 +1148,23 @@ FUNCTION pol1399_valid_form()#
    IF mr_param.email2_cliente = mr_param.email1_cliente THEN
       INITIALIZE mr_param.email2_cliente TO NULL
    END IF
+
+   IF mr_param.grupo_env_email IS NULL OR mr_param.grupo_env_email <= 0 THEN
+      CALL _ADVPL_set_property(m_grupo,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   IF mr_param.cabec_email IS NULL THEN
+      CALL _ADVPL_set_property(m_cabec,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   IF mr_param.rodape_email IS NULL THEN
+      CALL _ADVPL_set_property(m_rodape,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+   
+   CALL log0030_mensagem(mr_param.rodape_email, 'info')
    
    LET m_msg = ''
       
@@ -1214,7 +1298,11 @@ FUNCTION pol1399_exibe_dados()#
           email1_cliente,   
           email2_cliente,   
           email3_cliente,   
-          observacao                        
+          observacao,
+          grupo_env_email, 
+          em_exec_judicial,
+          cabec_email,     
+          rodape_email                            
      INTO mr_param.cod_cliente,       
           mr_param.vencidos_de,       
           mr_param.vencidos_ate,      
@@ -1230,7 +1318,11 @@ FUNCTION pol1399_exibe_dados()#
           mr_param.email1_cliente,    
           mr_param.email2_cliente,        
           mr_param.email3_cliente,    
-          mr_param.observacao         
+          mr_param.observacao,  
+          mr_param.grupo_env_email, 
+          mr_param.em_exec_judicial,
+          mr_param.cabec_email,     
+          mr_param.rodape_email            
      FROM param_cobranca_912
     WHERE id_registro = m_id_registro
 
@@ -1466,7 +1558,11 @@ FUNCTION pol1399_ies_alterar()#
           email1_cliente     = mr_param.email1_cliente,   
           email2_cliente     = mr_param.email2_cliente,   
           email3_cliente     = mr_param.email3_cliente,   
-          observacao         = mr_param.observacao       
+          observacao         = mr_param.observacao,
+          grupo_env_email    = mr_param.grupo_env_email, 
+          em_exec_judicial   = mr_param.em_exec_judicial,
+          cabec_email        = mr_param.cabec_email,     
+          rodape_email       = mr_param.rodape_email       
     WHERE id_registro = m_id_registro
 
    IF STATUS <> 0 THEN
@@ -1691,7 +1787,7 @@ FUNCTION pol1399_valida_cli_cobr()#
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
    
    IF mr_cobranca.cod_cliente IS NULL THEN
-      LET m_msg = 'Informe o cliente.'
+      LET m_msg = 'Informe o cliente para cobrança.'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
    END IF
@@ -1965,7 +2061,7 @@ FUNCTION pol1399_valida_cli_lembre()#
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
    
    IF mr_lembrete.cod_cliente IS NULL THEN
-      LET m_msg = 'Informe o cliente.'
+      LET m_msg = 'Informe o cliente para lembrete.'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
    END IF
@@ -2205,7 +2301,7 @@ FUNCTION pol1399_erro_cursor(l_where, l_order)#
     
     DEFINE l_where     CHAR(500)
     DEFINE l_order     CHAR(200)
-    DEFINE l_sql_stmt  CHAR(2000),
+    DEFINE l_sql_stmt  CHAR(2000)
     DEFINE l_ind       INTEGER
 
     LET l_ind = 1

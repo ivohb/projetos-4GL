@@ -86,7 +86,7 @@ MAIN
    SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 300 
    DEFER INTERRUPT 
-   LET p_versao = "POL0289-10.02.23"
+   LET p_versao = "POL0289-10.02.22"
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol0289.iem") RETURNING p_nom_help
    LET p_nom_help = p_nom_help CLIPPED

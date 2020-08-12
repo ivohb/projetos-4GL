@@ -55,7 +55,9 @@ DEFINE m_dialog          VARCHAR(10),
        m_limite          VARCHAR(10),
        m_obs             VARCHAR(10),
        m_browse          VARCHAR(10),
+       m_brw_port        VARCHAR(10),
        m_erro_construct  VARCHAR(10),
+       m_port_construct  VARCHAR(10),
        m_grupo           VARCHAR(10),
        m_cobrar          VARCHAR(10),
        m_cabec           VARCHAR(10),
@@ -127,18 +129,23 @@ DEFINE m_panel_aba           VARCHAR(10),
        m_pnl_cobranca        VARCHAR(10),
        m_pnl_lembrete        VARCHAR(10),
        m_pnl_erro            VARCHAR(10),
+       m_pnl_portador        VARCHAR(10),
        m_aba_parametro       VARCHAR(10),
        m_aba_cobranca        VARCHAR(10),
        m_aba_lembrete        VARCHAR(10),      
        m_aba_erro            VARCHAR(10),      
+       m_aba_portador        VARCHAR(10),      
        m_menu_parametro      VARCHAR(10),
        m_menu_cobranca       VARCHAR(10),
        m_menu_lembrete       VARCHAR(10),
        m_menu_erro           VARCHAR(10),
+       m_menu_portador       VARCHAR(10),
        m_pnl_cab_param       VARCHAR(10),
        m_pnl_cab_cobr        VARCHAR(10),
        m_pnl_cab_lembre      VARCHAR(10),
        m_pnl_cab_erro        VARCHAR(10),
+       m_pnl_cab_portacor    VARCHAR(10),
+       m_pnl_grd_portacor    VARCHAR(10),
        m_cli_cobranca        VARCHAR(10),
        m_cli_lembrete        VARCHAR(10),
        m_vencer_ate          VARCHAR(10)
@@ -150,7 +157,31 @@ DEFINE ma_erro               ARRAY[1000] OF RECORD
        hor_proces            VARCHAR(08), 
        mensagem              VARCHAR(150) 
 END RECORD
-        
+
+DEFINE ma_portador           ARRAY[100] OF RECORD
+       cod_cliente           VARCHAR(15),
+       nom_cliente           VARCHAR(36),
+       cod_portador          DECIMAL(4,0),
+       nom_portador          VARCHAR(36)
+END RECORD
+
+DEFINE mr_portador           RECORD
+       cod_cliente           VARCHAR(15),
+       nom_cliente           VARCHAR(36),
+       cod_portador          DECIMAL(4,0),
+       nom_portador          VARCHAR(36)
+END RECORD
+
+DEFINE m_port_cli            VARCHAR(10),
+       m_portador            VARCHAR(10),
+       m_cod_port            DECIMAL(4,0),
+       m_nom_port            VARCHAR(40),
+       m_zoom_portador       VARCHAR(40),
+       m_ies_portador        SMALLINT,
+       m_cli_cod             VARCHAR(15),
+       m_cli_ant             VARCHAR(15),
+       m_exc_portador        SMALLINT
+       
 #-----------------#
 FUNCTION pol1399()#
 #-----------------#
@@ -205,6 +236,10 @@ FUNCTION pol1399_menu()#
     CALL _ADVPL_set_property(m_menu_erro,"HELP_VISIBLE",FALSE)
     CALL _ADVPL_set_property(m_menu_erro,"VISIBLE",FALSE)
 
+    LET m_menu_portador = _ADVPL_create_component(NULL,"LMENUBAR",m_dialog)
+    CALL _ADVPL_set_property(m_menu_portador,"HELP_VISIBLE",FALSE)
+    CALL _ADVPL_set_property(m_menu_portador,"VISIBLE",FALSE)
+
     LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_dialog)
     CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
 
@@ -223,6 +258,9 @@ FUNCTION pol1399_menu()#
     CALL pol1399_menu_erro()
     CALL pol1399_dados_erro()
 
+    CALL pol1399_menu_portador()
+    CALL pol1399_dados_portador()
+
     CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
 
 END FUNCTION
@@ -235,6 +273,7 @@ FUNCTION pol1399_ativa_cor()#
    CALL _ADVPL_set_property(m_aba_cobranca,"FOREGROUND_COLOR",255,0,0)  
    CALL _ADVPL_set_property(m_aba_lembrete,"FOREGROUND_COLOR",255,0,0) 
    CALL _ADVPL_set_property(m_aba_erro,"FOREGROUND_COLOR",255,0,0) 
+   CALL _ADVPL_set_property(m_aba_portador,"FOREGROUND_COLOR",255,0,0) 
    
    CALL pol1399_parametro_click()
    
@@ -272,6 +311,10 @@ FUNCTION pol1399_paineis(l_panel)#
     CALL _ADVPL_set_property(m_pnl_erro,"ALIGN","CENTER")
     CALL _ADVPL_set_property(m_pnl_erro,"VISIBLE",FALSE)
 
+    LET m_pnl_portador = _ADVPL_create_component(NULL,"LPANEL",m_panel_dados)
+    CALL _ADVPL_set_property(m_pnl_portador,"ALIGN","CENTER")
+    CALL _ADVPL_set_property(m_pnl_portador,"VISIBLE",FALSE)
+
 END FUNCTION
 
 #---------------------------#
@@ -303,6 +346,11 @@ FUNCTION pol1399_cria_abas()#
     CALL _ADVPL_set_property(m_aba_erro,"POSITION",10,100)
     CALL _ADVPL_set_property(m_aba_erro,"TEXT","> Consulta erro")  
     CALL _ADVPL_set_property(m_aba_erro,"CLICK_EVENT","pol1399_erro_click")
+
+    LET m_aba_portador = _ADVPL_create_component(NULL,"LLABEL",m_panel_aba)
+    CALL _ADVPL_set_property(m_aba_portador,"POSITION",10,130)
+    CALL _ADVPL_set_property(m_aba_portador,"TEXT","> Portadores")  
+    CALL _ADVPL_set_property(m_aba_portador,"CLICK_EVENT","pol1399_portador_click")
 
 END FUNCTION
 
@@ -370,6 +418,22 @@ FUNCTION pol1399_erro_click()#
        
 END FUNCTION
 
+#--------------------------------#
+FUNCTION pol1399_portador_click()#
+#--------------------------------#
+   
+   CALL pol1399_desativa_cor()
+   CALL _ADVPL_set_property(m_aba_portador,"FOREGROUND_COLOR",255,0,0)
+   CALL _ADVPL_set_property(m_aba_portador,"FONT",NULL,NULL,TRUE,TRUE)
+
+   CALL pol1399_enib_menu_panel()
+   CALL _ADVPL_set_property(m_menu_portador,"VISIBLE",TRUE)
+   CALL _ADVPL_set_property(m_pnl_portador,"VISIBLE",TRUE)
+   
+   RETURN TRUE
+       
+END FUNCTION
+
 #------------------------------#
 FUNCTION pol1399_desativa_cor()#
 #------------------------------#
@@ -382,6 +446,8 @@ FUNCTION pol1399_desativa_cor()#
    CALL _ADVPL_set_property(m_aba_lembrete,"FONT",NULL,NULL,FALSE,TRUE)
    CALL _ADVPL_set_property(m_aba_erro,"FOREGROUND_COLOR",0,0,0)  
    CALL _ADVPL_set_property(m_aba_erro,"FONT",NULL,NULL,FALSE,TRUE)
+   CALL _ADVPL_set_property(m_aba_portador,"FOREGROUND_COLOR",0,0,0)  
+   CALL _ADVPL_set_property(m_aba_portador,"FONT",NULL,NULL,FALSE,TRUE)
 
 END FUNCTION
 
@@ -398,6 +464,7 @@ FUNCTION pol1399_enib_menu_panel()#
    CALL _ADVPL_set_property(m_pnl_cobranca,"VISIBLE",FALSE)   
    CALL _ADVPL_set_property(m_pnl_lembrete,"VISIBLE",FALSE)   
    CALL _ADVPL_set_property(m_pnl_erro,"VISIBLE",FALSE)   
+   CALL _ADVPL_set_property(m_pnl_portador,"VISIBLE",FALSE)   
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
 
@@ -1154,18 +1221,16 @@ FUNCTION pol1399_valid_form()#
       RETURN FALSE
    END IF
 
-   IF mr_param.cabec_email IS NULL THEN
+   IF mr_param.cabec_email IS NULL AND mr_param.cod_cliente IS NULL THEN
       CALL _ADVPL_set_property(m_cabec,"GET_FOCUS")
       RETURN FALSE
    END IF
 
-   IF mr_param.rodape_email IS NULL THEN
+   IF mr_param.rodape_email IS NULL AND mr_param.cod_cliente IS NULL THEN
       CALL _ADVPL_set_property(m_rodape,"GET_FOCUS")
       RETURN FALSE
    END IF
-   
-   CALL log0030_mensagem(mr_param.rodape_email, 'info')
-   
+      
    LET m_msg = ''
       
    RETURN TRUE
@@ -2357,4 +2422,792 @@ FUNCTION pol1399_erro_cursor(l_where, l_order)#
     
 END FUNCTION
 
+#-------------------------------#
+FUNCTION pol1399_menu_portador()#
+#-------------------------------#
+
+    DEFINE l_update    VARCHAR(10),
+           l_delete    VARCHAR(10),
+           l_find      VARCHAR(10),
+           l_create    VARCHAR(10),
+           l_first     VARCHAR(10),
+           l_previous  VARCHAR(10),
+           l_next      VARCHAR(10),
+           l_last      VARCHAR(10)
+                   
+    LET l_create = _ADVPL_create_component(NULL,"LCREATEBUTTON",m_menu_portador)
+    CALL _ADVPL_set_property(l_create,"EVENT","pol1399_port_insert")
+    CALL _ADVPL_set_property(l_create,"CONFIRM_EVENT","pol1399_port_insert_conf")
+    CALL _ADVPL_set_property(l_create,"CANCEL_EVENT","pol1399_port_insert_canc")
+
+    LET l_update = _ADVPL_create_component(NULL,"LUPDATEBUTTON",m_menu_portador)
+    CALL _ADVPL_set_property(l_update,"EVENT","pol1399_port_update")
+    CALL _ADVPL_set_property(l_update,"CONFIRM_EVENT","pol1399_port_update_conf")
+    CALL _ADVPL_set_property(l_update,"CANCEL_EVENT","pol1399_port_update_canc")
+
+    LET l_delete = _ADVPL_create_component(NULL,"LDELETEBUTTON",m_menu_portador)
+    CALL _ADVPL_set_property(l_delete,"EVENT","pol1399_port_delete")
+
+    LET l_find = _ADVPL_create_component(NULL,"LFINDBUTTON",m_menu_portador)
+    CALL _ADVPL_set_property(l_find,"TYPE","NO_CONFIRM")
+    CALL _ADVPL_set_property(l_find,"EVENT","pol1399_port_find")
+
+    LET l_first = _ADVPL_create_component(NULL,"LFIRSTBUTTON",m_menu_portador)
+    CALL _ADVPL_set_property(l_first,"EVENT","pol1399_pfirst")
+
+    LET l_previous = _ADVPL_create_component(NULL,"LPREVIOUSBUTTON",m_menu_portador)
+    CALL _ADVPL_set_property(l_previous,"EVENT","pol1399_pprevious")
+
+    LET l_next = _ADVPL_create_component(NULL,"LNEXTBUTTON",m_menu_portador)
+    CALL _ADVPL_set_property(l_next,"EVENT","pol1399_pnext")
+
+    LET l_last = _ADVPL_create_component(NULL,"LLASTBUTTON",m_menu_portador)
+    CALL _ADVPL_set_property(l_last,"EVENT","pol1399_plast")
+
+
+    CALL _ADVPL_create_component(NULL,"LQUITBUTTON",m_menu_portador)
+    
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1399_dados_portador()#
+#--------------------------------#
+   
+    DEFINE l_panel           VARCHAR(10),
+           l_caixa           VARCHAR(10),
+           l_zoom            VARCHAR(10),
+           l_label           VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_tabcolumn       VARCHAR(10),
+           l_lupa_cli        VARCHAR(10),
+           l_lupa_port       VARCHAR(10)
+           
+    LET m_pnl_cab_portacor = _ADVPL_create_component(NULL,"LPANEL",m_pnl_portador)
+    CALL _ADVPL_set_property(m_pnl_cab_portacor,"ALIGN","TOP")
+    CALL _ADVPL_set_property(m_pnl_cab_portacor,"HEIGHT",80)
+    CALL _ADVPL_set_property(m_pnl_cab_portacor,"BACKGROUND_COLOR",231,237,237)
+    CALL _ADVPL_set_property(m_pnl_cab_portacor,"ENABLE",FALSE)
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cab_portacor)
+    CALL _ADVPL_set_property(l_label,"POSITION",300,10)  
+    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)    
+    CALL _ADVPL_set_property(l_label,"TEXT","CADASTRO DE PORTADORES ISENTOS DE COBRANÇA")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,11,TRUE,TRUE)  
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cab_portacor)
+    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
+    CALL _ADVPL_set_property(l_label,"POSITION",10,40)  
+    CALL _ADVPL_set_property(l_label,"TEXT","Cod cliente:")    
+
+    LET m_port_cli = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pnl_cab_portacor)     
+    CALL _ADVPL_set_property(m_port_cli,"POSITION",80,40) 
+    CALL _ADVPL_set_property(m_port_cli,"LENGTH",15,0)    
+    CALL _ADVPL_set_property(m_port_cli,"PICTURE","@!") 
+    CALL _ADVPL_set_property(m_port_cli,"VARIABLE",mr_portador,"cod_cliente")
+    CALL _ADVPL_set_property(m_port_cli,"VALID","pol1399_valid_cli_port")        
+
+    LET l_lupa_cli = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pnl_cab_portacor)
+    CALL _ADVPL_set_property(l_lupa_cli,"IMAGE","BTPESQ")
+    CALL _ADVPL_set_property(l_lupa_cli,"POSITION",220,40)     
+    CALL _ADVPL_set_property(l_lupa_cli,"SIZE",24,20)
+    CALL _ADVPL_set_property(l_lupa_cli,"CLICK_EVENT","pol1399_zoom_cli_port")
+
+    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pnl_cab_portacor)     
+    CALL _ADVPL_set_property(l_caixa,"POSITION",260,40) 
+    CALL _ADVPL_set_property(l_caixa,"LENGTH",35,0)    
+    CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_portador,"nom_cliente")
+    CALL _ADVPL_set_property(l_caixa,"CAN_GOT_FOCUS",FALSE)
+              
+    LET m_pnl_grd_portacor = _ADVPL_create_component(NULL,"LPANEL",m_pnl_portador)
+    CALL _ADVPL_set_property(m_pnl_grd_portacor,"ALIGN","CENTER")
+    CALL _ADVPL_set_property(m_pnl_grd_portacor,"ENABLE",FALSE) 
+
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",m_pnl_grd_portacor)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",1) 
+    CALL _ADVPL_set_property(l_layout,"EXPANSIBLE",TRUE) 
+   
+    LET m_brw_port = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
+    CALL _ADVPL_set_property(m_brw_port,"ALIGN","CENTER")
+    CALL _ADVPL_set_property(m_brw_port,"BEFORE_ADD_ROW_EVENT","pol1399_checa_linha")
+    CALL _ADVPL_set_property(m_brw_port,"AFTER_ADD_ROW_EVENT","pol1399_limpa_linha")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brw_port)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Portador")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","LENGTH",4,0)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","PICTURE","@E ####")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_portador")
+    CALL _ADVPL_set_property(l_tabcolumn,"AFTER_EDIT_EVENT","pol1399_checa_portador")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brw_port)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER"," ")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",20)
+    CALL _ADVPL_set_property(l_tabcolumn,"NO_VARIABLE")
+    CALL _ADVPL_set_property(l_tabcolumn,"IMAGE_RENDERER","BTPESQ")
+    CALL _ADVPL_set_property(l_tabcolumn,"BEFORE_EDIT_EVENT","pol1399_zoom_portador")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brw_port)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","None")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",200)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","nom_portador")
+
+    CALL _ADVPL_set_property(m_brw_port,"SET_ROWS",ma_portador,1)
+    CALL _ADVPL_set_property(m_brw_port,"EDITABLE",FALSE)
+    
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1399_port_insert()#
+#-----------------------------#
+
+   INITIALIZE mr_portador.*, ma_portador TO NULL
+   CALL _ADVPL_set_property(m_brw_port,"ITEM_COUNT", 1)
+   CALL _ADVPL_set_property(m_pnl_cab_portacor,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_pnl_grd_portacor,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_brw_port,"EDITABLE",TRUE)
+   CALL _ADVPL_set_property(m_port_cli,"GET_FOCUS")
+
+END FUNCTION
+
+#----------------------------------#
+FUNCTION pol1399_port_insert_canc()#
+#----------------------------------#
+   
+   INITIALIZE mr_portador TO NULL
+   CALL _ADVPL_set_property(m_pnl_cab_portacor,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_pnl_grd_portacor,"ENABLE",FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#----------------------------------#
+FUNCTION pol1399_port_insert_conf()#
+#----------------------------------#
+
+   CALL _ADVPL_set_property(m_brw_port,"REMOVE_EMPTY_ROWS")
+   LET m_count = _ADVPL_get_property(m_brw_port,"ITEM_COUNT")
+   
+   IF m_count < 1 THEN
+      LET m_msg = 'Informe ao menos um portador.'
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN FALSE
+   END IF
+   
+   CALL log085_transacao("BEGIN")
+   
+   IF NOT pol1399_ins_portador() THEN
+      CALL log085_transacao("ROLLBACK")
+      RETURN FALSE
+   END IF
+   
+   CALL log085_transacao("COMMIT")
+   
+   CALL _ADVPL_set_property(m_pnl_cab_portacor,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_pnl_grd_portacor,"ENABLE",FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1399_ins_portador()#
+#------------------------------#
+   
+   DEFINE l_ind           INTEGER
+   
+   FOR l_ind = 1 TO m_count
+     IF ma_portador[l_ind].cod_portador IS NOT NULL THEN
+        IF pol1399_nao_existe(mr_portador.cod_cliente, ma_portador[l_ind].cod_portador) THEN
+           INSERT INTO client_x_portador_912
+            VALUES(mr_portador.cod_cliente, ma_portador[l_ind].cod_portador)
+           IF STATUS <> 0 THEN
+              CALL log003_err_sql('INSERT','client_x_portador_912')
+              RETURN FALSE
+           END IF
+        END IF
+     END IF 
+   END FOR
+   
+   RETURN TRUE
+
+END FUNCTION   
+
+#-------------------------------------------------#
+FUNCTION pol1399_nao_existe(l_cliente, l_portador)#
+#-------------------------------------------------#
+   
+   DEFINE l_cliente          VARCHAR(15),
+          l_portador         DECIMAL(4,0)
+          
+   SELECT 1
+     FROM client_x_portador_912
+    WHERE cod_portador = l_portador
+      AND ((cod_cliente IS NULL AND l_cliente IS NULL) OR
+           (cod_cliente = l_cliente AND l_cliente IS NOT NULL))
+
+   IF STATUS = 100 THEN
+      RETURN TRUE
+   ELSE
+      IF STATUS = 0 THEN
+      ELSE
+         CALL log003_err_sql('SELECT','portador')
+      END IF
+   END IF
+
+   RETURN FALSE
+
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1399_valid_cli_port()#
+#--------------------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", '')
+   
+   IF mr_portador.cod_cliente IS NOT NULL THEN
+      IF NOT pol1399_le_cliente(mr_portador.cod_cliente) THEN
+         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+         RETURN FALSE
+      END IF
+   END IF
+   
+   LET mr_portador.nom_cliente = m_nome_cliente
+      
+   RETURN TRUE
+
+END FUNCTION
+
+#-------------------------------#
+FUNCTION pol1399_zoom_cli_port()#
+#-------------------------------#
+
+    DEFINE l_codigo    LIKE clientes.cod_cliente,
+           l_descri    LIKE clientes.nom_cliente
+    
+    IF  m_zoom_cliente IS NULL THEN
+        LET m_zoom_cliente = _ADVPL_create_component(NULL,"LZOOMMETADATA")
+        CALL _ADVPL_set_property(m_zoom_cliente,"ZOOM","zoom_clientes")
+    END IF
+    
+    CALL _ADVPL_get_property(m_zoom_cliente,"ACTIVATE")
+    
+    LET l_codigo = _ADVPL_get_property(m_zoom_cliente,"RETURN_BY_TABLE_COLUMN","clientes","cod_cliente")
+    LET l_descri = _ADVPL_get_property(m_zoom_cliente,"RETURN_BY_TABLE_COLUMN","clientes","nom_cliente")
+
+    IF  l_codigo IS NOT NULL THEN
+        LET mr_portador.cod_cliente = l_codigo
+        LET mr_portador.nom_cliente = l_descri
+    END IF
+   
+    CALL _ADVPL_set_property(m_port_cli,"GET_FOCUS")  
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1399_checa_linha()#
+#-----------------------------#
+   
+   DEFINE l_linha         INTEGER
+          
+   CALL _ADVPL_set_property(m_brw_port,"REMOVE_EMPTY_ROWS")
+   
+   LET m_count = _ADVPL_get_property(m_brw_port,"ITEM_COUNT")
+   
+   IF m_count < 1 THEN
+      CALL _ADVPL_set_property(m_brw_port,"SET_ROWS",ma_portador,1)
+   END IF
+   
+   LET l_linha = _ADVPL_get_property(m_brw_port,"ROW_SELECTED")
+      
+   LET m_cod_port = ma_portador[l_linha].cod_portador
+   
+   IF m_cod_port IS NULL THEN                 
+      RETURN TRUE
+   END IF
+   
+   IF NOT pol1399_valid_port(m_cod_port) THEN
+      RETURN FALSE
+   END IF
+   
+   LET ma_portador[l_linha].nom_portador = m_nom_port
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1399_valid_port(l_cod)#
+#---------------------------------#
+   
+   DEFINE l_cod         DECIMAL(4,0)
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   SELECT nom_portador
+     INTO m_nom_port
+     FROM portador
+    WHERE cod_portador = l_cod
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','portador')
+      LET m_nom_port = NULL
+      RETURN FALSE
+   END IF
+         
+   RETURN TRUE
+   
+END FUNCTION
+
+#-------------------------------#
+FUNCTION pol1399_limpa_linha()#
+#-------------------------------#
+
+   DEFINE l_lin_atu        INTEGER
+   
+   LET l_lin_atu = _ADVPL_get_property(m_brw_port,"ROW_SELECTED")
+   LET m_msg = 'Linha ',l_lin_atu
+   
+   LET ma_portador[l_lin_atu].cod_portador = NULL
+   LET ma_portador[l_lin_atu].nom_portador = NULL
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1399_checa_portador()#
+#--------------------------------#
+   
+   DEFINE l_lin_atu        INTEGER
+   
+   LET l_lin_atu = _ADVPL_get_property(m_brw_port,"ROW_SELECTED")
+      
+   LET m_cod_port = ma_portador[l_lin_atu].cod_portador
+   
+   IF m_cod_port IS NULL THEN                 
+      RETURN TRUE
+   END IF
+   
+   IF NOT pol1399_valid_port(m_cod_port) THEN
+      RETURN FALSE
+   END IF
+   
+   LET ma_portador[l_lin_atu].nom_portador = m_nom_port
+      
+   RETURN TRUE
+
+END FUNCTION   
+
+#-------------------------------#
+FUNCTION pol1399_zoom_portador()#
+#-------------------------------#
+
+    DEFINE l_codigo    LIKE portador.cod_portador,
+           l_descri    LIKE portador.nom_portador,
+           l_lin_atu        INTEGER
+       
+    IF  m_zoom_portador IS NULL THEN
+        LET m_zoom_portador = _ADVPL_create_component(NULL,"LZOOMMETADATA")
+        CALL _ADVPL_set_property(m_zoom_portador,"ZOOM","zoom_portador")
+    END IF
+    
+    CALL _ADVPL_get_property(m_zoom_portador,"ACTIVATE")
+    
+    LET l_codigo = _ADVPL_get_property(m_zoom_portador,"RETURN_BY_TABLE_COLUMN","portador","cod_portador")
+    LET l_descri = _ADVPL_get_property(m_zoom_portador,"RETURN_BY_TABLE_COLUMN","portador","nom_portador")
+
+    IF  l_codigo IS NOT NULL THEN
+        LET l_lin_atu = _ADVPL_get_property(m_brw_port,"ROW_SELECTED")
+        LET ma_portador[l_lin_atu].cod_portador = l_codigo
+        LET ma_portador[l_lin_atu].nom_portador = l_descri
+    END IF
+   
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1399_port_update()#
+#-----------------------------#
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF NOT m_ies_portador THEN 
+      LET m_msg = 'Efetue a consulta previamente.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)   
+      RETURN FALSE
+   END IF
+   
+   CALL _ADVPL_set_property(m_pnl_grd_portacor,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_brw_port,"EDITABLE",TRUE)
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#----------------------------------#
+FUNCTION pol1399_port_update_canc()#
+#----------------------------------#
+   
+   CALL _ADVPL_set_property(m_pnl_grd_portacor,"ENABLE",FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#----------------------------------#
+FUNCTION pol1399_port_update_conf()#
+#----------------------------------#
+
+   CALL _ADVPL_set_property(m_brw_port,"REMOVE_EMPTY_ROWS")
+   LET m_count = _ADVPL_get_property(m_brw_port,"ITEM_COUNT")
+   
+   IF m_count < 1 THEN
+      LET m_msg = 'Informe ao menos um portador.'
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN FALSE
+   END IF
+   
+   CALL log085_transacao("BEGIN")
+   
+   IF NOT pol1399_del_portador(mr_portador.cod_cliente) THEN
+      CALL log085_transacao("ROLLBACK")
+      RETURN FALSE
+   END IF
+   
+   IF NOT pol1399_ins_portador() THEN
+      CALL log085_transacao("ROLLBACK")
+      RETURN FALSE
+   END IF
+   
+   CALL log085_transacao("COMMIT")
+   
+   CALL _ADVPL_set_property(m_pnl_grd_portacor,"ENABLE",FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------------------#
+FUNCTION pol1399_del_portador(l_cliente)#
+#---------------------------------------#
+   
+   DEFINE l_cliente         VARCHAR(15)
+   
+   DELETE FROM client_x_portador_912
+    WHERE ((cod_cliente IS NULL AND l_cliente IS NULL) OR
+           (cod_cliente = l_cliente AND l_cliente IS NOT NULL))
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE','client_x_portador_912')
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1399_port_find()#
+#---------------------------#
+
+    DEFINE l_status       SMALLINT,
+           l_where        CHAR(500),
+           l_order        CHAR(200)
+    
+    IF m_port_construct IS NULL THEN
+       LET m_port_construct = _ADVPL_create_component(NULL,"LCONSTRUCT")
+       CALL _ADVPL_set_property(m_port_construct,"CONSTRUCT_NAME","pol1399_FILTER_PORT")
+       CALL _ADVPL_set_property(m_port_construct,"ADD_VIRTUAL_TABLE","client_x_portador_912","portador")
+       CALL _ADVPL_set_property(m_port_construct,"ADD_VIRTUAL_COLUMN","client_x_portador_912","cod_cliente","Cliente",1 {CHAR},2,0,"zoom_clientes")
+       CALL _ADVPL_set_property(m_port_construct,"ADD_VIRTUAL_COLUMN","client_x_portador_912","cod_portador","Portador",1 {INT},4,0,"zoom_portador")
+    END IF
+
+    LET l_status = _ADVPL_get_property(m_port_construct,"INIT_CONSTRUCT")
+
+    IF l_status THEN
+       LET l_where = _ADVPL_get_property(m_port_construct,"WHERE_CLAUSE")
+       LET l_order = _ADVPL_get_property(m_port_construct,"ORDER_BY")
+       CALL pol1399_port_cursor(l_where,l_order)
+    ELSE
+       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT","Pesquisa cancelada.")
+    END IF
+    
+END FUNCTION
+
+#---------------------------------------------#
+FUNCTION pol1399_port_cursor(l_where, l_order)#
+#---------------------------------------------#
+    
+    DEFINE l_where     CHAR(500)
+    DEFINE l_order     CHAR(200)
+    DEFINE l_sql_stmt  CHAR(2000)
+    DEFINE l_ind       INTEGER
+
+    LET l_ind = 1
+    INITIALIZE mr_portador.*, ma_portador TO NULL
+    INITIALIZE m_cli_ant, m_cli_cod TO NULL
+    CALL _ADVPL_set_property(m_brw_port,"CLEAR")
+
+    IF l_order IS NULL THEN
+       LET l_order = " cod_cliente "
+    END IF
+    
+    LET l_sql_stmt = "SELECT DISTINCT cod_cliente FROM client_x_portador_912",
+                     " WHERE ",l_where CLIPPED,
+                     " ORDER BY ",l_order
+
+    PREPARE var_port FROM l_sql_stmt
+    IF STATUS <> 0 THEN
+       CALL log003_err_sql("PREPARE SQL","client_x_portador_912")
+       RETURN FALSE
+    END IF
+
+    DECLARE cq_port SCROLL CURSOR WITH HOLD FOR var_port
+
+    IF  STATUS <> 0 THEN
+        CALL log003_err_sql("DECLARE CURSOR","cq_port")
+        RETURN FALSE
+    END IF
+    
+    OPEN cq_port 
+    
+    FETCH cq_port INTO m_cli_cod
+
+    IF STATUS <> 0 THEN
+       IF sqlca.sqlcode <> NOTFOUND THEN
+          CALL log003_err_sql("FETCH CURSOR","cq_port")
+       ELSE
+          LET m_msg = "Argumentos de pesquisa não encontrados."
+          CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+       END IF
+       RETURN FALSE
+    END IF
+    
+    CALL pol1399_exibe_portador() RETURNING p_status 
+    
+    LET m_ies_portador = TRUE
+    LET m_cli_ant = m_cli_cod
+    
+    RETURN TRUE
+    
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1399_exibe_portador()#
+#--------------------------------#
+    
+    DEFINE l_ind           INTEGER
+    
+    LET m_exc_portador = FALSE
+    LET mr_portador.cod_cliente = m_cli_cod
+    CALL pol1399_le_cliente(m_cli_cod) RETURNING p_status
+    LET mr_portador.nom_cliente = m_nome_cliente
+    
+    LET l_ind = 1
+    INITIALIZE ma_portador TO NULL
+    CALL _ADVPL_set_property(m_brw_port,"CLEAR")
+   
+   DECLARE cq_le_port CURSOR FOR
+   SELECT cod_portador
+     FROM client_x_portador_912
+    WHERE ((cod_cliente IS NULL AND m_cli_cod IS NULL) OR
+           (cod_cliente = m_cli_cod AND m_cli_cod IS NOT NULL))
+   
+   FOREACH cq_le_port INTO ma_portador[l_ind].cod_portador
+   
+      IF STATUS <> 0 THEN
+         RETURN FALSE
+      END IF
+      
+      LET ma_portador[l_ind].cod_cliente = m_cli_cod
+      CALL pol1399_valid_port(ma_portador[l_ind].cod_portador) RETURNING p_status
+      LET ma_portador[l_ind].nom_portador = m_nom_port
+      
+      LET l_ind = l_ind + 1
+      
+      IF l_ind > 100 THEN
+         LET m_msg = 'Limite de linhas da grade ultrapassou.'
+         CALL log0030_mensagem(m_msg,'info')
+         EXIT FOREACH
+      END IF
+   
+   END FOREACH
+   
+   LET l_ind = l_ind - 1
+   CALL _ADVPL_set_property(m_brw_port,"ITEM_COUNT", l_ind)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#-----------------------#
+FUNCTION pol1399_pfirst()#
+#-----------------------#
+
+   IF NOT pol1399_ppaginacao('F') THEN
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+    
+END FUNCTION
+    
+#-----------------------#
+FUNCTION pol1399_pnext()#
+#-----------------------#
+
+   IF NOT pol1399_ppaginacao('N') THEN
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+    
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1399_pprevious()#
+#---------------------------#
+
+   IF NOT pol1399_ppaginacao('P') THEN
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+    
+END FUNCTION
+
+#-----------------------#
+FUNCTION pol1399_plast()#
+#-----------------------#
+
+   IF NOT pol1399_ppaginacao('L') THEN
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+    
+END FUNCTION
+
+#--------------------------#
+FUNCTION pol1399_ies_port()#
+#--------------------------#
+
+   IF NOT m_ies_portador THEN
+      LET m_msg = 'Não há consulta ativa.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT", m_msg)
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION
+
+#-----------------------------------#
+FUNCTION pol1399_ppaginacao(l_opcao)#
+#-----------------------------------#
+   
+   DEFINE l_opcao CHAR(01),
+          l_achou SMALLINT
+
+   IF NOT pol1399_ies_port() THEN
+      RETURN FALSE
+   END IF
+   
+   LET l_achou = FALSE
+   LET m_cli_ant = m_cli_cod
+
+   WHILE TRUE
+   
+      CASE l_opcao
+         WHEN 'F' 
+            FETCH FIRST cq_port INTO m_cli_cod
+            LET l_opcao = 'N'
+         WHEN 'L' 
+            FETCH LAST cq_port INTO m_cli_cod
+            LET l_opcao = 'P'
+         WHEN 'N' 
+            FETCH NEXT cq_port INTO m_cli_cod
+         WHEN 'P' 
+            FETCH PREVIOUS cq_port INTO m_cli_cod
+      END CASE
+       
+      IF STATUS <> 0 THEN
+         IF STATUS <> 100 THEN
+            CALL log003_err_sql("FETCH CURSOR","cq_port")
+         ELSE
+            CALL _ADVPL_set_property(m_statusbar,
+               "ERROR_TEXT","Não existem mais registros nesta direção.")
+         END IF
+         LET m_cli_cod = m_cli_ant
+         EXIT WHILE
+      ELSE
+         SELECT DISTINCT cod_cliente
+           FROM client_x_portador_912
+          WHERE ((cod_cliente IS NULL AND m_cli_cod IS NULL) OR
+                 (cod_cliente = m_cli_cod AND m_cli_cod IS NOT NULL))          
+         IF STATUS = 100 THEN
+         ELSE
+            IF STATUS = 0 THEN
+               CALL pol1399_exibe_portador()
+               LET l_achou = TRUE
+               EXIT WHILE
+            ELSE 
+               CALL log003_err_sql("SELECT","client_x_portador_912")
+               EXIT WHILE
+            END IF
+         END IF
+      END IF               
+   
+   END WHILE
+   
+   RETURN l_achou
+   
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1399_port_delete()#
+#-----------------------------#
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF NOT m_ies_portador THEN 
+      LET m_msg = 'Efetue a consulta previamente.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)   
+      RETURN FALSE
+   END IF
+
+   IF m_exc_portador THEN 
+      LET m_msg = 'Não dados na tela a serem excluidos'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)   
+      RETURN FALSE
+   END IF
+   
+   IF NOT LOG_question("Confirma a exclusão dos dados?") THEN
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",
+             "Operação cancelada.")
+      RETURN FALSE
+   END IF
+
+   CALL log085_transacao("BEGIN")
+   
+   IF NOT pol1399_del_portador(mr_portador.cod_cliente) THEN
+      CALL log085_transacao("ROLLBACK")
+      RETURN FALSE
+   END IF
+
+   CALL log085_transacao("COMMIT")
+   
+   INITIALIZE mr_portador.*, ma_portador TO NULL
+   CALL _ADVPL_set_property(m_brw_port,"CLEAR")
+   
+   LET m_exc_portador = TRUE
+   
+   RETURN TRUE
+
+END FUNCTION
    

@@ -109,7 +109,9 @@ DEFINE mr_cobranca       RECORD
        repetir_cobranca  VARCHAR(01),
        repetir_cob_apos  DECIMAL(3,0),
        limite_saldo      DECIMAL(12,2),
-       emitente_email    VARCHAR(08)
+       emitente_email    VARCHAR(08),
+       grupo_env_email   DECIMAL(3,0),
+       em_exec_judicial  VARCHAR(01)          
 END RECORD
 
 DEFINE mr_lembrete       RECORD
@@ -1870,14 +1872,18 @@ FUNCTION pol1399_valida_cli_cobr()#
           repetir_cobranca,                 
           repetir_cob_apos,                 
           limite_saldo,                     
-          emitente_email   
+          emitente_email,
+          grupo_env_email,
+          em_exec_judicial
      INTO mr_cobranca.vencidos_de,     
           mr_cobranca.vencidos_ate,    
           mr_cobranca.enviar_cobranca, 
           mr_cobranca.repetir_cobranca,
           mr_cobranca.repetir_cob_apos,
           mr_cobranca.limite_saldo,    
-          mr_cobranca.emitente_email   
+          mr_cobranca.emitente_email,
+          mr_cobranca.grupo_env_email,
+          mr_cobranca.em_exec_judicial
      FROM param_cobranca_912
     WHERE cod_cliente = mr_cobranca.cod_cliente
 
@@ -1888,14 +1894,18 @@ FUNCTION pol1399_valida_cli_cobr()#
              repetir_cobranca,              
              repetir_cob_apos,                                                 
              limite_saldo,                                                     
-             emitente_email                                                    
+             emitente_email,
+             grupo_env_email,
+             em_exec_judicial
         INTO mr_cobranca.vencidos_de,                                          
              mr_cobranca.vencidos_ate,                                         
              mr_cobranca.enviar_cobranca,   
              mr_cobranca.repetir_cobranca,  
              mr_cobranca.repetir_cob_apos,  
              mr_cobranca.limite_saldo,      
-             mr_cobranca.emitente_email     
+             mr_cobranca.emitente_email,
+             mr_cobranca.grupo_env_email,
+             mr_cobranca.em_exec_judicial
         FROM param_cobranca_912                   
        WHERE cod_cliente IS NULL
 
@@ -2838,6 +2848,12 @@ FUNCTION pol1399_port_update()#
    
    IF NOT m_ies_portador THEN 
       LET m_msg = 'Efetue a consulta previamente.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)   
+      RETURN FALSE
+   END IF
+
+   IF m_exc_portador THEN 
+      LET m_msg = 'Não dados na tela a serem excluidos'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)   
       RETURN FALSE
    END IF

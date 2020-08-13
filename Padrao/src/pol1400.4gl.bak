@@ -49,8 +49,11 @@ DEFINE m_den_empresa     CHAR(02),
        p_cod_cliente     CHAR(15),
        m_le_param        SMALLINT,
        m_tip_envio       CHAR(01),
-       m_email_ok        SMALLINT
-
+       m_email_ok        SMALLINT,
+       m_grp_env_email   DECIMAL(3,0),
+       m_exec_judicial   CHAR(01),
+       m_qtd_dias        DECIMAL(3,0)
+       
 DEFINE p_remetente               CHAR(08),
        p_email_remetente         CHAR(50),
        p_nom_remetente           CHAR(36),
@@ -58,7 +61,7 @@ DEFINE p_remetente               CHAR(08),
        p_nom_destinatario        CHAR(36),
        p_destinatario            CHAR(08),
        p_email_destinatario      CHAR(400),
-       p_arquivo                 CHAR(40),
+       p_arquivo                 CHAR(45),
        p_den_comando             CHAR(110),
        p_total                   DECIMAL(12,2),
        p_num_nf                  CHAR(09),
@@ -66,12 +69,7 @@ DEFINE p_remetente               CHAR(08),
        p_dat_vencto              CHAR(10),
        p_valor                   CHAR(12),
        p_val_saldo               DECIMAL(12,2),
-       p_assunto                 CHAR(30),
-       p_titulo1                 CHAR(100),       
-       p_titulo2                 CHAR(100),    
-       p_mensa_1                 VARCHAR(120),
-       p_mensa_2                 VARCHAR(120),
-       p_mensa_3                 VARCHAR(120)
+       p_assunto                 CHAR(30)
        
 DEFINE mr_docum          RECORD   
        num_docum         CHAR(15),        
@@ -96,8 +94,15 @@ DEFINE mr_param                  RECORD
        emitente_email       VARCHAR(08),  
        email1_cliente       VARCHAR(50),  
        email2_cliente       VARCHAR(50),  
-       email3_cliente       VARCHAR(50)   
+       email3_cliente       VARCHAR(50),
+       grupo_env_email      DECIMAL(3,0),
+       em_exec_judicial     VARCHAR(01)          
 END RECORD                
+
+DEFINE  m_cabec_email       VARCHAR(120),
+        m_rodape_email      VARCHAR(360),
+        m_prezado           VARCHAR(100),
+        m_cli_cod           VARCHAR(15)
 
 MAIN   
 
@@ -112,22 +117,26 @@ MAIN
    END IF
    
    CALL log0180_conecta_usuario()
-   
-   #CALL pol1396_exibe_tela()
-         
+            
    CALL log001_acessa_usuario("ESPEC999","")
         RETURNING p_status, p_cod_empresa, p_user
-   CALL log0030_mensagem(p_cod_empresa, 'info')
-   CALL log0030_mensagem(p_user, 'info')
-
-      LET m_msg = 'Exwcucao manual.'
-      CALL pol1400_ins_mensagem() RETURNING p_status      
    
-   IF p_status = 0 THEN    
-      #CALL pol1400_job()
+   IF p_cod_empresa IS NULL THEN
+      LET p_cod_empresa = '01'
    END IF
-
-   #CLOSE WINDOW w_pol1396
+   
+   LET m_cod_empresa = p_cod_empresa
+   LET m_msg = 'Exwcucao manual.'
+   LET m_cod_cliente = ''
+   CALL pol1400_ins_mensagem() RETURNING p_status         
+   
+   LET m_msg = NULL
+   
+   IF NOT pol1400_processa() THEN
+      IF m_msg IS NOT NULL THEN
+         CALL log0030_mensagem(m_msg,'info')
+      END IF
+   END IF
          
 END MAIN
 
@@ -148,31 +157,28 @@ FUNCTION pol1400_job(l_rotina) #
 
    LET m_dat_envio = TODAY
    LET m_hor_envio = TIME
-   
-   CALL log0030_mensagem(p_cod_empresa,'info')
-   
-   LET m_cod_empresa = l_param1_empresa
-   CALL log0030_mensagem(m_cod_empresa,'info')
-   
+      
+   LET p_cod_empresa = l_param1_empresa   
    LET p_user = l_param2_user
-   CALL log0030_mensagem(p_user,'info')
    
    IF p_user IS NULL THEN
-      LET p_user = 'admlog'
+      LET p_user = 'job0003'
    END IF
 
-      LET m_msg = 'Execucao pela JOB0003.'
-      CALL pol1400_ins_mensagem() RETURNING p_status      
-RETURN
+   LET m_cod_empresa = p_cod_empresa
 
    IF m_cod_empresa IS NULL THEN
       LET m_msg = 'Empresa não parametrizada na JOB0003.'
+      LET m_cod_cliente = ''
       CALL pol1400_ins_mensagem() RETURNING p_status      
       RETURN FALSE
    END IF
-      
+   
+   LET m_msg = NULL
+   
    IF NOT pol1400_processa() THEN
       IF m_msg IS NOT NULL THEN
+         LET m_cod_cliente = ''
          CALL pol1400_ins_mensagem() RETURNING p_status
       END IF
       RETURN FALSE
@@ -194,12 +200,16 @@ FUNCTION pol1400_processa()#
       AND ies_enviado = 'N'
 
    CALL pol1400_le_empresa()
-   CALL pol1400_set_mensa_cob()
+   CALL pol1400_set_mensa_cob() RETURNING p_status
+   
+   IF NOT p_status THEN
+      RETURN FALSE
+   END IF
 
    LET l_dat_agora = TODAY  
    LET l_dat_corte = '01/01/2017'        
 
-   DECLARE cq_docum CURSOR FOR
+   DECLARE cq_docum CURSOR WITH HOLD FOR
     SELECT DISTINCT cod_cliente
       FROM docum
      WHERE cod_empresa = m_cod_empresa
@@ -230,8 +240,8 @@ FUNCTION pol1400_processa()#
       END IF
 
       LET m_le_param = TRUE
-      LET m_tip_envio = 'C'
-   
+      LET m_tip_envio = 'L'
+         
       CALL log085_transacao("BEGIN")
 
       IF NOT pol1400_le_docum_lembre() THEN
@@ -262,7 +272,9 @@ FUNCTION pol1400_proces_cobranca(lr_cobranca)#
           repetir_cobranca  VARCHAR(01),
           repetir_cob_apos  DECIMAL(3,0),
           limite_saldo      DECIMAL(12,2),
-          emitente_email    VARCHAR(08)
+          emitente_email    VARCHAR(08),
+          grupo_env_email   DECIMAL(3,0),
+          em_exec_judicial  VARCHAR(01)          
    END RECORD
    
    LET m_cod_empresa = lr_cobranca.cod_empresa
@@ -274,7 +286,8 @@ FUNCTION pol1400_proces_cobranca(lr_cobranca)#
    LET m_repet_env_apos = lr_cobranca.repetir_cob_apos
    LET m_limite_saldo = lr_cobranca.limite_saldo
    LET m_emitente_email = lr_cobranca.emitente_email
-
+   LET m_grp_env_email = lr_cobranca.grupo_env_email
+   LET m_exec_judicial = lr_cobranca.em_exec_judicial
    LET m_dat_envio = TODAY
    LET m_hor_envio = TIME
    LET m_msg = NULL
@@ -282,7 +295,11 @@ FUNCTION pol1400_proces_cobranca(lr_cobranca)#
    LET m_tip_envio = 'C'
    
    CALL pol1400_le_empresa()
-   CALL pol1400_set_mensa_cob()
+   CALL pol1400_set_mensa_cob() RETURNING p_status
+   
+   IF NOT p_status THEN
+      RETURN m_msg
+   END IF
 
    CALL log085_transacao("BEGIN")
 
@@ -308,7 +325,8 @@ FUNCTION pol1400_proces_lembrete(lr_lembrete)#
        repetir_lembrete  CHAR(01),  
        repetir_lemb_apos DECIMAL(3,0),   
        vencer_ate        DECIMAL(3,0),
-       emitente_email    VARCHAR(08)
+       emitente_email    VARCHAR(08),
+       grupo_env_email   DECIMAL(3,0)
    END RECORD
 
    LET m_cod_empresa = lr_lembrete.cod_empresa
@@ -316,8 +334,10 @@ FUNCTION pol1400_proces_lembrete(lr_lembrete)#
    LET m_enviar_email = lr_lembrete.enviar_lembrete
    LET m_repet_envio = lr_lembrete.repetir_lembrete
    LET m_repet_env_apos = lr_lembrete.repetir_lemb_apos
-   LET m_dat_ate = TODAY + lr_lembrete.vencer_ate 
+   LET m_qtd_dias = lr_lembrete.vencer_ate 
+   LET m_dat_ate = TODAY + m_qtd_dias
    LET m_emitente_email = lr_lembrete.emitente_email
+   LET m_grp_env_email = lr_lembrete.grupo_env_email
    LET m_dat_de = TODAY
    LET m_dat_envio = m_dat_de
    LET m_hor_envio = TIME
@@ -362,15 +382,25 @@ END FUNCTION
 #-------------------------------#
 FUNCTION pol1400_set_mensa_cob()#
 #-------------------------------#
-Não identificamos em nosso sistema o pagamento dos seguintes documentos: seguintes documentos dfd dd
-Não identificamos em nosso sistema o pagamento dos seguintes documentos: segui fasdf fadfa daf fddd
-Caso o(s) pagamento(s) tenham sido efetuado(s), solicitamos a gentileza de nos enviar o(s) comprovante(s) por e-mail.
-Parâmetros padrões a serem usados em todos os clientes que não estejam cadastrad
-   LET p_titulo2 = 'Não identificamos em nosso sistema o pagamento dos seguintes documentos:'
-   LET p_mensa_1 = 'Caso o(s) pagamento(s) tenham sido efetuado(s), solicitamos a gentileza de nos enviar o(s) comprovante(s) por e-mail.'
-   LET p_mensa_2 = 'Caso ainda estejam em aberto, favor entrar em contato para negociação do(s)  débito(s)  através dos  telefones'       
-   LET p_mensa_3 = '0800-7701010/ (19) 3666.6111/ 3666.6112/ 3666.6121 ou  através  do  e-mail : sandraj@cairucp.com.br'
 
+   SELECT cabec_email, 
+          rodape_email  
+     INTO m_cabec_email, 
+          m_rodape_email
+     FROM param_cobranca_912
+    WHERE cod_cliente IS NULL 
+
+   IF STATUS <> 0 THEN      
+      LET m_erro = STATUS
+      LET m_msg = 'Erro ', m_erro CLIPPED, 
+          ' lendo mensagens da tabela param_cobranca_912.'
+      RETURN FALSE
+   END IF
+   
+   LET p_assunto = 'Titulos em atraso'
+
+   RETURN TRUE
+   
 END FUNCTION
 
 #----------------------------------------#
@@ -379,10 +409,9 @@ FUNCTION pol1400_set_mensa_lembre(l_dias)#
    
    DEFINE l_dias      VARCHAR(03)
    
-   LET p_titulo2 = 'Para sua comodidade, enviamos relação do documentos a vencerem nos próximos ', l_dias, ' dias'
-   LET p_mensa_1 = ''
-   LET p_mensa_2 = ''       
-   LET p_mensa_3 = ''
+   LET m_cabec_email = 'Para sua comodidade, enviamos relação dos documentos a vencerem nos próximos ', l_dias, ' dias'
+   LET m_rodape_email = ''
+   LET p_assunto = 'Titulos a vencer'
 
 END FUNCTION
 
@@ -390,7 +419,9 @@ END FUNCTION
 FUNCTION pol1400_le_docum_cob()#
 #------------------------------#
    
-   DEFINE l_dia_repete    DECIMAL(3,0)
+   DEFINE l_dia_repete      DECIMAL(3,0),
+          l_ies_situa_docum CHAR(01),
+          l_le_email        SMALLINT
    
    IF m_le_param THEN
       IF NOT pol1400_le_padrao() THEN
@@ -400,17 +431,8 @@ FUNCTION pol1400_le_docum_cob()#
          RETURN TRUE
       END IF
    END IF
-
-   LET m_email_ok = TRUE
    
-   IF NOT pol1400_prepara_email() THEN
-      RETURN FALSE
-   END IF
-   
-   IF NOT m_email_ok THEN
-      RETURN TRUE
-   END IF   
-   
+   LET l_le_email = TRUE   
    LET m_tem_docum = FALSE
    
    DECLARE cq_docum_cob CURSOR FOR
@@ -419,14 +441,18 @@ FUNCTION pol1400_le_docum_cob()#
            dat_emis, 
            dat_vencto_s_desc, 
            cod_cliente,
-           dat_prorrogada
+           dat_prorrogada,
+           ies_situa_docum
       FROM docum
      WHERE cod_empresa = m_cod_empresa
-       AND ies_situa_docum NOT IN ('C','E')
+       AND ies_situa_docum <> 'C'
        AND val_saldo >= m_limite_saldo
        AND DATE(dat_vencto_s_desc) < m_dat_de
        AND DATE(dat_vencto_s_desc) >= m_dat_ate
        AND cod_cliente = m_cod_cliente
+       AND cod_portador NOT IN
+           (SELECT cod_portador FROM client_x_portador_912
+             WHERE cod_cliente = m_cod_cliente)
        	
    FOREACH cq_docum_cob INTO
       mr_docum.num_docum,        
@@ -434,7 +460,8 @@ FUNCTION pol1400_le_docum_cob()#
       mr_docum.dat_emis,         
       mr_docum.dat_vencto_s_desc,
       mr_docum.cod_cliente,
-      m_dat_prorrogada     
+      m_dat_prorrogada,
+      l_ies_situa_docum     
       
       IF STATUS <> 0 THEN      
          LET m_erro = STATUS
@@ -442,7 +469,25 @@ FUNCTION pol1400_le_docum_cob()#
              ' lendo titulos da tabela docum.'
          RETURN FALSE
       END IF
-
+      
+      DELETE FROM mensagem_envio_912
+       WHERE cod_cliente = m_cod_cliente       
+      
+      IF l_le_email THEN
+         LET l_le_email = FALSE
+         LET m_email_ok = TRUE
+         IF NOT pol1400_prepara_email() THEN
+            RETURN FALSE
+         END IF
+         IF NOT m_email_ok THEN
+            RETURN TRUE
+        END IF   
+      END IF
+      
+      IF l_ies_situa_docum = 'E' AND m_exec_judicial = 'N' THEN
+         CONTINUE FOREACH
+      END IF
+      
       IF m_dat_prorrogada IS NOT NULL THEN
          LET mr_docum.dat_vencto_s_desc = m_dat_prorrogada
       END IF
@@ -463,6 +508,7 @@ FUNCTION pol1400_le_docum_cob()#
          END IF
          
          LET l_dia_repete = m_dat_envio - m_dat_enviado
+
          IF l_dia_repete < m_repet_env_apos THEN
             CONTINUE FOREACH
          END IF
@@ -477,7 +523,7 @@ FUNCTION pol1400_le_docum_cob()#
    END FOREACH
    
    IF m_tem_docum THEN      
-      IF NOT pol1400_envia_email() THEN
+      IF NOT pol1400_envia_email("COBRA") THEN
          RETURN FALSE
       END IF
    ELSE
@@ -493,27 +539,20 @@ END FUNCTION
 FUNCTION pol1400_le_docum_lembre()#
 #---------------------------------#
    
-   DEFINE l_dia_repete    DECIMAL(3,0)
+   DEFINE l_dia_repete    DECIMAL(3,0),
+          l_le_email      SMALLINT
    
    IF m_le_param THEN
-      IF NOT pol1400_le_padrao() THEN
+      IF NOT pol1400_le_param() THEN
          RETURN FALSE
       END IF
       IF m_enviar_email = 'N' THEN
          RETURN TRUE
       END IF
+      CALL pol1400_set_mensa_lembre(m_qtd_dias)
    END IF
 
-   LET m_email_ok = TRUE
-   
-   IF NOT pol1400_prepara_email() THEN
-      RETURN FALSE
-   END IF
-   
-   IF NOT m_email_ok THEN
-      RETURN TRUE
-   END IF   
-   
+   LET l_le_email = TRUE   
    LET m_tem_docum = FALSE
    
    DECLARE cq_docum_lembre CURSOR FOR
@@ -525,7 +564,7 @@ FUNCTION pol1400_le_docum_lembre()#
            dat_prorrogada
       FROM docum
      WHERE cod_empresa = m_cod_empresa
-       AND ies_situa_docum NOT IN ('C','E')
+       AND ies_situa_docum <> 'C'
        AND DATE(dat_vencto_s_desc) >= m_dat_de
        AND DATE(dat_vencto_s_desc) <= m_dat_ate
        AND cod_cliente = m_cod_cliente
@@ -543,6 +582,17 @@ FUNCTION pol1400_le_docum_lembre()#
          LET m_msg = 'Erro ', m_erro CLIPPED, 
              ' lendo titulos da tabela docum.'
          RETURN FALSE
+      END IF
+
+      IF l_le_email THEN
+         LET l_le_email = FALSE
+         LET m_email_ok = TRUE
+         IF NOT pol1400_prepara_email() THEN
+            RETURN FALSE
+         END IF
+         IF NOT m_email_ok THEN
+            RETURN TRUE
+        END IF   
       END IF
 
       IF m_dat_prorrogada IS NOT NULL THEN
@@ -579,7 +629,7 @@ FUNCTION pol1400_le_docum_lembre()#
    END FOREACH
    
    IF m_tem_docum THEN      
-      IF NOT pol1400_envia_email() THEN
+      IF NOT pol1400_envia_email("LEMBR") THEN
          RETURN FALSE
       END IF
    ELSE
@@ -601,14 +651,18 @@ FUNCTION pol1400_le_padrao()#
           repetir_cobranca,
           repetir_cob_apos,
           limite_saldo,
-          emitente_email    
+          emitente_email,
+          grupo_env_email,
+          em_exec_judicial           
      INTO mr_param.vencidos_de,     
           mr_param.vencidos_ate,                              
           mr_param.enviar_cobranca,                                   
           mr_param.repetir_cobranca,
           mr_param.repetir_cob_apos,
           mr_param.limite_saldo,                            
-          mr_param.emitente_email
+          mr_param.emitente_email,
+          mr_param.grupo_env_email,
+          mr_param.em_exec_judicial
      FROM param_cobranca_912                                     
     WHERE cod_cliente = m_cod_cliente                 
                                                              
@@ -626,14 +680,18 @@ FUNCTION pol1400_le_padrao()#
              repetir_cobranca,          
              repetir_cob_apos,          
              limite_saldo,              
-             emitente_email             
+             emitente_email,             
+             grupo_env_email,
+             em_exec_judicial           
         INTO mr_param.vencidos_de,      
              mr_param.vencidos_ate,                           
              mr_param.enviar_cobranca,                                
              mr_param.repetir_cobranca, 
              mr_param.repetir_cob_apos, 
              mr_param.limite_saldo,                         
-             mr_param.emitente_email    
+             mr_param.emitente_email,   
+             mr_param.grupo_env_email,
+             mr_param.em_exec_judicial
         FROM param_cobranca_912                                  
        WHERE cod_cliente IS NULL               
                                                              
@@ -653,12 +711,81 @@ FUNCTION pol1400_le_padrao()#
    LET m_repet_env_apos = mr_param.repetir_cob_apos
    LET m_limite_saldo = mr_param.limite_saldo
    LET m_emitente_email = mr_param.emitente_email
+   LET m_grp_env_email = mr_param.grupo_env_email
+   LET m_exec_judicial = mr_param.em_exec_judicial
    LET m_dat_envio = TODAY
       
    RETURN TRUE
 
 END FUNCTION                                               
- 
+
+#--------------------------#
+FUNCTION pol1400_le_param()#
+#--------------------------#   
+
+   SELECT enviar_lembrete,  
+          repetir_lembrete, 
+          repetir_lemb_apos,
+          vencer_ate,       
+          emitente_email,
+          grupo_env_email
+     INTO mr_param.enviar_lembrete,  
+          mr_param.repetir_lembrete,                   
+          mr_param.repetir_lemb_apos,                          
+          mr_param.vencer_ate,       
+          mr_param.emitente_email,   
+          mr_param.grupo_env_email                   
+     FROM param_cobranca_912                                     
+    WHERE cod_cliente = m_cod_cliente                 
+                                                             
+   IF STATUS <> 0 AND STATUS <> 100 THEN                        
+      LET m_erro = STATUS                                       
+      LET m_msg = 'Erro ', m_erro CLIPPED,                      
+          ' lendo PARAMETROS PADRÃO da tabela param_cobranca_912.'      
+      RETURN FALSE                                              
+   END IF  
+   
+   IF STATUS = 100 THEN   
+      SELECT enviar_lembrete,             
+             repetir_lembrete,            
+             repetir_lemb_apos,           
+             vencer_ate,                  
+             emitente_email,              
+             grupo_env_email              
+        INTO mr_param.enviar_lembrete,    
+             mr_param.repetir_lembrete,   
+             mr_param.repetir_lemb_apos,  
+             mr_param.vencer_ate,         
+             mr_param.emitente_email,     
+             mr_param.grupo_env_email        
+        FROM param_cobranca_912           
+       WHERE cod_cliente IS NULL               
+                                                             
+      IF STATUS <> 0 AND STATUS <> 100 THEN                       
+         LET m_erro = STATUS                                       
+         LET m_msg = 'Erro ', m_erro CLIPPED,                      
+             ' lendo PARAMETROS PADRÃO da tabela param_cobranca_912.'      
+         RETURN FALSE                                              
+      END IF  
+      
+   END IF
+
+   LET m_enviar_email = mr_param.enviar_lembrete
+   LET m_repet_envio = mr_param.repetir_lembrete
+   LET m_repet_env_apos = mr_param.repetir_lemb_apos
+   LET m_qtd_dias =  mr_param.vencer_ate
+   LET m_dat_ate = TODAY + m_qtd_dias 
+   LET m_emitente_email = mr_param.emitente_email
+   LET m_grp_env_email = mr_param.grupo_env_email
+   LET m_dat_de = TODAY
+   LET m_dat_envio = m_dat_de
+   LET m_hor_envio = TIME
+   LET m_msg = NULL
+   
+   RETURN TRUE
+
+END FUNCTION
+
 #-------------------------------#
 FUNCTION pol1400_prepara_email()#
 #-------------------------------#
@@ -683,7 +810,7 @@ FUNCTION pol1400_prepara_email()#
       LET m_email_ok = FALSE
    END IF                                                                              
                                                                                     
-   LET p_titulo1 = 'Prezado Sr.(a): ', p_nom_destinatario CLIPPED, ' CNPJ:',m_cnpj     
+   LET m_prezado = 'Prezado Sr.(a): ', p_nom_destinatario CLIPPED, ' CNPJ:',m_cnpj     
                                                                                     
    RETURN TRUE
 
@@ -786,58 +913,39 @@ FUNCTION pol1400_email_para()#
          LET m_email_cliente = m_email_cliente CLIPPED, l_email3_cliente CLIPPED,';'
       END IF      
    END IF
-    
-   DECLARE cq_grupo CURSOR FOR
-    SELECT DISTINCT grupo_email 
-      FROM vdp_cliente_grupo  
-     WHERE tip_registro = 'C' 
-       AND cliente = m_cod_cliente
-
-   FOREACH cq_grupo INTO l_grupo_email
-     
-      IF STATUS <> 0 THEN                        
-         LET m_erro = STATUS                                       
-         LET m_msg = 'Erro ', m_erro CLIPPED,                      
-          ' lendo tabela vdp_cliente_grupo.'      
-         RETURN FALSE   
-      END IF      
-      
-      LET m_count = 0
-       
-      DECLARE cq_email CURSOR FOR
-       SELECT email         
-         FROM vdp_cli_grp_email      
-        WHERE cliente = m_cod_cliente
-          AND grupo_email = l_grupo_email
-          AND tip_registro = 'C'
-          AND email IS NOT NULL
-        ORDER BY seq_email
-
-      FOREACH cq_email INTO l_email
-     
-         IF STATUS <> 0 THEN                        
-            LET m_erro = STATUS                                       
-            LET m_msg = 'Erro ', m_erro CLIPPED,                      
-               ' lendo tabela vdp_cli_grp_email.'      
-            RETURN FALSE   
-         END IF   
+          
+   LET m_count = 0                                                           
+                                                                                
+   DECLARE cq_email CURSOR FOR                                                  
+    SELECT email                                                                
+      FROM vdp_cli_grp_email                                                    
+     WHERE cliente = m_cod_cliente                                              
+       AND grupo_email = m_grp_env_email                                        
+       AND tip_registro = 'C'                                                   
+       AND email IS NOT NULL                                                    
+     ORDER BY seq_email                                                         
+                                                                             
+   FOREACH cq_email INTO l_email                                                
+                                                                               
+      IF STATUS <> 0 THEN                                                       
+         LET m_erro = STATUS                                                    
+         LET m_msg = 'Erro ', m_erro CLIPPED,                                   
+            ' lendo tabela vdp_cli_grp_email.'                                  
+         RETURN FALSE                                                           
+      END IF                                                                    
+                                                                                
+      IF l_email IS NOT NULL THEN                                               
+         LET m_email_cliente = m_email_cliente CLIPPED, l_email CLIPPED, ';'    
+      END IF                                                                    
+                                                                                
+      LET m_count = m_count + 1                                                 
+                                                                                
+      IF m_count >= 3 THEN                                                      
+         EXIT FOREACH                                                           
+      END IF                                                                    
+                                                                                
+   END FOREACH                                                                  
          
-         IF l_email IS NOT NULL THEN
-            LET m_email_cliente = m_email_cliente CLIPPED, l_email CLIPPED, ';'
-         END IF
-         
-         LET m_count = m_count + 1
-         
-         IF m_count >= 3 THEN
-            EXIT FOREACH
-         END IF
-         
-      END FOREACH
-      
-      EXIT FOREACH
-      
-   END FOREACH
-   
    LET p_email_destinatario = m_email_cliente CLIPPED
    
    RETURN TRUE
@@ -909,11 +1017,12 @@ FUNCTION pol1400_ins_docum()#
 
 END FUNCTION
 
-#-----------------------------#
-FUNCTION pol1400_envia_email()#
-#-----------------------------#
+#-----------------------------------#
+FUNCTION pol1400_envia_email(l_oper)#
+#-----------------------------------#
    
-   DEFINE l_ret     SMALLINT,
+   DEFINE l_oper    VARCHAR(05),
+          l_ret     SMALLINT,
           l_valor   CHAR(17),
           l_nota    CHAR(15),
           l_docum   CHAR(25),
@@ -927,9 +1036,7 @@ FUNCTION pol1400_envia_email()#
    LET l_dat_atu = l_dat_atu CLIPPED,'-',l_hor_atu[1,2],l_hor_atu[4,5],l_hor_atu[7,8]
    
    CALL log150_procura_caminho("LST") RETURNING p_caminho
-   
-   LET p_assunto = 'Titulos em atraso'
-   
+      
    DECLARE cq_le_clientes CURSOR FOR
     SELECT DISTINCT 
            cod_cliente            
@@ -947,7 +1054,7 @@ FUNCTION pol1400_envia_email()#
          RETURN FALSE
       END IF
                      
-      LET p_arquivo = p_cod_cliente CLIPPED,l_dat_atu,'.lst'
+      LET p_arquivo = p_cod_cliente CLIPPED,l_oper,l_dat_atu CLIPPED,'.lst'
       LET p_den_comando = p_caminho CLIPPED, p_arquivo CLIPPED   
                
       START REPORT pol1400_relat TO p_den_comando
@@ -1062,10 +1169,13 @@ FUNCTION pol1400_atu_cli_cob()#
 
    IF STATUS = 100 THEN
       INSERT INTO client_enviado_912
-       VALUES(m_cod_empresa, p_cod_cliente, m_dat_envio, m_tip_envio)
+       VALUES(m_cod_empresa, p_cod_cliente, 
+              m_dat_envio, m_tip_envio, 
+              p_email_destinatario)
    ELSE
       UPDATE client_enviado_912 
-         SET dat_envio = m_dat_envio
+         SET dat_envio = m_dat_envio,
+             email_destino = p_email_destinatario
        WHERE cod_empresa = m_cod_empresa
          AND cod_cliente = p_cod_cliente
          AND tip_envio = m_tip_envio
@@ -1085,9 +1195,10 @@ END FUNCTION
 #------------------------------#
 FUNCTION pol1400_ins_mensagem()#
 #------------------------------#
-      
+ 
+   
    INSERT INTO mensagem_envio_912
-    VALUES(m_cod_empresa, p_user, m_dat_envio, m_hor_envio,  m_msg)
+    VALUES(m_cod_empresa, m_cod_cliente, p_user, m_dat_envio, m_hor_envio,  m_msg)
 
    IF STATUS <> 0 THEN
       LET m_erro = STATUS
@@ -1116,9 +1227,9 @@ END FUNCTION
           
       FIRST PAGE HEADER  
          
-         PRINT COLUMN 001, p_titulo1
+         PRINT COLUMN 001, m_prezado
          PRINT
-         PRINT COLUMN 001, p_titulo2
+         PRINT COLUMN 001, m_cabec_email
          PRINT
 
                             
@@ -1136,18 +1247,12 @@ END FUNCTION
         PRINT COLUMN 001, p_imp_linha
         PRINT
         PRINT
-        PRINT COLUMN 001, p_mensa_1
-        PRINT COLUMN 001, p_mensa_2
-        PRINT COLUMN 001, p_mensa_3
+        PRINT COLUMN 001, m_rodape_email
         PRINT
         PRINT
         PRINT COLUMN 001, 'Atenciosamente,'
         PRINT
         PRINT
-        PRINT COLUMN 001, 'Departamento de Cobrança,'
-        PRINT
-        PRINT COLUMN 001, m_den_empresa
-        PRINT COLUMN 001, '       GROOVE e TITO' 
         PRINT COLUMN 001, l_data
 
         

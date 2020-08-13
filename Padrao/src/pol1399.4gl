@@ -109,7 +109,9 @@ DEFINE mr_cobranca       RECORD
        repetir_cobranca  VARCHAR(01),
        repetir_cob_apos  DECIMAL(3,0),
        limite_saldo      DECIMAL(12,2),
-       emitente_email    VARCHAR(08)
+       emitente_email    VARCHAR(08),
+       grupo_env_email   DECIMAL(3,0),
+       em_exec_judicial  VARCHAR(01)          
 END RECORD
 
 DEFINE mr_lembrete       RECORD
@@ -120,7 +122,8 @@ DEFINE mr_lembrete       RECORD
        repetir_lembrete  CHAR(01),  
        repetir_lemb_apos DECIMAL(3,0),   
        vencer_ate        DECIMAL(3,0),
-       emitente_email    VARCHAR(08)
+       emitente_email    VARCHAR(08),
+       grupo_env_email   DECIMAL(3,0)
 END RECORD
 
 DEFINE m_panel_aba           VARCHAR(10),
@@ -1870,14 +1873,18 @@ FUNCTION pol1399_valida_cli_cobr()#
           repetir_cobranca,                 
           repetir_cob_apos,                 
           limite_saldo,                     
-          emitente_email   
+          emitente_email,
+          grupo_env_email,
+          em_exec_judicial
      INTO mr_cobranca.vencidos_de,     
           mr_cobranca.vencidos_ate,    
           mr_cobranca.enviar_cobranca, 
           mr_cobranca.repetir_cobranca,
           mr_cobranca.repetir_cob_apos,
           mr_cobranca.limite_saldo,    
-          mr_cobranca.emitente_email   
+          mr_cobranca.emitente_email,
+          mr_cobranca.grupo_env_email,
+          mr_cobranca.em_exec_judicial
      FROM param_cobranca_912
     WHERE cod_cliente = mr_cobranca.cod_cliente
 
@@ -1888,14 +1895,18 @@ FUNCTION pol1399_valida_cli_cobr()#
              repetir_cobranca,              
              repetir_cob_apos,                                                 
              limite_saldo,                                                     
-             emitente_email                                                    
+             emitente_email,
+             grupo_env_email,
+             em_exec_judicial
         INTO mr_cobranca.vencidos_de,                                          
              mr_cobranca.vencidos_ate,                                         
              mr_cobranca.enviar_cobranca,   
              mr_cobranca.repetir_cobranca,  
              mr_cobranca.repetir_cob_apos,  
              mr_cobranca.limite_saldo,      
-             mr_cobranca.emitente_email     
+             mr_cobranca.emitente_email,
+             mr_cobranca.grupo_env_email,
+             mr_cobranca.em_exec_judicial
         FROM param_cobranca_912                   
        WHERE cod_cliente IS NULL
 
@@ -2142,12 +2153,14 @@ FUNCTION pol1399_valida_cli_lembre()#
           repetir_lembrete, 
           repetir_lemb_apos,
           vencer_ate,                    
-          emitente_email                                       
+          emitente_email,
+          grupo_env_email                                    
      INTO mr_lembrete.enviar_lembrete,  
           mr_lembrete.repetir_lembrete, 
           mr_lembrete.repetir_lemb_apos,
           mr_lembrete.vencer_ate,       
-          mr_lembrete.emitente_email    
+          mr_lembrete.emitente_email,
+          mr_lembrete.grupo_env_email              
      FROM param_cobranca_912
     WHERE cod_cliente = mr_cobranca.cod_cliente
 
@@ -2156,12 +2169,14 @@ FUNCTION pol1399_valida_cli_lembre()#
              repetir_lembrete,             
              repetir_lemb_apos,            
              vencer_ate,                   
-             emitente_email                
+             emitente_email,
+             grupo_env_email              
         INTO mr_lembrete.enviar_lembrete,  
              mr_lembrete.repetir_lembrete, 
              mr_lembrete.repetir_lemb_apos,
              mr_lembrete.vencer_ate,       
-             mr_lembrete.emitente_email    
+             mr_lembrete.emitente_email,    
+             mr_lembrete.grupo_env_email              
         FROM param_cobranca_912                   
        WHERE cod_cliente IS NULL
 

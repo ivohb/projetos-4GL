@@ -84,7 +84,7 @@ DEFINE m_raz_social       CHAR(76),
 
 DEFINE mr_cust          RECORD
        cod_empresa       CHAR(02),     
-       cod_cc_concor     INTEGER,      
+       cod_cc_concor     CHAR(15),      
        cod_cc_logix      INTEGER,      
        nom_cent_cust     CHAR(30),     
        cod_lin_prod      decimal(2,0), 
@@ -96,7 +96,7 @@ END RECORD
 
 DEFINE ma_cust          ARRAY[200] OF RECORD
        cod_empresa       CHAR(02),     
-       cod_cc_concor     INTEGER,      
+       cod_cc_concor     CHAR(15),      
        cod_cc_logix      INTEGER,      
        nom_cent_cust     CHAR(30),     
        cod_lin_prod      decimal(2,0), 
@@ -109,14 +109,14 @@ END RECORD
 
 DEFINE mr_desp          RECORD
        cod_empresa      CHAR(02),
-       tip_desp_concur  INTEGER,
+       tip_desp_concur  CHAR(15),
        tip_desp_logix   INTEGER,
        den_despesa      CHAR(30)
 END RECORD
 
 DEFINE ma_desp          ARRAY[10] OF RECORD
        cod_empresa      CHAR(02),
-       tip_desp_concur  INTEGER,
+       tip_desp_concur  CHAR(15),
        tip_desp_logix   INTEGER,
        den_despesa      CHAR(30),
        filler           CHAR(01)
@@ -134,7 +134,7 @@ FUNCTION pol1392()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1392-12.00.03  "
+   LET p_versao = "pol1392-12.00.04  "
    CALL func002_versao_prg(p_versao)
    
    LET m_car_func = TRUE
@@ -970,32 +970,33 @@ FUNCTION pol1392_desp_campo(l_container)#
     CALL _ADVPL_set_property(l_label,"TEXT","Desp concur:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE) 
 
-    LET m_desp_concur = _ADVPL_create_component(NULL,"LNUMERICFIELD",m_pan_desp)
+    LET m_desp_concur = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_desp)
     CALL _ADVPL_set_property(m_desp_concur,"POSITION",80,10) 
-    CALL _ADVPL_set_property(m_desp_concur,"LENGTH",5)    
+    CALL _ADVPL_set_property(m_desp_concur,"LENGTH",15)    
+    CALL _ADVPL_set_property(m_desp_concur,"PICTURE","@!")  
     CALL _ADVPL_set_property(m_desp_concur,"VARIABLE",mr_desp,"tip_desp_concur")
     CALL _ADVPL_set_property(m_desp_concur,"VALID","pol1392_valid_desp_concur")    
               
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_desp)
     CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
-    CALL _ADVPL_set_property(l_label,"POSITION",190,10)  
+    CALL _ADVPL_set_property(l_label,"POSITION",240,10)  
     CALL _ADVPL_set_property(l_label,"TEXT","Desp logix:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_desp_logix = _ADVPL_create_component(NULL,"LNUMERICFIELD",m_pan_desp)
-    CALL _ADVPL_set_property(m_desp_logix,"POSITION",260,10)
+    CALL _ADVPL_set_property(m_desp_logix,"POSITION",300,10)
     CALL _ADVPL_set_property(m_desp_logix,"LENGTH",5)    
     CALL _ADVPL_set_property(m_desp_logix,"VARIABLE",mr_desp,"tip_desp_logix")
     CALL _ADVPL_set_property(m_desp_logix,"VALID","pol1392_valid_desp_logix")    
 
     LET m_lupa_desp = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pan_desp)
     CALL _ADVPL_set_property(m_lupa_desp,"IMAGE","BTPESQ")
-    CALL _ADVPL_set_property(m_lupa_desp,"POSITION",320,10)     
+    CALL _ADVPL_set_property(m_lupa_desp,"POSITION",360,10)     
     CALL _ADVPL_set_property(m_lupa_desp,"SIZE",24,20)
     CALL _ADVPL_set_property(m_lupa_desp,"CLICK_EVENT","pol1392_zoom_despesa")
 
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_desp)     
-    CALL _ADVPL_set_property(l_caixa,"POSITION",350,10) 
+    CALL _ADVPL_set_property(l_caixa,"POSITION",390,10) 
     CALL _ADVPL_set_property(l_caixa,"LENGTH",30,0)    
     CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_desp,"den_despesa")
@@ -1113,7 +1114,7 @@ FUNCTION pol1392_desp_find()#
        LET m_construct = _ADVPL_create_component(NULL,"LCONSTRUCT")
        CALL _ADVPL_set_property(m_construct,"CONSTRUCT_NAME","pol1392_FILTER")
        CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_TABLE","tip_desp_concur","Despesa")
-       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","tip_desp_concur","tip_desp_concur","Desp concur",1 {INT},5,0)
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","tip_desp_concur","tip_desp_concur","Desp concur",1 {CHAR},15,0)
        CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","tip_desp_concur","tip_desp_logix","Desp logix",1 {INT},5,0,"zoom_tipo_despesa")
     END IF
 
@@ -1633,32 +1634,33 @@ FUNCTION pol1392_cust_campo(l_container)#
     CALL _ADVPL_set_property(l_label,"TEXT","Cent cust concur:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE) 
 
-    LET m_cc_concur = _ADVPL_create_component(NULL,"LNUMERICFIELD",m_pan_cust)
+    LET m_cc_concur = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_cust)
     CALL _ADVPL_set_property(m_cc_concur,"POSITION",110,10) 
-    CALL _ADVPL_set_property(m_cc_concur,"LENGTH",5)    
+    CALL _ADVPL_set_property(m_cc_concur,"LENGTH",15)    
+    CALL _ADVPL_set_property(m_cc_concur,"PICTURE","@!")  
     CALL _ADVPL_set_property(m_cc_concur,"VARIABLE",mr_cust,"cod_cc_concor")
     CALL _ADVPL_set_property(m_cc_concur,"VALID","pol1392_valid_cust_concur")    
               
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cust)
     CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
-    CALL _ADVPL_set_property(l_label,"POSITION",180,10)  
+    CALL _ADVPL_set_property(l_label,"POSITION",250,10)  
     CALL _ADVPL_set_property(l_label,"TEXT","Cent cust logix:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_cc_logix = _ADVPL_create_component(NULL,"LNUMERICFIELD",m_pan_cust)
-    CALL _ADVPL_set_property(m_cc_logix,"POSITION",270,10)
+    CALL _ADVPL_set_property(m_cc_logix,"POSITION",340,10)
     CALL _ADVPL_set_property(m_cc_logix,"LENGTH",5)    
     CALL _ADVPL_set_property(m_cc_logix,"VARIABLE",mr_cust,"cod_cc_logix")
     CALL _ADVPL_set_property(m_cc_logix,"VALID","pol1392_valid_cust_logix")    
 
     LET m_lupa_cust = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pan_cust)
     CALL _ADVPL_set_property(m_lupa_cust,"IMAGE","BTPESQ")
-    CALL _ADVPL_set_property(m_lupa_cust,"POSITION",320,10)     
+    CALL _ADVPL_set_property(m_lupa_cust,"POSITION",390,10)     
     CALL _ADVPL_set_property(m_lupa_cust,"SIZE",24,20)
     CALL _ADVPL_set_property(m_lupa_cust,"CLICK_EVENT","pol1392_zoom_cust")
 
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_cust)     
-    CALL _ADVPL_set_property(l_caixa,"POSITION",350,10) 
+    CALL _ADVPL_set_property(l_caixa,"POSITION",420,10) 
     CALL _ADVPL_set_property(l_caixa,"LENGTH",30,0)    
     CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_cust,"nom_cent_cust")
@@ -1870,7 +1872,7 @@ FUNCTION pol1392_cust_find()#
        LET m_construct = _ADVPL_create_component(NULL,"LCONSTRUCT")
        CALL _ADVPL_set_property(m_construct,"CONSTRUCT_NAME","pol1392_FILTER")
        CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_TABLE","cent_cust_concur","Cent_custo")
-       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","cent_cust_concur","cod_cc_concor","Cent cust concur",1 {INT},5,0)
+       CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","cent_cust_concur","cod_cc_concor","Cent cust concur",1 {CHAR},15,0)
        CALL _ADVPL_set_property(m_construct,"ADD_VIRTUAL_COLUMN","cent_cust_concur","cod_cc_logix","Cent cust logix",1 {INT},5,0,"zoom_tipo_custesa")
     END IF
 
@@ -2396,3 +2398,13 @@ FUNCTION pol1392_cust_delete()#
    RETURN l_ret
         
 END FUNCTION
+
+    
+#LOG1700
+#-------------------------------#
+ FUNCTION pol1392_version_info()
+#-------------------------------#
+
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/pol1392.4gl $|$Revision: 04 $|$Date: 24/08/2020 14:12 $|$Modtime: 14/08/2020 13:12 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+
+ END FUNCTION

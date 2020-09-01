@@ -7,13 +7,13 @@ SCREEN
        Núm NF:[j      ]  Emissão:[k         ]  Série:[l ]  Sub série:[m   ]
     Fonecedor:[f              ] [g                                        ]
   Tip despesa:[h      ] [i                             ]
-   Observação:[e1                                      ]
-              [e2                                      ]
-              [e3                                      ]
-              [e4                                      ]
-              [e5                                      ]
-              [e6                                      ]
-              [e7                                      ]
+   Observação:[e                                       ]
+              [e                                       ]
+              [e                                       ]
+              [e                                       ]
+              [e                                       ]
+              [e                                       ]
+              [e                                       ]
       AP  Par    Valor     Vencto   Portador   Descrição
    [o     |p |q           |r         |s  |t                       ]
    [o     |p |q           |r         |s  |t                       ]
@@ -35,16 +35,10 @@ ATTRIBUTES
  g = FORMONLY.raz_social,        NOENTRY;
  h = FORMONLY.cod_tip_despesa,   NOENTRY;
  i = FORMONLY.nom_tip_despesa,   NOENTRY;
- e1= FORMONLY.observ1,           NOENTRY;
- e2= FORMONLY.observ2,           NOENTRY;
- e3= FORMONLY.observ3,           NOENTRY;
- e4= FORMONLY.observ4,           NOENTRY;
- e5= FORMONLY.observ5,           NOENTRY;
- e6= FORMONLY.observ6,           NOENTRY;
- e7= FORMONLY.observ7,           NOENTRY;
- o = FORMONLY.num_ap,            NOENTRY;
- p = FORMONLY.num_parcela,       AUTONEXT,
+ e = FORMONLY.texto,             AUTONEXT,
      COMMENTS = 'Ctrl+S = Suspende/Re-ativa AD'; 
+ o = FORMONLY.num_ap,            NOENTRY;
+ p = FORMONLY.num_parcela,       AUTONEXT;
  q = FORMONLY.val_nom_ap,        NOENTRY;
  r = FORMONLY.dat_vencto_s_desc, NOENTRY;
  s = FORMONLY.cod_portador,      NOENTRY;
@@ -52,5 +46,6 @@ ATTRIBUTES
 END
 
 INSTRUCTIONS
+   SCREEN RECORD sa_texto[7](texto);
    SCREEN RECORD sr_ap[5](num_ap THRU nom_portador);
 END 

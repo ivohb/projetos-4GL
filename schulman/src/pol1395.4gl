@@ -1,3 +1,8 @@
+#----------------------------------------------------#
+# GERAÇÃO DE RELATÓRIO A PARTIR DE ARQUIVO DE IMAGEM #
+#----------------------------------------------------#
+
+
 DATABASE logix
 
 GLOBALS
@@ -59,7 +64,7 @@ FUNCTION pol1395_menu()#
            l_fechar      VARCHAR(10),
            l_titulo      VARCHAR(100)
     
-    LET l_titulo = "GERAÇÃO DE TÍTULOS - INTEGRAÇÃO CONCUR - ",p_versao
+    LET l_titulo = "GERAÇÃO DE RELATÓRIO A PARTIR DE ARQUIVO DE IMAGEM - ",p_versao
     
     LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
     CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)

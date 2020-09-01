@@ -7,13 +7,13 @@ SCREEN
        Núm NF:[j      ]  Emissão:[k         ]  Série:[l ]  Sub série:[m   ]
     Fonecedor:[f              ] [g                                        ]
   Tip despesa:[h      ] [i                             ]
-   Observação:[e1                                      ]
-              [e2                                      ]
-              [e3                                      ]
-              [e4                                      ]
-              [e5                                      ]
-              [e6                                      ]
-              [e7                                      ]
+   Observação:[e                                       ]
+              [e                                       ]
+              [e                                       ]
+              [e                                       ]
+              [e                                       ]
+              [e                                       ]
+              [e                                       ]
       AP  Par    Valor     Vencto   Portador   Descrição
    [o     |p |q           |r         |s  |t                       ]
    [o     |p |q           |r         |s  |t                       ]
@@ -31,12 +31,11 @@ ATTRIBUTES
  k = FORMONLY.dat_emis_nf,       NOENTRY;
  l = FORMONLY.ser_nf,            NOENTRY;
  m = FORMONLY.ssr_nf,            NOENTRY;
- e = FORMONLY.observ,            NOENTRY;
  f = FORMONLY.cod_fornecedor,    NOENTRY;
  g = FORMONLY.raz_social,        NOENTRY;
  h = FORMONLY.cod_tip_despesa,   NOENTRY;
  i = FORMONLY.nom_tip_despesa,   NOENTRY;
-
+ e = FORMONLY.texto,             AUTONEXT;
  o = FORMONLY.num_ap,            NOENTRY;
  p = FORMONLY.num_parcela,       AUTONEXT,
      COMMENTS = 'Ctrl+S = Suspende/Re-ativa AD'; 
@@ -47,5 +46,6 @@ ATTRIBUTES
 END
 
 INSTRUCTIONS
+   SCREEN RECORD sa_texto[7](texto);
    SCREEN RECORD sr_ap[5](num_ap THRU nom_portador);
 END 

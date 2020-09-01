@@ -195,7 +195,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 7
    DEFER INTERRUPT
-   LET p_versao = "POL0403-10.02.49"
+   LET p_versao = "POL0403-10.02.52"
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol0403.iem") RETURNING p_nom_help
    LET  p_nom_help = p_nom_help CLIPPED
@@ -918,8 +918,9 @@ FUNCTION pol0403_le_doca()#
          AND num_sequencia = l_num_sequencia         
 
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','ped_item_edi:cq_doca')
-         RETURN FALSE
+         #CALL log003_err_sql('SELECT','ped_item_edi:cq_doca')
+         #RETURN FALSE
+         CONTINUE FOREACH
       END IF
       
       IF l_cod_doca IS NULL THEN
@@ -941,7 +942,7 @@ FUNCTION pol0403_le_doca()#
       IF STATUS = 100 THEN
          INSERT INTO doca_tmp VALUES(l_cod_doca)
          IF STATUS <> 0 THEN
-            CALL log003_err_sql('INSERT','doca:cq_itens')
+            CALL log003_err_sql('INSERT','doca:cq_doca')
             RETURN FALSE
          END IF
       END IF
@@ -1047,42 +1048,41 @@ END FUNCTION
           l_prioridade        LIKE man_prior_consumo.prioridade, 
           l_qtd_reservada     LIKE man_prior_consumo.qtd_reservada,
           sql_stmt            CHAR(1000),
-          l_cod_doca          CHAR(05)
+          l_cod_doca          CHAR(05),
+          l_pedido            CHAR(07)
 
    LET l_ind = 1
    LET p_cod_item = NULL
    LET p_qtd_estoque = 0
    INITIALIZE pr_reser TO NULL
    INITIALIZE ma_doca TO NULL
+   LET l_pedido = mr_tela.num_pedido
 
    LET sql_stmt = 
       " SELECT a.num_sequencia, a.prz_entrega, b.cod_item, ",
-      "        (qtd_pecas_solic - (qtd_pecas_atend + ",
-      "                            qtd_pecas_cancel + ",
-      "                            qtd_pecas_reserv + ",
-      "                            qtd_pecas_romaneio)), ",
-      "        a.cod_item, b.ies_ctr_lote ",
-      "   FROM ped_itens a, item b ",
-      "  WHERE a.cod_empresa = '",p_cod_empresa,"'",
-      "    AND a.num_pedido  = ",mr_tela.num_pedido,
-      "    AND a.cod_empresa = b.cod_empresa ",
-      "    AND a.cod_item    = b.cod_item ",
-      "    AND (qtd_pecas_solic - (qtd_pecas_atend  + ",
-      "                            qtd_pecas_cancel + ",
-      "                            qtd_pecas_reserv + ",
-      "                            qtd_pecas_romaneio)) > 0 "
+      " (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_reserv - qtd_pecas_romaneio), ",
+      " a.cod_item, b.ies_ctr_lote FROM ped_itens a, item b ",
+      " WHERE a.cod_empresa = '",p_cod_empresa,"' ",
+      " AND a.num_pedido  = '",l_pedido,"' ",
+      " AND a.cod_empresa = b.cod_empresa ",
+      " AND a.cod_item = b.cod_item ",
+      " AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_reserv - qtd_pecas_romaneio) > 0 "
       
    IF mr_tela.entrega_ate IS NOT NULL THEN
       LET sql_stmt = sql_stmt CLIPPED, "  AND a.prz_entrega <= '",mr_tela.entrega_ate,"'"
    END IF
 
    LET sql_stmt = sql_stmt CLIPPED, " ORDER BY a.prz_entrega, a.cod_item "
-
-#  LET sql_stmt = sql_stmt CLIPPED, " ORDER BY a.prz_entrega, a.num_sequencia "
    
    LET p_itens_sel = 0
    
    PREPARE var_query FROM sql_stmt
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('PREPARE','var_query')
+      RETURN FALSE
+   END IF    
+   
    DECLARE cq_itens CURSOR FOR var_query
  
    FOREACH cq_itens INTO ma_tela[l_ind].num_sequencia,

@@ -107,7 +107,7 @@ DEFINE mr_nota                      RECORD
        val_tot_nf                  	DECIMAL(15,2), 
        cod_moeda                   	DECIMAL(3,0),  
        cod_tip_despesa              DECIMAL(4,0),  
-       den_observacao              	VARCHAR(255),  
+       den_observacao              	VARCHAR(4000),  
        ies_gera_nota               	CHAR(1),       
        num_lote                    	INTEGER,                     
        cod_situacao                	CHAR(1),                     
@@ -236,7 +236,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.120 "
+   LET p_versao = "pol1328-12.00.121 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -328,7 +328,7 @@ FUNCTION pol1328_check_proces()#
    RETURN TRUE   
 
 END FUNCTION   
-         
+
 #-------------------------------#
 FUNCTION pol1328_cria_controle()#
 #-------------------------------#
@@ -440,8 +440,8 @@ FUNCTION pol1328_processa()#
       ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST)
     
    DISPLAY p_cod_empresa TO cod_empresa
-   CALL LOG_refresh_display()
-
+   CALL LOG_refresh_display()   
+   
    IF NOT log0150_verifica_se_tabela_existe("control_proces_912") THEN 
       IF NOT pol1328_cria_controle() THEN
          RETURN FALSE
@@ -3585,80 +3585,62 @@ FUNCTION pol1328_grv_texto()#
 #---------------------------#
 
    DEFINE l_parametro  RECORD 
-          texto      VARCHAR(255),
-          tam_linha  SMALLINT,
-          qtd_linha  SMALLINT,
-          justificar CHAR(01)
+          texto        VARCHAR(255),
+          tam_linha    SMALLINT,
+          justificar   CHAR(01)
    END RECORD
-
-   DEFINE 
-          l_ret_1      VARCHAR(40),
-          l_ret_2      VARCHAR(40),
-          l_ret_3      VARCHAR(40),
-          l_ret_4      VARCHAR(40),
-          l_ret_5      VARCHAR(40),
-          l_ret_6      VARCHAR(40),
-          l_ret_7      VARCHAR(40)
-
-   LET l_parametro.texto = mr_nota.den_observacao
-   LET l_parametro.tam_linha = 40
-   LET l_parametro.qtd_linha = 7
-   LET l_parametro.justificar = 'N'
- 
-   CALL func001_quebrar_texto(l_parametro) RETURNING l_ret_1,l_ret_2,l_ret_3,l_ret_4,l_ret_5,l_ret_6,l_ret_7
+   
+   DEFINE l_seq        INTEGER,
+          l_texto      VARCHAR(40)
 
    DELETE FROM cap_obs_ad
     WHERE empresa = p_cod_empresa
       AND apropriacao_desp = m_num_ad
 
-   LET m_seq_txt = 0
-   
-   IF NOT pol1328_grv_cap_obs(l_ret_1) THEN
-      RETURN FALSE
+   LET l_parametro.texto = mr_nota.den_observacao
+   LET l_parametro.tam_linha = 40
+   LET l_parametro.justificar = 'N'
+ 
+   IF NOT func024_quebrar_texto(l_parametro) THEN
+      IF NOT pol1328_grv_cap_obs(mr_ad_mestre.observ,1) THEN
+         RETURN FALSE
+      END IF
+   ELSE
+      DECLARE cq_txt_obs CURSOR FOR
+       SELECT num_seq, texto 
+         FROM w_txt_observ
+      FOREACH cq_txt_obs INTO l_seq, l_texto
+
+         IF STATUS <> 0 THEN
+            LET m_erro = STATUS USING '<<<<<'                                                                 
+            LET m_msg = 'Erro de status: ',m_erro                                                             
+            LET m_msg = m_msg CLIPPED, ' lendo textos da tabela w_txt_observ.'                    
+            RETURN FALSE                                                                                      
+         END IF
+      
+         IF NOT pol1328_grv_cap_obs(l_texto, l_seq) THEN
+            RETURN FALSE
+         END IF
+      END FOREACH
    END IF
 
-   IF NOT pol1328_grv_cap_obs(l_ret_2) THEN
-      RETURN FALSE
-   END IF
-
-   IF NOT pol1328_grv_cap_obs(l_ret_3) THEN
-      RETURN FALSE
-   END IF
-
-   IF NOT pol1328_grv_cap_obs(l_ret_4) THEN
-      RETURN FALSE
-   END IF
-
-   IF NOT pol1328_grv_cap_obs(l_ret_5) THEN
-      RETURN FALSE
-   END IF
-
-   IF NOT pol1328_grv_cap_obs(l_ret_6) THEN
-      RETURN FALSE
-   END IF
-
-   IF NOT pol1328_grv_cap_obs(l_ret_7) THEN
-      RETURN FALSE
-   END IF
-   
    RETURN TRUE
 
 END FUNCTION
    
-#------------------------------------#
-FUNCTION pol1328_grv_cap_obs(l_texto)#
-#------------------------------------#
+#-------------------------------------------#
+FUNCTION pol1328_grv_cap_obs(l_texto, l_seq)#
+#-------------------------------------------#
 
-   DEFINE l_texto VARCHAR(40)
+   DEFINE l_texto VARCHAR(40),
+          l_seq   INTEGER
    
    IF l_texto IS NULL THEN
       RETURN TRUE
    END IF
-   
-   LET m_seq_txt = m_seq_txt + 1
-   
+      
    INSERT INTO cap_obs_ad(empresa, apropriacao_desp, seql_obs_ad, obs_ad)
-    VALUES(p_cod_empresa, m_num_ad, m_seq_txt, l_texto)
+    VALUES(p_cod_empresa, m_num_ad, l_seq, l_texto)
 
    IF STATUS <> 0 THEN
       LET m_erro = STATUS USING '<<<<<'                                                                 

@@ -34,7 +34,7 @@ DEFINE r_01 VARCHAR(200),
     
 #--parâmetros recebidos--#
           
-DEFINE texto        VARCHAR(3000),
+DEFINE texto        VARCHAR(4000),
        tam_linha    SMALLINT,
        qtd_linha    SMALLINT,
        justificar   CHAR(01)
@@ -50,7 +50,7 @@ DEFINE num_carac    SMALLINT,
 #----------------------------------------#
 
    DEFINE parametro  RECORD 
-          texto      VARCHAR(3000),
+          texto      VARCHAR(4000),
           tam_linha  SMALLINT,
           qtd_linha  SMALLINT,
           justificar CHAR(01)
@@ -113,7 +113,7 @@ END FUNCTION
    IF tam_linha IS NULL THEN
       RETURN FALSE
    ELSE
-      IF tam_linha < 20 OR tam_linha > 200 THEN
+      IF tam_linha < 20 OR tam_linha > 200 OR tam_linha < LENGTH(texto) THEN
          RETURN FALSE
       END IF 
    END IF
@@ -142,7 +142,7 @@ END FUNCTION
 #------------------------------#
  FUNCTION func001_separa_texto()
 #------------------------------#
-          
+      
    LET r_01 = func001_quebra_texto()
    LET r_02 = func001_quebra_texto()
    LET r_03 = func001_quebra_texto()
@@ -158,7 +158,6 @@ END FUNCTION
    LET r_13 = func001_quebra_texto()
    LET r_14 = func001_quebra_texto()
    LET r_15 = func001_quebra_texto()
-      
               
 END FUNCTION
 

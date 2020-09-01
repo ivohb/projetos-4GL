@@ -987,7 +987,7 @@ FUNCTION pol1159_ins_ctrl_leitura()#
    ELSE
       LET p_ies_ar_cs = 'NOTA'
    END IF
-   
+      
    INSERT INTO nfe_aprov_265
     VALUES(p_cod_empresa, 
            p_num_ar, 

@@ -104,8 +104,8 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 60
    DEFER INTERRUPT
-   LET p_versao = "pol1159-10.02.53"
-   LET p_ver_prog = "10.02.52"
+   LET p_versao = "pol1159-10.02.54"
+   LET p_ver_prog = "10.02.53"
    OPTIONS 
       NEXT KEY control-f,
       INSERT KEY control-i,
@@ -986,6 +986,10 @@ FUNCTION pol1159_ins_ctrl_leitura()#
       LET p_ies_ar_cs = 'CONTRATO'
    ELSE
       LET p_ies_ar_cs = 'NOTA'
+   END IF
+   
+   IF p_ies_incl_cap IS NULL THEN
+      LET p_ies_incl_cap = 'X'
    END IF
    
    INSERT INTO nfe_aprov_265

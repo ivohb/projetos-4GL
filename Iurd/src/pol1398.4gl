@@ -63,7 +63,6 @@ MAIN
         RETURNING p_status, p_cod_empresa, p_user
    
    IF p_status = 0 THEN    
-      CALL pol1398_exibe_tela()
       CALL pol1398_controle()
    END IF
          
@@ -79,7 +78,7 @@ FUNCTION pol1398_exibe_tela()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 60
 
-   LET p_versao = "pol1398-12.00.01  "
+   LET p_versao = "pol1398-12.00.03  "
    CALL func002_versao_prg(p_versao)
 
    INITIALIZE l_nom_tela TO NULL 
@@ -217,9 +216,9 @@ FUNCTION pol1398_processa()#
       RETURN FALSE
    END IF
 
-   IF NOT pol1398_gera_arq() THEN
+   {IF NOT pol1398_gera_arq() THEN
       RETURN FALSE
-   END IF
+   END IF}
 
    IF NOT pol1398_le_ap() THEN
       RETURN FALSE
@@ -235,12 +234,19 @@ FUNCTION pol1398_le_caminho()#
 
    SELECT nom_caminho
      INTO m_caminho
-   FROM path_logix_v2
+     FROM log_usu_dir_relat
+    WHERE empresa = p_cod_empresa 
+      AND usuario = p_user 
+      AND sistema_fonte = 'TXT'
+ 
+   {SELECT nom_caminho
+     INTO m_caminho
+   FROM path_logix_v2 #log_usu_dir_relat
    WHERE cod_empresa = p_cod_empresa 
-     AND cod_sistema = "TXT"
+     AND cod_sistema = "TXT"}
 
    IF STATUS = 100 THEN
-      LET m_msg = 'Caminho do sistema TXT não cadastrado na LOG1100.'      
+      LET m_msg = 'Caminho do sistema TXT não cadastrado na log00098.'      
       RETURN FALSE
    ELSE
       IF STATUS <> 0 THEN
@@ -283,7 +289,7 @@ END FUNCTION
 FUNCTION pol1398_gera_arq()#
 #--------------------------#
         
-  LET m_file_w = m_caminho CLIPPED, 'APS_A_PAGAR.txt'
+  LET m_file_w = m_caminho CLIPPED, 'APS_A_PAGAR.txt'  
   LET m_handle_w = LOG_file_create(m_file_w,0,0)
       
   IF m_handle_w < 0 THEN
@@ -308,20 +314,23 @@ FUNCTION pol1398_le_ap()#
           l_valor         LIKE ap_valores.valor,
           l_ies_tipo      CHAR(01)
    
-   LET m_handle_w = LOG_file_openMode(m_file_w,0,1)
+   {LET m_handle_w = LOG_file_openMode(m_file_w,0,1)
   
    IF m_handle_w < 0 THEN
       LET m_msg = 'Erro na abertura do arquivo ', m_file_w
       RETURN FALSE
-   END IF    
-      
+   END IF    }
+   
+   LET m_file_w = m_caminho CLIPPED, 'APS_A_PAGAR.txt'     
+   START REPORT pol1398_relat TO m_file_w
+
    DECLARE cq_ap CURSOR FOR
     SELECT a.cod_empresa, 
            c.num_ap, 
-           lpad(b.cod_anterior,5,'0') || lpad(e.num_obrigacao_lcc,2,'0') num_nf_orig,
-           dt_vencimento, 
+           '9910',
+           d.dt_vencimento, 
            a.cod_tip_despesa,
-           val_nom_ap
+           c.val_nom_ap
       FROM gi_ad_912 a, 
            gi_imovel b, 
            ap c, 
@@ -356,7 +365,7 @@ FUNCTION pol1398_le_ap()#
       DISPLAY m_cod_empresa TO cod_empresa
       DISPLAY l_num_ap TO num_ap
       #lds CALL LOG_refresh_display()
-            
+             
       DECLARE cq_valor CURSOR FOR
        SELECT cod_tip_val, valor 
          FROM ap_valores 
@@ -377,7 +386,7 @@ FUNCTION pol1398_le_ap()#
            FROM tipo_valor 
           WHERE cod_empresa = m_cod_empresa
             AND cod_tip_val = l_cod_tip_val
-            AND and ies_ad_ap = '2'
+            AND ies_ad_ap = '2'
 
          IF STATUS <> 0 THEN
             LET m_erro = STATUS
@@ -394,24 +403,56 @@ FUNCTION pol1398_le_ap()#
          END IF
          
       END FOREACH
-
+			
+			FREE cq_valor
+			 
       LET m_num_ap = func002_strzero(l_num_ap, 6)
       LET m_cod_tip = func002_strzero(l_cod_tip_desp, 4)
       LET m_val_liq = func002_dec_strzero(l_val_liquido, 16)
       
       LET m_linha = m_cod_empresa,'|',m_num_ap,'|',m_num_nf,'|',m_data,'|',m_val_liq,'|',m_cod_tip
 
-      IF NOT LOG_file_write(m_handle_w, m_linha) THEN
+      {IF NOT LOG_file_write(m_handle_w, m_linha) THEN
          LET m_msg = 'Erro ao gravar no arquivo ',m_file_w
          RETURN FALSE
-      END IF
-   
+      END IF}
+      
+      OUTPUT TO REPORT pol1398_relat() 
+            
    END FOREACH
    
-   LET m_handle_w = LOG_file_close(m_handle_w)
+   #LET m_handle_w = LOG_file_close(m_handle_w)
+   
+   FINISH REPORT pol1398_relat  
+   FREE cq_ap
    
    RETURN TRUE
 
 END FUNCTION
 
- 
+#---------------------#
+ REPORT pol1398_relat()
+#---------------------#
+
+   OUTPUT LEFT   MARGIN 0
+          TOP    MARGIN 0
+          BOTTOM MARGIN 0
+          PAGE   LENGTH 1
+          
+   FORMAT
+          
+     ON EVERY ROW 
+        PRINT COLUMN 001, m_linha
+        
+END REPORT
+   
+#LOG1700
+#-------------------------------#
+ FUNCTION pol1398_version_info()
+#-------------------------------#
+
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/pol1398.4gl $|$Revision: 03 $|$Date: 25/08/2020 16:12 $|$Modtime: 14/08/2020 13:12 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+
+ END FUNCTION
+
+

@@ -154,7 +154,7 @@ END RECORD
 
 MAIN
   CALL log0180_conecta_usuario()
-  LET p_versao = "POL0211-10.02.19" 
+  LET p_versao = "POL0211-10.02.20" 
   WHENEVER ANY ERROR CONTINUE
   CALL log1400_isolation()
   
@@ -292,7 +292,7 @@ FUNCTION pol0211_qfptran_carrega_ped_itens_qfp()
                                                p_qfptran.qfp_tran_txt[34,37],"-",
                                                p_qfptran.qfp_tran_txt[38,39]
            
-           LET m_itenf_cli = p_qfptran.qfp_tran_txt[54,60]
+           LET m_itenf_cli = p_qfptran.qfp_tran_txt[62,68] 
            
          WHEN "PE1"
             
@@ -2823,6 +2823,11 @@ FUNCTION pol0211_gera_tabela_edi_pe4(l_status)
    LET p_pedidos_edi_pe4.tip_emb_cli_seg   = p_qfptran.qfp_tran_txt[4,33]
    LET p_pedidos_edi_pe4.tip_emb_forn_seg  = p_qfptran.qfp_tran_txt[34,63]
    LET w_valor                             = p_qfptran.qfp_tran_txt[64,75] 
+   
+   IF w_valor IS NULL THEN
+      LET w_valor = 0
+   END IF
+   
    LET p_pedidos_edi_pe4.capac_emb_seg     = w_valor / 1000
    LET p_pedidos_edi_pe4.tip_emb_forn_pri  = p_qfptran.qfp_tran_txt[76,105]
    LET p_pedidos_edi_pe4.capac_emb_pri     = p_qfptran.qfp_tran_txt[106,117]
@@ -2846,6 +2851,7 @@ FUNCTION pol0211_gera_tabela_edi_pe4(l_status)
       sqlca.sqlcode <> -1226 THEN 
       CALL log003_err_sql("INCLUSAO","PEDIDOS_EDI_PE4")
    END IF
+   
 END FUNCTION
 
 

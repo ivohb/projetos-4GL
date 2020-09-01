@@ -80,7 +80,7 @@ DEFINE m_caminho         VARCHAR(120),
        m_qtd_reg         CHAR(10),
        m_ies_erro        SMALLINT,
        m_ssr_nf          INTEGER,
-       m_cent_cust       INTEGER,
+       m_cent_cust       CHAR(15),
        m_ctrl_aen        CHAR(01),
        m_ctrl_con        CHAR(01),
        m_query           VARCHAR(1000)
@@ -175,7 +175,7 @@ FUNCTION pol1393()#
    WHENEVER ANY ERROR CONTINUE
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1393-12.00.10  "
+   LET p_versao = "pol1393-12.00.11  "
    CALL func002_versao_prg(p_versao)
 
    IF pol1393_atu_titulos() THEN
@@ -355,7 +355,7 @@ FUNCTION pol1393_cria_grade(l_container)#
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Tp Desp")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",70)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tip_desp")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
@@ -365,7 +365,7 @@ FUNCTION pol1393_cria_grade(l_container)#
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Cent cust")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",70)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cent_cust")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
@@ -573,7 +573,9 @@ FUNCTION pol1393_carrega_lista()#
        LET ma_files[l_ind] = LOG_file_getFromList(l_ind)
        CALL _ADVPL_set_property(m_arquivo,"ADD_ITEM",t_ind,ma_files[l_ind])                    
    END FOR
-    
+   
+   RETURN TRUE
+   
 END FUNCTION
 
 #---------------------------------#
@@ -1821,3 +1823,11 @@ FUNCTION pol1393_exibe_dados()#
 
 END FUNCTION
 
+#LOG1700             
+#-------------------------------#
+ FUNCTION pol1393_version_info()
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1393.4gl $|$Revision: 11 $|$Date: 21/08/2020 13:23 $|$Modtime: 26/06/2020 07:40 $" 
+
+ END FUNCTION

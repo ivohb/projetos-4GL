@@ -257,7 +257,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 15
    DEFER INTERRUPT
-   LET p_versao = "pol1158-10.02.70"
+   LET p_versao = "pol1158-10.02.71"
    OPTIONS 
       NEXT KEY control-f,
       INSERT KEY control-i,
@@ -317,8 +317,11 @@ END MAIN
             END IF
          END IF 
          CALL log0030_mensagem(p_msg, 'excla')
-      COMMAND KEY ("O") "sObre" "Exibe a versão do programa"
-         CALL pol1158_sobre() 
+      COMMAND KEY ("O") "sObre" "Exibe a versão do programa"   
+      LET p_empresa = '01'      
+      LET p_num_docum = '378566'  
+      CALL pol1158_dados_ad()  
+      #   CALL pol1158_sobre() 
       COMMAND KEY ("!")
          PROMPT "Digite o comando : " FOR comando
          RUN comando
@@ -2515,7 +2518,7 @@ FUNCTION pol1158_dados_ad()#
    INITIALIZE p_nom_tela TO NULL
    CALL log130_procura_caminho("pol11587") RETURNING p_nom_tela
    LET p_nom_tela = p_nom_tela CLIPPED
-   OPEN WINDOW w_pol11587 AT 02,01 WITH FORM p_nom_tela
+   OPEN WINDOW w_pol11587 AT 02,03 WITH FORM p_nom_tela
       ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST, FORM LINE FIRST)
 
    CALL pol1158_exibe_ad()
@@ -2550,9 +2553,16 @@ FUNCTION pol1158_exibe_ad()#
           p_cod_tip_despesa   CHAR(04),
           p_nom_tip_despesa   CHAR(30),
           p_num_ap            INTEGER,
-          p_num_parcela       INTEGER,
+          p_texto             CHAR(40),
+          l_observ            LIKE ad_mestre.observ,
           p_observ            VARCHAR(40),
-          p_seq_txt           INTEGER
+          p_seq_txt           INTEGER,
+          l_texto             SMALLINT,
+          l_ind               INTEGER
+
+   DEFINE la_texto ARRAY[120] OF RECORD   
+          texto               CHAR(40)
+   END RECORD
    
    SELECT a.num_ad,
           a.val_tot_nf,
@@ -2569,7 +2579,7 @@ FUNCTION pol1158_exibe_ad()#
      INTO p_num_ad,         
           p_val_tot_nf,     
           p_dat_venc,  
-          p_observ,     
+          l_observ,     
           p_cod_fornecedor, 
           p_raz_social,     
           p_cod_tip_despesa,
@@ -2610,30 +2620,11 @@ FUNCTION pol1158_exibe_ad()#
    DISPLAY p_dat_emis_nf TO dat_emis_nf
    DISPLAY p_ser_nf TO ser_nf
    DISPLAY p_ssr_nf TO ssr_nf
-
-   #DISPLAY p_observ TO observ
-
-   DECLARE cq_obser CURSOR FOR
-    SELECT obs_ad, seql_obs_ad
-      FROM cap_obs_ad 
-     WHERE empresa = p_empresa
-       AND apropriacao_desp = p_num_docum
-   FOREACH cq_obser INTO p_observ, p_seq_txt
-
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('Lendo','cap_obs_ad')
-         RETURN
-      END IF
-      
-      IF p_seq_txt = 1 THEN
-      
-   END FOREACH
-   
    DISPLAY p_cod_fornecedor TO cod_fornecedor  
    DISPLAY p_raz_social TO raz_social  
    DISPLAY p_cod_tip_despesa TO cod_tip_despesa  
    DISPLAY p_nom_tip_despesa TO nom_tip_despesa  
-
+      
    LET p_index = 1
    
    DECLARE cq_le_aps CURSOR FOR
@@ -2699,28 +2690,60 @@ FUNCTION pol1158_exibe_ad()#
    END IF
    
    CALL SET_COUNT(p_index - 1)
-   
+
    INPUT ARRAY pr_ap WITHOUT DEFAULTS FROM sr_ap.*
+      BEFORE INPUT
+         EXIT INPUT
+   END INPUT
+
+   LET l_texto = FALSE
+   LET p_index = 1
+   INITIALIZE la_texto TO NULL
+   
+   DECLARE cq_obser CURSOR FOR
+    SELECT obs_ad
+      FROM cap_obs_ad 
+     WHERE empresa = p_empresa
+       AND apropriacao_desp = p_num_docum
+   FOREACH cq_obser INTO la_texto[p_index].texto
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('Lendo','cap_obs_ad')
+         RETURN
+      END IF
+      
+      LET l_texto = TRUE
+      LET p_index = p_index + 1
+               
+   END FOREACH
+   
+   IF NOT l_texto THEN   
+      LET la_texto[p_index].texto = l_observ
+      LET p_index = p_index + 1
+   END IF
+   
+   CALL SET_COUNT(p_index - 1)
+         
+   INPUT ARRAY la_texto WITHOUT DEFAULTS FROM sa_texto.*
       ATTRIBUTES(INSERT ROW = FALSE, DELETE ROW = FALSE)
       
       BEFORE ROW
          LET p_index = ARR_CURR()
          LET s_index = SCR_LINE()  
 
-      BEFORE FIELD num_parcela
-         LET p_num_parcela = pr_ap[p_index].num_parcela 
+      BEFORE FIELD texto
+         LET p_texto = la_texto[p_index].texto
          
-      AFTER FIELD num_parcela
+      AFTER FIELD texto
          
-         LET pr_ap[p_index].num_parcela = p_num_parcela
-         DISPLAY p_num_parcela to sr_ap[s_index].num_parcela
+         LET la_texto[p_index].texto = p_texto
+         DISPLAY p_texto to sa_texto[s_index].texto
          
          IF FGL_LASTKEY() = 27 OR FGL_LASTKEY() = 2000 OR FGL_LASTKEY() = 2016 THEN
          ELSE
             LET p_count = p_index + 1
-            IF p_count > 50 OR pr_ap[p_count].num_parcela IS NULL OR
-               pr_ap[p_count].num_parcela <= 0 THEN
-               NEXT FIELD num_parcela
+            IF la_texto[p_count].texto IS NULL THEN
+               NEXT FIELD texto
             END IF
          END IF
       

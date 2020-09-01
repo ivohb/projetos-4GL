@@ -30,7 +30,8 @@ DEFINE    m_msg                  CHAR(150),
           m_num_pedido           INTEGER,
           m_cod_cliente          CHAR(15),
           m_dat_proces           VARCHAR(19),
-          m_tem_erro             SMALLINT
+          m_tem_erro             SMALLINT,
+          m_ies_situa            CHAR(01)
 
 
 MAIN   
@@ -70,7 +71,7 @@ FUNCTION pol1396_exibe_tela()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 60
 
-   LET p_versao = "pol1396-12.00.04  "
+   LET p_versao = "pol1396-12.00.06  "
    CALL func002_versao_prg(p_versao)
 
    INITIALIZE l_nom_tela TO NULL 
@@ -159,11 +160,12 @@ FUNCTION pol1396_consiste()#
    END IF
 
    DECLARE cq_ped_cons CURSOR WITH HOLD FOR
-    SELECT num_pedido
+    SELECT num_pedido,
+           ies_sit_pedido
       FROM pedidos 
      WHERE cod_empresa = p_cod_empresa
        AND (ies_sit_pedido = 'E' OR ies_sit_pedido = 'B')
-   FOREACH cq_ped_cons INTO m_num_pedido       
+   FOREACH cq_ped_cons INTO m_num_pedido, m_ies_situa    
       
       IF STATUS <> 0 THEN
          LET m_erro = STATUS
@@ -187,6 +189,10 @@ FUNCTION pol1396_consiste()#
       END IF
       
    END FOREACH
+
+   UPDATE pedidos set ies_sit_pedido = 'B'
+    WHERE cod_empresa = '08'
+      AND   ies_sit_pedido = 'E'
    
    RETURN TRUE
 
@@ -280,7 +286,11 @@ END FUNCTION
 #--------------------------#
 FUNCTION pol1396_processa()#
 #--------------------------#
-
+   
+   DEFINE l_count       INTEGER,
+          l_dat_proces  DATE,
+          l_hor_proces  CHAR(08)          
+   
    IF NOT vdp20023_carga_inicial_exec_por_fora(p_cod_empresa,TRUE) THEN
       LET m_msg = 'A função vdp20023_carga_inicial_exec_por_fora retornou erro'
       RETURN FALSE
@@ -295,11 +305,79 @@ FUNCTION pol1396_processa()#
      LET m_msg = 'A função vdp20023_processa_consistencia_exec_por_fora retornou erro'
      RETURN FALSE
   END IF
+  
+  IF m_ies_situa <> 'B' THEN
+     RETURN TRUE
+  END IF
+  
+  SELECT COUNT(*) INTO l_count
+    FROM vdp_ped_consis 
+   WHERE empresa = p_cod_empresa
+     AND pedido = m_num_pedido
+  
+  IF STATUS <> 0 THEN
+     LET m_msg = 'Erro: ',STATUS,' lendo tabela vdp_ped_consis'
+     CALL pol1396_ins_erro()
+     RETURN FALSE
+  END IF
+  
+  IF l_count > 0 THEN
+     RETURN TRUE
+  END IF
+  
+  LET l_dat_proces = TODAY
+  LET l_hor_proces = TIME
+  
+  UPDATE pedidos 
+     SET ies_sit_pedido = 'N', 
+         dat_pedido = l_dat_proces
+   WHERE cod_empresa = p_cod_empresa 
+     AND num_pedido =  m_num_pedido
+
+  IF STATUS <> 0 THEN
+     LET m_msg = 'Erro: ',STATUS,' liberando pedido - pedidos'
+     CALL pol1396_ins_erro()
+     RETURN FALSE
+  END IF
+  
+  LET m_msg = 'Situação do pedido alterada de B para N' 
+ 
+  INSERT INTO audit_vdp (
+     cod_empresa, 
+     num_pedido, 
+     tipo_informacao, 
+     tipo_movto, 
+     texto, 
+     num_programa, 
+     data, 
+     hora, 
+     usuario) 
+  VALUES(p_cod_empresa,
+         m_num_pedido,'M','A',
+         m_msg,
+         'POL1396',
+         l_dat_proces,
+         l_hor_proces,
+         p_user)
+
+  IF STATUS <> 0 THEN
+     LET m_msg = 'Erro: ',STATUS,' inserindo tabela audit_vdp'
+     CALL pol1396_ins_erro()
+     RETURN FALSE
+  END IF
 
   RETURN TRUE
 
 END FUNCTION
     
+#LOG1700
+#-------------------------------#
+ FUNCTION pol1396_version_info()
+#-------------------------------#
+
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/pol1396.4gl $|$Revision: 05 $|$Date: 14/08/2020 13:12 $|$Modtime: 11/08/2020 11:12 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+
+ END FUNCTION
 
 {
 

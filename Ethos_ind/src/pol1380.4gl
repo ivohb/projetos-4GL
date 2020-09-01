@@ -71,7 +71,7 @@ FUNCTION pol1380()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1380-12.00.02  "
+   LET p_versao = "pol1380-12.00.03  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1380_menu()
@@ -433,6 +433,7 @@ FUNCTION pol1380_valida_item()#
 
    IF STATUS = 0 THEN
       LET m_msg = 'Cliente/item já cadastrados no POL1380'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       RETURN FALSE
    ELSE
       IF STATUS <> 100 THEN

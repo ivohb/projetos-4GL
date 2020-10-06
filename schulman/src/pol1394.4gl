@@ -43,7 +43,8 @@ DEFINE m_ies_carga       SMALLINT,
        m_num_lista       INTEGER,
        m_ies_print       SMALLINT,
        m_index           INTEGER,
-       m_page_length     INTEGER
+       m_page_length     INTEGER,
+       m_despesa         DECIMAL(12,2)
 
 
 DEFINE mr_cabec          RECORD
@@ -105,8 +106,7 @@ DEFINE ma_itens ARRAY[2000] OF RECORD
        tip_pgto          VARCHAR(30),
        num_ad            INTEGER,
        num_ap            INTEGER,
-       cod_tip_despesa   INTEGER,
-       nom_arquivo       VARCHAR(80)
+       cod_tip_despesa   INTEGER
 END RECORD
 
 DEFINE mr_relat          RECORD
@@ -145,7 +145,7 @@ FUNCTION pol1394()#
    WHENEVER ANY ERROR CONTINUE
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1394-12.00.02  "
+   LET p_versao = "pol1394-12.00.03  "
    CALL func002_versao_prg(p_versao)
 
    CALL pol1394_menu()
@@ -409,10 +409,10 @@ FUNCTION pol1394_cria_grade(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","num_ap")
 
-    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
+    {LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_browse)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Arquivo")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",250)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","nom_arquivo")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","nom_arquivo")}
 
     CALL _ADVPL_set_property(m_browse,"SET_ROWS",ma_itens,1)
     CALL _ADVPL_set_property(m_browse,"EDITABLE",FALSE)
@@ -509,7 +509,7 @@ FUNCTION pol1394_monta_select()#
    END IF
    
    LET m_query =
-    " select i.*, a.nom_arquivo from itens_concur i, arquivo_concur a  ",           
+    " select DISTINCT i.* from itens_concur i, arquivo_concur a  ",           
     " where a.cod_empresa = i.cod_empresa ",
     " and a.cod_empresa = '",p_cod_empresa,"' ",
     " and i.id_arquivo = a.id_arquivo ",
@@ -543,7 +543,7 @@ FUNCTION pol1394_monta_select()#
        LET m_query = m_query, " AND a.usuario = '",mr_cabec.usuario,"' "
     END IF
 
-    LET m_query = m_query, " order by funcio_id, relat_key   "                            
+    LET m_query = m_query, " order by funcio_id, num_ad   "                            
     
     
 END FUNCTION
@@ -810,7 +810,7 @@ FUNCTION pol1394_relatorio(l_report)#
    
       LET l_progres = LOG_progresspopup_increment("PROCESS") 
 
-      OUTPUT TO REPORT pol1394_relat(mr_relat.funcio_id)
+      OUTPUT TO REPORT pol1394_relat(mr_relat.num_ad)
    
    END FOREACH
 
@@ -841,10 +841,11 @@ END FUNCTION
 END FUNCTION
    
 #--------------------------------#
-REPORT pol1394_relat(l_funcio_id)#
+REPORT pol1394_relat(l_num_ad)#
 #--------------------------------#
 
-   DEFINE l_funcio_id     VARCHAR(15)
+   DEFINE l_num_ad     VARCHAR(15),
+          l_val_ad     DECIMAL(12,2)
 
     OUTPUT
         TOP    MARGIN 0
@@ -853,41 +854,73 @@ REPORT pol1394_relat(l_funcio_id)#
         BOTTOM MARGIN 0
         PAGE   LENGTH m_page_length
    
-       ORDER EXTERNAL BY l_funcio_id
+       ORDER EXTERNAL BY l_num_ad
 
     FORMAT
 
-    PAGE HEADER
+    FIRST PAGE HEADER
 
       CALL ReportPageHeader("pol1394")
 
-      SKIP 1 LINE
+      PRINT COLUMN 001, 'PESSOAL FUNCIONARIO          FUNCIO ID RELAT KEY EMPRESA DESPESA  MOEDA TIP_DESP DEN DESP        CENT CUST SITUACAO DAT EMISS  DAT PAGTO  TIP_PGTO NUM AD NUM AP'
+      PRINT COLUMN 001, '------- -------------------- --------- --------- ------- -------- ----- -------- --------------- --------- -------- ---------- ---------- -------- ------ ------'
 
-   BEFORE GROUP OF l_funcio_id
-      SKIP TO TOP OF PAGE
-      SKIP 1 LINE
+    PAGE HEADER
            
-      PRINT COLUMN 001, 'PESSOAL FUNCIONARIO          FUNCIO ID RELAT KEY EMPRESA DESPESA MOEDA TIP_DESP DEN DESP        CENT CUST SITUACAO DAT EMISS  DAT PAGTO  TIP_PGTO NUM AD NUM AP'
-      PRINT COLUMN 001, '------- -------------------- --------- --------- ------- ------- ----- -------- --------------- --------- -------- ---------- ---------- -------- ------ ------'
-           
+      PRINT COLUMN 001, 'PESSOAL FUNCIONARIO          FUNCIO ID RELAT KEY EMPRESA DESPESA  MOEDA TIP_DESP DEN DESP        CENT CUST SITUACAO DAT EMISS  DAT PAGTO  TIP_PGTO NUM AD NUM AP'
+      PRINT COLUMN 001, '------- -------------------- --------- --------- ------- -------- ----- -------- --------------- --------- -------- ---------- ---------- -------- ------ ------'
+
     ON EVERY ROW 
+        LET m_despesa = mr_relat.despesa[1,7]
+        
         PRINT COLUMN 001, mr_relat.pessoal,    
               COLUMN 009, mr_relat.funcionario[1,20],
               COLUMN 030, mr_relat.funcio_id[1,9],
               COLUMN 040, mr_relat.relat_key[1,9],  
               COLUMN 050, mr_relat.empresa[1,7],    
-              COLUMN 058, mr_relat.despesa[1,7],           
-              COLUMN 066, mr_relat.moeda[1,5],                    
-              COLUMN 072, mr_relat.tip_desp[1,8],                 
-              COLUMN 081, mr_relat.den_desp[1,15],                 
-              COLUMN 097, mr_relat.cent_cust[1,9],      
-              COLUMN 107, mr_relat.situacao[1,8],           
-              COLUMN 116, mr_relat.dat_emissao[1,10],
-              COLUMN 127, mr_relat.dat_pagto[1,10],  
-              COLUMN 138, mr_relat.tip_pgto[1,8],   
-              COLUMN 147, mr_relat.num_ad USING '#####&',  
-              COLUMN 154, mr_relat.num_ap USING '#####&'      
+              COLUMN 058, m_despesa USING '####&.&&',        
+              COLUMN 067, mr_relat.moeda[1,5],                    
+              COLUMN 073, mr_relat.tip_desp[1,8],                 
+              COLUMN 082, mr_relat.den_desp[1,15],                 
+              COLUMN 098, mr_relat.cent_cust[1,9],      
+              COLUMN 108, mr_relat.situacao[1,8],           
+              COLUMN 117, mr_relat.dat_emissao[1,10],
+              COLUMN 128, mr_relat.dat_pagto[1,10],  
+              COLUMN 139, mr_relat.tip_pgto[1,8],   
+              COLUMN 148, mr_relat.num_ad USING '#####&',  
+              COLUMN 155, mr_relat.num_ap USING '#####&'      
+
+   AFTER GROUP OF l_num_ad
+      
+      IF l_num_ad IS NULL THEN
+         LET l_val_ad = NULL
+      ELSE
+         SELECT val_tot_nf 
+           INTO l_val_ad
+           FROM ad_mestre 
+          WHERE cod_empresa = p_cod_empresa 
+            AND num_ad = l_num_ad
+      
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('SELECT','ad_mestre')
+            LET l_val_ad = NULL
+         END IF
+      END IF
+      
+      SKIP 1 LINE
+      PRINT COLUMN 030, 'VALOR TOTAL DO TITULO:',
+            COLUMN 054, l_val_ad USING '#,###,##&.&&'
+      SKIP 1 LINE
 
 END REPORT
 
+
+#LOG1700             
+#-------------------------------#
+ FUNCTION pol1394_version_info()
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1394.4gl $|$Revision: 3 $|$Date: 17/09/2020 13:23 $|$Modtime: 26/06/2020 07:40 $" 
+
+ END FUNCTION
        

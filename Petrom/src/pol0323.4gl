@@ -47,7 +47,8 @@ END GLOBALS
           p_raz_social    CHAR(40),
           p_den_item      CHAR(60),
           p_dat_fabric    DATE,
-          p_dat_valid     DATE
+          p_dat_valid     DATE,
+          m_bloq_laudo    CHAR(01)
 
    DEFINE mr_tela RECORD 
       num_laudo      LIKE laudo_mest_petrom.num_laudo,
@@ -104,7 +105,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 300 
    DEFER INTERRUPT
-   LET p_versao = "POL0323-10.02.15"
+   LET p_versao = "POL0323-10.02.19"
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol0323.iem") RETURNING p_nom_help
    LET  p_nom_help = p_nom_help CLIPPED
@@ -310,6 +311,7 @@ END FUNCTION
          END IF     
 
       AFTER FIELD lote_tanque
+      
       IF mr_tela.lote_tanque IS NOT NULL AND 
          mr_tela.lote_tanque <> ' ' THEN
          IF pol0323_verifica_se_tem_resultado(mr_tela.lote_tanque) = FALSE THEN
@@ -604,7 +606,383 @@ END FUNCTION
 
 END FUNCTION
 
+#---------------------------------------------------#
+FUNCTION pol0323_ve_formula_saida(l_cliente, l_data)#
+#---------------------------------------------------#
 
+   DEFINE l_cliente        LIKE clientes.cod_cliente,
+          l_data           DATE          
+
+   DEFINE l_teor_agua       LIKE analise_petrom.val_analise,   #8	
+          l_pesados         LIKE analise_petrom.val_analise,   #71
+          l_alcool_tot      LIKE analise_petrom.val_analise,   #33
+          l_n_pentanol      LIKE analise_petrom.val_analise,   #69
+          l_isobutanol      LIKE analise_petrom.val_analise,   #36
+          l_n_butanol       LIKE analise_petrom.val_analise,   #37
+          l_sec_butanol     LIKE analise_petrom.val_analise,   #68
+          l_iso_pentanol    LIKE analise_petrom.val_analise,   #70
+          l_somatoria_c4_c5 LIKE analise_petrom.val_analise,   #72
+          l_val_analise     LIKE analise_petrom.val_analise,
+          l_formula         LIKE analise_petrom.val_analise,
+          l_msg             VARCHAR(1200)
+
+   LET m_bloq_laudo = 'N'
+   LET l_msg = NULL
+    
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '8'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_teor_agua = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+
+   IF l_teor_agua IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- TEOR DE AGUA não encontrado na tabela analise_petrom\n'
+   END IF
+      
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '71'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_pesados = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+   
+   IF l_pesados IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- PESADOS não encontrado na tabela analise_petrom\n'
+   END IF
+
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '33'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_alcool_tot = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+   
+   IF l_alcool_tot IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- ALCOOL TOTAL/PUREZA não encontrado na tabela analise_petrom\n'
+   END IF
+
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '69'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_n_pentanol = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+   
+   IF l_n_pentanol IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- N-PENTANOL não encontrado na tabela analise_petrom\n'
+   END IF
+
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '36'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_isobutanol = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+   
+   IF l_isobutanol IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- ISOBUTANOL não encontrado na tabela analise_petrom\n'
+   END IF
+
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '37'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_n_butanol = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+   
+   IF l_n_butanol IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- N-BUTANOL não encontrado na tabela analise_petrom\n'
+   END IF
+
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '68'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_sec_butanol = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+   
+   IF l_sec_butanol IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- SEC BUTANOL não encontrado na tabela analise_petrom\n'
+   END IF
+
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '70'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_iso_pentanol = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+   
+   IF l_iso_pentanol IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- ISO PENTANOL não encontrado na tabela analise_petrom\n'
+   END IF
+
+   DECLARE cq_vanalise CURSOR FOR                                  
+    SELECT val_analise                                           
+      FROM analise_petrom                                        
+     WHERE cod_empresa = p_cod_empresa                           
+       AND cod_item    = m_item_petrom                           
+       AND tip_analise = '72'                                 
+       AND lote_tanque = mr_tela.lote_tanque                     
+       AND dat_analise = l_data                              
+     ORDER BY hor_analise DESC                                   
+                                                                 
+   FOREACH cq_vanalise INTO l_val_analise                              
+                                                                 
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_vanalise')  
+         RETURN FALSE                                 
+      ELSE                                                       
+         LET l_somatoria_c4_c5 = l_val_analise                             
+      END IF                                                     
+                                                                 
+      EXIT FOREACH                                               
+                                                                 
+   END FOREACH                                                   
+   
+   FREE cq_vanalise
+   
+   IF l_somatoria_c4_c5 IS NULL THEN
+      LET l_msg = l_msg CLIPPED, '- SOMATORIA C4 + C5 não encontrado na tabela analise_petrom\n'
+   END IF
+   
+   IF l_msg IS NOT NULL THEN
+      CALL log0030_mensagem(l_msg,'info')
+      LET m_bloq_laudo = 'S'
+      RETURN TRUE
+   END IF
+
+   LET l_formula = 100 - l_teor_agua - l_pesados
+   
+   IF l_formula <> l_alcool_tot THEN
+      LET m_bloq_laudo = 'S'
+      LET mr_tela.texto_1 = '100 - TEOR DE AGUA + PESADOS DIFERENTE DE ALCOOL TOTAL/PUREZA'
+   END IF
+
+   LET l_formula = l_n_pentanol + l_isobutanol + l_n_butanol + l_sec_butanol + l_iso_pentanol
+
+   IF l_formula <> l_somatoria_c4_c5 THEN
+      LET m_bloq_laudo = 'S'
+      LET mr_tela.texto_2 = 'N-PENTANOL + ISOBUTANOL + N-BUTANOL + SEC BUTANOL + ISO PENTANOL <> SOMATORIA C4 + C5'
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION   
+
+#----------------------------#
+FUNCTION pol0323_ve_formula()#
+#----------------------------#
+
+   DEFINE l_teor_agua       LIKE analise_petrom.val_analise,   
+          l_pesados         LIKE analise_petrom.val_analise,   
+          l_alcool_tot      LIKE analise_petrom.val_analise,   
+          l_n_pentanol      LIKE analise_petrom.val_analise,   
+          l_isobutanol      LIKE analise_petrom.val_analise,   
+          l_n_butanol       LIKE analise_petrom.val_analise,   
+          l_sec_butanol     LIKE analise_petrom.val_analise,   
+          l_iso_pentanol    LIKE analise_petrom.val_analise,   
+          l_somatoria_c4_c5 LIKE analise_petrom.val_analise,   
+          l_formula         LIKE analise_petrom.val_analise,
+          l_val_analise     LIKE laudo_item_petrom.resultado,
+          l_tip_analise     LIKE laudo_item_petrom.tip_analise,
+          l_tipo            VARCHAR(02)
+
+   LET m_bloq_laudo = 'N'
+
+   DECLARE cq_formula CURSOR FOR
+    SELECT tip_analise,
+           resultado
+      FROM laudo_item_petrom
+     WHERE cod_empresa = p_cod_empresa
+       AND num_laudo = mr_nfe.num_laudo
+    FOREACH cq_formula INTO l_tip_analise, l_val_analise
+
+      IF STATUS <> 0 THEN                                        
+         CALL log003_err_sql('FOREACH','cq_formula')  
+         RETURN FALSE                                 
+      END IF 
+      
+      LET l_tipo = l_tip_analise USING '<<'
+   
+      CASE l_tipo
+           WHEN '8'  LET l_teor_agua = l_val_analise       
+           WHEN '71' LET l_pesados = l_val_analise         
+           WHEN '33' LET l_alcool_tot = l_val_analise      
+           WHEN '34' LET l_n_pentanol = l_val_analise      
+           WHEN '36' LET l_isobutanol = l_val_analise      
+           WHEN '37' LET l_n_butanol = l_val_analise       
+           WHEN '68' LET l_sec_butanol = l_val_analise     
+           WHEN '70' LET l_iso_pentanol = l_val_analise    
+           WHEN '72' LET l_somatoria_c4_c5 = l_val_analise        
+      END CASE
+    
+    END FOREACH
+
+   LET l_formula = 100 - l_teor_agua - l_pesados
+   
+   IF l_formula <> l_alcool_tot THEN
+      LET m_bloq_laudo = 'S'
+      LET mr_tela.texto_1 = '100 - TEOR DE AGUA + PESADOS DIFERENTE DE ALCOOL TOTAL/PUREZA'
+   END IF
+
+   LET l_formula = l_n_pentanol + l_isobutanol + l_n_butanol + l_sec_butanol + l_iso_pentanol
+
+   IF l_formula <> l_somatoria_c4_c5 THEN
+      LET m_bloq_laudo = 'S'
+      LET mr_tela.texto_2 = 'N-PENTANOL + ISOBUTANOL + N-BUTANOL + SEC BUTANOL + ISO PENTANOL <> SOMATORIA C4 + C5'
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION   
+
+
+    
 #----------------------------------------------#   
  FUNCTION pol0323_ve_validade(l_cliente,l_item)#
 #----------------------------------------------#   
@@ -1500,68 +1878,65 @@ END FUNCTION
             LET l_variacao        = l_variacao_2
             LET l_metodo          = l_metodo_2
          ELSE
-              SELECT tip_analise, val_especif_de, val_especif_ate, 
-                     tipo_valor, variacao, metodo 
-                INTO l_tip_analise, l_val_especif_de, l_val_especif_ate,
-                     l_tipo_valor, l_variacao, l_metodo
-                FROM especific_petrom
-               WHERE cod_empresa = p_cod_empresa
-                 AND cod_item    = m_item_petrom
-                 AND cod_cliente IS NULL 
-                 AND tip_analise = l_tip_analise
+            SELECT tip_analise, val_especif_de, val_especif_ate,      
+                   tipo_valor, variacao, metodo                         
+              INTO l_tip_analise, l_val_especif_de, l_val_especif_ate,  
+                   l_tipo_valor, l_variacao, l_metodo                   
+              FROM especific_petrom                                     
+             WHERE cod_empresa = p_cod_empresa                          
+               AND cod_item    = m_item_petrom                          
+               AND cod_cliente IS NULL                                  
+               AND tip_analise = l_tip_analise                          
          END IF 
       
-           SELECT MAX(dat_analise)
-             INTO l_dat_analise
-             FROM analise_petrom
-            WHERE cod_empresa = p_cod_empresa
-              AND cod_item    = m_item_petrom
-              AND tip_analise = l_tip_analise
-              AND lote_tanque = mr_tela.lote_tanque
+         SELECT MAX(dat_analise)                   
+           INTO l_dat_analise                        
+           FROM analise_petrom                       
+          WHERE cod_empresa = p_cod_empresa          
+            AND cod_item    = m_item_petrom          
+            AND tip_analise = l_tip_analise          
+            AND lote_tanque = mr_tela.lote_tanque    
+                                  
+         SELECT MAX(hor_analise)                     
+           INTO l_hor_analise                        
+           FROM analise_petrom                       
+          WHERE cod_empresa = p_cod_empresa          
+            AND cod_item    = m_item_petrom          
+            AND tip_analise = l_tip_analise          
+            AND lote_tanque = mr_tela.lote_tanque    
+            AND dat_analise = l_dat_analise          
            
+         LET l_media_final = NULL
            
-           SELECT MAX(hor_analise)
-             INTO l_hor_analise
-             FROM analise_petrom
-            WHERE cod_empresa = p_cod_empresa
-              AND cod_item    = m_item_petrom
-              AND tip_analise = l_tip_analise
-              AND lote_tanque = mr_tela.lote_tanque
-              AND dat_analise = l_dat_analise
-           
-           LET l_media_final = NULL
-           
-           DECLARE cq_vanalise CURSOR FOR
-            SELECT val_analise 
-              FROM analise_petrom
-             WHERE cod_empresa = p_cod_empresa
-               AND cod_item    = m_item_petrom
-               AND tip_analise = l_tip_analise
-               AND lote_tanque = mr_tela.lote_tanque
-               AND dat_analise = l_dat_analise
-             ORDER BY hor_analise DESC
-           
-           FOREACH cq_vanalise INTO l_valor
-              
-              IF STATUS <> 0 THEN
-                 CALL log003_err_sql('FOREACH','cq_vanalise')
-              ELSE
-                 LET l_media_final = l_valor
-              END IF
-              
-              EXIT FOREACH
-              
-           END FOREACH
+         DECLARE cq_vanalise CURSOR FOR                        
+          SELECT val_analise                                     
+            FROM analise_petrom                                  
+           WHERE cod_empresa = p_cod_empresa                     
+             AND cod_item    = m_item_petrom                     
+             AND tip_analise = l_tip_analise                     
+             AND lote_tanque = mr_tela.lote_tanque               
+             AND dat_analise = l_dat_analise                     
+           ORDER BY hor_analise DESC                             
+                                                                 
+         FOREACH cq_vanalise INTO l_valor                        
+                                                                 
+            IF STATUS <> 0 THEN                                  
+               CALL log003_err_sql('FOREACH','cq_vanalise')      
+            ELSE                                                 
+               LET l_media_final = l_valor                       
+            END IF                                               
+                                                                 
+            EXIT FOREACH                                         
+                                                                 
+         END FOREACH                                             
                       
          LET l_bloq_item  = 'N'
          
          IF l_val_especif_de = l_val_especif_ate THEN
-            IF l_variacao IS NOT NULL AND
-               l_variacao <> '0' THEN
+            IF l_variacao IS NOT NULL AND l_variacao <> '0' THEN
                LET l_val_especif_de  = l_val_especif_de - l_variacao
                LET l_val_especif_ate = l_val_especif_ate + l_variacao
-               IF l_media_final >= l_val_especif_de AND
-                  l_media_final <= l_val_especif_ate THEN
+               IF l_media_final >= l_val_especif_de AND l_media_final <= l_val_especif_ate THEN
                ELSE
                   IF l_bloqueia_laudo = 'S' THEN
                      LET l_bloq_laudo = 'S'
@@ -1615,8 +1990,7 @@ END FUNCTION
                END IF
             END IF
          ELSE
-            IF l_media_final < l_val_especif_de OR
-               l_media_final > l_val_especif_ate THEN
+            IF l_media_final < l_val_especif_de OR l_media_final > l_val_especif_ate THEN
                IF l_bloqueia_laudo = 'S' THEN
                   LET l_bloq_laudo = 'S'
                   LET l_bloq_item  = 'S'
@@ -1637,6 +2011,8 @@ END FUNCTION
             LET l_houve_erro = TRUE
             CALL log003_err_sql("INCLUSAO","LAUDO_ITEM_PETROM")
          END IF
+         
+         
       END FOREACH
    ELSE
       DECLARE cq_param CURSOR FOR
@@ -1843,7 +2219,7 @@ END FUNCTION
       IF sqlca.sqlcode <> 0 THEN
          LET l_houve_erro = TRUE
          CALL log003_err_sql("INCLUSAO","LAUDO_MEST_PETROM")
-      END IF
+      END IF  
       
       IF m_ies_tanque = 'N' THEN
          FOR l_ind = 1 TO 50     
@@ -2730,6 +3106,17 @@ END FUNCTION
    LET p_hoje = TODAY
       
    IF l_houve_erro = FALSE THEN
+
+      IF l_bloq_laudo <> 'S' AND m_item_petrom = '36' THEN
+         IF NOT pol0323_ve_formula() THEN
+            LET l_houve_erro = TRUE
+         ELSE 
+           LET l_bloq_laudo = m_bloq_laudo
+        END IF
+      END IF
+   END IF
+   
+   IF l_houve_erro = FALSE THEN
       INSERT INTO laudo_mest_petrom VALUES (
         p_cod_empresa,        
         mr_nfe.num_laudo,     
@@ -2784,3 +3171,26 @@ END FUNCTION
    END IF     
              
 END FUNCTION
+
+{
+Item 36 OLEO FUSEL - tabelas item_petrom e item_refer_petrom
+
+especific_petrom contem os tipos de analise do item petrom e parameros e intervaçlos e variaçoes
+it_analise_petrom contem a descrição do tipo de analise
+
+tipo
+analise descrição
+8				TEOR DE AGUA
+71			PESADOS  
+33			ALCOOL TOTAL/PUREZA
+
+69			N-PENTANOL
+36			ISOBUTANOL
+37			N-BUTANOL
+68			SEC BUTANOL
+70			ISO PENTANOL
+72			SOMATORIA C4 + C5
+
+ 
+1.  100 -  TEOR DE AGUA + PESADOS  = ALCOOL TOTAL/PUREZA
+2.  N-PENTANOL + ISOBUTANOL + N-BUTANOL + SEC BUTANOL + ISO PENTANOL = SOMATORIA C4 + C5

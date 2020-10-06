@@ -175,7 +175,7 @@ FUNCTION pol1393()#
    WHENEVER ANY ERROR CONTINUE
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1393-12.00.11  "
+   LET p_versao = "pol1393-12.00.13  "
    CALL func002_versao_prg(p_versao)
 
    IF pol1393_atu_titulos() THEN
@@ -919,7 +919,14 @@ FUNCTION pol1393_divide_texto()#
    
    DEFINE l_ind        INTEGER,
           l_conteudo   CHAR(20)
-                   
+   
+   LET m_pos_fim = 0
+   
+   IF m_linha[m_pos_ini] = ',' THEN
+      LET m_pos_ini = m_pos_ini + 1
+      RETURN ''
+   END IF
+   
    FOR l_ind = m_pos_ini TO LENGTH(m_linha)
        IF m_linha[l_ind] = ',' THEN
           LET m_pos_fim = l_ind - 1
@@ -928,10 +935,15 @@ FUNCTION pol1393_divide_texto()#
    END FOR
    
    IF m_pos_fim < m_pos_ini THEN
-      LET m_pos_fim = l_ind - 1
+      LET m_pos_fim = m_pos_ini
+   END IF
+
+   IF m_pos_fim > LENGTH(m_linha)  THEN
+      LET l_conteudo = ''
+   ELSE
+      LET l_conteudo = m_linha[m_pos_ini, m_pos_fim]
    END IF
       
-   LET l_conteudo = m_linha[m_pos_ini, m_pos_fim]
    LET m_pos_ini = m_pos_fim + 2
    
    RETURN l_conteudo
@@ -1377,16 +1389,22 @@ END FUNCTION
 FUNCTION pol1393_move_arquivo()#
 #------------------------------#
    
-   DEFINE l_arq_dest       CHAR(100),
+   DEFINE l_arq_dest       CHAR(120),
           l_comando        CHAR(120),
-          l_tamanho        integer
-   
+          l_tamanho        INTEGER,
+          l_data          CHAR(10),
+          l_hora          CHAR(06)
+
    LET m_arq_origem = m_arq_origem CLIPPED
    
    LET l_tamanho = LENGTH(m_arq_origem)
    
-   LET l_arq_dest = m_arq_origem[1,(l_tamanho-4)],'.prc'
-     
+   LET l_arq_dest = m_arq_origem[1,(l_tamanho-4)]
+
+   LET l_data = EXTEND(m_dat_atu, YEAR TO DAY)
+   LET l_hora = m_hor_atu[1,2],m_hor_atu[4,5],m_hor_atu[7,8]
+   LET l_arq_dest = l_arq_dest CLIPPED,l_data, l_hora,'.prc'
+
    IF m_ies_ambiente = 'W' THEN
       LET l_comando = 'move ', m_arq_origem CLIPPED, ' ', l_arq_dest
    ELSE
@@ -1828,6 +1846,6 @@ END FUNCTION
  FUNCTION pol1393_version_info()
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1393.4gl $|$Revision: 11 $|$Date: 21/08/2020 13:23 $|$Modtime: 26/06/2020 07:40 $" 
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1393.4gl $|$Revision: 13 $|$Date: 17/09/2020 13:23 $|$Modtime: 26/06/2020 07:40 $" 
 
  END FUNCTION

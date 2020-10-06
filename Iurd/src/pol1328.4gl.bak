@@ -236,7 +236,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.121 "
+   LET p_versao = "pol1328-12.00.130 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -777,6 +777,16 @@ END FUNCTION
             
       LET m_dat_recebto = m_dat_emissao
       LET m_dat_vencto  = m_min_dat_venct_ap
+            
+      IF NOT pol1328_checa_per_cont() THEN
+         RETURN FALSE
+      END IF
+
+      IF m_num_seq > 0 THEN
+         UPDATE gi_ad_912 SET cod_situacao = 'C'
+          WHERE id_ad = mr_nota.id_ad
+         CONTINUE FOREACH
+      END IF            
       
       LET l_num_nf = mr_nota.num_nf  USING '<<<<<<<' 
       
@@ -1007,6 +1017,123 @@ END FUNCTION
    RETURN TRUE
    
 END FUNCTION         
+
+#--------------------------------#
+FUNCTION pol1328_checa_per_cont()#
+#--------------------------------#
+   
+   DEFINE l_ano_con           VARCHAR(04),
+          l_mes_con           VARCHAR(2,0),
+          l_ano_mes_con       VARCHAR(06),
+          l_ano_rec           VARCHAR(04),
+          l_mes_rec           VARCHAR(02),
+          l_ano_mes_rec       VARCHAR(06),
+          l_ano_orig          VARCHAR(04),
+          l_mes_orig          VARCHAR(02),
+          l_ano_mes_fec       VARCHAR(06)
+   
+   LET l_ano_rec = YEAR(m_dat_recebto)
+   LET l_mes_rec = MONTH(m_dat_recebto)
+   
+   LET l_mes_rec = l_mes_rec CLIPPED
+   
+   IF LENGTH(l_mes_rec) = 1 THEN
+      LET l_mes_rec = '0',l_mes_rec CLIPPED
+   END IF
+   
+   LET l_ano_mes_rec = l_ano_rec, l_mes_rec
+   
+   SELECT ult_num_per_fech, 
+          ult_num_seg_fech 
+     INTO l_ano_con,
+          l_mes_con
+     FROM par_con 
+    WHERE cod_empresa = p_cod_empresa
+
+   IF STATUS <> 0 THEN 
+      LET m_erro = STATUS USING '<<<<<'
+      LET m_msg = 'Erro de status: ',m_erro
+      LET m_msg = m_msg CLIPPED, ' lendo tabela par_con.'
+      LET m_num_seq = 0
+      RETURN FALSE
+   END IF
+   
+   IF LENGTH(l_mes_con) = 1 THEN
+      LET l_mes_con = '0',l_mes_con
+   END IF
+   
+   LET l_ano_mes_con = l_ano_con, l_mes_con
+
+   IF l_ano_mes_rec <= l_ano_mes_con THEN
+      LET m_msg = 'Modulo contabil fechado para o período'
+      IF NOT pol1328_grava_erro() THEN
+         RETURN FALSE
+      END IF
+   END IF      
+
+   IF mr_nota.ies_gera_nota MATCHES '[FS]' THEN 
+
+      SELECT 
+             substr(area_livre,3,2), 
+             substr(area_livre,5,4)
+        INTO l_mes_orig,
+             l_ano_orig
+        FROM sistemas  
+       WHERE cod_empresa = p_cod_empresa  
+         AND COD_SISTEMA = 'CAP'
+
+      IF STATUS <> 0 THEN 
+         LET m_erro = STATUS USING '<<<<<'
+         LET m_msg = 'Erro de status: ',m_erro
+         LET m_msg = m_msg CLIPPED, ' lendo tabela sistemas.CAP.'
+         LET m_num_seq = 0
+         RETURN FALSE
+      END IF
+
+      LET l_ano_mes_fec = l_ano_orig, l_mes_orig
+
+      IF l_ano_mes_rec <= l_ano_mes_fec THEN
+         LET m_msg = 'Modulo financeiro fechado para o período'
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
+      END IF      
+   
+   END IF
+   
+   IF mr_nota.ies_gera_nota MATCHES '[AS]' THEN 
+
+      SELECT 
+             substr(area_livre,3,2), 
+             substr(area_livre,5,4)
+        INTO l_mes_orig,
+             l_ano_orig
+        FROM sistemas  
+       WHERE cod_empresa = p_cod_empresa  
+         AND COD_SISTEMA = 'SUP'
+
+      IF STATUS <> 0 THEN 
+         LET m_erro = STATUS USING '<<<<<'
+         LET m_msg = 'Erro de status: ',m_erro
+         LET m_msg = m_msg CLIPPED, ' lendo tabela sistemas.CAP.'
+         LET m_num_seq = 0
+         RETURN FALSE
+      END IF
+
+      LET l_ano_mes_fec = l_ano_orig, l_mes_orig
+
+      IF l_ano_mes_rec <= l_ano_mes_fec THEN
+         LET m_msg = 'Modulo suprimento fechado para o período'
+         IF NOT pol1328_grava_erro() THEN
+            RETURN FALSE
+         END IF
+      END IF      
+   
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
     
 #---------------------------#
 FUNCTION pol1328_atu_gi_ad()#
@@ -3462,7 +3589,7 @@ FUNCTION pol1328_insere_ad()#
       SELECT parametro_val  
         INTO mr_nota.num_lote
         FROM sup_par_fornecedor  
-       WHERE empresa = p_cod_empresa 
+       WHERE empresa = 'SE' 
          AND fornecedor = mr_nota.cod_fornecedor
          AND parametro = 'lote_pagamento_forne'
       
@@ -3585,7 +3712,7 @@ FUNCTION pol1328_grv_texto()#
 #---------------------------#
 
    DEFINE l_parametro  RECORD 
-          texto        VARCHAR(255),
+          texto        VARCHAR(4000),
           tam_linha    SMALLINT,
           justificar   CHAR(01)
    END RECORD
@@ -4751,9 +4878,9 @@ FUNCTION pol1328_ins_irrf_pg()#
       LET m_val_irrf = 0
    END IF
    
-   IF m_val_irrf < 10 THEN
-      LET m_val_irrf = 0
-   END IF
+   #IF m_val_irrf < 10 THEN
+   #   LET m_val_irrf = 0
+   #END IF
    
    INITIALIZE mr_reten_irrf_pg TO NULL        
 

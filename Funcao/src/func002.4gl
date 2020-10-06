@@ -1103,3 +1103,13 @@ FUNCTION func002_checa_validade(mr_control) #
      
 END FUNCTION
    
+FUNCTION func002_criptografa(l_texto)
+  
+  DEFINE l_texto    VARCHAR(30),
+         l_md5      VARCHAR(120)
+ 
+  LET l_md5 = LOG_md5(l_texto CLIPPED) 
+ 
+  RETURN l_md5 CLIPPED
+  
+END FUNCTION

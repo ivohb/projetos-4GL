@@ -37,7 +37,8 @@ DEFINE m_execucao                CHAR(01),
        m_msg                     VARCHAR(150),
        g_msg                     VARCHAR(150),
        m_arq_arigem              VARCHAR(150),
-       m_arq_dest                VARCHAR(150)
+       m_arq_dest                VARCHAR(180),
+       m_proc                    SMALLINT
 
 DEFINE ma_files ARRAY[150] OF CHAR(80)
 
@@ -132,9 +133,6 @@ END FUNCTION
 FUNCTION pol1378_menu()#
 #----------------------#
 
-   LET p_versao = "pol1378-12.00.03  "
-   CALL func002_versao_prg(p_versao)
-
    MENU "OPCAO"
       COMMAND "Consultar" "Consulta erros de processamento"
          IF pol1378_consulta() THEN
@@ -145,8 +143,6 @@ FUNCTION pol1378_menu()#
       COMMAND "Processar" "Processa a importação de arquivos"
          CALL pol1378_processa() RETURNING p_status
          ERROR m_msg
-      COMMAND "Sobre" "Exibe a versão do programa"
-         CALL func002_exibe_versao(p_versao)
       COMMAND KEY ("!")
          PROMPT "Digite o comando : " FOR comando
          RUN comando
@@ -258,8 +254,7 @@ FUNCTION pol1378_processa()#
       LET p_user = 'admlog'
    END IF
 
-   LET p_versao = "pol1378-12.00.00  "
-   CALL func002_versao_prg(p_versao)
+   LET p_versao = "pol1378-12.00.06  "
 
    LET g_tipo_sgbd = LOG_getCurrentDBType()
    LET m_nom_arquivo = ' '
@@ -573,6 +568,8 @@ FUNCTION pol1378_carrega_lista()#
    
    INITIALIZE ma_files TO NULL
    
+   LET m_proc = FALSE
+   
    FOR l_ind = 1 TO m_qtd_arq
        LET t_ind = l_ind
        LET ma_files[l_ind] = LOG_file_getFromList(l_ind)
@@ -587,8 +584,30 @@ FUNCTION pol1378_carrega_lista()#
    
    LET m_msg = 'Processamento efetuado com sucesso'
    
+   IF m_proc THEN
+      CALL pol1378_exec_proc()
+   END IF
+   
    RETURN TRUE
    
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1378_exec_proc()#
+#---------------------------#
+   
+   DEFINE l_sql_procedure   VARCHAR(80)
+    
+   CASE g_tipo_sgbd
+      WHEN "MSV" 
+         LET l_sql_procedure = "EXECUTE prc_integ_apon();"
+      WHEN "ORA" 
+         LET l_sql_procedure = "BEGIN prc_integ_apon(); END;"
+      OTHERWISE LET l_sql_procedure = "EXECUTE PROCEDURE prc_integ_apon();"
+   END CASE
+
+   RUN l_sql_procedure
+
 END FUNCTION
 
 #--------------------------#
@@ -648,6 +667,8 @@ FUNCTION pol1378_load_arq()#
    
    CALL LOG_transaction_commit()
    
+   LET m_proc = TRUE
+   
    RETURN TRUE
 
 END FUNCTION
@@ -657,48 +678,34 @@ FUNCTION pol1378_ins_tab_imp()#
 #-----------------------------#
 
    DEFINE  lr_man_tmp           RECORD
-      check_plan                   char(02)       ,       
-      posicao                      integer        ,       
-      num_analise                  integer        ,       
-      inspetor                     char(50)       ,       
-      data_prod                    date           ,       
-      hora_prod                    char(05)       ,       
-      produto                      char (15)      ,       
-      maquina                      char(05)       ,       
-      lado                         char(02)       ,       
-      tamanho                      char(05)       ,       
-      turno                        char(03)       ,       
-      num_lote                     char(15)       ,       
-      cod_item                     char(15)       ,       
-      den_item                     varchar(70)    ,       
-      disposicao                   char(18)       ,       
-      peso_grama                   decimal(15,3)  ,       
-      qtd_sacos                    decimal(15,3)  ,       
-      peso_tot_kg                  decimal(15,3)  ,       
-      peso_medio                   decimal(15,3)  ,       
-      qtd_lote_prod                decimal(15,3)  ,       
-      marcacao                     decimal(15,3)  ,       
-      fur_palm_pun_dedo            decimal(15,3)  ,       
-      esbarrada                    decimal(15,3)  ,       
-      rasgada                      decimal(15,3)  ,       
-      mistura                      decimal(15,3)  ,       
-      prega                        decimal(15,3)  ,       
-      impureza                     decimal(15,3)  ,       
-      cordao_defeito               decimal(15,3)  ,       
-      acumulo                      decimal(15,3)  ,       
-      ponto_fraco                  decimal(15,3)  ,       
-      motivo_Reprova               varchar(50)    ,       
-      obs_marcacao                 varchar(50)    ,       
-      obs_palm_pun_dedo            varchar(50)    ,       
-      obs_esbarrada                varchar(50)    ,       
-      obs_rasgada                  varchar(50)    ,       
-      obs_mistura                  varchar(50)    ,       
-      obs_prega                    varchar(50)    ,       
-      obs_impureza                 varchar(50)    ,       
-      obs_cordao_defeito           varchar(50)    ,       
-      obs_acumulo                  varchar(50)    ,       
-      obs_ponto_fraco              varchar(50)    ,       
-      obs_geral                    varchar(50)            
+           inspetor char(50) ,               
+           data_prod date ,                  
+           hora_prod char(05) ,              
+           produto char (15) ,               
+           maquina char(05) ,                
+           lado char(02) ,                   
+           tamanho char(05) ,                
+           turno char(03) ,                  
+           num_lote char(15) ,               
+           cod_item char(15) ,               
+           den_item varchar(70) ,            
+           disposicao char(18) ,             
+           peso_grama decimal(15,3) ,        
+           qtd_sacos decimal(15,3) ,         
+           peso_tot_kg decimal(15,3) ,       
+           peso_medio decimal(15,3) ,        
+           qtd_lote_prod decimal(15,3) ,     
+           marcacao decimal(15,3) ,          
+           fur_palm_pun_dedo varchar(30) , 
+           esbarrada decimal(15,3) ,         
+           rasgada decimal(15,3) ,           
+           mistura decimal(15,3) ,           
+           prega decimal(15,3) ,             
+           impureza decimal(15,3) ,          
+           cordao_defeito decimal(15,3) ,    
+           acumulo decimal(15,3) ,           
+           qtd_odor decimal(15,3),
+           motivo_Reprova varchar(50)       
    END RECORD
    
    LET m_reg_proces = 0
@@ -764,7 +771,7 @@ END FUNCTION
 FUNCTION pol1378_move_arquivo()#
 #------------------------------#
    
-   DEFINE l_comando        CHAR(150)
+   DEFINE l_comando        CHAR(220)
           
    IF m_ies_ambiente = 'W' THEN
       LET l_comando = 'move ', m_arq_arigem CLIPPED, ' ', m_arq_dest
@@ -783,4 +790,18 @@ FUNCTION pol1378_move_arquivo()#
    RETURN TRUE
 
 END FUNCTION   
+
+#--------FIM DO PROGRAMA--------#
+
+
+
+#---CONTROLE DE VERSÃO---LOG1700#
+
+#-------------------------------#
+ FUNCTION pol1378_version_info()
+#-------------------------------#
+
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/pol1378.4gl $|$Revision: 05 $|$Date: 29/09/2020 16:45 $|$Modtime: 28/09/2020 16:45 $" 
+
+ END FUNCTION
           

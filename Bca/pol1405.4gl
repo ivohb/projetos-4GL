@@ -1,0 +1,772 @@
+#-------------------------------------------------------------------#
+# SISTEMA.: LOGIX      BCA                                          #
+# PROGRAMA: pol1405                                                 #
+# OBJETIVO: TEXTO DO ITEM DO PEDIDO                                 #
+# AUTOR...: IVO                                                     #
+# DATA....: 125/09/2020                                             #
+#-------------------------------------------------------------------#
+# Alterações                                                        #
+#-------------------------------------------------------------------#
+
+DATABASE logix
+
+GLOBALS
+    DEFINE p_cod_empresa   LIKE empresa.cod_empresa,
+           p_user          LIKE usuarios.cod_usuario,
+           p_status        SMALLINT,
+           p_den_empresa   VARCHAR(36),
+           p_versao        CHAR(18),
+           g_tipo_sgbd     CHAR(003),
+           g_msg           CHAR(150),
+           p_nom_arquivo   CHAR(100),
+           p_caminho       CHAR(080)
+END GLOBALS
+
+DEFINE m_dialog          VARCHAR(10),
+       m_statusbar       VARCHAR(10),
+       m_pnl_cabec       VARCHAR(10),
+       m_pnl_item        VARCHAR(10),
+       m_pnl_texto       VARCHAR(10),
+       m_brz_item        VARCHAR(10),
+       m_brz_texto       VARCHAR(10)
+
+DEFINE m_pedido          VARCHAR(10),
+       m_dat_de          VARCHAR(10),
+       m_dat_ate         VARCHAR(10),
+       m_cliente         VARCHAR(10),
+       m_zoom_ped        VARCHAR(10)
+       
+DEFINE mr_cabec          RECORD
+       num_pedido        LIKE pedidos.num_pedido,
+       cod_cliente       LIKE clientes.cod_cliente,
+       nom_cliente       LIKE clientes.nom_cliente
+END RECORD       
+
+DEFINE ma_item          ARRAY[1000] OF RECORD
+       num_sequencia    LIKE ped_itens.num_sequencia,
+       cod_item         LIKE item.cod_item,
+       den_item         LIKE item.den_item_reduz,
+       prz_entrega      LIKE ped_itens.prz_entrega,
+       qtd_saldo        LIKE ped_itens.qtd_pecas_solic,
+       ies_select       CHAR(01)
+END RECORD
+
+DEFINE ma_texto         ARRAY[5] OF RECORD
+       den_texto        LIKE ped_itens_texto.den_texto_1
+END RECORD
+
+DEFINE m_msg           CHAR(150),
+       m_carregando    SMALLINT,
+       m_ies_info      SMALLINT,
+       m_count         INTEGER,
+       m_cod_cliente   CHAR(15),
+       m_cod_item      CHAR(15),
+       m_index         INTEGER,
+       m_num_seq       INTEGER,
+       m_lin_atu       INTEGER
+
+       
+#-----------------#
+FUNCTION pol1405()#
+#-----------------#
+          
+   IF LOG_initApp("PADRAO") <> 0 THEN
+      RETURN
+   END IF
+
+   #CALL LOG_connectDatabase("DEFAULT")
+
+   WHENEVER ANY ERROR CONTINUE
+   SET ISOLATION TO DIRTY READ
+   SET LOCK MODE TO WAIT 300
+   
+   LET g_tipo_sgbd = LOG_getCurrentDBType()
+   LET p_versao = "pol1405-12.00.02  "
+   #CALL func002_versao_prg(p_versao)
+   CALL pol1405_menu()
+    
+END FUNCTION
+
+#----------------------#
+FUNCTION pol1405_menu()#
+#----------------------#
+
+    DEFINE l_menubar     VARCHAR(10),
+           l_panel       VARCHAR(10),
+           l_inform      VARCHAR(10),
+           l_update      VARCHAR(10),
+           l_select      VARCHAR(10),
+           l_titulo      CHAR(80)
+    
+    LET l_titulo = "TEXTO DO ITEM DO PEDIDO - ",p_versao
+    
+    LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
+    CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)
+    CALL _ADVPL_set_property(m_dialog,"TITLE",l_titulo)
+    CALL _ADVPL_set_property(m_dialog,"ENABLE_ESC_CLOSE",FALSE)
+    CALL _ADVPL_set_property(m_dialog,"FORM_NAME",p_versao)
+    
+    LET m_statusbar = _ADVPL_create_component(NULL,"LSTATUSBAR",m_dialog)
+
+    LET l_menubar = _ADVPL_create_component(NULL,"LMENUBAR",m_dialog)
+    CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
+
+    LET l_inform = _ADVPL_create_component(NULL,"LINFORMBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_inform,"EVENT","pol1405_informar")
+    CALL _ADVPL_set_property(l_inform,"CONFIRM_EVENT","pol1405_info_conf")
+    CALL _ADVPL_set_property(l_inform,"CANCEL_EVENT","pol1405_info_canc")
+
+    LET l_update = _ADVPL_create_component(NULL,"LUPDATEBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_update,"EVENT","pol1405_update")
+    CALL _ADVPL_set_property(l_update,"CONFIRM_EVENT","pol1405_update_conf")
+    CALL _ADVPL_set_property(l_update,"CANCEL_EVENT","pol1405_update_canc")
+
+    {LET l_select = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
+    CALL _ADVPL_set_property(l_select,"IMAGE","SELECIONAR_OPCAO")     
+    CALL _ADVPL_set_property(l_select,"TYPE","N_CONFIRM")     
+    CALL _ADVPL_set_property(l_select,"TOOLTIP","Selecionar item para edição")
+    CALL _ADVPL_set_property(l_select,"EVENT","pol1405_select")}
+
+   CALL _ADVPL_create_component(NULL,"LQUITBUTTON",l_menubar)
+
+   LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_dialog)
+   CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+
+   CALL pol1405_cabec(l_panel)
+   CALL pol1405_item(l_panel)
+   CALL pol1405_texto(l_panel)
+
+   CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
+
+END FUNCTION
+
+#----------------------------------#
+FUNCTION pol1405_cabec(l_container)#
+#----------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_panel           VARCHAR(10),
+           l_label           VARCHAR(10),
+           l_cliente         VARCHAR(10),
+           l_descricao       VARCHAR(10),
+           l_menubar         VARCHAR(10),
+           l_lupa_ped        VARCHAR(10)
+
+    LET m_pnl_cabec = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(m_pnl_cabec,"ALIGN","TOP")
+    CALL _ADVPL_set_property(m_pnl_cabec,"HEIGHT",40)
+    CALL _ADVPL_set_property(m_pnl_cabec,"BACKGROUND_COLOR",231,231,237)
+    CALL _ADVPL_set_property(m_pnl_cabec,"ENABLE",FALSE)
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cabec)
+    CALL _ADVPL_set_property(l_label,"POSITION",20,15)     
+    CALL _ADVPL_set_property(l_label,"TEXT","Pedido:")    
+
+    LET m_pedido = _ADVPL_create_component(NULL,"LNUMERICFIELD",m_pnl_cabec)
+    CALL _ADVPL_set_property(m_pedido,"POSITION",100,15)     
+    CALL _ADVPL_set_property(m_pedido,"LENGTH",10)
+    CALL _ADVPL_set_property(m_pedido,"VARIABLE",mr_cabec,"num_pedido")
+    CALL _ADVPL_set_property(m_pedido,"VALID","pol1405_chec_pedido")
+
+    LET l_lupa_ped = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pnl_cabec)
+    CALL _ADVPL_set_property(l_lupa_ped,"POSITION",190,15)     
+    CALL _ADVPL_set_property(l_lupa_ped,"IMAGE","BTPESQ")
+    CALL _ADVPL_set_property(l_lupa_ped,"SIZE",24,20)
+    CALL _ADVPL_set_property(l_lupa_ped,"CLICK_EVENT","pol1405_pedido_zoom")
+    
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pnl_cabec)
+    CALL _ADVPL_set_property(l_label,"POSITION",260,15)     
+    CALL _ADVPL_set_property(l_label,"TEXT","Cliente:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET l_cliente = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pnl_cabec)
+    CALL _ADVPL_set_property(l_cliente,"POSITION",320,15)     
+    CALL _ADVPL_set_property(l_cliente,"LENGTH",15)
+    CALL _ADVPL_set_property(l_cliente,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(l_cliente,"VARIABLE",mr_cabec,"cod_cliente")
+    CALL _ADVPL_set_property(l_cliente,"CAN_GOT_FOCUS",FALSE)
+    
+    LET l_descricao = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pnl_cabec)
+    CALL _ADVPL_set_property(l_descricao,"POSITION",470,15)     
+    CALL _ADVPL_set_property(l_descricao,"LENGTH",36) 
+    CALL _ADVPL_set_property(l_descricao,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(l_descricao,"VARIABLE",mr_cabec,"nom_cliente")
+    CALL _ADVPL_set_property(l_descricao,"CAN_GOT_FOCUS",FALSE)
+
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1405_item(l_container)#
+#---------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_panel           VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_tabcolumn       VARCHAR(10)
+
+    LET m_pnl_item= _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(m_pnl_item,"ALIGN","LEFT")
+  
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",m_pnl_item)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",1) 
+    CALL _ADVPL_set_property(l_layout,"EXPANSIBLE",TRUE) 
+   
+    LET m_brz_item = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
+    CALL _ADVPL_set_property(m_brz_item,"ALIGN","CENTER")
+    CALL _ADVPL_set_property(m_brz_item,"BEFORE_ROW_EVENT","pol1405_item_before_row")
+    
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Seq")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","num_sequencia")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Item")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_item")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",200)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_item")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Entrega")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","prz_entrega")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Saldo")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","qtd_saldo")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
+    CALL _ADVPL_set_property(l_tabcolumn,"IMAGE_HEADER","UNCHECKED")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Sel")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",50)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","ies_select")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LCHECKBOX")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","VALUE_CHECKED",'S')
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","VALUE_NCHECKED",'N')
+    CALL _ADVPL_set_property(l_tabcolumn,"AFTER_EDIT_EVENT","pol1405_sel_row")
+
+    CALL _ADVPL_set_property(m_brz_item,"SET_ROWS",ma_item,1)
+    CALL _ADVPL_set_property(m_brz_item,"CAN_REMOVE_ROW",FALSE)
+    CALL _ADVPL_set_property(m_brz_item,"CAN_ADD_ROW",FALSE)
+    CALL _ADVPL_set_property(m_brz_item,"EDITABLE",FALSE)
+
+END FUNCTION
+
+#----------------------------------#
+FUNCTION pol1405_texto(l_container)#
+#----------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_panel           VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_tabcolumn       VARCHAR(10)
+
+    LET m_pnl_texto = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(m_pnl_texto,"ALIGN","CENTER")
+  
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",m_pnl_texto)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",1) 
+    CALL _ADVPL_set_property(l_layout,"EXPANSIBLE",TRUE) 
+   
+    LET m_brz_texto = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
+    CALL _ADVPL_set_property(m_brz_texto,"ALIGN","CENTER")
+    #CALL _ADVPL_set_property(m_brz_texto,"BEFORE_ROW_EVENT","pol1405_txt_before_row")
+    
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_texto)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Texto")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_texto")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LTEXTFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","LENGTH",76)
+    #CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","PICTURE","@!")    
+
+    CALL _ADVPL_set_property(m_brz_texto,"SET_ROWS",ma_texto,1)
+    CALL _ADVPL_set_property(m_brz_texto,"CAN_REMOVE_ROW",FALSE)
+    CALL _ADVPL_set_property(m_brz_texto,"CAN_ADD_ROW",FALSE)
+    CALL _ADVPL_set_property(m_brz_texto,"EDITABLE",FALSE)
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1405_chec_pedido()#
+#-----------------------------#
+
+   LET m_msg = NULL
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+
+   IF mr_cabec.num_pedido IS NULL OR mr_cabec.num_pedido = 0 THEN
+      LET m_msg = 'Informe o pedido.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_pedido,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1405_le_pedidos() THEN
+      RETURN FALSE
+   END IF 
+
+   IF NOT pol1405_le_clientes() THEN
+      RETURN FALSE
+   END IF 
+      
+   RETURN TRUE
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1405_le_pedidos()#
+#----------------------------#
+   
+   DEFINE l_ies_situa   CHAR(01)
+   
+   SELECT cod_cliente, 
+          ies_sit_pedido
+     INTO mr_cabec.cod_cliente,
+          l_ies_situa
+     FROM pedidos
+    WHERE cod_empresa = p_cod_empresa
+      AND num_pedido = mr_cabec.num_pedido
+
+   IF STATUS = 100 THEN
+      LET m_msg = 'Pedido não existe.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   ELSE
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','pedidos')
+         RETURN FALSE
+      END IF
+   END IF
+   
+   IF l_ies_situa = '9' THEN
+      LET m_msg = 'Pedido cancelado.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION    
+
+#-----------------------------#
+FUNCTION pol1405_le_clientes()#
+#-----------------------------#
+   
+   DEFINE l_ies_situa   CHAR(01)
+   
+   SELECT nom_cliente
+     INTO mr_cabec.nom_cliente
+     FROM clientes
+    WHERE cod_cliente = mr_cabec.cod_cliente
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','pedidos')
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION    
+
+#-----------------------------#
+FUNCTION pol1405_pedido_zoom()#
+#-----------------------------#
+
+    DEFINE l_pedido         LIKE pedidos.num_pedido,
+           l_cliente        LIKE pedidos.cod_cliente,
+           l_where_clause   CHAR(300)
+    
+    IF m_zoom_ped IS NULL THEN
+       LET m_zoom_ped = _ADVPL_create_component(NULL,"LZOOMMETADATA")
+       CALL _ADVPL_set_property(m_zoom_ped,"ZOOM","zoom_pedidos")
+    END IF
+
+    LET l_where_clause = " pedidos.cod_empresa = '",p_cod_empresa CLIPPED,"' "
+    CALL LOG_zoom_set_where_clause(l_where_clause CLIPPED)
+    
+    CALL _ADVPL_get_property(m_zoom_ped,"ACTIVATE")
+    
+    LET l_pedido  = _ADVPL_get_property(m_zoom_ped,"RETURN_BY_TABLE_COLUMN","pedidos","num_pedido")
+    LET l_cliente = _ADVPL_get_property(m_zoom_ped,"RETURN_BY_TABLE_COLUMN","pedidos","cod_cliente")
+
+    IF l_pedido IS NOT NULL THEN
+       LET mr_cabec.num_pedido = l_pedido
+       LET mr_cabec.cod_cliente = l_cliente
+    END IF        
+
+   CALL _ADVPL_set_property(m_pedido,"GET_FOCUS")
+       
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1405_limpa_campos()#
+#------------------------------#
+   
+   INITIALIZE mr_cabec.* TO NULL
+   INITIALIZE ma_item TO NULL
+   INITIALIZE ma_texto TO NULL
+   LET m_carregando = TRUE
+   LET m_ies_info = FALSE
+   CALL _ADVPL_set_property(m_brz_item,"CLEAR")
+   CALL _ADVPL_set_property(m_brz_texto,"CLEAR")
+
+END FUNCTION   
+
+#------------------------------------#
+FUNCTION pol1405_set_compon(l_status)#
+#------------------------------------#
+   
+   DEFINE l_status SMALLINT
+      
+   CALL _ADVPL_set_property(m_pnl_cabec,"ENABLE",l_status)      
+
+END FUNCTION
+   
+#--------------------------#
+FUNCTION pol1405_informar()#
+#--------------------------#
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+
+   CALL pol1405_limpa_campos()
+   CALL pol1405_set_compon(TRUE)
+   CALL _ADVPL_set_property(m_pedido,"GET_FOCUS")
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1405_info_canc()#
+#---------------------------#
+
+   CALL pol1405_limpa_campos()
+   CALL pol1405_set_compon(FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1405_info_conf()#
+#---------------------------#
+
+   IF mr_cabec.num_pedido IS NULL THEN
+      LET m_msg = 'Informe os parâmetros previamente.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   SELECT COUNT(*) INTO m_count
+     FROM ped_itens
+    WHERE cod_empresa = p_cod_empresa
+      AND num_pedido = mr_cabec.num_pedido
+      AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel) > 0
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','ped_itens')
+      RETURN FALSE
+   END IF
+   
+   IF m_count = 0 THEN
+      LET m_msg = 'Pedido não tem item com saldo a faturar.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+
+   LET p_status = LOG_progresspopup_start(
+       "Lendo dados...","pol1405_le_itens","PROCESS")  
+   
+   IF NOT p_status THEN
+      RETURN FALSE
+   END IF
+       
+   LET m_carregando = FALSE
+   LET m_ies_info = TRUE
+
+   CALL pol1405_set_compon(FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------#
+FUNCTION pol1405_le_itens()#
+#--------------------------#
+
+   DEFINE l_progres        SMALLINT
+
+   INITIALIZE ma_item TO NULL
+   CALL _ADVPL_set_property(m_brz_item,"CLEAR")
+
+   CALL LOG_progresspopup_set_total("PROCESS",m_count)
+
+   LET m_index = 1
+   
+   DECLARE cq_itens CURSOR FOR
+    SELECT num_sequencia,
+           cod_item,
+           prz_entrega,
+           (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel)
+      FROM ped_itens
+     WHERE cod_empresa = p_cod_empresa
+       AND num_pedido = mr_cabec.num_pedido
+       AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel) > 0
+   
+   FOREACH cq_itens INTO
+      ma_item[m_index].num_sequencia,
+      ma_item[m_index].cod_item,
+      ma_item[m_index].prz_entrega,
+      ma_item[m_index].qtd_saldo
+   
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','ped_itens:cq_itens')
+         RETURN FALSE
+      END IF
+
+      LET l_progres = LOG_progresspopup_increment("PROCESS")
+      
+      SELECT den_item_reduz
+        INTO ma_item[m_index].den_item
+        FROM item
+       WHERE cod_empresa = p_cod_empresa
+         AND cod_item = ma_item[m_index].cod_item
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','item:cq_itens')
+         RETURN FALSE
+      END IF
+      
+      LET ma_item[m_index].ies_select = 'N'
+      
+      LET m_index = m_index + 1
+        
+      IF m_index > 1000 THEN
+         LET m_msg = 'Limite de linha de itens ultrapassou.\n',
+                     'Serão exibidos apenas 1000 itens.'
+         CALL log0030_mensagem(m_msg,'info')
+         EXIT FOREACH
+      END IF
+      
+   END FOREACH
+   
+   LET m_index = m_index - 1
+   CALL _ADVPL_set_property(m_brz_item,"ITEM_COUNT", m_index)
+   LET m_num_seq = ma_item[1].num_sequencia
+
+   IF NOT pol1405_le_textos() THEN
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1405_le_textos()#
+#---------------------------# 
+   
+   INITIALIZE ma_texto TO NULL
+  # CALL _ADVPL_set_property(m_brz_texto,"CLEAR")
+   
+   SELECT den_texto_1,
+          den_texto_2,
+          den_texto_3,
+          den_texto_4,
+          den_texto_5
+     INTO ma_texto[1].den_texto,
+          ma_texto[2].den_texto,
+          ma_texto[3].den_texto,
+          ma_texto[4].den_texto,
+          ma_texto[5].den_texto
+     FROM ped_itens_texto 
+    WHERE cod_empresa = p_cod_empresa
+      AND num_pedido = mr_cabec.num_pedido
+      AND num_sequencia = m_num_seq
+
+   IF STATUS <> 0 AND STATUS <> 100 THEN
+      CALL log003_err_sql('SELECT','ped_itens_texto:cq_itens')
+      RETURN FALSE
+   END IF
+   
+   CALL _ADVPL_set_property(m_brz_texto,"ITEM_COUNT", 5)
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1405_item_before_row()#
+#---------------------------------#
+
+   IF m_carregando THEN
+      RETURN TRUE
+   END IF
+   
+   #CALL _ADVPL_set_property(m_brz_pedido,"CLEAR_ALL_LINE_FONT_COLOR")
+   
+   IF m_lin_atu IS NOT NULL AND m_lin_atu > 0 THEN
+      LET m_lin_atu = _ADVPL_get_property(m_brz_item,"ROW_SELECTED")         
+      LET m_num_seq = ma_item[m_lin_atu].num_sequencia
+      IF m_num_seq > 0 THEN
+         CALL pol1405_le_textos() RETURNING p_status
+      END IF
+   END IF
+    
+   RETURN TRUE
+   
+END FUNCTION
+
+#------------------------#
+FUNCTION pol1405_sel_row()#
+#------------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   LET m_lin_atu = _ADVPL_get_property(m_brz_item,"ROW_SELECTED")
+
+   IF ma_item[m_lin_atu].ies_select = 'N' then
+      RETURN FALSE
+   END IF
+
+   LET m_num_seq = ma_item[m_lin_atu].num_sequencia
+   
+   CALL _ADVPL_set_property(m_brz_item,"EDITABLE",FALSE)
+   CALL _ADVPL_set_property(m_pnl_item,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_brz_texto,"EDITABLE",TRUE)
+   CALL _ADVPL_set_property(m_brz_texto,"SELECT_ITEM",1,1)
+
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------#
+FUNCTION pol1405_update()#
+#------------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF NOT m_ies_info THEN
+      LET m_msg = 'Infome o pedido previamente.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   CALL _ADVPL_set_property(m_brz_item,"EDITABLE",TRUE)
+   CALL _ADVPL_set_property(m_brz_item,"SELECT_ITEM",1,6)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1405_update_canc()#
+#-----------------------------#
+
+   CALL pol1405_seta_conpons()
+      
+   IF NOT pol1405_le_textos() THEN
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1405_seta_conpons()#
+#------------------------------#
+
+   CALL _ADVPL_set_property(m_brz_item,"EDITABLE",FALSE)
+   CALL _ADVPL_set_property(m_pnl_item,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_brz_texto,"EDITABLE",FALSE)
+
+   LET ma_item[m_lin_atu].ies_select = 'N'
+   CALL _ADVPL_set_property(m_brz_item,"COLUMN_VALUE","ies_select",m_lin_atu,'N')
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1405_update_conf()#
+#-----------------------------#
+
+   CALL LOG_transaction_begin()
+   
+   IF NOT pol1405_grava() THEN
+      CALL LOG_transaction_rollback()
+      RETURN FALSE
+   END IF
+   
+   CALL LOG_transaction_commit()
+
+   CALL pol1405_seta_conpons()
+
+   RETURN TRUE
+
+END FUNCTION
+
+#-----------------------#
+FUNCTION pol1405_grava()#
+#-----------------------#
+
+   SELECT 1 
+     FROM ped_itens_texto 
+    WHERE cod_empresa = p_cod_empresa
+      AND num_pedido = mr_cabec.num_pedido
+      AND num_sequencia = m_num_seq
+
+   IF STATUS = 0 THEN
+      UPDATE ped_itens_texto
+         SET den_texto_1 = ma_texto[1].den_texto,
+             den_texto_2 = ma_texto[2].den_texto,
+             den_texto_3 = ma_texto[3].den_texto,
+             den_texto_4 = ma_texto[4].den_texto,
+             den_texto_5 = ma_texto[5].den_texto
+       WHERE cod_empresa = p_cod_empresa
+         AND num_pedido = mr_cabec.num_pedido
+         AND num_sequencia = m_num_seq
+   ELSE
+      IF STATUS = 100 THEN
+         INSERT INTO ped_itens_texto
+         VALUES(p_cod_empresa, mr_cabec.num_pedido, m_num_seq,
+                ma_texto[1].den_texto, ma_texto[2].den_texto,
+                ma_texto[3].den_texto, ma_texto[4].den_texto,
+                ma_texto[5].den_texto)
+      ELSE
+         CALL log003_err_sql('SELECT','ped_itens_texto:grava')
+         RETURN FALSE
+      END IF
+   END IF
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('GRAVANDO','ped_itens_texto:grava')
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+
+
+
+#--------FIM DO PROGRAMA--------#
+
+
+
+#---CONTROLE DE VERSÃO---LOG1700#
+
+#-------------------------------#
+ FUNCTION pol1405_version_info()
+#-------------------------------#
+
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/pol1405.4gl $|$Revision: 01 $|$Date: 30/09/2020 09:21 $|$Modtime: 28/09/2020 16:45 $" 
+
+ END FUNCTION
+   

@@ -584,6 +584,9 @@ FUNCTION pol1400_le_docum_lembre()#
          RETURN FALSE
       END IF
 
+      DELETE FROM mensagem_envio_912
+       WHERE cod_cliente = m_cod_cliente       
+
       IF l_le_email THEN
          LET l_le_email = FALSE
          LET m_email_ok = TRUE

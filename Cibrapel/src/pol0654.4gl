@@ -65,7 +65,7 @@ MAIN
 
    CALL log001_acessa_usuario("VDP","LIC_LIB")
       RETURNING p_status, p_cod_empresa, p_user
-      
+         
    IF p_status = 0  THEN
       CALL pol0654_controle()
    END IF

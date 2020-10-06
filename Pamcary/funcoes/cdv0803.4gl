@@ -139,7 +139,7 @@ END GLOBALS
    DEFINE m_usuario_aprovante  LIKE usuario.nom_usuario
 
 #----------------------------------------------------------------------------------------#
- FUNCTION cdv0803_email_aprov_eletronica(l_dispara_email, l_progr_aprov_eletr,
+ FUNCTION cdv0803_envia_email_aprov_eletronica(l_dispara_email, l_progr_aprov_eletr,
                                                l_ies_aprov_aut, l_num_viagem, l_num_ad,
                                                l_num_ap, l_status)
 #----------------------------------------------------------------------------------------#
@@ -551,7 +551,7 @@ END FUNCTION
     CALL log006_exibe_teclas("01 02 03",m_versao_funcao)
     CURRENT WINDOW IS w_cap02217
 
-    CALL cdv0803_dados_email_aprov() RETURNING g_text_email_aprov1, g_text_email_aprov2
+    CALL cdv0803_busca_dados_email_aprov() RETURNING g_text_email_aprov1, g_text_email_aprov2
 
     INPUT g_text_email_aprov1, g_text_email_aprov2 WITHOUT DEFAULTS
       FROM text_email_aprov1,   text_email_aprov2
@@ -740,7 +740,7 @@ END FUNCTION
 END FUNCTION
 
 #-----------------------------------------#
- FUNCTION cdv0803_dados_email_aprov()
+ FUNCTION cdv0803_busca_dados_email_aprov()
 #-----------------------------------------#
  DEFINE l_text_1, l_text_2    CHAR(70)
 

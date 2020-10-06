@@ -25,7 +25,9 @@ DEFINE texto        VARCHAR(4000),
 
 DEFINE num_carac    SMALLINT,
        ret          VARCHAR(200),
-       p_ind        INTEGER
+       p_ind        INTEGER,
+       m_ind        integer
+
 
 #----------------------------------------#
  FUNCTION func024_quebrar_texto(parametro)
@@ -81,7 +83,7 @@ FUNCTION func024_cria_tab_txt()#
 
    DROP TABLE w_txt_observ;
    
-   CREATE TABLE w_txt_observ (
+   CREATE TEMP TABLE w_txt_observ (
     num_seq        INTEGER,
     texto          CHAR(400)
    );
@@ -106,7 +108,6 @@ END FUNCTION
 #------------------------------#
    
    DEFINE den_txt       VARCHAR(400),
-          m_ind         integer,
           lenf          integer
           
    LET lenf = LENGTH(texto)
@@ -116,6 +117,8 @@ END FUNCTION
    IF resto > 0 THEN 
       LET qtd_linha = qtd_linha + 1
    END IF
+   
+   LET qtd_linha = 1000
    
    DELETE FROM w_txt_observ
    
@@ -149,12 +152,14 @@ FUNCTION func024_quebra_texto()
    LET texto = texto CLIPPED
    LET num_carac = LENGTH(texto)
    IF num_carac = 0 THEN
+      LET m_ind = qtd_linha
       RETURN ''
    END IF
    
    IF num_carac <= tam_linha THEN
       LET ret = texto CLIPPED
       INITIALIZE texto TO NULL
+      LET m_ind = qtd_linha
       RETURN(ret)
    END IF
    

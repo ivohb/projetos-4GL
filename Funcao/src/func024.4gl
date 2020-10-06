@@ -25,7 +25,9 @@ DEFINE texto        VARCHAR(4000),
 
 DEFINE num_carac    SMALLINT,
        ret          VARCHAR(200),
-       p_ind        INTEGER
+       p_ind        INTEGER,
+       m_ind        integer
+
 
 #----------------------------------------#
  FUNCTION func024_quebrar_texto(parametro)
@@ -106,8 +108,8 @@ END FUNCTION
 #------------------------------#
    
    DEFINE den_txt       VARCHAR(400),
-          m_ind         integer,
-          lenf          integer
+          lenf          integer,
+          l_ind         integer
           
    LET lenf = LENGTH(texto)
    LET qtd_linha = lenf / tam_linha
@@ -117,18 +119,23 @@ END FUNCTION
       LET qtd_linha = qtd_linha + 1
    END IF
    
+   LET qtd_linha = 1000
+   
    DELETE FROM w_txt_observ
    
    IF STATUS <> 0 THEN
       RETURN FALSE
    END IF
-
+   
+   LET l_ind = 0
+   
    FOR m_ind = 1 TO qtd_linha
        
        IF texto IS NOT NULL THEN
           LET den_txt = func024_quebra_texto()
+          LET l_ind = l_ind + 1
           INSERT INTO w_txt_observ
-           VALUES(m_ind, den_txt)
+           VALUES(l_ind, den_txt)
           IF STATUS <> 0 THEN
              RETURN FALSE
           END IF           
@@ -149,12 +156,14 @@ FUNCTION func024_quebra_texto()
    LET texto = texto CLIPPED
    LET num_carac = LENGTH(texto)
    IF num_carac = 0 THEN
+      LET m_ind = qtd_linha
       RETURN ''
    END IF
    
    IF num_carac <= tam_linha THEN
       LET ret = texto CLIPPED
       INITIALIZE texto TO NULL
+      LET m_ind = qtd_linha
       RETURN(ret)
    END IF
    

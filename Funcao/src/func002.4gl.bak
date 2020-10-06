@@ -241,7 +241,7 @@ FUNCTION func002_tira_formato(l_conteudo)#--#
 		
 		FOR l_ind = 1 TO LENGTH(l_conteudo)
 		    LET l_dig = l_conteudo[l_ind]
-		    IF l_dig MATCHES "[.,/-:]"  THEN
+		    IF l_dig MATCHES "[.,-:]"  THEN
 		    ELSE
 		       LET l_retorno = l_retorno CLIPPED, l_dig
 		    END IF

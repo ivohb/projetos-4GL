@@ -1102,4 +1102,89 @@ FUNCTION func002_checa_validade(mr_control) #
    RETURN TRUE
      
 END FUNCTION
-   
+
+#-------------------------------------------#
+#Criptografa o texto no padrão MD5          #
+#-------------------------------------------#
+# Parâmetro: texto a ser criptografado      #
+# Retorno: texto criptografado              #
+#-------------------------------------------#
+#------------------------------------#   
+FUNCTION func002_criptografa(l_texto)#
+#------------------------------------#   
+  
+  DEFINE l_texto    VARCHAR(30),
+         l_md5      VARCHAR(120)
+ 
+  LET l_md5 = LOG_md5(l_texto CLIPPED) 
+ 
+  RETURN l_md5 CLIPPED
+  
+END FUNCTION
+
+#-------------------------------------------#
+#Verifica se a senha contém pelo menos uma, #
+# letra, um número e um carcatere especial  #
+#-------------------------------------------#
+# Parâmetro: senha                          #
+# Retorno: True: senha forte                #
+#       ou False: senha fraca               #
+#-------------------------------------------#
+FUNCTION func002_validaSenha(l_senha) 
+#-------------------------------------------#
+		
+		DEFINE  l_senha    VARCHAR(15),
+		        l_ind      INTEGER,
+		        l_tamanho  INTEGER,
+		        l_digito   CHAR(01),
+		        l_maiusc   INTEGER,
+		        l_minusc   INTEGER,
+		        l_numero   INTEGER,
+		        l_especial INTEGER
+		        
+		LET l_tamanho = LENGTH(l_senha CLIPPED)
+
+		IF l_tamanho < 4 OR l_tamanho > 15  THEN
+			RETURN FALSE
+    END IF		
+				
+		LET l_maiusc = 0;
+		LET l_minusc = 0
+		LET l_numero = 0;
+		LET l_especial = 0;
+		
+		FOR l_ind = 1 TO l_tamanho
+			
+			LET l_digito = l_senha[l_ind]
+			CALL log0030_mensagem(l_digito,'info')
+			IF l_digito MATCHES "[ABCDEFGHIJKLMNOPQRSTUVWXYZ]"  THEN
+			   LET l_maiusc = l_maiusc + 1
+			ELSE
+   			 IF l_digito MATCHES "[0123456789]"  THEN
+		   	    LET l_numero = l_numero + 1
+    		 ELSE
+   			    IF l_digito MATCHES "[!@#$%&*()+?<>{}=-_|.,;:]"  THEN
+		   	       LET l_especial = l_especial + 1
+            ELSE
+  			       IF l_digito MATCHES "[abcdefghijklmnopqrstuvwxyz]"  THEN
+			            LET l_minusc = l_minusc + 1
+			         END IF
+		   	    END IF
+		   	 END IF
+		  END IF
+		  
+	 END FOR	 
+	 
+	 CALL log0030_mensagem(l_maiusc,'info')
+	 CALL log0030_mensagem(l_numero,'info')
+	 CALL log0030_mensagem(l_especial,'info')
+	 CALL log0030_mensagem(l_minusc,'info')
+	 
+   IF l_maiusc = 0 OR l_numero = 0 OR l_especial = 0 OR l_minusc = 0 THEN
+			RETURN FALSE
+   END IF
+		
+   RETURN TRUE
+
+END FUNCTION
+

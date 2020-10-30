@@ -24,3 +24,71 @@ GLOBALS
           m_caminho              CHAR(150),
           g_tipo_sgbd            CHAR(003)
 END GLOBALS
+
+MAIN   
+
+   
+   CALL log0180_conecta_usuario()
+         
+   CALL log001_acessa_usuario("ESPEC999","")
+        RETURNING p_status, p_cod_empresa, p_user
+   
+   IF p_status = 0 THEN    
+      CALL pol1397_controle()
+   END IF
+         
+END MAIN
+
+#--------------------------#
+FUNCTION pol1397_controle()#
+#--------------------------#
+
+END FUNCTION
+
+FUNCTION vdp30100y_after_processar(l_empresa, l_roma)
+
+   DEFINE l_empresa VARCHAR(02),
+          l_roma    INTEGER
+          
+   CALL log0030_mensagem(l_empresa,'info')
+   CALL log0030_mensagem(l_roma,'info')
+
+END FUNCTION
+
+#---------------------------------------------------#
+FUNCTION man100211y_after_incluir(l_empresa, l_item)#
+#---------------------------------------------------#
+   
+   DEFINE l_empresa VARCHAR(02),
+          l_item    VARCHAR(15)
+          
+   CALL log0030_mensagem(l_empresa,'info')
+   CALL log0030_mensagem(l_item,'info')
+
+END FUNCTION
+
+#-----------------------------------------------------#
+FUNCTION man100211y_after_modificar(l_empresa, l_item)#
+#-----------------------------------------------------#
+   
+   DEFINE l_empresa VARCHAR(02),
+          l_item    VARCHAR(15)
+          
+   CALL log0030_mensagem(l_empresa,'info')
+   CALL log0030_mensagem(l_item,'info')
+
+END FUNCTION
+
+#---------------------------------------------------#
+FUNCTION man100211y_after_excluir(l_empresa, l_item)#
+#---------------------------------------------------#
+   
+   DEFINE l_empresa VARCHAR(02),
+          l_item    VARCHAR(15)
+          
+   CALL log0030_mensagem(l_empresa,'info')
+   CALL log0030_mensagem(l_item,'info')
+
+END FUNCTION
+
+   

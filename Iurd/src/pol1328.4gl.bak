@@ -236,7 +236,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.130 "
+   LET p_versao = "pol1328-12.00.131 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -1281,6 +1281,13 @@ FUNCTION pol1328_consiste_ad()#
    
    IF mr_nota.val_tot_nf = 0 THEN
       LET m_msg = 'O valor total do campo gi_ad_912.val_tot_nf está com zero.'
+      IF NOT pol1328_grava_erro() THEN
+         RETURN FALSE
+      END IF
+   END IF      
+
+   IF LENGTH(mr_nota.den_observacao CLIPPED) > 3950 THEN
+      LET m_msg = 'TEXTO DA FATURA SUPERIOR 3950 POSIÇÕES, O LOGIX NÃO ACEITA'
       IF NOT pol1328_grava_erro() THEN
          RETURN FALSE
       END IF
@@ -3745,8 +3752,12 @@ FUNCTION pol1328_grv_texto()#
             RETURN FALSE                                                                                      
          END IF
       
-         IF NOT pol1328_grv_cap_obs(l_texto, l_seq) THEN
-            RETURN FALSE
+         IF l_seq < 100 THEN
+            IF NOT pol1328_grv_cap_obs(l_texto, l_seq) THEN
+               RETURN FALSE
+            END IF
+         ELSE
+            EXIT FOREACH
          END IF
       END FOREACH
    END IF

@@ -66,7 +66,7 @@ DEFINE mr_deman          RECORD
        nom_arquivo       VARCHAR(80)
 END RECORD
                      
-DEFINE ma_deman          ARRAY[12000] OF RECORD
+DEFINE ma_deman          ARRAY[20000] OF RECORD
        cod_cliente       CHAR(15),
        nom_reduzido      CHAR(15),
        num_pedido        CHAR(06),
@@ -85,7 +85,7 @@ DEFINE mr_item           RECORD
        nom_arquivo       VARCHAR(80)
 END RECORD
 
-DEFINE ma_item          ARRAY[12000] OF RECORD
+DEFINE ma_item          ARRAY[20000] OF RECORD
        cod_empresa       CHAR(02),
        cod_item          CHAR(15),
        den_item_reduz    CHAR(18),
@@ -113,7 +113,7 @@ FUNCTION pol1385()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1385-12.00.04  "
+   LET p_versao = "pol1385-12.00.07  "
    CALL func002_versao_prg(p_versao)
    
    LET m_car_deman = TRUE
@@ -661,8 +661,24 @@ FUNCTION pol1385_deman_cria_temp()#
       linha          CHAR(120)
    );
    
+   DELETE FROM w_demanda
+
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('CREATE','w_demanda')
+      CALL log003_err_sql('DELETE','w_demanda:dct')
+      RETURN FALSE
+   END IF
+   
+   SELECT COUNT(*) INTO m_count
+     FROM w_demanda
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','w_demanda:dct:COUNT')
+      RETURN FALSE
+   END IF
+   
+   IF m_count > 0 THEN
+      LET m_msg = 'Não foi posivel inicializar a tabela w_demanda.'
+      CALL log0030_mensagem(m_msg,'info')
       RETURN FALSE
    END IF
       
@@ -709,7 +725,7 @@ FUNCTION pol1385_exibe_deman()#
 
       LET m_ind = m_ind + 1             
       
-      IF m_ind > 12000 THEN
+      IF m_ind > 20000 THEN
          LET m_msg = 'Limite previsto de itens ultrapassou'
          CALL log0030_mensagem(m_msg,'info')
          RETURN FALSE
@@ -869,7 +885,7 @@ FUNCTION pol1385_consist_pedido()#
       END IF
    END IF
 
-   SELECT (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel )
+   SELECT SUM(qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel )
      INTO ma_deman[m_ind].faturar
      FROM ped_itens
     WHERE cod_empresa = p_cod_empresa
@@ -877,15 +893,14 @@ FUNCTION pol1385_consist_pedido()#
       AND cod_item = ma_deman[m_ind].cod_item
       AND prz_entrega = l_data
    
-   IF STATUS = 0 THEN
-   ELSE
-      LET ma_deman[m_ind].faturar = 0
-      IF STATUS = 100 THEN
-         LET m_msg = 'Programação de entrega não existe'
-      ELSE   
-         CALL log003_err_sql('SELECT','ped_itens')
-         RETURN FALSE
-      END IF
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','ped_itens')
+      RETURN FALSE
+   END IF
+
+   IF  ma_deman[m_ind].faturar IS NULL
+       LET ma_deman[m_ind].faturar = 0
+       LET m_msg = 'Programação de entrega não existe'
    END IF
          
    RETURN TRUE
@@ -1467,7 +1482,7 @@ FUNCTION pol1385_exibe_item()#
       
       LET m_ind = m_ind + 1             
       
-      IF m_ind > 12000 THEN
+      IF m_ind > 20000 THEN
          LET m_msg = 'Limite previsto de demandas ultrapassou'
          CALL log0030_mensagem(m_msg,'info')
          RETURN FALSE

@@ -898,7 +898,7 @@ FUNCTION pol1385_consist_pedido()#
       RETURN FALSE
    END IF
 
-   IF  ma_deman[m_ind].faturar IS NULL
+   IF  ma_deman[m_ind].faturar IS NULL THEN
        LET ma_deman[m_ind].faturar = 0
        LET m_msg = 'Programação de entrega não existe'
    END IF

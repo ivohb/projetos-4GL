@@ -45,15 +45,28 @@ FUNCTION pol1397_controle()#
 
 END FUNCTION
 
-FUNCTION vdp30100y_after_processar(l_empresa, l_roma)
+FUNCTION vdp30100y_before_processar()
 
    DEFINE l_empresa VARCHAR(02),
           l_roma    INTEGER
           
-   CALL log0030_mensagem(l_empresa,'info')
+   CALL log0030_mensagem(p_cod_empresa,'info')
+   SELECT max(num_om) into l_roma from ordem_montag_item where cod_empresa = '01'                       
    CALL log0030_mensagem(l_roma,'info')
 
 END FUNCTION
+
+FUNCTION vdp30100y_after_processar()
+
+   DEFINE l_empresa VARCHAR(02),
+          l_roma    INTEGER
+          
+   CALL log0030_mensagem(p_cod_empresa,'info')
+   SELECT max(num_om) into l_roma from ordem_montag_item where cod_empresa = '01'                       
+   CALL log0030_mensagem(l_roma,'info')
+
+END FUNCTION
+
 
 #---------------------------------------------------#
 FUNCTION man100211y_after_incluir(l_empresa, l_item)#
@@ -62,18 +75,18 @@ FUNCTION man100211y_after_incluir(l_empresa, l_item)#
    DEFINE l_empresa VARCHAR(02),
           l_item    VARCHAR(15)
           
-   CALL log0030_mensagem(l_empresa,'info')
-   CALL log0030_mensagem(l_item,'info')
+   
 
 END FUNCTION
 
 #-----------------------------------------------------#
-FUNCTION man100211y_after_modificar(l_empresa, l_item)#
+FUNCTION man100211y_after_modificar()#
 #-----------------------------------------------------#
    
    DEFINE l_empresa VARCHAR(02),
           l_item    VARCHAR(15)
-          
+   
+   LET  l_empresa = CALL LOG_getVar("empresa",mr_entrada.cod_empresa)
    CALL log0030_mensagem(l_empresa,'info')
    CALL log0030_mensagem(l_item,'info')
 

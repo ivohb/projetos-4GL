@@ -113,7 +113,7 @@ FUNCTION pol1385()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1385-12.00.07  "
+   LET p_versao = "pol1385-12.00.08  "
    CALL func002_versao_prg(p_versao)
    
    LET m_car_deman = TRUE

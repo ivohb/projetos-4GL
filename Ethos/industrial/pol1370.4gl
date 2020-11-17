@@ -363,7 +363,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.43  "
+   LET p_versao = "POL1370-12.00.51  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
    
@@ -1708,6 +1708,201 @@ FUNCTION pol1370_sepa_txt()#
       RETURN FALSE
    END IF
    
+   {IF m_cod_cliente = '1' OR m_cod_cliente = '1162' OR 
+         m_cod_cliente = '254' OR m_cod_cliente = '592' THEN
+      IF NOT pol1370_junta_pe1() THEN
+         RETURN FALSE
+      END IF
+   END IF}
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1370_junta_pe1()#
+#---------------------------#
+   
+   DEFINE l_item_cli     VARCHAR(30),
+          l_item_logix   VARCHAR(15),
+          l_pedido_logix INTEGER,
+          l_min_id       INTEGER,
+          l_id_pe1       INTEGER,
+          l_rowid        INTEGER,
+          l_sequenc      INTEGER,
+          l_data         DATE
+   
+   DECLARE cq_junta CURSOR FOR
+    SELECT cod_item_cliente, cod_item, num_pedido, COUNT(*) 
+      FROM edi_pe1_547 
+     WHERE cod_empresa = p_cod_empresa
+       AND id_arquivo = m_id_arquivo
+     GROUP BY cod_item_cliente, cod_item, num_pedido
+    HAVING COUNT(*) > 1
+
+   FOREACH cq_junta INTO l_item_cli, l_item_logix, l_pedido_logix
+      
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT', 'edi_pe1_547:cq_junta')
+         RETURN FALSE
+      END IF
+      
+      SELECT MIN(id_pe1)  
+        INTO l_min_id
+        FROM edi_pe1_547 
+       WHERE cod_empresa = p_cod_empresa
+         AND id_arquivo = m_id_arquivo
+         AND cod_item_cliente = l_item_cli 
+         AND cod_item = l_item_logix
+         AND num_pedido = l_pedido_logix
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT', 'edi_pe1_547:MIN')
+         RETURN FALSE
+      END IF
+      
+      DECLARE cq_pe1 CURSOR FOR
+       SELECT id_pe1  
+         FROM edi_pe1_547 
+        WHERE cod_empresa = p_cod_empresa
+          AND id_arquivo = m_id_arquivo
+          AND cod_item_cliente = l_item_cli
+         AND cod_item = l_item_logix
+         AND num_pedido = l_pedido_logix
+          AND id_pe1 > l_min_id
+
+      FOREACH cq_pe1 INTO l_id_pe1
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('SELECT', 'edi_pe1_547:cq_pe1')
+            RETURN FALSE
+         END IF
+         
+         DELETE FROM edi_pe1_547 
+          WHERE cod_empresa = p_cod_empresa
+            AND id_arquivo = m_id_arquivo 
+            AND cod_item_cliente = l_item_cli
+            AND id_pe1 = l_id_pe1 
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('DELETE', 'edi_pe1_547:cq_pe1')
+            RETURN FALSE
+         END IF
+         
+         UPDATE edi_pe2_547 SET id_pe1 = l_min_id 
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = l_id_pe1                                              
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE', 'edi_pe2_547:cq_pe1')
+            RETURN FALSE
+         END IF
+
+         UPDATE edi_pe3_547 SET id_pe1 = l_min_id 
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = l_id_pe1                                              
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE', 'edi_pe3_547:cq_pe1')
+            RETURN FALSE
+         END IF
+
+         UPDATE edi_pe5_547 SET id_pe1 = l_min_id 
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = l_id_pe1                                              
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE', 'edi_pe5_547:cq_pe1')
+            RETURN FALSE
+         END IF
+
+         UPDATE pedidos_edi_547 SET id_pe1 = l_min_id 
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = l_id_pe1                                              
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE', 'pedidos_edi_547:cq_pe1')
+            RETURN FALSE
+         END IF
+
+         UPDATE ped_itens_edi_547 SET id_pe1 = l_min_id 
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = l_id_pe1                                              
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE', 'ped_itens_edi_547:cq_pe1')
+            RETURN FALSE
+         END IF
+
+         UPDATE ped_itens_edi_pe5_547 SET id_pe1 = l_min_id 
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = l_id_pe1                                              
+         
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE', 'ped_itens_edi_pe5_547:cq_pe1')
+            RETURN FALSE
+         END IF
+                                                                                                                                             
+      END FOREACH
+      
+      LET l_sequenc = 0
+      
+      DECLARE cq_sequen CURSOR FOR
+       SELECT rowid, prz_entrega
+         FROM ped_itens_edi_547
+        WHERE cod_empresa = p_cod_empresa
+          AND id_pe1 = l_min_id                                              
+        ORDER BY prz_entrega
+        
+      FOREACH cq_sequen INTO l_rowid, l_data     
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('FOREACH', 'ped_itens_edi_547:cq_sequen')
+            RETURN FALSE
+         END IF
+         
+         LET l_sequenc = l_sequenc + 1
+         
+         UPDATE ped_itens_edi_547 SET num_sequencia = l_sequenc
+          WHERE rowid = l_rowid
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE', 'ped_itens_edi_547:cq_sequen')
+            RETURN FALSE
+         END IF         
+         
+      END FOREACH
+
+      LET l_sequenc = 0
+      
+      DECLARE cq_sequen2 CURSOR FOR
+       SELECT rowid, dat_abertura
+         FROM ped_itens_edi_pe5_547
+        WHERE cod_empresa = p_cod_empresa
+          AND id_pe1 = l_min_id      
+        ORDER BY dat_abertura                                  
+      
+      FOREACH cq_sequen2 INTO l_rowid, l_data     
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('FOREACH', 'ped_itens_edi_pe5_547:cq_sequen2')
+            RETURN FALSE
+         END IF
+         
+         LET l_sequenc = l_sequenc + 1
+         
+         UPDATE ped_itens_edi_pe5_547 SET num_sequencia = l_sequenc
+          WHERE rowid = l_rowid
+
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('UPDATE', 'ped_itens_edi_pe5_547:cq_sequen2')
+            RETURN FALSE
+         END IF         
+         
+      END FOREACH
+      
+   END FOREACH    
+
    RETURN TRUE
 
 END FUNCTION
@@ -2028,11 +2223,43 @@ END FUNCTION
 FUNCTION pol1370_pega_pedido()#
 #-----------------------------#
 
-   DEFINE l_cod_item    LIKE cliente_item.cod_item
+   DEFINE l_cod_item    LIKE cliente_item.cod_item,
+          l_count      INTEGER
    
    LET m_num_pedido = NULL
    LET m_cod_item = NULL
 
+   SELECT COUNT(*) INTO l_count
+     FROM cliente_item_pc_547
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_cliente = m_cod_cliente
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','cliente_item_pc_547:COUNT')
+      RETURN FALSE
+   END IF
+   
+   IF l_count > 0 THEN
+      SELECT num_pedido, cod_it_logix
+        INTO m_num_pedido, m_cod_item
+        FROM cliente_item_pc_547
+       WHERE cod_empresa = p_cod_empresa
+         AND cod_cliente = m_cod_cliente
+         AND cod_it_cli = m_item_cliente
+         AND num_ped_cli = m_num_ped_comp
+   
+      IF STATUS = 0 THEN
+         RETURN TRUE
+      ELSE
+         IF STATUS = 100 THEN
+            RETURN TRUE
+         ELSE
+            CALL log003_err_sql('SELECT','cliente_item_pc_547:cq_cli_item')
+            RETURN FALSE
+         END IF
+      END IF
+   END IF
+   
    SELECT num_pedido, cod_it_logix
      INTO m_num_pedido, m_cod_item
      FROM cliente_item_edi_547
@@ -3188,7 +3415,7 @@ FUNCTION pol1370_monta_grades()#
          CALL log003_err_sql('SELECT','cq_monta')
          RETURN FALSE
       END IF
-      
+            
       LET m_progres = LOG_progresspopup_increment("PROCESS")
 
       IF m_ies_carga THEN
@@ -4653,6 +4880,12 @@ FUNCTION pol1370_grv_programacao()#
       RETURN FALSE
    END IF
    
+   SELECT num_pedido_cli
+     INTO m_num_ped_cli
+     FROM pedidos
+    WHERE cod_empresa = p_cod_empresa
+      AND num_pedido = m_num_pedido
+   
    SELECT 1 FROM ped_itens_texto
     WHERE cod_empresa = p_cod_empresa
       AND num_pedido = m_num_pedido 
@@ -5094,6 +5327,7 @@ FUNCTION pol1370_proc_todos()#
           LET p_num_pedido = ma_pedido[m_ind].num_pedido
           LET p_cod_item = ma_pedido[m_ind].cod_item
           LET m_cod_it_cli = ma_pedido[m_ind].item_cliente
+          LET m_num_ped_cli = ma_pedido[m_ind].num_pc
           IF NOT pol1370_atu_carteira() THEN
              RETURN FALSE
           END IF
@@ -5168,9 +5402,9 @@ FUNCTION pol1370_atu_carteira()#
          LET m_prz_entrega = m_dat_abertura
       END IF
       
-      IF m_prz_entrega < m_dat_proces THEN
-         CONTINUE FOREACH
-      END IF
+      #IF m_prz_entrega < m_dat_proces THEN
+      #   CONTINUE FOREACH
+      #END IF
 
       IF m_prz_entrega < mr_arquivo.peri_de OR m_prz_entrega > mr_arquivo.peri_ate  THEN
          CONTINUE FOREACH
@@ -5273,7 +5507,7 @@ FUNCTION pol1370_canc_prog()#
    
    DEFINE l_qtd_dias   INTEGER,
           l_dias_param INTEGER
-      
+    {  
    SELECT parametro_numerico 
      INTO l_dias_param
      FROM min_par_modulo
@@ -5294,6 +5528,7 @@ FUNCTION pol1370_canc_prog()#
    IF l_qtd_dias <= l_dias_param THEN
       RETURN TRUE
    END IF
+}
 
    UPDATE ped_itens                                        
       SET qtd_pecas_cancel = qtd_pecas_cancel + m_qtd_saldo   

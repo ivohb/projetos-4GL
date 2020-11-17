@@ -215,9 +215,7 @@ FUNCTION func015_pega_lote_om()#
    IF m_num_om < m_om_padrao THEN
       LET m_num_om = m_om_padrao
    END IF
-   
-   LET m_num_om = m_num_om + 1
-   
+
    UPDATE par_vdp
       SET num_ult_om = m_num_om
     WHERE cod_empresa = p_cod_empresa

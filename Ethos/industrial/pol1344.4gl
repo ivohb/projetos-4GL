@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------#
 # SISTEMA.: LOGIX      ETHOS INDUSTRIAL                             #
-# PROGRAMA: pol1404                                                 #
+# PROGRAMA: pol1344                                                 #
 # OBJETIVO: APURAÇÃO DA NECESSIDADE DE COMPRAS                      #
 # AUTOR...: IVO                                                     #
 # DATA....: 15/09/2018                                              #
@@ -117,7 +117,7 @@ DEFINE ma_files ARRAY[150] OF CHAR(80)
        
        
 #-----------------#
-FUNCTION pol1404()#
+FUNCTION pol1344()#
 #-----------------#
           
    IF LOG_initApp("PADRAO") <> 0 THEN
@@ -131,14 +131,14 @@ FUNCTION pol1404()#
    SET LOCK MODE TO WAIT 300
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1404-12.00.00  "
+   LET p_versao = "pol1344-12.00.00  "
    CALL func002_versao_prg(p_versao)
-   CALL pol1404_menu()
+   CALL pol1344_menu()
     
 END FUNCTION
 
 #----------------------#
-FUNCTION pol1404_menu()#
+FUNCTION pol1344_menu()#
 #----------------------#
 
     DEFINE l_menubar     VARCHAR(10),
@@ -162,19 +162,19 @@ FUNCTION pol1404_menu()#
     CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
 
     LET l_inform = _ADVPL_create_component(NULL,"LINFORMBUTTON",l_menubar)
-    CALL _ADVPL_set_property(l_inform,"EVENT","pol1404_informar")
+    CALL _ADVPL_set_property(l_inform,"EVENT","pol1344_informar")
     CALL _ADVPL_set_property(l_proces,"TOOLTIP","Informar parâmetros p/ a pesquisa")
-    CALL _ADVPL_set_property(l_inform,"CONFIRM_EVENT","pol1404_info_conf")
-    CALL _ADVPL_set_property(l_inform,"CANCEL_EVENT","pol1404_info_cancel")
+    CALL _ADVPL_set_property(l_inform,"CONFIRM_EVENT","pol1344_info_conf")
+    CALL _ADVPL_set_property(l_inform,"CANCEL_EVENT","pol1344_info_cancel")
 
     LET l_proces = _ADVPL_create_component(NULL,"LPROCESSBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_proces,"TOOLTIP","Proessa a apuração das mecessidades")
-    CALL _ADVPL_set_property(l_proces,"EVENT","pol1404_processar")
+    CALL _ADVPL_set_property(l_proces,"EVENT","pol1344_processar")
 
    LET l_export = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
    CALL _ADVPL_set_property(l_export,"IMAGE","EXPORT_EX")
    CALL _ADVPL_set_property(l_export,"TYPE","NO_CONFIRM")     
-   CALL _ADVPL_set_property(l_export,"EVENT","pol1404_exportar")         
+   CALL _ADVPL_set_property(l_export,"EVENT","pol1344_exportar")         
 
  
 
@@ -183,15 +183,15 @@ FUNCTION pol1404_menu()#
    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_dialog)
    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
 
-   CALL pol1404_cria_cabec(l_panel)
-   CALL pol1404_cria_grade(l_panel)
+   CALL pol1344_cria_cabec(l_panel)
+   CALL pol1344_cria_grade(l_panel)
 
    CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
 
 END FUNCTION
 
 #----------------------------------------#
-FUNCTION pol1404_cria_cabec(l_container)#
+FUNCTION pol1344_cria_cabec(l_container)#
 #----------------------------------------#
 
     DEFINE l_container       VARCHAR(10),
@@ -237,7 +237,7 @@ FUNCTION pol1404_cria_cabec(l_container)#
     CALL _ADVPL_set_property(m_lupa_cli,"POSITION",610,10)     
     CALL _ADVPL_set_property(m_lupa_cli,"SIZE",24,20)
     CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",FALSE)
-    CALL _ADVPL_set_property(m_lupa_cli,"CLICK_EVENT","pol1404_pesq_cliente")
+    CALL _ADVPL_set_property(m_lupa_cli,"CLICK_EVENT","pol1344_pesq_cliente")
 
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_panel)     
     CALL _ADVPL_set_property(l_caixa,"POSITION",660,10)     
@@ -249,7 +249,7 @@ FUNCTION pol1404_cria_cabec(l_container)#
 END FUNCTION
 
 #---------------------------------------#
-FUNCTION pol1404_cria_grade(l_container)#
+FUNCTION pol1344_cria_grade(l_container)#
 #---------------------------------------#
 
     DEFINE l_container       VARCHAR(10),
@@ -354,7 +354,7 @@ END FUNCTION
 
 {
 #----------------------------#
-FUNCTION pol1404_zoom_item()#
+FUNCTION pol1344_zoom_item()#
 #----------------------------#
 
     DEFINE l_cod_item       LIKE item.cod_item,
@@ -378,14 +378,14 @@ FUNCTION pol1404_zoom_item()#
     IF l_cod_item IS NOT NULL THEN
        LET l_lin_atu = _ADVPL_get_property(m_brz_item,"ROW_SELECTED")
        LET ma_produto[l_lin_atu].cod_item = l_cod_item
-       CALL pol1404_le_item(l_cod_item) RETURNING p_status
+       CALL pol1344_le_item(l_cod_item) RETURNING p_status
        LET ma_produto[l_lin_atu].den_item = m_den_item
     END IF        
     
 END FUNCTION
 
 #-----------------------------#
-FUNCTION pol1404_checa_linha()#
+FUNCTION pol1344_checa_linha()#
 #-----------------------------#
 
    DEFINE l_lin_atu        INTEGER,
@@ -407,7 +407,7 @@ FUNCTION pol1404_checa_linha()#
       RETURN TRUE
    END IF
    
-   IF NOT pol1404_valid_item(l_cod_item) THEN
+   IF NOT pol1344_valid_item(l_cod_item) THEN
       RETURN FALSE
    END IF
    
@@ -418,7 +418,7 @@ FUNCTION pol1404_checa_linha()#
 END FUNCTION
 
 #-------------------------------#
-FUNCTION pol1404_limpa_linha()#
+FUNCTION pol1344_limpa_linha()#
 #-------------------------------#
 
    DEFINE l_lin_atu        INTEGER
@@ -434,7 +434,7 @@ FUNCTION pol1404_limpa_linha()#
 END FUNCTION
 
 #----------------------------#
-FUNCTION pol1404_checa_item()#
+FUNCTION pol1344_checa_item()#
 #----------------------------#
    
    DEFINE l_lin_atu        INTEGER,
@@ -448,7 +448,7 @@ FUNCTION pol1404_checa_item()#
       RETURN TRUE
    END IF
    
-   IF NOT pol1404_valid_item(l_cod_item) THEN
+   IF NOT pol1344_valid_item(l_cod_item) THEN
       RETURN FALSE
    END IF
    
@@ -459,18 +459,18 @@ FUNCTION pol1404_checa_item()#
 END FUNCTION   
    
 #--------------------------------------#
-FUNCTION pol1404_valid_item(l_cod_item)#
+FUNCTION pol1344_valid_item(l_cod_item)#
 #--------------------------------------#
    
    DEFINE l_cod_item       CHAR(15)
    
    CALL _ADVPL_set_property(m_bar_status_item,"ERROR_TEXT",'')
    
-   IF NOT pol1404_le_item(l_cod_item) THEN
+   IF NOT pol1344_le_item(l_cod_item) THEN
       RETURN FALSE
    END IF
    
-   IF NOT pol1404_chek_estrut(l_cod_item) THEN
+   IF NOT pol1344_chek_estrut(l_cod_item) THEN
       RETURN FALSE
    END IF
    
@@ -485,7 +485,7 @@ FUNCTION pol1404_valid_item(l_cod_item)#
 END FUNCTION
 
 #-----------------------------------#
-FUNCTION pol1404_le_item(l_cod_item)#
+FUNCTION pol1344_le_item(l_cod_item)#
 #-----------------------------------#
    
    DEFINE l_cod_item     CHAR(15)
@@ -516,7 +516,7 @@ END FUNCTION
 
 
 #---------------------------#
-FUNCTION pol1404_posiciona()#
+FUNCTION pol1344_posiciona()#
 #---------------------------#
 
    CALL _ADVPL_set_property(m_arquivo,"GET_FOCUS")
@@ -524,7 +524,7 @@ FUNCTION pol1404_posiciona()#
 END FUNCTION
 
 #---------------------------------------#
-FUNCTION pol1404_param_item(l_container)#
+FUNCTION pol1344_param_item(l_container)#
 #---------------------------------------#
 
     DEFINE l_container       VARCHAR(10),
@@ -548,7 +548,7 @@ FUNCTION pol1404_param_item(l_container)#
     CALL _ADVPL_set_property(m_arquivo,"POSITION",370,10)     
     CALL _ADVPL_set_property(m_arquivo,"ADD_ITEM","0","Select    ")
     CALL _ADVPL_set_property(m_arquivo,"VARIABLE",mr_cabec,"nom_arquivo")
-    CALL _ADVPL_set_property(m_arquivo,"VALID","pol1404_valid_arquivo")     
+    CALL _ADVPL_set_property(m_arquivo,"VALID","pol1344_valid_arquivo")     
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_panel)
     CALL _ADVPL_set_property(l_label,"POSITION",260,40)     
@@ -571,7 +571,7 @@ FUNCTION pol1404_param_item(l_container)#
 END FUNCTION
 
 #---------------------------------------#
-FUNCTION pol1404_grade_item(l_container)#
+FUNCTION pol1344_grade_item(l_container)#
 #---------------------------------------#
    
    DEFINE l_container, l_panel, l_layout, l_tabcolumn           VARCHAR(20)
@@ -585,8 +585,8 @@ FUNCTION pol1404_grade_item(l_container)#
    
     LET m_brz_item = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
     CALL _ADVPL_set_property(m_brz_item,"ALIGN","CENTER")
-    CALL _ADVPL_set_property(m_brz_item,"BEFORE_ADD_ROW_EVENT","pol1404_checa_linha")
-    CALL _ADVPL_set_property(m_brz_item,"AFTER_ADD_ROW_EVENT","pol1404_limpa_linha")
+    CALL _ADVPL_set_property(m_brz_item,"BEFORE_ADD_ROW_EVENT","pol1344_checa_linha")
+    CALL _ADVPL_set_property(m_brz_item,"AFTER_ADD_ROW_EVENT","pol1344_limpa_linha")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Item")
@@ -596,7 +596,7 @@ FUNCTION pol1404_grade_item(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LTEXTFIELD")
     CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","LENGTH",15)
     CALL _ADVPL_set_property(l_tabcolumn,"EDIT_PROPERTY","PICTURE","@!")
-    CALL _ADVPL_set_property(l_tabcolumn,"AFTER_EDIT_EVENT","pol1404_checa_item")
+    CALL _ADVPL_set_property(l_tabcolumn,"AFTER_EDIT_EVENT","pol1344_checa_item")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER"," ")
@@ -604,7 +604,7 @@ FUNCTION pol1404_grade_item(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",20)
     CALL _ADVPL_set_property(l_tabcolumn,"NO_VARIABLE")
     CALL _ADVPL_set_property(l_tabcolumn,"IMAGE_RENDERER","BTPESQ")
-    CALL _ADVPL_set_property(l_tabcolumn,"BEFORE_EDIT_EVENT","pol1404_zoom_item")
+    CALL _ADVPL_set_property(l_tabcolumn,"BEFORE_EDIT_EVENT","pol1344_zoom_item")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_item)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
@@ -619,7 +619,7 @@ FUNCTION pol1404_grade_item(l_container)#
 END FUNCTION   
 
 #-------------------------------#
-FUNCTION pol1404_carrega_lista()#
+FUNCTION pol1344_carrega_lista()#
 #-------------------------------#     
 
    DEFINE l_ind     INTEGER,
@@ -655,7 +655,7 @@ FUNCTION pol1404_carrega_lista()#
 END FUNCTION
    
 #---------------------------------------#
-FUNCTION pol1404_chek_estrut(l_item_pai)#
+FUNCTION pol1344_chek_estrut(l_item_pai)#
 #---------------------------------------#
    
    DEFINE l_item_pai      CHAR(15)
@@ -681,7 +681,7 @@ FUNCTION pol1404_chek_estrut(l_item_pai)#
 END FUNCTION
 
 #-------------------------------#
-FUNCTION pol1404_valid_periodo()#
+FUNCTION pol1344_valid_periodo()#
 #-------------------------------#
    
    
@@ -713,7 +713,7 @@ FUNCTION pol1404_valid_periodo()#
 END FUNCTION
 
 #-----------------------------#
-FUNCTION pol1404_limpa_campos()
+FUNCTION pol1344_limpa_campos()
 #-----------------------------#
 
    INITIALIZE mr_cabec.* TO NULL
@@ -724,7 +724,7 @@ FUNCTION pol1404_limpa_campos()
 END FUNCTION
 
 #----------------------------------------#
-FUNCTION pol1404_ativa_desativa(l_status)#
+FUNCTION pol1344_ativa_desativa(l_status)#
 #----------------------------------------#
 
    DEFINE l_status SMALLINT
@@ -733,7 +733,7 @@ FUNCTION pol1404_ativa_desativa(l_status)#
 END FUNCTION
 
 #----------------------------#
-FUNCTION pol1404_le_caminho()#
+FUNCTION pol1344_le_caminho()#
 #----------------------------#
 
    SELECT nom_caminho, ies_ambiente
@@ -758,7 +758,7 @@ FUNCTION pol1404_le_caminho()#
 END FUNCTION
 
 #---------------------------#
- FUNCTION pol1404_dirExist()#
+ FUNCTION pol1344_dirExist()#
 #---------------------------#
 
   DEFINE l_dir  CHAR(250),
@@ -783,17 +783,17 @@ END FUNCTION
 END FUNCTION
 
 #--------------------------#
-FUNCTION pol1404_informar()#
+FUNCTION pol1344_informar()#
 #--------------------------#
    
    DEFINE l_cod_item    CHAR(15),
           l_ind         INTEGER
 
-   IF NOT pol1404_le_caminho() THEN
+   IF NOT pol1344_le_caminho() THEN
       RETURN FALSE
    END IF
 
-   IF NOT pol1404_dirExist() THEN
+   IF NOT pol1344_dirExist() THEN
       RETURN FALSE
    END IF
    
@@ -812,11 +812,11 @@ FUNCTION pol1404_informar()#
 
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    
-   CALL pol1404_limpa_campos()   
+   CALL pol1344_limpa_campos()   
    
    LET mr_cabec.cod_item = ''
    DELETE FROM item_sel_547
-   CALL pol1404_dialog_item()
+   CALL pol1344_dialog_item()
    
    IF m_count > 0 THEN
    
@@ -841,7 +841,7 @@ FUNCTION pol1404_informar()#
    
       LET m_carregando = TRUE
 
-      LET p_status = LOG_progresspopup_start("Carregando...","pol1404_carrega_item","PROCESS") 
+      LET p_status = LOG_progresspopup_start("Carregando...","pol1344_carrega_item","PROCESS") 
    
    END IF
    
@@ -850,7 +850,7 @@ FUNCTION pol1404_informar()#
 END FUNCTION
 
 #-------------------------#
-FUNCTION pol1404_cancela()#
+FUNCTION pol1344_cancela()#
 #-------------------------#
 
     LET m_count = 0
@@ -861,7 +861,7 @@ FUNCTION pol1404_cancela()#
 END FUNCTION
 
 #-------------------------------#
-FUNCTION pol1404_valid_arquivo()#
+FUNCTION pol1344_valid_arquivo()#
 #-------------------------------#
 
    LET m_carregando = TRUE
@@ -884,17 +884,17 @@ FUNCTION pol1404_valid_arquivo()#
    CALL LOG_consoleMessage("Arquivo: "||m_arq_arigem)
    
    LET p_status = LOG_progresspopup_start(
-       "Carregando arquivo...","pol1404_load_arq","PROCESS")  
+       "Carregando arquivo...","pol1344_load_arq","PROCESS")  
             
    RETURN TRUE
    
 END FUNCTION
 
 #--------------------------#
-FUNCTION pol1404_load_arq()#
+FUNCTION pol1344_load_arq()#
 #--------------------------#
       
-   IF NOT pol1404_cria_temp() THEN
+   IF NOT pol1344_cria_temp() THEN
       RETURN 
    END IF
       
@@ -924,11 +924,11 @@ FUNCTION pol1404_load_arq()#
       RETURN 
    END IF
 
-   IF NOT pol1404_le_item_temp() THEN
+   IF NOT pol1344_le_item_temp() THEN
       RETURN
    END IF
    
-   CALL pol1404_move_arquivo()
+   CALL pol1344_move_arquivo()
    
    CALL _ADVPL_set_property(m_brz_item,"EDITABLE", FALSE)
    
@@ -937,7 +937,7 @@ FUNCTION pol1404_load_arq()#
 END FUNCTION
 
 #------------------------------#
-FUNCTION pol1404_le_item_temp()#
+FUNCTION pol1344_le_item_temp()#
 #------------------------------#
 
    DEFINE l_progres         SMALLINT
@@ -981,7 +981,7 @@ FUNCTION pol1404_le_item_temp()#
 END FUNCTION
    
 #---------------------------#
-FUNCTION pol1404_cria_temp()#
+FUNCTION pol1344_cria_temp()#
 #---------------------------#
    
    DROP TABLE item_temp
@@ -998,7 +998,7 @@ FUNCTION pol1404_cria_temp()#
 END FUNCTION   
 
 #------------------------------#
-FUNCTION pol1404_move_arquivo()#
+FUNCTION pol1344_move_arquivo()#
 #------------------------------#
    
    DEFINE l_arq_dest       CHAR(100),
@@ -1027,14 +1027,14 @@ FUNCTION pol1404_move_arquivo()#
 END FUNCTION   
 
 #--------------------------#
-FUNCTION pol1404_confirma()#
+FUNCTION pol1344_confirma()#
 #--------------------------#
    
    DEFINE l_ind     INTEGER
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
 
-   IF NOT pol1404_valid_periodo() THEN
+   IF NOT pol1344_valid_periodo() THEN
       RETURN FALSE
    END IF
 
@@ -1055,7 +1055,7 @@ FUNCTION pol1404_confirma()#
 END FUNCTION
 
 #------------------------------#
-FUNCTION pol1404_carrega_item()#
+FUNCTION pol1344_carrega_item()#
 #------------------------------#
 
    DEFINE l_progres         SMALLINT
@@ -1080,7 +1080,7 @@ FUNCTION pol1404_carrega_item()#
       LET g_cod_item = m_cod_item
       LET m_qtd_neces = 1
       
-      IF NOT pol1404_carrega_compon() THEN
+      IF NOT pol1344_carrega_compon() THEN
          RETURN FALSE
       END IF
 
@@ -1100,14 +1100,14 @@ FUNCTION pol1404_carrega_item()#
 END FUNCTION
    
 #--------------------------------#
-FUNCTION pol1404_carrega_compon()#
+FUNCTION pol1344_carrega_compon()#
 #--------------------------------#
 
    DEFINE l_progres         SMALLINT,
           l_ies_tipo        CHAR(01),
           l_qtd_neces       LIKE estrut_grade.qtd_necessaria
   
-   IF NOT pol1404_explode_estrut() THEN
+   IF NOT pol1344_explode_estrut() THEN
       RETURN FALSE
    END IF
          
@@ -1129,7 +1129,7 @@ FUNCTION pol1404_carrega_compon()#
       LET ma_compon[m_index].den_compon = func002_le_den_item(m_cod_comp) 
       LET ma_compon[m_index].qtd_neces = l_qtd_neces
       
-      IF NOT pol1404_le_preco() THEN
+      IF NOT pol1344_le_preco() THEN
          RETURN FALSE
       END IF
       
@@ -1147,7 +1147,7 @@ FUNCTION pol1404_carrega_compon()#
 END FUNCTION
 
 #--------------------------#
-FUNCTION pol1404_le_preco()#
+FUNCTION pol1344_le_preco()#
 #--------------------------#
 
    DEFINE l_preco    LIKE aviso_rec.pre_unit_nf,
@@ -1183,7 +1183,7 @@ FUNCTION pol1404_le_preco()#
    END FOREACH
       
    IF l_tem_nf THEN
-      LET ma_compon[m_index].fornec_min = pol1404_le_fornec(l_num_ar)
+      LET ma_compon[m_index].fornec_min = pol1344_le_fornec(l_num_ar)
       LET ma_compon[m_index].preco_min = l_preco 
       LET ma_compon[m_index].dat_min = l_data
    ELSE
@@ -1217,7 +1217,7 @@ FUNCTION pol1404_le_preco()#
    END FOREACH   
    
    IF l_tem_nf THEN
-      LET ma_compon[m_index].fornec_max = pol1404_le_fornec(l_num_ar)
+      LET ma_compon[m_index].fornec_max = pol1344_le_fornec(l_num_ar)
       LET ma_compon[m_index].preco_max = l_preco
       LET ma_compon[m_index].dat_max = l_data
    END IF   
@@ -1246,7 +1246,7 @@ FUNCTION pol1404_le_preco()#
    END FOREACH   
    
    IF l_tem_nf THEN
-      LET ma_compon[m_index].fornec_ult = pol1404_le_fornec(l_num_ar)
+      LET ma_compon[m_index].fornec_ult = pol1344_le_fornec(l_num_ar)
       LET ma_compon[m_index].preco_ult = l_preco 
       LET ma_compon[m_index].dat_ult = l_data
    END IF   
@@ -1256,7 +1256,7 @@ FUNCTION pol1404_le_preco()#
 END FUNCTION
  
 #-----------------------------------#
-FUNCTION pol1404_le_fornec(l_num_ar)#
+FUNCTION pol1344_le_fornec(l_num_ar)#
 #-----------------------------------#
    
    DEFINE l_raz_social     LIKE fornecedor.raz_social,
@@ -1279,7 +1279,7 @@ FUNCTION pol1404_le_fornec(l_num_ar)#
       LET l_raz_social = 'ERRO ',l_erro CLIPPED, ' LENDO FORNECEDOR'
    ELSE
       IF STATUS = 0 THEN
-         CALL pol1404_le_fat_conver(l_cod_fornecedor) RETURNING p_status
+         CALL pol1344_le_fat_conver(l_cod_fornecedor) RETURNING p_status
       END IF
    END IF
       
@@ -1288,7 +1288,7 @@ FUNCTION pol1404_le_fornec(l_num_ar)#
 END FUNCTION
 
 #------------------------------------#
-FUNCTION pol1404_le_fat_conver(l_cod)#
+FUNCTION pol1344_le_fat_conver(l_cod)#
 #------------------------------------#
    
    DEFINE l_cod     CHAR(15)
@@ -1315,7 +1315,7 @@ END FUNCTION
        
 
 #--------------------------------#
-FUNCTION pol1404_explode_estrut()#
+FUNCTION pol1344_explode_estrut()#
 #--------------------------------#
    
    DEFINE l_count     INTEGER,
@@ -1323,11 +1323,11 @@ FUNCTION pol1404_explode_estrut()#
           l_ies_tipo  CHAR(01),
           l_qtd_neces DECIMAL(17,7)
 
-   IF NOT pol1404_cria_tab_tmp() THEN
+   IF NOT pol1344_cria_tab_tmp() THEN
       RETURN FALSE
    END IF
    
-   IF NOT pol1404_ins_it(m_cod_item) THEN
+   IF NOT pol1344_ins_it(m_cod_item) THEN
       RETURN FALSE
    END IF
    
@@ -1348,7 +1348,7 @@ FUNCTION pol1404_explode_estrut()#
             RETURN FALSE
          END IF
 
-         IF NOT pol1404_del_item(m_cod_item) THEN
+         IF NOT pol1344_del_item(m_cod_item) THEN
             RETURN FALSE
          END IF         
          
@@ -1384,16 +1384,16 @@ FUNCTION pol1404_explode_estrut()#
             END IF
       
             IF l_ies_tipo MATCHES '[BC]' THEN
-               IF NOT pol1404_ins_compon() THEN
+               IF NOT pol1344_ins_compon() THEN
                   RETURN FALSE
                END IF
                IF l_ies_tipo = 'B' THEN
-                  IF NOT pol1404_ins_it(m_cod_comp) THEN
+                  IF NOT pol1344_ins_it(m_cod_comp) THEN
                      RETURN FALSE
                   END IF
                END IF
             ELSE
-               IF NOT pol1404_ins_it(m_cod_comp) THEN
+               IF NOT pol1344_ins_it(m_cod_comp) THEN
                   RETURN FALSE
                END IF
             END IF            
@@ -1421,7 +1421,7 @@ FUNCTION pol1404_explode_estrut()#
 END FUNCTION
 
 #-------------------------------#
-FUNCTION pol1404_del_item(l_cod)#
+FUNCTION pol1344_del_item(l_cod)#
 #-------------------------------#
    
    DEFINE l_cod       CHAR(15)
@@ -1438,7 +1438,7 @@ FUNCTION pol1404_del_item(l_cod)#
 END FUNCTION
 
 #-----------------------------#
-FUNCTION pol1404_ins_it(l_cod)#
+FUNCTION pol1344_ins_it(l_cod)#
 #-----------------------------#
    
    DEFINE l_cod    CHAR(15)
@@ -1456,7 +1456,7 @@ FUNCTION pol1404_ins_it(l_cod)#
 END FUNCTION
 
 #----------------------------#
-FUNCTION pol1404_ins_compon()#
+FUNCTION pol1344_ins_compon()#
 #----------------------------#
 
    INSERT INTO item_compon_1350 
@@ -1472,7 +1472,7 @@ FUNCTION pol1404_ins_compon()#
 END FUNCTION
 
 #------------------------------#
-FUNCTION pol1404_cria_tab_tmp()
+FUNCTION pol1344_cria_tab_tmp()
 #------------------------------#
    
    DROP TABLE item_estrut_1350;

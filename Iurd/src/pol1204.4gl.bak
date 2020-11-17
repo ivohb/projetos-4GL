@@ -103,7 +103,7 @@ MAIN
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
    
-   LET p_versao = "pol1204-10.02.30"
+   LET p_versao = "pol1204-10.02.29"
    
    OPTIONS 
       NEXT KEY control-f,

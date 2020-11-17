@@ -6,7 +6,7 @@
 # DATA....: 30/09/2020                                              #
 #-------------------------------------------------------------------#
 #Lista de preço
-{VPD10002 – Tabela Mestre
+{VPD10102 – Tabela Mestre
 VPD0270 – Item} 
 
 DATABASE logix
@@ -2151,6 +2151,7 @@ FUNCTION pol1406_emp_campo(l_container)#
     CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","A","Ambos")
     CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","E","Estoque")
     CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","P","Produto")
+    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","N","Nenhum")
     CALL _ADVPL_set_property(m_env_aut,"VARIABLE",mr_emp,"enviar")
 
 

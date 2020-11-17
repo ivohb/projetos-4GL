@@ -67,7 +67,7 @@ FUNCTION vdp30100y_after_processar()
 
 END FUNCTION
 
-{
+
 #---------------------------------------------------#
 FUNCTION man100211y_after_incluir(l_empresa, l_item)#
 #---------------------------------------------------#
@@ -80,14 +80,24 @@ FUNCTION man100211y_after_incluir(l_empresa, l_item)#
 END FUNCTION
 
 #-----------------------------------------------------#
-FUNCTION man100211y_after_modificar(l_empresa, l_item)#
+FUNCTION man100211y_after_modificar()#
 #-----------------------------------------------------#
    
    DEFINE l_empresa VARCHAR(02),
           l_item    VARCHAR(15)
-          
+   
+   call LOG_setVar("empresa",l_empresa)
    CALL log0030_mensagem(l_empresa,'info')
+   call LOG_setVar("cod_empresa",l_empresa)
+   CALL log0030_mensagem(l_empresa,'info')
+
+   let l_empresa = LOG_getVar("empresa")
+   CALL log0030_mensagem(l_empresa,'info')
+   let l_empresa = LOG_getVar("cod_empresa")
+   CALL log0030_mensagem(l_empresa,'info')
+   let l_item = LOG_getVar("cod_item")
    CALL log0030_mensagem(l_item,'info')
+
 
 END FUNCTION
 

@@ -1,10 +1,7 @@
 #-------------------------------------------------------------------#
-# PROGRAMA: pol1403                                                 #
-# OBJETIVO: APURAÇÃO DE DEMANDA E GERAÇÃO DE ORDENS DE PRODUÇÃO     #
+# PROGRAMA: pol1343                                                 #
+# OBJETIVO: GERAÇÃO DE ORDENS DE PRODUÇÃO POR DEMANDA               #
 # CLIENTE.: ETHOS IND                                               #
-# DATA....: 27/07/2018                                              #
-# DATA   ALTERAÇÃO                                                  #
-#                                                                   #
 #-------------------------------------------------------------------#
 
 DATABASE logix
@@ -25,7 +22,12 @@ DEFINE m_dialog          VARCHAR(10),
        m_pan_cabec       VARCHAR(10),
        m_pan_item        VARCHAR(10),
        m_brz_item        VARCHAR(10),
-       m_arq_denam       VARCHAR(10)
+       m_arq_denam       VARCHAR(10),
+       m_dat_de          VARCHAR(10),
+       m_dat_ate         VARCHAR(10),
+       m_cod_cliente     VARCHAR(10),
+       m_zoom_cliente    VARCHAR(10),
+       m_lupa_cli        VARCHAR(10)
 
 DEFINE m_count           INTEGER,
        m_msg             VARCHAR(150),
@@ -48,13 +50,18 @@ DEFINE m_count           INTEGER,
        m_linha           VARCHAR(120),
        m_qtd_erro        INTEGER,
        m_dat_atu         DATE,
-       m_hor_atu         CHAR(08)
+       m_hor_atu         CHAR(08),
+       m_ies_info        SMALLINT,
+       m_query           VARCHAR(800)
 
 DEFINE ma_files ARRAY[150] OF CHAR(100)
 
 DEFINE mr_deman          RECORD
        cod_empresa       CHAR(02),
-       nom_arquivo       VARCHAR(80)
+       nom_arquivo       VARCHAR(80),
+       cod_cliente       VARCHAR(15),
+       dat_de            DATE,
+       dat_ate           DATE
 END RECORD
                      
 DEFINE ma_deman          ARRAY[12000] OF RECORD
@@ -69,10 +76,9 @@ DEFINE ma_deman          ARRAY[12000] OF RECORD
        abrir             CHAR(10),
        mensagem          VARCHAR(120)
 END RECORD
-         
-             
+                      
 #-----------------#
-FUNCTION pol1403()#
+FUNCTION pol1343()#
 #-----------------#
           
    IF LOG_initApp("PADRAO") <> 0 THEN
@@ -86,67 +92,14 @@ FUNCTION pol1403()#
    SET LOCK MODE TO WAIT 300
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1403-12.00.00  "
+   LET p_versao = "pol1343-12.00.00  "
    CALL func002_versao_prg(p_versao)
-   CALL pol1403_teste()
-   CALL pol1403_menu()
-
-END FUNCTION
-
-FUNCTION pol1403_teste()
-
-DECLARE cq_teste cursor for
-select CASE WHEN (x1.num_lanc IS NULL )  THEN '0' ::decimal(17,
-    2)  ELSE x1.num_lanc  END ,x0.num_conta_reduz ,x0.cod_empresa 
-    ,x1.num_conta ,x0.den_conta ,x1.den_sistema_ger ,x1.ies_sit_lanc 
-    ,x1.ies_tip_lanc ,LEFT (x0.num_conta_reduz ,4 ),CASE WHEN 
-    (x1.dat_movto ::date IS NULL )  THEN x7.parametro_dat  ELSE 
-    x1.dat_movto ::date  END ,CASE WHEN (x1.per_contabil ::decimal(17,
-    2) IS NULL )  THEN '1900' ::decimal(17,2)  ELSE x1.per_contabil 
-    ::decimal(17,2)  END ,x1.cod_seg_periodo ,((TRIM ( BOTH ' '
-     FROM x2.tex_hist ) || ' ' ) || TRIM ( BOTH ' ' FROM x3.tex_hist 
-    ) ) ,((TRIM ( BOTH ' ' FROM x2.tex_hist ) || ' ' ) || TRIM 
-    ( BOTH ' ' FROM x4.tex_hist ) ) ,((TRIM ( BOTH ' ' FROM x2.tex_hist 
-    ) || ' ' ) || TRIM ( BOTH ' ' FROM x5.tex_hist ) ) ,CASE WHEN 
-    (x1.val_lanc IS NULL )  THEN '0' ::decimal(17,2)  ELSE x1.val_lanc 
-     END ,CASE WHEN (x6.val_debito_seg IS NULL )  THEN '0' ::decimal(17,
-    2)  ELSE x6.val_debito_seg  END ,CASE WHEN ((x6.val_saldo_acum 
-    * -1 ) ::decimal(17,2) IS NULL )  THEN '0' ::decimal(17,2) 
-     ELSE (x6.val_saldo_acum * -1 ) ::decimal(17,2)  END from 
-    (((((((plano_contas1 x0 left join lancamentos 
-    x1 on ((x0.cod_empresa = x1.cod_empresa ) AND (x0.num_conta 
-    = x1.num_conta ) ) )left join hist_padrao x2 on 
-    (((x1.cod_empresa = x2.cod_empresa ) AND (x1.cod_hist = x2.cod_hist 
-    ) ) AND (x1.ies_compl_hist = x2.ies_complemento ) ) )left 
-    join hist_compl_1 x3 on ((((((x1.cod_empresa = 
-    x3.cod_empresa ) AND (x1.den_sistema_ger = x3.den_sistema_ger 
-    ) ) AND (x1.per_contabil = x3.per_contabil ) ) AND (x1.cod_seg_periodo 
-    = x3.cod_seg_periodo ) ) AND (x1.num_lote = x3.num_lote ) 
-    ) AND (x1.num_lanc = x3.num_lanc ) ) )left join 
-    hist_compl_2 x4 on ((((((x1.cod_empresa = x4.cod_empresa 
-    ) AND (x1.den_sistema_ger = x4.den_sistema_ger ) ) AND (x1.per_contabil 
-    = x4.per_contabil ) ) AND (x1.cod_seg_periodo = x4.cod_seg_periodo 
-    ) ) AND (x1.num_lote = x4.num_lote ) ) AND (x1.num_lanc = 
-    x4.num_lanc ) ) )left join hist_compl_3 x5 on ((((((x1.cod_empresa 
-    = x5.cod_empresa ) AND (x1.den_sistema_ger = x5.den_sistema_ger 
-    ) ) AND (x1.per_contabil = x5.per_contabil ) ) AND (x1.cod_seg_periodo 
-    = x5.cod_seg_periodo ) ) AND (x1.num_lote = x5.num_lote ) 
-    ) AND (x1.num_lanc = x5.num_lanc ) ) )left join 
-    saldos x6 on (((((x0.cod_empresa = x6.cod_empresa ) AND 
-    (x0.num_conta = x6.num_conta ) ) AND (x1.per_contabil = x6.per_contabil 
-    ) ) AND (x1.cod_seg_periodo = x6.cod_seg_periodo ) ) AND 
-    (x6.cod_moeda = x1.cod_moeda ) ) )left join min_par_modulo 
-    x7 on ((x7.empresa = x0.cod_empresa ) AND (x7.parametro = 
-    'DATA_INICIO' ) ) )where (x0.cod_empresa IN ('06' ,'08' ));
-
-FOREACH cq_teste  INTO m_msg
-
-END FOREACH
+   CALL pol1343_menu()
 
 END FUNCTION
 
 #----------------------#
-FUNCTION pol1403_menu()#
+FUNCTION pol1343_menu()#
 #----------------------#
 
     DEFINE l_menubar     VARCHAR(10),
@@ -156,7 +109,7 @@ FUNCTION pol1403_menu()#
            l_ordem       VARCHAR(10),
            l_titulo      CHAR(80)
     
-    LET l_titulo = "APURAÇÃO DE DEMANDA E GERAÇÃO DE ORDENS DE PRODUÇÃO - ",p_versao
+    LET l_titulo = "GERAÇÃO DE ORDENS DE PRODUÇÃO POR DEMANDA - ",p_versao
     
     LET m_dialog = _ADVPL_create_component(NULL,"LDIALOG")
     CALL _ADVPL_set_property(m_dialog,"SIZE",640,480)
@@ -171,38 +124,38 @@ FUNCTION pol1403_menu()#
 
     LET l_inform = _ADVPL_create_component(NULL,"LFINDBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_inform,"TOOLTIP","Parãmetros p/ apuração da demanda")
-    CALL _ADVPL_set_property(l_inform,"EVENT","pol1403_informar")
-    CALL _ADVPL_set_property(l_inform,"CONFIRM_EVENT","pol1403_info_conf")
-    CALL _ADVPL_set_property(l_inform,"CANCEL_EVENT","pol1403_info_canc")
+    CALL _ADVPL_set_property(l_inform,"EVENT","pol1343_informar")
+    CALL _ADVPL_set_property(l_inform,"CONFIRM_EVENT","pol1343_info_conf")
+    CALL _ADVPL_set_property(l_inform,"CANCEL_EVENT","pol1343_info_canc")
 
     LET l_import = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
     CALL _ADVPL_set_property(l_import,"IMAGE","IMPORTAR_ARQUIVO")     
     CALL _ADVPL_set_property(l_import,"TYPE","CONFIRM")     
     CALL _ADVPL_set_property(l_import,"TOOLTIP","Iportar demanda de arquivo CSV")
-    CALL _ADVPL_set_property(l_import,"EVENT","pol1403_deman_info")
-    CALL _ADVPL_set_property(l_import,"CONFIRM_EVENT","pol1403_deman_conf")
-    CALL _ADVPL_set_property(l_import,"CANCEL_EVENT","pol1403_deman_canc")
+    CALL _ADVPL_set_property(l_import,"EVENT","pol1343_deman_info")
+    CALL _ADVPL_set_property(l_import,"CONFIRM_EVENT","pol1343_deman_conf")
+    CALL _ADVPL_set_property(l_import,"CANCEL_EVENT","pol1343_deman_canc")
 
     LET l_ordem = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_ordem,"IMAGE","ORDENS") 
     CALL _ADVPL_set_property(l_ordem,"TOOLTIP","Gerar ordens de produção")
     CALL _ADVPL_set_property(l_ordem,"TYPE","NO_CONFIRM")    
-    CALL _ADVPL_set_property(l_ordem,"EVENT","pol1403_gerar")
+    CALL _ADVPL_set_property(l_ordem,"EVENT","pol1343_gerar")
 
     CALL _ADVPL_create_component(NULL,"LQUITBUTTON",l_menubar)
 
     LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_dialog)
     CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
 
-    CALL pol1403_cabec(l_panel)
-    CALL pol1403_item(l_panel)
+    CALL pol1343_cabec(l_panel)
+    CALL pol1343_item(l_panel)
 
     CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
 
 END FUNCTION
 
 #----------------------------------#
-FUNCTION pol1403_cabec(l_container)#
+FUNCTION pol1343_cabec(l_container)#
 #----------------------------------#
 
     DEFINE l_container       VARCHAR(10),
@@ -235,13 +188,49 @@ FUNCTION pol1403_cabec(l_container)#
 
     LET m_arq_denam = _ADVPL_create_component(NULL,"LCOMBOBOX",m_pan_cabec)     
     CALL _ADVPL_set_property(m_arq_denam,"POSITION",160,10)     
+    CALL _ADVPL_set_property(m_arq_denam,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(m_arq_denam,"ADD_ITEM","0","Select    ")
     CALL _ADVPL_set_property(m_arq_denam,"VARIABLE",mr_deman,"nom_arquivo")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
+    CALL _ADVPL_set_property(l_label,"POSITION",635,10) 
+    CALL _ADVPL_set_property(l_label,"TEXT","Cliente:")    
+
+    LET m_cod_cliente = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_cabec)
+    CALL _ADVPL_set_property(m_cod_cliente,"POSITION",692,10)     
+    CALL _ADVPL_set_property(m_cod_cliente,"LENGTH",15)   
+    CALL _ADVPL_set_property(m_cod_cliente,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(m_cod_cliente,"VARIABLE",mr_deman,"cod_cliente")
+
+    LET m_lupa_cli = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pan_cabec)
+    CALL _ADVPL_set_property(m_lupa_cli,"IMAGE","BTPESQ")
+    CALL _ADVPL_set_property(m_lupa_cli,"POSITION",830,10)     
+    CALL _ADVPL_set_property(m_lupa_cli,"SIZE",24,20)
+    CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",FALSE)
+    CALL _ADVPL_set_property(m_lupa_cli,"CLICK_EVENT","pol1343_zoom_cliente")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
+    CALL _ADVPL_set_property(l_label,"POSITION",905,10) 
+    CALL _ADVPL_set_property(l_label,"TEXT","Período de:")    
+
+    LET m_dat_de = _ADVPL_create_component(NULL,"LDATEFIELD",m_pan_cabec)
+    CALL _ADVPL_set_property(m_dat_de,"POSITION",988,10)     
+    CALL _ADVPL_set_property(m_dat_de,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(m_dat_de,"VARIABLE",mr_deman,"dat_de")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
+    CALL _ADVPL_set_property(l_label,"POSITION",1130,10)     
+    CALL _ADVPL_set_property(l_label,"TEXT","Até:")   
+
+    LET m_dat_ate = _ADVPL_create_component(NULL,"LDATEFIELD",m_pan_cabec)
+    CALL _ADVPL_set_property(m_dat_ate,"POSITION",1165,10)     
+    CALL _ADVPL_set_property(m_dat_ate,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(m_dat_ate,"VARIABLE",mr_deman,"dat_ate")
 
 END FUNCTION
 
 #---------------------------------#
-FUNCTION pol1403_item(l_container)#
+FUNCTION pol1343_item(l_container)#
 #---------------------------------#
 
     DEFINE l_container       VARCHAR(10),
@@ -321,30 +310,31 @@ FUNCTION pol1403_item(l_container)#
 END FUNCTION
 
 #----------------------------#
-FUNCTION pol1403_deman_info()#
+FUNCTION pol1343_deman_info()#
 #----------------------------#
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    
    LET m_ies_deman = FALSE
    
-   IF NOT pol1403_le_caminho() THEN
+   IF NOT pol1343_le_caminho() THEN
       RETURN FALSE
    END IF
    
-   CALL pol1403_limpa_deman()
+   CALL pol1343_limpa_deman()
    LET m_car_deman = FALSE
 
-   IF NOT pol1403_dirExist() THEN
+   IF NOT pol1343_dirExist() THEN
       RETURN FALSE
    END IF
       
-   IF NOT pol1403_deman_lista() THEN
+   IF NOT pol1343_deman_lista() THEN
       RETURN FALSE
    END IF
    
    LET mr_deman.cod_empresa = p_cod_empresa
    CALL _ADVPL_set_property(m_pan_cabec,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_arq_denam,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_arq_denam,"GET_FOCUS")
    
    RETURN TRUE
@@ -352,7 +342,7 @@ FUNCTION pol1403_deman_info()#
 END FUNCTION
 
 #----------------------------#
-FUNCTION pol1403_le_caminho()#
+FUNCTION pol1343_le_caminho()#
 #----------------------------#
 
    SELECT nom_caminho, ies_ambiente
@@ -377,7 +367,7 @@ FUNCTION pol1403_le_caminho()#
 END FUNCTION
 
 #--------------------------#
-FUNCTION pol1403_dirExist()#
+FUNCTION pol1343_dirExist()#
 #--------------------------#
 
   DEFINE l_dir  CHAR(250),
@@ -402,7 +392,7 @@ FUNCTION pol1403_dirExist()#
 END FUNCTION
 
 #----------------------------#
- FUNCTION pol1403_fileExist()#
+ FUNCTION pol1343_fileExist()#
 #----------------------------#
   
   DEFINE l_file  CHAR(250)
@@ -430,7 +420,7 @@ END FUNCTION
 END FUNCTION
 
 #-----------------------------#
-FUNCTION pol1403_limpa_deman()#
+FUNCTION pol1343_limpa_deman()#
 #-----------------------------#
    
    LET m_car_deman = TRUE
@@ -440,7 +430,7 @@ FUNCTION pol1403_limpa_deman()#
 END FUNCTION
 
 #-----------------------------#
-FUNCTION pol1403_deman_lista()#
+FUNCTION pol1343_deman_lista()#
 #-----------------------------#     
 
    DEFINE l_ind     INTEGER,
@@ -478,35 +468,36 @@ FUNCTION pol1403_deman_lista()#
 END FUNCTION
 
 #----------------------------#
-FUNCTION pol1403_deman_canc()#
+FUNCTION pol1343_deman_canc()#
 #----------------------------#
 
-   CALL pol1403_limpa_deman()
+   CALL pol1343_limpa_deman()
    CALL _ADVPL_set_property(m_pan_cabec,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_arq_denam,"ENABLE",FALSE)
    
    RETURN TRUE
 
 END FUNCTION
 
 #----------------------------#
-FUNCTION pol1403_deman_conf()#
+FUNCTION pol1343_deman_conf()#
 #----------------------------#
 
    DEFINE l_status        SMALLINT
    
-   IF NOT pol1403_deman_valid_arq() THEN
+   IF NOT pol1343_deman_valid_arq() THEN
       RETURN FALSE
    END IF
    
    LET m_car_deman = TRUE
 
    LET p_status = LOG_progresspopup_start(
-       "Carregando arquivo...","pol1403_deman_load_arq","PROCESS")  
+       "Carregando arquivo...","pol1343_deman_load_arq","PROCESS")  
    
    LET m_car_deman = FALSE
 
    IF NOT p_status THEN
-      CALL pol1403_deman_canc() RETURNING l_status
+      CALL pol1343_deman_canc() RETURNING l_status
       RETURN FALSE
    END IF
    
@@ -517,6 +508,9 @@ FUNCTION pol1403_deman_conf()#
    ELSE
       LET m_msg = 'Operação efetuada com sucesso'
    END IF
+
+   CALL _ADVPL_set_property(m_pan_cabec,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_arq_denam,"ENABLE",FALSE)
    
    CALL log0030_mensagem(m_msg,'info')
    
@@ -525,7 +519,7 @@ FUNCTION pol1403_deman_conf()#
 END FUNCTION
 
 #---------------------------------#
-FUNCTION pol1403_deman_valid_arq()#
+FUNCTION pol1343_deman_valid_arq()#
 #---------------------------------#
            
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
@@ -549,13 +543,13 @@ FUNCTION pol1403_deman_valid_arq()#
 END FUNCTION
 
 #--------------------------------#
-FUNCTION pol1403_deman_load_arq()#
+FUNCTION pol1343_deman_load_arq()#
 #--------------------------------#
    
    DEFINE l_lista, l_moeda INTEGER,
           l_empresa        CHAR(02)
    
-   IF NOT pol1403_deman_cria_temp() THEN
+   IF NOT pol1343_deman_cria_temp() THEN
       RETURN FALSE
    END IF
       
@@ -585,7 +579,7 @@ FUNCTION pol1403_deman_load_arq()#
       RETURN FALSE
    END IF
    
-   IF NOT pol1403_exibe_deman() THEN
+   IF NOT pol1343_exibe_deman() THEN
       RETURN FALSE
    END IF
    
@@ -594,7 +588,7 @@ FUNCTION pol1403_deman_load_arq()#
 END FUNCTION
 
 #---------------------------------#
-FUNCTION pol1403_deman_cria_temp()#
+FUNCTION pol1343_deman_cria_temp()#
 #---------------------------------#
    
    DROP TABLE w_demanda
@@ -613,7 +607,7 @@ FUNCTION pol1403_deman_cria_temp()#
 END FUNCTION
 
 #-----------------------------#
-FUNCTION pol1403_exibe_deman()#
+FUNCTION pol1343_exibe_deman()#
 #-----------------------------#
    
    DEFINE l_progres     SMALLINT
@@ -658,16 +652,16 @@ FUNCTION pol1403_exibe_deman()#
       END IF
       
       LET m_pos_ini = 1
-      LET m_cliente = pol1403_divide_texto()      
-      LET ma_deman[m_ind].cod_cliente = pol1403_pega_codigo()
-      CALL pol1403_le_cliente(ma_deman[m_ind].cod_cliente)
+      LET m_cliente = pol1343_divide_texto()      
+      LET ma_deman[m_ind].cod_cliente = pol1343_pega_codigo()
+      CALL pol1343_le_cliente(ma_deman[m_ind].cod_cliente)
       LET ma_deman[m_ind].nom_reduzido = m_nom_reduz
-      LET ma_deman[m_ind].num_pedido = pol1403_divide_texto()   
-      LET ma_deman[m_ind].cod_item = pol1403_divide_texto()   
-      CALL pol1403_le_item(ma_deman[m_ind].cod_item)
+      LET ma_deman[m_ind].num_pedido = pol1343_divide_texto()   
+      LET ma_deman[m_ind].cod_item = pol1343_divide_texto()   
+      CALL pol1343_le_item(ma_deman[m_ind].cod_item)
       LET ma_deman[m_ind].den_item_reduz = m_den_reduz  
-      LET ma_deman[m_ind].prz_entrega = pol1403_divide_texto()   
-      LET ma_deman[m_ind].abrir = pol1403_divide_texto()   
+      LET ma_deman[m_ind].prz_entrega = pol1343_divide_texto()   
+      LET ma_deman[m_ind].abrir = pol1343_divide_texto()   
       
       LET l_parametro.cod_empresa = p_cod_empresa
       LET l_parametro.cod_item = ma_deman[m_ind].cod_item
@@ -688,7 +682,7 @@ FUNCTION pol1403_exibe_deman()#
       CALL func002_le_estoque(l_parametro) RETURNING m_msg, ma_deman[m_ind].estoque
       
       IF m_msg IS NULL THEN
-         IF NOT pol1403_consist_pedido() THEN
+         IF NOT pol1343_consist_pedido() THEN
             RETURN FALSE
          END IF
       END IF
@@ -712,7 +706,7 @@ FUNCTION pol1403_exibe_deman()#
 END FUNCTION      
 
 #------------------------------#
-FUNCTION pol1403_divide_texto()#
+FUNCTION pol1343_divide_texto()#
 #------------------------------#
    
    DEFINE l_ind        INTEGER,
@@ -737,7 +731,7 @@ FUNCTION pol1403_divide_texto()#
 END FUNCTION
 
 #-----------------------------#
-FUNCTION pol1403_pega_codigo()#
+FUNCTION pol1343_pega_codigo()#
 #-----------------------------#
    
    DEFINE l_ind        INTEGER,
@@ -770,7 +764,7 @@ FUNCTION pol1403_pega_codigo()#
 END FUNCTION
 
 #--------------------------------#
-FUNCTION pol1403_consist_pedido()#
+FUNCTION pol1343_consist_pedido()#
 #--------------------------------#
    
    DEFINE l_ies_situa    CHAR(01),
@@ -832,7 +826,7 @@ FUNCTION pol1403_consist_pedido()#
 END FUNCTION
 
 #---------------------------------#   
-FUNCTION pol1403_le_cliente(l_cod)#
+FUNCTION pol1343_le_cliente(l_cod)#
 #---------------------------------#
 
    DEFINE l_cod       CHAR(15)
@@ -850,7 +844,7 @@ FUNCTION pol1403_le_cliente(l_cod)#
 END FUNCTION    
 
 #------------------------------#   
-FUNCTION pol1403_le_item(l_cod)#
+FUNCTION pol1343_le_item(l_cod)#
 #------------------------------#
 
    DEFINE l_cod       CHAR(15)
@@ -869,3 +863,169 @@ FUNCTION pol1403_le_item(l_cod)#
    END IF
             
 END FUNCTION    
+
+#------------------------------#
+FUNCTION pol1343_zoom_cliente()#
+#------------------------------#
+
+    DEFINE l_codigo         LIKE clientes.cod_cliente,
+           l_descri         LIKE clientes.nom_cliente
+    
+    IF m_zoom_cliente IS NULL THEN
+       LET m_zoom_cliente = _ADVPL_create_component(NULL,"LZOOMMETADATA")
+       CALL _ADVPL_set_property(m_zoom_cliente,"ZOOM","zoom_clientes")
+    END IF
+    
+    CALL _ADVPL_get_property(m_zoom_cliente,"ACTIVATE")
+    
+    LET l_codigo = _ADVPL_get_property(m_zoom_cliente,"RETURN_BY_TABLE_COLUMN","clientes","cod_cliente")
+    LET l_descri = _ADVPL_get_property(m_zoom_cliente,"RETURN_BY_TABLE_COLUMN","clientes","nom_cliente")
+    
+    IF l_codigo IS NOT NULL THEN
+       LET mr_deman.cod_cliente = l_codigo
+    END IF        
+    
+END FUNCTION
+
+
+#--------------------------#
+FUNCTION pol1343_informar()#
+#--------------------------#
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   LET m_ies_info = FALSE
+   
+   
+   CALL pol1343_limpa_deman()
+   LET m_car_deman = FALSE
+   
+   LET mr_deman.cod_empresa = p_cod_empresa
+   CALL _ADVPL_set_property(m_pan_cabec,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_dat_de,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_dat_ate,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_cod_cliente,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",TRUE)
+   CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1343_info_canc()#
+#---------------------------#
+
+   CALL pol1343_limpa_deman()
+   CALL _ADVPL_set_property(m_pan_cabec,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_dat_de,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_dat_ate,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_cod_cliente,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1343_info_conf()#
+#----------------------------#
+
+   DEFINE l_status        SMALLINT
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF mr_deman.dat_de IS NULL THEN
+      LET m_msg = 'Informe o período de:'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_dat_de,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   IF mr_deman.dat_ate IS NULL THEN
+      LET m_msg = 'Informe o período até:'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_dat_ate,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+   
+   IF mr_deman.dat_de > mr_deman.dat_ate THEN
+      LET m_msg = 'Período inválido'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_dat_de,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   CALL pol1343_monta_select()
+   
+   LET m_car_deman = TRUE
+   LET m_qtd_erro = 0
+
+   LET p_status = LOG_progresspopup_start(
+       "Carregando arquivo...","pol1343_le_demanda","PROCESS")  
+   
+   LET m_car_deman = FALSE
+
+   IF NOT p_status THEN
+      CALL pol1343_info_canc() RETURNING l_status
+      RETURN FALSE
+   END IF
+   
+   LET m_ies_info = TRUE
+
+   IF m_qtd_erro > 0 THEN
+      LET m_msg = 'Foram encontrados ',m_qtd_erro USING '<<<<', ' registos com erro'
+   ELSE
+      LET m_msg = 'Operação efetuada com sucesso'
+   END IF
+
+   CALL _ADVPL_set_property(m_pan_cabec,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_dat_de,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_dat_ate,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_cod_cliente,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",FALSE)
+   
+   CALL log0030_mensagem(m_msg,'info')
+   
+   RETURN TRUE   
+    
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1343_monta_select()#
+#------------------------------#
+
+   LET m_query = " SELECT i.num_pedido, i.num_sequencia, i.cod_item, ",
+       " i.prz_entrega, (i.qtd_pecas_solic - i.qtd_pecas_cancel), ",
+       " p.cod_cliente FROM ped_itens i, pedidos p",
+       " WHERE i.cod_empresa = '",p_cod_empresa,"' ",
+       " AND i.cod_empresa = p.cod_empresa",
+       " AND i.num_pedido = p.num_pedido",
+       " AND a.ies_sit_pedido <> '9' ",
+       " AND i.qtd_pecas_atend = 0",
+       " AND i.qtd_pecas_romanio = 0",
+       " AND (i.qtd_pecas_solic - i.qtd_pecas_cancel) > 0 ",
+       " AND i.prz_entrega >= '",mr_deman.dat_de,"' ",
+       " AND i.prz_entrega <= '",mr_deman.dat_ate,"' "
+       
+   IF mr_deman.cod_cliente IS NOT NULL THEN
+      LET m_query = m_query CLIPPED, " AND p.cod_cliente = '",mr_deman.cod_cliente,"' "
+   END IF   
+      
+   LET m_query = m_query CLIPPED, " ORDER BY p.cod_cliente, i.num_pedido, i.cod_item, i.prz_entrega "
+
+END FUNCTION          
+       
+#----------------------------#
+FUNCTION pol1343_le_demanda()#
+#----------------------------#
+
+   DEFINE l_progres     SMALLINT
+
+   CALL LOG_progresspopup_set_total("PROCESS",m_count)
+
+   LET l_progres = LOG_progresspopup_increment("PROCESS")
+
+   RETURN TRUE
+
+END FUNCTION

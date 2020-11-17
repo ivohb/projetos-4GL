@@ -1472,14 +1472,8 @@ FUNCTION pol1406_aen_campo(l_container)#
     CALL _ADVPL_set_property(m_lupa_aen,"SIZE",24,20)
     CALL _ADVPL_set_property(m_lupa_aen,"CLICK_EVENT","pol1406_zoom_lin_prod")
 
-    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_aen)
-    CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
-    CALL _ADVPL_set_property(l_label,"POSITION",650,10)  
-    CALL _ADVPL_set_property(l_label,"TEXT","Descriçao:")    
-    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
-
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_aen)     
-    CALL _ADVPL_set_property(l_caixa,"POSITION",570,10) 
+    CALL _ADVPL_set_property(l_caixa,"POSITION",620,10) 
     CALL _ADVPL_set_property(l_caixa,"LENGTH",30)    
     CALL _ADVPL_set_property(l_caixa,"EDITABLE",FALSE)
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_aen,"desc_linha")
@@ -2157,6 +2151,7 @@ FUNCTION pol1406_emp_campo(l_container)#
     CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","A","Ambos")
     CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","E","Estoque")
     CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","P","Produto")
+    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","N","Nenhum")
     CALL _ADVPL_set_property(m_env_aut,"VARIABLE",mr_emp,"enviar")
 
 

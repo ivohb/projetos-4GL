@@ -1141,7 +1141,7 @@ FUNCTION pol1400_envia_email(l_oper)#
                    
    END FOREACH
 
-   #CALL log5600_envia_email(p_email_remetente, p_email_destinatario, p_assunto, p_den_comando, 2)
+   CALL log5600_envia_email(p_email_remetente, p_email_destinatario, p_assunto, p_den_comando, 2)
 
    IF NOT pol1400_atu_cli_cob() THEN
       RETURN FALSE

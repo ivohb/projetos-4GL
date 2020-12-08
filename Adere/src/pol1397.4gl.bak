@@ -236,17 +236,3 @@ FUNCTION man100211y_after_excluir()#
    LET l_item = LOG_getVar("cod_item") #pega o item excluido no man10021
 
 END FUNCTION
-
-#--------------------------#
-FUNCTION pol1397_junta_om()#
-#--------------------------#
-
-DEFINE m_progres      SMALLINT
-
-   CALL LOG_progresspopup_set_total("PROCESS",m_count)
-
-
-
-   LET m_progres = LOG_progresspopup_increment("PROCESS")   
-
-END FUNCTION

@@ -137,7 +137,7 @@ FUNCTION pol1396_controle()#
             ERROR 'Operação efetuada com sucesso.'
          END IF         
       COMMAND KEY ("O") "sObre" "Exibe a versão do programa"
-         CALL pol0440_sobre()
+         CALL pol1396_sobre()
       COMMAND KEY ("!")
          PROMPT "Digite o comando : " FOR comando
          RUN comando
@@ -368,6 +368,23 @@ FUNCTION pol1396_processa()#
 
   RETURN TRUE
 
+END FUNCTION
+
+
+#-----------------------#
+FUNCTION pol1396_sobre()
+#-----------------------#
+   
+   DEFINE l_msg      VARCHAR(120)
+   
+   LET l_msg = p_versao CLIPPED,"\n\n",
+               "       LOGIX 10.02 \n\n",
+               " Home page: www.aceex.com.br \n\n",
+               "      ivohb.me@gmail.com ",
+               "    (0xx11) 4991-6667 \n\n"
+
+   CALL log0030_mensagem(l_msg,'excla')
+                  
 END FUNCTION
     
 #LOG1700

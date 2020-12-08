@@ -370,7 +370,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
-   LET p_versao = "pol1271-12.02.65  "
+   LET p_versao = "pol1271-12.02.64  "
    CALL func002_versao_prg(p_versao)
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol1271.iem") RETURNING p_nom_help
@@ -7166,7 +7166,7 @@ END FUNCTION
  FUNCTION pol1271_version_info()
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1271.4gl $|$Revision: 65 $|$Date: 19/11/2020 08:07 $|$Modtime: 03/01/2020 14:07 $" 
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1271.4gl $|$Revision: 64 $|$Date: 19/11/2020 08:07 $|$Modtime: 03/01/2020 14:07 $" 
 
  END FUNCTION
 

@@ -1262,4 +1262,12 @@ END FUNCTION
 END REPORT
    
 
-   
+#LOG1700             
+#-------------------------------#
+ FUNCTION pol1400_version_info()
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1400.4gl $|$Revision: 0 $|$Date: 19/11/2020 08:07 $|$Modtime: 19/11/2020 08:07 $" 
+
+ END FUNCTION
+    

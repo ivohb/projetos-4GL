@@ -13,7 +13,6 @@ GLOBALS
    DEFINE p_cod_empresa          CHAR(02),
           g_id_man_apont         INTEGER,
           g_tem_critica          SMALLINT,          
-          g_msg                  CHAR(150),
           g_tipo_sgbd            CHAR(03)
 
    DEFINE p_user                 LIKE usuarios.cod_usuario
@@ -34,6 +33,7 @@ DEFINE m_num_pedido              INTEGER,
        m_dat_hor                 DATETIME year to second,
        m_carteira                CHAR(02),
        m_cod_local_estoq         VARCHAR(10),
+       m_cod_local               VARCHAR(10),
        m_num_reserva             INTEGER,
        m_bonific                 CHAR(01),
        m_cod_lin_prod            DECIMAL(2,0), 
@@ -42,9 +42,9 @@ DEFINE m_num_pedido              INTEGER,
        m_cod_cla_uso             DECIMAL(2,0),
        m_sit_om                  CHAR(01),
        m_transpor                VARCHAR(15),
-       m_num_programa            VARCHAR(08)
-       
-           
+       m_num_programa            VARCHAR(08),
+       m_txt_audit               VARCHAR(200)
+                  
 DEFINE mr_ent_ender              RECORD LIKE estoque_lote_ender.*       
 
 DEFINE m_qtd_padr_embal          LIKE item_embalagem.qtd_padr_embal,                                            
@@ -61,7 +61,8 @@ FUNCTION func015_gera_om(l_num_pedido, l_prog)#
 #---------------------------------------------#
    
    DEFINE l_num_pedido        DECIMAL(6,0),
-          l_prog              VARCHAR(08)
+          l_prog              VARCHAR(08),
+          l_txt               VARCHAR(200)
    
    LET m_num_pedido = l_num_pedido
    LET m_msg = NULL
@@ -74,8 +75,10 @@ FUNCTION func015_gera_om(l_num_pedido, l_prog)#
    LET m_num_programa = l_prog
    LET m_transpor = ' '
    
-   SELECT cod_tip_carteira
-     INTO m_carteira
+   SELECT cod_tip_carteira,
+          cod_local_estoq
+     INTO m_carteira,
+          m_cod_local
      FROM pedidos
     WHERE cod_empresa = p_cod_empresa
       AND num_pedido = m_num_pedido
@@ -85,7 +88,7 @@ FUNCTION func015_gera_om(l_num_pedido, l_prog)#
       RETURN FALSE
    END IF
    
-   IF NOT func015_proces_om() THEN
+   IF NOT func015_proces_ped() THEN
       LET m_num_om = 0
    END IF
    
@@ -93,14 +96,18 @@ FUNCTION func015_gera_om(l_num_pedido, l_prog)#
    
 END FUNCTION
 
-#---------------------------#
-FUNCTION func015_proces_om()#
-#---------------------------#
+#----------------------------#
+FUNCTION func015_proces_ped()#
+#----------------------------#
 
+   DEFINE l_gera_mest  SMALLINT
+   
    IF NOT func015_pega_lote_om() THEN
       RETURN FALSE
    END IF
-
+   
+   LET l_gera_mest = FALSE
+   
    DECLARE cq_itens CURSOR FOR
     SELECT num_sequencia, cod_item,
            (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio)
@@ -115,14 +122,25 @@ FUNCTION func015_proces_om()#
          RETURN FALSE
       END IF
       
+      IF m_qtd_romanear <= 0 THEN
+         CONTINUE FOREACH
+      END IF
+       
       IF NOT func015_gra_item_om() THEN
          RETURN FALSE
       END IF
       
+      LET l_gera_mest = TRUE
+      
    END FOREACH
    
-   IF NOT func015_ins_ord_montag_mest() THEN
-      RETURN FALSE
+   IF l_gera_mest THEN
+      IF NOT func015_ins_ord_montag_mest() THEN
+         RETURN FALSE
+      END IF
+      LET m_msg = 'Unificação de OMs efetuada com sucesso'
+   ELSE
+      LET m_msg = 'Pedido sem saldo a faturar'
    END IF
    
    RETURN TRUE
@@ -275,9 +293,14 @@ FUNCTION func015_grava_reserva()#
       RETURN FALSE
 	 END IF
    
+   IF m_cod_local IS NULL OR m_cod_local =  ' ' THEN
+   ELSE
+      LET m_cod_local_estoq = m_cod_local
+   END IF
+   
    LET l_a_reservar = m_qtd_romanear
    
-   DECLARE cq_reser CURSOR FOR
+   DECLARE cq_est_reser CURSOR FOR
     SELECT *
       FROM estoque_lote_ender
      WHERE cod_empresa = p_cod_empresa
@@ -287,7 +310,7 @@ FUNCTION func015_grava_reserva()#
        AND qtd_saldo > 0       
      ORDER BY num_transac
 
-   FOREACH cq_reser INTO mr_ent_ender.*
+   FOREACH cq_est_reser INTO mr_ent_ender.*
    
       IF STATUS <> 0 THEN
          LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo dados na tabela estoque_lote_ender '
@@ -300,6 +323,7 @@ FUNCTION func015_grava_reserva()#
        WHERE cod_empresa = p_cod_empresa
          AND cod_item    = m_cod_item
          AND cod_local   = m_cod_local_estoq
+         AND ies_situacao =  'L'
       
       IF STATUS <> 0 THEN
          LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo dados na tabela estoque_loc_reser '
@@ -649,6 +673,8 @@ END FUNCTION
 FUNCTION func015_atu_item()#
 #--------------------------#
 
+   DEFINE l_qtd_reser  VARCHAR(10)
+
    UPDATE ped_itens                                                                       
       SET qtd_pecas_romaneio = qtd_pecas_romaneio + m_qtd_romanear    
     WHERE cod_empresa   = p_cod_empresa                                                      
@@ -672,9 +698,53 @@ FUNCTION func015_atu_item()#
       RETURN FALSE
    END IF   
 
+   LET l_qtd_reser = m_qtd_romanear
+     
+   LET m_txt_audit = 
+       "INCLUSAO DA OM Nr. ", m_num_om USING '<<<<<<<',
+       " para seq_item_ped ", m_num_seq USING '<<<',
+       " qtd reservada ", l_qtd_reser
+   
+   IF NOT func015_ins_audit() THEN
+      RETURN FALSE
+   END IF
+   
    RETURN TRUE
 
 END FUNCTION
+
+#---------------------------#
+FUNCTION func015_ins_audit()#
+#---------------------------#
+
+   INSERT INTO audit_vdp (
+      cod_empresa,
+      num_pedido,
+      tipo_informacao,
+      tipo_movto,
+      texto,
+      num_programa,
+      data,
+      hora,
+      usuario)
+    VALUES(p_cod_empresa,
+           m_num_pedido,
+           'I',
+           'I', 
+           m_txt_audit,
+           m_num_programa,
+           m_dat_atu,
+           m_hor_atu,
+           p_user)
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' inserindo dados na tabela audit_vdp '
+      RETURN FALSE
+   END IF   
+	 
+	 RETURN TRUE
+
+END FUNCTION	 
 
 #-------------------------------------#
 FUNCTION func015_ins_ord_montag_mest()#
@@ -749,34 +819,7 @@ FUNCTION func015_ins_ord_montag_mest()#
       LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' inserindo dados na tabela wpedido_om '
       RETURN FALSE
    END IF   
-
-   LET l_texto = 'INCLUSAO DA OM Nr.', m_num_om USING '<<<<<<<' 
    
-   INSERT INTO audit_vdp (
-      cod_empresa,
-      num_pedido,
-      tipo_informacao,
-      tipo_movto,
-      texto,
-      num_programa,
-      data,
-      hora,
-      usuario)
-    VALUES(p_cod_empresa,
-           m_num_pedido,
-           'C',
-           'C', 
-           l_texto,
-           m_num_programa,
-           m_dat_atu,
-           m_hor_atu,
-           p_user)
-
-   IF STATUS <> 0 THEN
-      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' inserindo dados na tabela audit_vdp '
-      RETURN FALSE
-   END IF   
-	  
    RETURN TRUE
 
 END FUNCTION

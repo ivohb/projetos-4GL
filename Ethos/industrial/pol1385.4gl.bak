@@ -23,17 +23,22 @@ DEFINE m_dialog          VARCHAR(10),
        m_folder          VARCHAR(10),
        m_fold_deman      VARCHAR(10),
        m_fold_item       VARCHAR(10),
+       m_fold_sup        VARCHAR(10),
        m_construct       VARCHAR(10)
 
 DEFINE m_pan_deman       VARCHAR(10),
        m_pan_item        VARCHAR(10),
+       m_pan_sup         VARCHAR(10),
        m_arq_denam       VARCHAR(10),
+       m_arq_sup         VARCHAR(10),
        m_arq_item        VARCHAR(10)
        
 DEFINE m_brz_deman       VARCHAR(10),
        m_brz_item        VARCHAR(10),
+       m_brz_sup         VARCHAR(10),
        m_car_deman       SMALLINT,
        m_car_item        SMALLINT,
+       m_car_sup         SMALLINT,
        m_posi_arq        INTEGER,
        m_qtd_arq         INTEGER,
        m_nom_arquivo     CHAR(40),
@@ -41,7 +46,8 @@ DEFINE m_brz_deman       VARCHAR(10),
        m_linha           VARCHAR(120),
        m_qtd_erro        INTEGER,
        m_dat_atu         DATE,
-       m_hor_atu         CHAR(08)
+       m_hor_atu         CHAR(08),
+       m_lin_sup         VARCHAR(120)
        
 DEFINE m_count           INTEGER,
        m_msg             VARCHAR(150),
@@ -49,15 +55,19 @@ DEFINE m_count           INTEGER,
        m_lin_atu         INTEGER,
        m_nom_reduz       VARCHAR(15),
        m_den_reduz       VARCHAR(18),
+       m_dat_cadastro    DATE,
+       m_txt_audit       VARCHAR(120),
        m_ies_deman       SMALLINT,
        m_ies_item        SMALLINT,
+       m_ies_sup         SMALLINT,
        m_caminho         VARCHAR(120),
        m_ies_ambiente    CHAR(01),
        m_pos_ini         INTEGER,
        m_pos_fim         INTEGER,
        m_cliente         VARCHAR(60),
        m_qtd_deman       INTEGER,
-       m_qtd_item        INTEGER
+       m_qtd_item        INTEGER,
+       m_qtd_sup         INTEGER
 
 DEFINE ma_files ARRAY[150] OF CHAR(100)
 
@@ -100,6 +110,24 @@ DEFINE ma_item          ARRAY[20000] OF RECORD
        mensagem          VARCHAR(120)
 END RECORD
 
+DEFINE mr_sup            RECORD
+       cod_empresa       CHAR(02),
+       nom_arquivo       VARCHAR(80)
+END RECORD
+
+DEFINE ma_sup            ARRAY[20000] OF RECORD
+   cod_item                VARCHAR(15),   
+   den_item_reduz          VARCHAR(18),
+   dat_cadastro            DATE,
+   qtd_lote_minimo         DECIMAL(12,3),  
+   qtd_pt_pedid            DECIMAL(12,3),  
+   tmp_necessar_p_ped      DECIMAL(2,0),   
+   tmp_necessar_fabr       DECIMAL(3,0),   
+   tmp_transpor            DECIMAL(3,0),   
+   tmp_inspecao            DECIMAL(2,0),   
+   tmp_necessar_cont       DECIMAL(2,0),   
+   mensagem                VARCHAR(120)
+END RECORD
              
 #-----------------#
 FUNCTION pol1385()#
@@ -113,7 +141,7 @@ FUNCTION pol1385()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1385-12.00.08  "
+   LET p_versao = "pol1385-12.00.11  "
    CALL func002_versao_prg(p_versao)
    
    LET m_car_deman = TRUE
@@ -159,6 +187,12 @@ FUNCTION pol1385_menu()#
     CALL _ADVPL_set_property(m_fold_item,"TITLE","Item")
     CALL pol1385_item(m_fold_item)
 
+    # FOLDER suprimentos 
+
+    LET m_fold_sup = _ADVPL_create_component(NULL,"LFOLDERPANEL",m_folder)
+    CALL _ADVPL_set_property(m_fold_sup,"TITLE","Pelanej de compras")
+    CALL pol1385_sup(m_fold_sup)
+
     CALL _ADVPL_set_property(m_folder,"FOLDER_SELECTED",1)
     CALL _ADVPL_set_property(m_dialog,"ACTIVATE",TRUE)
 
@@ -181,8 +215,13 @@ FUNCTION pol1385_desativa_folder(l_folder)#
    CASE l_folder
         WHEN '1' 
            CALL _ADVPL_set_property(m_fold_item,"ENABLE",FALSE)        
+           CALL _ADVPL_set_property(m_fold_sup,"ENABLE",FALSE)   
         WHEN '2' 
            CALL _ADVPL_set_property(m_fold_deman,"ENABLE",FALSE)   
+           CALL _ADVPL_set_property(m_fold_sup,"ENABLE",FALSE)   
+        WHEN '3' 
+           CALL _ADVPL_set_property(m_fold_deman,"ENABLE",FALSE)   
+           CALL _ADVPL_set_property(m_fold_item,"ENABLE",FALSE)   
    END CASE
    
 END FUNCTION
@@ -193,6 +232,7 @@ FUNCTION pol1385_ativa_folder()#
 
    CALL _ADVPL_set_property(m_fold_deman,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_fold_item,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_fold_sup,"ENABLE",TRUE)
 
 END FUNCTION
 
@@ -898,7 +938,7 @@ FUNCTION pol1385_consist_pedido()#
       RETURN FALSE
    END IF
 
-   IF  ma_deman[m_ind].faturar IS NULL
+   IF  ma_deman[m_ind].faturar IS NULL THEN
        LET ma_deman[m_ind].faturar = 0
        LET m_msg = 'Programação de entrega não existe'
    END IF
@@ -1227,8 +1267,10 @@ FUNCTION pol1385_le_item(l_cod)#
 
    DEFINE l_cod       CHAR(15)
    
-   SELECT den_item_reduz
-     INTO m_den_reduz
+   SELECT den_item_reduz,
+          dat_cadastro
+     INTO m_den_reduz,
+          m_dat_cadastro
      FROM item
     WHERE cod_empresa = p_cod_empresa
       AND cod_item = l_cod
@@ -1623,3 +1665,646 @@ FUNCTION pol1385_ins_item()#
    RETURN TRUE
 
 END FUNCTION
+
+#---rotinas para importaçaõ do planejamento de compras
+
+#-----------------------------#
+FUNCTION pol1385_sup(l_fpanel)#
+#-----------------------------#
+
+    DEFINE l_fpanel    VARCHAR(10),
+           l_menubar   VARCHAR(10),
+           l_panel     VARCHAR(10),
+           l_carga     VARCHAR(10),
+           l_proces    VARCHAR(10),
+           l_fechar    VARCHAR(10)
+        
+    LET l_menubar = _ADVPL_create_component(NULL,"LMENUBAR",l_fpanel)
+    CALL _ADVPL_set_property(l_menubar,"HELP_VISIBLE",FALSE)
+
+    LET l_carga = _ADVPL_create_component(NULL,"LMENUBUTTON",l_menubar)     
+    CALL _ADVPL_set_property(l_carga,"IMAGE","IMPORTAR_ARQUIVO")     
+    CALL _ADVPL_set_property(l_carga,"TYPE","CONFIRM")     
+    CALL _ADVPL_set_property(l_carga,"TOOLTIP","Selecionar um arquivo para carga")
+    CALL _ADVPL_set_property(l_carga,"EVENT","pol1385_sup_info")
+    CALL _ADVPL_set_property(l_carga,"CONFIRM_EVENT","pol1385_sup_conf")
+    CALL _ADVPL_set_property(l_carga,"CANCEL_EVENT","pol1385_sup_canc")
+
+    LET l_proces = _ADVPL_create_component(NULL,"LPROCESSBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_proces,"TOOLTIP","Proessa a carga do arquivo")
+    CALL _ADVPL_set_property(l_proces,"EVENT","pol1385_sup_proces")
+
+    LET l_fechar = _ADVPL_create_component(NULL,"LQUITBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_fechar,"EVENT","pol1385_fechar")
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",l_fpanel)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")   
+    
+    CALL pol1385_sup_campo(l_panel)
+    CALL pol1385_sup_grade(l_panel)
+    
+END FUNCTION
+
+#--------------------------------------#
+FUNCTION pol1385_sup_campo(l_container)#
+#--------------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_label           VARCHAR(10),
+           l_caixa           VARCHAR(10),
+           l_panel           VARCHAR(10)
+
+    LET m_pan_sup = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(m_pan_sup,"ALIGN","TOP")
+    CALL _ADVPL_set_property(m_pan_sup,"HEIGHT",40)
+    #CALL _ADVPL_set_property(m_pan_sup,"BACKGROUND_COLOR",225,232,232) 
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_sup)
+    CALL _ADVPL_set_property(l_label,"POSITION",10,10) 
+    CALL _ADVPL_set_property(l_label,"TEXT","Empresa:")    
+
+    LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_sup)     
+    CALL _ADVPL_set_property(l_caixa,"POSITION",70,10) 
+    CALL _ADVPL_set_property(l_caixa,"LENGTH",2,0)    
+    CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_sup,"cod_empresa")
+    CALL _ADVPL_set_property(l_caixa,"CAN_GOT_FOCUS",FALSE)
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_sup)
+    CALL _ADVPL_set_property(l_label,"POSITION",100,10) 
+    CALL _ADVPL_set_property(l_label,"TEXT","Arquivo:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET m_arq_sup = _ADVPL_create_component(NULL,"LCOMBOBOX",m_pan_sup)     
+    CALL _ADVPL_set_property(m_arq_sup,"POSITION",160,10)     
+    CALL _ADVPL_set_property(m_arq_sup,"ADD_ITEM","0","Select    ")
+    CALL _ADVPL_set_property(m_arq_sup,"VARIABLE",mr_sup,"nom_arquivo")
+        
+    CALL _ADVPL_set_property(m_pan_sup,"ENABLE",FALSE)
+
+END FUNCTION
+
+#--------------------------------------#
+FUNCTION pol1385_sup_grade(l_container)#
+#--------------------------------------#
+
+    DEFINE l_container       VARCHAR(10),
+           l_layout          VARCHAR(10),
+           l_tabcolumn       VARCHAR(10),
+           l_panel           VARCHAR(10)
+
+    LET l_panel = _ADVPL_create_component(NULL,"LPANEL",l_container)
+    CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
+
+    LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",l_panel)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",1) 
+    CALL _ADVPL_set_property(l_layout,"EXPANSIBLE",TRUE)
+   
+    LET m_brz_sup = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
+    CALL _ADVPL_set_property(m_brz_sup,"ALIGN","CENTER")
+    #CALL _ADVPL_set_property(m_brz_sup,"BEFORE_ROW_EVENT","pol1385_item_before_row")
+        
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Item")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_item")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Descrição")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","den_item_reduz")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Lot minimo")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","qtd_lote_minimo")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Ponto pedido")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","qtd_pt_pedid")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Temp prep pedido")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tmp_necessar_p_ped")
+   
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Temp fabricação")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tmp_necessar_fabr")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Temp transp")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tmp_transpor")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Temp inspeção")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tmp_inspecao")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Temp contagem")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tmp_necessar_cont")
+                        
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_sup)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Mensagem")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",100)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","mensagem")
+
+    CALL _ADVPL_set_property(m_brz_sup,"SET_ROWS",ma_sup,1)
+    CALL _ADVPL_set_property(m_brz_sup,"EDITABLE",FALSE)
+    CALL _ADVPL_set_property(m_brz_sup,"CAN_ADD_ROW",FALSE)
+    CALL _ADVPL_set_property(m_brz_sup,"CAN_REMOVE_ROW",FALSE)
+   
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1385_sup_info()#
+#---------------------------#
+   
+   LET m_ies_sup = FALSE
+   
+   IF NOT pol1385_sup_le_caminho() THEN
+      RETURN FALSE
+   END IF
+   
+   CALL pol1385_limpa_sup()
+   LET m_car_sup = FALSE
+
+   IF NOT pol1385_dirExist() THEN
+      RETURN FALSE
+   END IF
+      
+   IF NOT pol1385_sup_lista() THEN
+      RETURN FALSE
+   END IF
+   
+   LET mr_sup.cod_empresa = p_cod_empresa
+   CALL _ADVPL_set_property(m_pan_sup,"ENABLE",TRUE) 
+   CALL _ADVPL_set_property(m_arq_sup,"GET_FOCUS")
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1385_limpa_sup()#
+#----------------------------#
+   
+   LET m_car_sup = TRUE
+   INITIALIZE mr_sup.*, ma_sup TO NULL
+   CALL _ADVPL_set_property(m_brz_sup,"CLEAR")
+   
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1385_sup_canc()#
+#---------------------------#
+
+   CALL pol1385_limpa_sup()
+   CALL _ADVPL_set_property(m_pan_sup,"ENABLE",FALSE)
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1385_sup_lista()#
+#----------------------------#     
+
+   DEFINE l_ind     INTEGER,
+          t_ind     CHAR(03)
+
+   CALL _ADVPL_set_property(m_arq_sup,"CLEAR") 
+   CALL _ADVPL_set_property(m_arq_sup,"ADD_ITEM","0","Select    ") 
+   
+   LET m_posi_arq = LENGTH(m_caminho) + 1
+   LET m_qtd_arq = LOG_file_getListCount(m_caminho,"*.csv",FALSE,FALSE,FALSE)
+   
+   IF m_qtd_arq = 0 THEN
+      LET m_msg = 'Nenhum arquivo foi encontrado no caminho ', m_caminho
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   ELSE
+      IF m_qtd_arq > 150 THEN
+         LET m_msg = 'Arquivos previstos na pasta: 150 - ',
+                     'Arquivos encontrados: ', m_qtd_arq USING '<<<<<<'
+         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+         RETURN FALSE
+      END IF
+   END IF
+   
+   INITIALIZE ma_files TO NULL
+   
+   FOR l_ind = 1 TO m_qtd_arq
+       LET t_ind = l_ind
+       LET ma_files[l_ind] = LOG_file_getFromList(l_ind)
+       CALL _ADVPL_set_property(m_arq_sup,"ADD_ITEM",t_ind,ma_files[l_ind])   
+   END FOR
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1385_sup_le_caminho()#
+#--------------------------------#
+
+   SELECT nom_caminho, ies_ambiente
+     INTO m_caminho, m_ies_ambiente
+   FROM path_logix_v2
+   WHERE cod_empresa = p_cod_empresa 
+     AND cod_sistema = "PCC"
+
+   IF STATUS = 100 THEN
+      LET m_msg = 'Caminho do sistema PCC não cadastrado na LOG00098.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   ELSE
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql("SELECT","path_logix_v2")
+         RETURN FALSE
+      END IF
+   END IF
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1385_sup_conf()#
+#---------------------------#
+
+   DEFINE l_status        SMALLINT
+
+   IF NOT pol1385_sup_valid_arq() THEN
+      RETURN FALSE
+   END IF
+   
+   LET m_car_sup = TRUE
+
+   LET p_status = LOG_progresspopup_start(
+       "Carregando arquivo...","pol1385_sup_load_arq","PROCESS")  
+   
+   LET m_car_deman = FALSE
+
+   IF NOT p_status THEN
+      CALL pol1385_sup_canc() RETURNING l_status
+      RETURN FALSE
+   END IF
+   
+   LET m_ies_sup = TRUE
+   
+   IF m_qtd_erro > 0 THEN
+      LET m_msg = 'Foram encontrados ',m_qtd_erro USING '<<<<', ' registos com erro'
+   ELSE
+      LET m_msg = 'Operação efetuada com sucesso'
+   END IF
+   
+   CALL log0030_mensagem(m_msg,'info')
+   
+   RETURN TRUE   
+    
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1385_sup_valid_arq()#
+#--------------------------------#
+           
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+
+   IF mr_sup.nom_arquivo = "0" THEN
+      LET m_msg = 'Selecione um arquivo para carga.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_arq_sup,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   LET m_count = mr_sup.nom_arquivo
+   LET m_arq_origem = ma_files[m_count] CLIPPED
+   
+   LET m_nom_arquivo = m_arq_origem[m_posi_arq, LENGTH(m_arq_origem)]
+
+   CALL LOG_consoleMessage("Arquivo: "||m_arq_origem)
+         
+   RETURN TRUE
+   
+END FUNCTION
+
+#-------------------------------#
+FUNCTION pol1385_sup_load_arq()#
+#-------------------------------#
+   
+   DEFINE l_lista, l_moeda INTEGER,
+          l_empresa        CHAR(02)
+   
+   IF NOT pol1385_sup_cria_temp() THEN
+      RETURN FALSE
+   END IF
+      
+   CALL LOG_transaction_begin()
+   
+   LOAD FROM m_arq_origem INSERT INTO w_sup
+   
+   IF STATUS <> 0 THEN 
+      CALL log003_err_sql('SELECT','w_sup:LOAD')
+      CALL LOG_transaction_rollback()
+      RETURN FALSE
+   END IF
+   
+   CALL LOG_transaction_commit()
+   
+   SELECT COUNT(*) INTO m_count
+     FROM w_sup
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','w_sup:COUNT')
+      RETURN FALSE
+   END IF
+   
+   IF m_count = 0 THEN
+      LET m_msg = 'O arquivo selecionado está vazio.'
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN FALSE
+   END IF
+   
+   IF NOT pol1385_exibe_sup() THEN
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------------#
+FUNCTION pol1385_sup_cria_temp()#
+#--------------------------------#
+   
+   DROP TABLE w_sup
+   
+   CREATE TEMP TABLE w_sup (
+      linha          CHAR(300)
+   );
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('CREATE','w_sup')
+      RETURN FALSE
+   END IF
+      
+   RETURN TRUE
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1385_exibe_sup()#
+#----------------------------#
+   
+   DEFINE l_progres     SMALLINT
+   
+   INITIALIZE ma_sup TO NULL
+   CALL _ADVPL_set_property(m_brz_sup,"CLEAR")
+   LET m_ind = 0
+   LET m_qtd_erro = 0
+         
+   CALL LOG_progresspopup_set_total("PROCESS",m_count)
+   
+   DECLARE cq_sup CURSOR FOR
+   SELECT linha
+     FROM w_sup
+   
+   FOREACH cq_sup INTO m_lin_sup
+   
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','w_sup:cq_sup')
+         RETURN FALSE
+      END IF
+      
+      LET l_progres = LOG_progresspopup_increment("PROCESS")
+      
+      IF m_lin_sup[1,4] = 'item' THEN
+         CONTINUE FOREACH
+      END IF
+            
+      LET m_ind = m_ind + 1             
+      
+      IF m_ind > 20000 THEN
+         LET m_msg = 'Limite previsto de demandas ultrapassou'
+         CALL log0030_mensagem(m_msg,'info')
+         RETURN FALSE
+      END IF
+      
+      LET ma_sup[m_ind].mensagem = NULL
+      LET m_pos_ini = 1
+      LET ma_sup[m_ind].cod_item = pol1385_sup_divide_texto()      
+      CALL pol1385_le_item(ma_sup[m_ind].cod_item)
+      LET ma_sup[m_ind].den_item_reduz = m_den_reduz
+      LET ma_sup[m_ind].dat_cadastro = m_dat_cadastro
+      LET ma_sup[m_ind].qtd_lote_minimo   = pol1385_sup_divide_texto()   
+      LET ma_sup[m_ind].qtd_pt_pedid      = pol1385_sup_divide_texto()  
+      LET ma_sup[m_ind].tmp_necessar_p_ped= pol1385_sup_divide_texto()  
+      LET ma_sup[m_ind].tmp_necessar_fabr = pol1385_sup_divide_texto()  
+      LET ma_sup[m_ind].tmp_transpor      = pol1385_sup_divide_texto()  
+      LET ma_sup[m_ind].tmp_inspecao      = pol1385_sup_divide_texto()  
+      LET ma_sup[m_ind].tmp_necessar_cont = pol1385_sup_divide_texto()  
+            
+   END FOREACH
+
+   LET m_qtd_sup = m_ind 
+   CALL _ADVPL_set_property(m_brz_sup,"ITEM_COUNT", m_qtd_sup)
+
+   RETURN TRUE
+
+END FUNCTION      
+
+#----------------------------------#
+FUNCTION pol1385_sup_divide_texto()#
+#----------------------------------#
+   
+   DEFINE l_ind        INTEGER,
+          l_conteudo   CHAR(120)
+   
+   IF m_lin_sup < m_pos_ini THEN
+      LET ma_item[m_ind].mensagem = 'Registro imcompleto.'
+      RETURN l_conteudo
+   END IF
+      
+   FOR l_ind = m_pos_ini TO LENGTH(m_lin_sup)
+       IF m_lin_sup[l_ind] = ';' THEN
+          LET m_pos_fim = l_ind - 1
+          EXIT FOR
+       END IF
+   END FOR
+   
+   IF m_pos_fim < m_pos_ini THEN
+      LET m_pos_fim = l_ind - 1
+   END IF
+      
+   LET l_conteudo = m_lin_sup[m_pos_ini, m_pos_fim]
+   LET m_pos_ini = m_pos_fim + 2
+   
+   RETURN l_conteudo
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1385_sup_proces()#
+#----------------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF NOT m_ies_sup THEN
+      LET m_msg = 'Informe um arquivo previamente'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+
+   IF m_qtd_erro > 0 THEN
+      LET m_msg = 'Os registros com erro serão ignorados.\n',
+                  'Continuar mesmo assim?'
+                  
+      IF NOT LOG_question(m_msg) THEN
+         RETURN FALSE
+      END IF
+   END IF
+      
+   CALL LOG_transaction_begin()
+   
+   IF NOT pol1385_grava_sup() THEN
+      CALL LOG_transaction_rollback()
+      LET m_msg = 'Operação cancelada'
+      CALL log0030_mensagem(m_msg, 'info')  
+      RETURN FALSE
+   END IF
+   
+   CALL LOG_transaction_commit()
+   
+   CALL pol1385_move_arquivo()
+   
+   LET m_ies_sup = FALSE
+   LET m_msg = 'Operação efetuada com sucesso'
+   CALL log0030_mensagem(m_msg, 'info')   
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1385_grava_sup()#
+#---------------------------#
+   
+   LET m_txt_audit = 'MODIFICACAO ITEM_SUP - PLANEJAMENTO COMPRAS'
+   LET m_dat_atu = TODAY
+   LET m_hor_atu = TIME
+   
+   FOR m_ind = 1 TO m_qtd_sup
+       IF ma_sup[m_ind].cod_item IS NOT NULL THEN
+          IF ma_sup[m_ind].mensagem IS NULL THEN
+             IF NOT pol1385_atu_item() THEN
+                RETURN FALSE
+             END IF
+             CALL _ADVPL_set_property(m_brz_sup,"COLUMN_VALUE","mensagem",m_ind,m_msg)
+          END IF
+       END IF        
+   END FOR
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------#
+FUNCTION pol1385_atu_item()#
+#--------------------------#
+   
+   DEFINE l_revisao     INTEGER,
+          l_tmp_ressup  DECIMAL(10,3),
+          l_prod_min    DECIMAL(10,3),
+          l_prod_fix    DECIMAL(10,3)
+   
+   LET m_msg = NULL
+   
+   UPDATE item_sup
+      SET qtd_lote_minimo    = ma_sup[m_ind].qtd_lote_minimo,   
+          qtd_pt_pedid       = ma_sup[m_ind].qtd_pt_pedid,      
+          tmp_necessar_p_ped = ma_sup[m_ind].tmp_necessar_p_ped,
+          tmp_necessar_fabr  = ma_sup[m_ind].tmp_necessar_fabr, 
+          tmp_transpor       = ma_sup[m_ind].tmp_transpor,      
+          tmp_inspecao       = ma_sup[m_ind].tmp_inspecao,      
+          tmp_necessar_cont  = ma_sup[m_ind].tmp_necessar_cont
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item = ma_sup[m_ind].cod_item
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('UPDATE','item')
+      RETURN FALSE
+   END IF
+   
+   SELECT qtd_prog_fix
+     INTO l_prod_fix
+     FROM item_man
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item = ma_sup[m_ind].cod_item
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','item_man')
+      RETURN FALSE
+   END IF
+   
+   LET l_prod_min = ma_sup[m_ind].qtd_lote_minimo 
+   
+   IF l_prod_min > 0 THEN
+      LET l_prod_fix = 0
+   END IF
+   
+   LET l_tmp_ressup = ma_sup[m_ind].tmp_necessar_p_ped + 
+         ma_sup[m_ind].tmp_necessar_fabr + ma_sup[m_ind].tmp_transpor
+         
+   UPDATE item_man 
+      SET tmp_ressup = l_tmp_ressup,
+          qtd_prog_minima = ma_sup[m_ind].qtd_lote_minimo,
+          qtd_prog_fix = l_prod_fix
+    WHERE  cod_empresa = p_cod_empresa
+      AND cod_item = ma_sup[m_ind].cod_item
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('UPDATE','item_man')
+      RETURN FALSE
+   END IF
+   
+   SELECT MAX(num_revisao) 
+     INTO l_revisao
+     FROM audit_item 
+    WHERE cod_empresa = p_cod_empresa 
+      AND cod_item = ma_sup[m_ind].cod_item
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','audit_item')
+      RETURN FALSE
+   END IF
+   
+   IF l_revisao IS NULL THEN
+      LET l_revisao = 0
+   END IF
+   
+   LET l_revisao = l_revisao + 1
+   
+   INSERT INTO audit_item 
+      VALUES(p_cod_empresa, 
+             ma_sup[m_ind].cod_item,
+             m_txt_audit,
+             'POL1385',
+             m_dat_cadastro,
+             m_dat_atu,
+             l_revisao,
+             m_hor_atu,
+             p_user)
+                
+   LET m_msg = 'ATUALIZADO'
+   
+   RETURN TRUE
+
+END FUNCTION
+         

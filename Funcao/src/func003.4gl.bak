@@ -18,7 +18,8 @@ DEFINE p_num_reserva           INTEGER,
        p_cod_empresa           CHAR(02),
        p_msg                   CHAR(300),
        p_cod_item              CHAR(15),
-       p_qtd_reservada         DECIMAL(10,3)
+       p_qtd_reservada         DECIMAL(10,3),
+       m_msg                   VARCHAR(120)
 
 #-------------------------------------------#
 FUNCTION func003_deleta_reserva(p_parametro)#
@@ -31,6 +32,7 @@ FUNCTION func003_deleta_reserva(p_parametro)#
    
    LET p_cod_empresa = p_parametro.cod_empresa
    LET p_num_reserva = p_parametro.num_reserva
+   LET m_msg = NULL
    
    SELECT cod_item,
           qtd_reservada
@@ -41,20 +43,16 @@ FUNCTION func003_deleta_reserva(p_parametro)#
       AND num_reserva = p_num_reserva
 
    IF STATUS = 100 THEN
-      LET p_msg = 'Programa: FUNC003\n',
-                  'Mensagem de erro:\n',
-                  'Reserva inexistente.'
-      CALL log0030_mensagem(p_msg,'info')
-      RETURN FALSE
+      RETURN m_msg
    ELSE
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','estoque_loc_reser:func003')
-         RETURN FALSE
+         LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lemdo dados da tab estoque_loc_reser:func003 '
+         RETURN m_msg
       END IF
    END IF
    
    IF NOT func003_deleta_tabelas() THEN
-      RETURN FALSE
+      RETURN m_msg
    END IF
    
    UPDATE estoque
@@ -63,7 +61,7 @@ FUNCTION func003_deleta_reserva(p_parametro)#
       AND cod_item = p_cod_item
       
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('UPDATE','estoque:func003')
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' atualizando tab estoque:func003 '
       RETURN FALSE
    END IF
    
@@ -80,7 +78,7 @@ FUNCTION func003_deleta_tabelas()#
       AND num_reserva = p_num_reserva
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','estoque_loc_reser:func003')
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' deletando registro tab estoque_loc_reser:func003 '
       RETURN FALSE
    END IF
    
@@ -89,7 +87,7 @@ FUNCTION func003_deleta_tabelas()#
       AND num_reserva = p_num_reserva
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','est_loc_reser_end:func003')
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' deletando registro tab est_loc_reser_end:func003 '
       RETURN FALSE
    END IF
 
@@ -98,7 +96,7 @@ FUNCTION func003_deleta_tabelas()#
       AND num_reserva = p_num_reserva
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','ordem_montag_grade:func003')
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' deletando registro tab ordem_montag_grade:func003 '
       RETURN FALSE
    END IF
 
@@ -107,7 +105,7 @@ FUNCTION func003_deleta_tabelas()#
       AND reserva = p_num_reserva
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','ldi_om_grade_compl:func003')
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' deletando registro tab ldi_om_grade_compl:func003 '
       RETURN FALSE
    END IF
 
@@ -116,7 +114,7 @@ FUNCTION func003_deleta_tabelas()#
       AND num_trans_resv_est = p_num_reserva
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','sup_resv_lote_est:func003')
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' deletando registro tab sup_resv_lote_est:func003 '
       RETURN FALSE
    END IF
    
@@ -125,7 +123,7 @@ FUNCTION func003_deleta_tabelas()#
       AND num_reserva = p_num_reserva
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','est_reser_area_lin:func003')
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' deletando registro tab est_reser_area_lin:func003 '
       RETURN FALSE
    END IF
       
@@ -134,7 +132,7 @@ FUNCTION func003_deleta_tabelas()#
       AND reserva = p_num_reserva
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','sup_par_resv_est:func003')
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' deletando registro tab sup_par_resv_est:func003 '
       RETURN FALSE
    END IF
 
@@ -142,4 +140,4 @@ FUNCTION func003_deleta_tabelas()#
 
 END FUNCTION         
 
-#-------fim do programa----------#
+

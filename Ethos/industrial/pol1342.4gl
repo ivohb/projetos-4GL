@@ -32,7 +32,7 @@ DEFINE mr_fat              RECORD
    num_seq                 DECIMAL(4,0),
    cod_Item                VARCHAR(15),
    descricao               VARCHAR(50),
-   qtd_faturar             DECIMAL(10,3),
+   qtd_faturar             INTEGER,
    posicao                 VARCHAR(10),
    observacao              VARCHAR(10),
    responsavel             VARCHAR(15),
@@ -159,7 +159,7 @@ FUNCTION pol1342_le_caminho()#
      INTO m_caminho
    FROM path_logix_v2
    WHERE cod_empresa = p_cod_empresa 
-     AND cod_sistema = 'VDP'
+     AND cod_sistema = 'CSR'
 
    IF STATUS = 100 THEN
       LET m_msg = 'Caminho do sistema VDPEDI não cadastrado na LOG1100/LOG00098'
@@ -290,9 +290,9 @@ END REPORT
    
 #LOG1700             
 #-------------------------------#
- FUNCTION pol1342_version_info()
+ FUNCTION pol1342_version_info()#
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1342.4gl $|$Revision: 00 $|$Date: 05/11/2020 09:51 $|$Modtime: 05/11/2020 09:51 $" 
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1342.4gl $|$Revision: 02 $|$Date: 03/12/2020 08:11 $|$Modtime: 02/12/2020 07:59 $" 
 
  END FUNCTION

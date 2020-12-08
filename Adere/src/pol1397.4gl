@@ -190,14 +190,77 @@ FUNCTION vdp30100y_after_processar()#
    END IF
    
    IF m_count > 0 THEN
-      LET p_status = LOG_progresspopup_start(
-         "Juntando Ordens...","pol1407_junta_ordens","PROCESS")  
+      IF pol1397_le_pedidos() THEN
+         LET m_msg = LOG_progresspopup_start(
+            "Juntando Ordens...","pol1407_junta_ordens","PROCESS")  
+         IF m_msg IS NOT NULL THEN
+            CALL log0030_mensagem(m_msg,'info')
+         END IF
+      END IF
    END IF
    
    WHENEVER ANY ERROR STOP
    
 END FUNCTION
 
+#----------------------------#
+FUNCTION pol1397_le_pedidos()#
+#----------------------------#
+   
+   DEFINE l_num_om     INTEGER,
+          l_num_pedido INTEGER
+          
+   DROP TABLE w_pedido_tmp 
+   
+   CREATE TEMP  TABLE w_pedido_tmp(
+      num_pedido      INTEGER
+   );
+
+   IF STATUS <> 0 THEN      
+      CALL log003_err_sql('CREATE','w_pedido_tmp:EPL:vdp30100y_after_processar')
+      RETURN FALSE
+   END IF
+   
+   DELETE FROM w_pedido_tmp
+
+   DECLARE cq_oms CURSOR FOR
+    SELECT num_om
+     FROM w_om_nova
+   
+   FOREACH cq_oms INTO l_num_om
+
+      IF STATUS <> 0 THEN      
+         CALL log003_err_sql('FOREACH','cq_oms:vdp30100y_after_processar')
+         RETURN FALSE
+      END IF
+      
+      DECLARE cq_peds CURSOR FOR
+       SELECT DISTINCT num_pedido
+         FROM ordem_montag_item
+        WHERE cod_empresa = p_cod_empresa
+          AND num_om = l_num_om
+      
+      FOREACH cq_peds INTO l_num_pedido
+
+         IF STATUS <> 0 THEN      
+            CALL log003_err_sql('FOREACH','cq_peds:vdp30100y_after_processar')
+            RETURN FALSE
+         END IF
+         
+         INSERT INTO w_pedido_tmp VALUES(l_num_pedido)
+      
+         IF STATUS <> 0 THEN      
+            CALL log003_err_sql('INSERT','w_pedido_tmp:vdp30100y_after_processar')
+            RETURN FALSE
+         END IF
+      
+      END FOREACH
+   
+   END FOREACH
+   
+   RETURN TRUE
+
+END FUNCTION   
 
 #----------------------------------#
 FUNCTION man100211y_after_incluir()#

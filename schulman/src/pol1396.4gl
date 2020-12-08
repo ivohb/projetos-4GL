@@ -324,7 +324,20 @@ FUNCTION pol1396_processa()#
   IF l_count > 0 THEN
      RETURN TRUE
   END IF
-  
+
+ {SELECT  val_credito_conced ,
+         val_pedidos_aprov ,
+         val_debito_vencido ,
+         val_debito_a_venc ,
+	qtd_dias_maior_atr ,
+	qtd_dias_atras_med
+	FROM credcad_cgc
+	WHERE num_cgc_cpf = '008.743.708'
+       	AND dat_credito_conced >=
+
+ let saldo_credito = val_credito_conced - 
+     val_pedidos_aprov - val_debito_vencido - val_debito_a_venc}
+   
   LET l_dat_proces = TODAY
   LET l_hor_proces = TIME
   

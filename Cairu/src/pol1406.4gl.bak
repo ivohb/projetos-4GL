@@ -6,7 +6,7 @@
 # DATA....: 30/09/2020                                              #
 #-------------------------------------------------------------------#
 #Lista de preço
-{VPD10002 – Tabela Mestre
+{VPD10102 – Tabela Mestre
 VPD0270 – Item} 
 
 DATABASE logix
@@ -126,7 +126,7 @@ DEFINE mr_emp          RECORD
        empresa         VARCHAR(02),
        descricao       VARCHAR(36),
        uf              VARCHAR(02),
-       enviar          VARCHAR(01)
+       gerar_om        VARCHAR(01)
 END RECORD
 
 DEFINE ma_emp            ARRAY[100] OF RECORD
@@ -134,7 +134,7 @@ DEFINE ma_emp            ARRAY[100] OF RECORD
        empresa           VARCHAR(02),
        uf                CHAR(02),
        descricao         VARCHAR(36),
-       enviar            CHAR(01),
+       gerar_om          CHAR(01),
        filler            CHAR(01)
 END RECORD
 
@@ -2144,15 +2144,13 @@ FUNCTION pol1406_emp_campo(l_container)#
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_emp)
     CALL _ADVPL_set_property(l_label,"TRANSPARENT",TRUE)
     CALL _ADVPL_set_property(l_label,"POSITION",800,10)  
-    CALL _ADVPL_set_property(l_label,"TEXT","Envio automático:")    
+    CALL _ADVPL_set_property(l_label,"TEXT","Gerar romaneio:")    
 
     LET m_env_aut = _ADVPL_create_component(NULL,"LCOMBOBOX",m_pan_emp)     
-    CALL _ADVPL_set_property(m_env_aut,"POSITION",900,10)     
-    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","A","Ambos")
-    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","E","Estoque")
-    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","P","Produto")
-    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","N","Nenhum")
-    CALL _ADVPL_set_property(m_env_aut,"VARIABLE",mr_emp,"enviar")
+    CALL _ADVPL_set_property(m_env_aut,"POSITION",890,10)     
+    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","S","Sim")
+    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","N","Não")
+    CALL _ADVPL_set_property(m_env_aut,"VARIABLE",mr_emp,"gerar_om")
 
 
     CALL _ADVPL_set_property(m_pan_emp,"ENABLE",FALSE)
@@ -2201,9 +2199,9 @@ FUNCTION pol1406_emp_grade(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","uf")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_emp)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Enviar")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Gerar OM")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",50)    
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","enviar")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","gerar_om")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_emp)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","")
@@ -2253,7 +2251,7 @@ FUNCTION pol1406_emp_set_item(l_linha)#
    LET mr_emp.empresa = ma_emp[l_linha].empresa
    LET mr_emp.descricao = ma_emp[l_linha].descricao
    LET mr_emp.uf = ma_emp[l_linha].uf
-   LET mr_emp.enviar = ma_emp[l_linha].enviar
+   LET mr_emp.gerar_om = ma_emp[l_linha].gerar_om
 
 END FUNCTION
 
@@ -2384,11 +2382,11 @@ FUNCTION pol1406_emp_ins_emp()#
    INSERT INTO empresa_api_cairu(
        cnpj,       
        empresa,
-       uf, enviar)    
+       uf, gerar_om)    
     VALUES(mr_emp.cnpj,    
            mr_emp.empresa,
            mr_emp.uf,
-           mr_emp.enviar)
+           mr_emp.gerar_om)
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('INSERT','empresa_api_cairu')
@@ -2406,7 +2404,7 @@ FUNCTION pol1406_emp_prepare()#
    DEFINE l_sql_stmt CHAR(2000)
                         
    LET l_sql_stmt =
-       " SELECT cnpj, empresa, uf, enviar ",
+       " SELECT cnpj, empresa, uf, gerar_om ",
     "  FROM empresa_api_cairu ",
     " WHERE 1 = 1 "
 
@@ -2439,7 +2437,7 @@ FUNCTION pol1406_emp_exibe(l_sql_stmt)#
       ma_emp[l_ind].cnpj,
       ma_emp[l_ind].empresa,
       ma_emp[l_ind].uf,
-      ma_emp[l_ind].enviar
+      ma_emp[l_ind].gerar_om
             
       IF STATUS <> 0 THEN 
          CALL log003_err_sql('SELECT','cq_emp:01')
@@ -2608,7 +2606,7 @@ FUNCTION pol1406_emp_create_cursor(l_where, l_order)#
     END IF
     
     LET l_sql_stmt = 
-       " SELECT cnpj, empresa, uf, enviar ",
+       " SELECT cnpj, empresa, uf, gerar_om ",
        " FROM empresa_api_cairu ",
         " WHERE ",l_where CLIPPED,
         " ORDER BY ",l_order

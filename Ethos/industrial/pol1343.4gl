@@ -28,7 +28,9 @@ DEFINE m_dialog          VARCHAR(10),
        m_cod_cliente     VARCHAR(10),
        m_zoom_cliente    VARCHAR(10),
        m_lupa_cli        VARCHAR(10),
-       m_estoque         VARCHAR(10)
+       m_pedido          VARCHAR(10),
+       m_estoque         VARCHAR(10),
+       m_ordem           VARCHAR(10)
 
 DEFINE m_count           INTEGER,
        m_msg             VARCHAR(150),
@@ -42,7 +44,7 @@ DEFINE m_count           INTEGER,
        m_pos_ini         INTEGER,
        m_pos_fim         INTEGER,
        m_cliente         VARCHAR(60),
-       m_qtd_deman       INTEGER,
+       m_qtd_linha       INTEGER,
        m_car_deman       SMALLINT,
        m_posi_arq        INTEGER,
        m_qtd_arq         INTEGER,
@@ -52,8 +54,24 @@ DEFINE m_count           INTEGER,
        m_qtd_erro        INTEGER,
        m_dat_atu         DATE,
        m_hor_atu         CHAR(08),
+       m_dat_hor         CHAR(10),
        m_ies_info        SMALLINT,
-       m_query           VARCHAR(800)
+       m_query           VARCHAR(800),
+       m_index           INTEGER,
+       m_explodiu        VARCHAR(01),
+       m_num_pedido      INTEGER,
+       m_cod_item        VARCHAR(15),
+       m_prz_entrega     DATE,
+       m_num_docum       VARCHAR(10),
+       m_qtd_estoque     DECIMAL(10,3),
+       m_ies_situa       CHAR(01),
+       m_ja_liberou      SMALLINT,
+       m_ies_kanban      SMALLINT,
+       m_gera_op         SMALLINT,
+       m_progres         SMALLINT,
+       m_num_ordem       INTEGER,
+       m_qtd_deman       DECIMAL(10,3),
+       m_num_de_op       INTEGER
 
 DEFINE ma_files ARRAY[150] OF CHAR(100)
 
@@ -61,9 +79,11 @@ DEFINE mr_cabec          RECORD
        cod_empresa       CHAR(02),
        nom_arquivo       VARCHAR(80),
        cod_cliente       VARCHAR(15),
+       num_pedido        DECIMAL(6,0),
        dat_de            DATE,
        dat_ate           DATE,
-       ies_estoque       CHAR(01)
+       ies_estoque       CHAR(01),
+       ies_ordem         CHAR(01)
 END RECORD
                      
 DEFINE ma_deman          ARRAY[12000] OF RECORD
@@ -87,7 +107,22 @@ DEFINE mr_deman          RECORD
        demanda           DECIMAL(10,3),
        mensagem          VARCHAR(120)
 END RECORD
-                      
+
+DEFINE m_cod_it_pai      LIKE estrut_grade.cod_item_compon, 
+       m_qtd_it_pai      LIKE estrut_grade.qtd_necessaria,
+       m_qtd_planej      LIKE ordens.qtd_planej,       
+       m_cod_it_comp     LIKE estrut_grade.cod_item_compon, 
+       m_qtd_it_comp     LIKE estrut_grade.qtd_necessaria,
+       m_cod_local_estoq LIKE item.cod_local_estoq,
+       m_lot_fixo        DECIMAL(10,3),
+       m_ies_tip_item    CHAR(01)
+
+DEFINE mr_parametro      RECORD 
+       cod_empresa       VARCHAR(02),
+       num_ordem         INTEGER,
+       ies_transacao     CHAR(01)
+END RECORD
+
 #-----------------#
 FUNCTION pol1343()#
 #-----------------#
@@ -136,6 +171,28 @@ FUNCTION pol1343_cria_temp()#
     
    IF STATUS <> 0 THEN
       CALL log003_err_sql('CREATE','ix_w_pedido_temp')
+      RETURN FALSE
+   END IF
+
+   DROP TABLE w_item_temp
+   
+   CREATE TABLE w_item_temp (
+       cod_item       VARCHAR(15),
+       cod_item_pai   VARCHAR(15),
+       qtd_planej     DECIMAL(10,3),
+       lot_fixo       INTEGER,
+       explodiu       VARCHAR(01)
+   )
+      
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('CREATE','w_item_temp')
+      RETURN FALSE
+   END IF
+   
+   CREATE UNIQUE INDEX ix_w_item_temp ON w_item_temp(cod_item)
+    
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('CREATE','ix_w_item_temp')
       RETURN FALSE
    END IF
    
@@ -210,7 +267,7 @@ FUNCTION pol1343_cabec(l_container)#
 
     LET m_pan_cabec = _ADVPL_create_component(NULL,"LPANEL",l_container)
     CALL _ADVPL_set_property(m_pan_cabec,"ALIGN","TOP")
-    CALL _ADVPL_set_property(m_pan_cabec,"HEIGHT",40)
+    CALL _ADVPL_set_property(m_pan_cabec,"HEIGHT",60)
     CALL _ADVPL_set_property(m_pan_cabec,"ENABLE",FALSE)
     CALL _ADVPL_set_property(m_pan_cabec,"BACKGROUND_COLOR",217,227,253) 
 
@@ -220,68 +277,86 @@ FUNCTION pol1343_cabec(l_container)#
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_cabec)     
-    CALL _ADVPL_set_property(l_caixa,"POSITION",70,10) 
+    CALL _ADVPL_set_property(l_caixa,"POSITION",67,10) 
     CALL _ADVPL_set_property(l_caixa,"LENGTH",2,0)    
     CALL _ADVPL_set_property(l_caixa,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_cabec,"cod_empresa")
     CALL _ADVPL_set_property(l_caixa,"CAN_GOT_FOCUS",FALSE)
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
-    CALL _ADVPL_set_property(l_label,"POSITION",100,10) 
+    CALL _ADVPL_set_property(l_label,"POSITION",118,10) 
     CALL _ADVPL_set_property(l_label,"TEXT","Arquivo:")    
     CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_arq_denam = _ADVPL_create_component(NULL,"LCOMBOBOX",m_pan_cabec)     
-    CALL _ADVPL_set_property(m_arq_denam,"POSITION",160,10)     
+    CALL _ADVPL_set_property(m_arq_denam,"POSITION",170,10)     
     CALL _ADVPL_set_property(m_arq_denam,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(m_arq_denam,"ADD_ITEM","0","Select    ")
     CALL _ADVPL_set_property(m_arq_denam,"VARIABLE",mr_cabec,"nom_arquivo")
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
-    CALL _ADVPL_set_property(l_label,"POSITION",635,10) 
+    CALL _ADVPL_set_property(l_label,"POSITION",10,40) 
+    CALL _ADVPL_set_property(l_label,"TEXT","Período de:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET m_dat_de = _ADVPL_create_component(NULL,"LDATEFIELD",m_pan_cabec)
+    CALL _ADVPL_set_property(m_dat_de,"POSITION",77,40)     
+    CALL _ADVPL_set_property(m_dat_de,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(m_dat_de,"VARIABLE",mr_cabec,"dat_de")
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
+    CALL _ADVPL_set_property(l_label,"POSITION",187,40)     
+    CALL _ADVPL_set_property(l_label,"TEXT","-")   
+
+    LET m_dat_ate = _ADVPL_create_component(NULL,"LDATEFIELD",m_pan_cabec)
+    CALL _ADVPL_set_property(m_dat_ate,"POSITION",202,40)     
+    CALL _ADVPL_set_property(m_dat_ate,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(m_dat_ate,"VARIABLE",mr_cabec,"dat_ate")
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
+
+    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
+    CALL _ADVPL_set_property(l_label,"POSITION",330,40) 
     CALL _ADVPL_set_property(l_label,"TEXT","Cliente:")    
+    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,TRUE,FALSE)
 
     LET m_cod_cliente = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_cabec)
-    CALL _ADVPL_set_property(m_cod_cliente,"POSITION",675,10)     
+    CALL _ADVPL_set_property(m_cod_cliente,"POSITION",378,40)     
     CALL _ADVPL_set_property(m_cod_cliente,"LENGTH",15)   
     CALL _ADVPL_set_property(m_cod_cliente,"ENABLE",FALSE)    
     CALL _ADVPL_set_property(m_cod_cliente,"VARIABLE",mr_cabec,"cod_cliente")
 
     LET m_lupa_cli = _ADVPL_create_component(NULL,"LIMAGEBUTTON",m_pan_cabec)
     CALL _ADVPL_set_property(m_lupa_cli,"IMAGE","BTPESQ")
-    CALL _ADVPL_set_property(m_lupa_cli,"POSITION",809,10)     
+    CALL _ADVPL_set_property(m_lupa_cli,"POSITION",510,40)     
     CALL _ADVPL_set_property(m_lupa_cli,"SIZE",24,20)
     CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",FALSE)
     CALL _ADVPL_set_property(m_lupa_cli,"CLICK_EVENT","pol1343_zoom_cliente")
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
-    CALL _ADVPL_set_property(l_label,"POSITION",836,10) 
-    CALL _ADVPL_set_property(l_label,"TEXT","Período de:")    
+    CALL _ADVPL_set_property(l_label,"POSITION",548,40) 
+    CALL _ADVPL_set_property(l_label,"TEXT","Pedido:")    
 
-    LET m_dat_de = _ADVPL_create_component(NULL,"LDATEFIELD",m_pan_cabec)
-    CALL _ADVPL_set_property(m_dat_de,"POSITION",895,10)     
-    CALL _ADVPL_set_property(m_dat_de,"ENABLE",FALSE)    
-    CALL _ADVPL_set_property(m_dat_de,"VARIABLE",mr_cabec,"dat_de")
+    LET m_pedido = _ADVPL_create_component(NULL,"LNUMERICFIELD",m_pan_cabec)
+    CALL _ADVPL_set_property(m_pedido,"POSITION",589,40)     
+    CALL _ADVPL_set_property(m_pedido,"LENGTH",7)   
+    CALL _ADVPL_set_property(m_pedido,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(m_pedido,"VARIABLE",mr_cabec,"num_pedido")
 
-    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
-    CALL _ADVPL_set_property(l_label,"POSITION",1005,10)     
-    CALL _ADVPL_set_property(l_label,"TEXT","-")   
-
-    LET m_dat_ate = _ADVPL_create_component(NULL,"LDATEFIELD",m_pan_cabec)
-    CALL _ADVPL_set_property(m_dat_ate,"POSITION",1020,10)     
-    CALL _ADVPL_set_property(m_dat_ate,"ENABLE",FALSE)    
-    CALL _ADVPL_set_property(m_dat_ate,"VARIABLE",mr_cabec,"dat_ate")
-
-    LET l_label = _ADVPL_create_component(NULL,"LLABEL",m_pan_cabec)
-    CALL _ADVPL_set_property(l_label,"POSITION",1140,10) 
-    CALL _ADVPL_set_property(l_label,"TEXT","Considerar estoq?")    
-
-    LET m_estoque = _ADVPL_create_component(NULL,"LTEXTFIELD",m_pan_cabec)
-    CALL _ADVPL_set_property(m_estoque,"POSITION",1240,10)     
-    CALL _ADVPL_set_property(m_estoque,"LENGTH",02)   
+    LET m_estoque = _ADVPL_create_component(NULL,"LCHECKBOX",m_pan_cabec)
+    CALL _ADVPL_set_property(m_estoque,"POSITION",670,40)     
     CALL _ADVPL_set_property(m_estoque,"ENABLE",FALSE)    
-    CALL _ADVPL_set_property(m_estoque,"PICTURE","!")   
+    CALL _ADVPL_set_property(m_estoque,"TEXT","Considerar estoque do primeiro nivel?")    
+    CALL _ADVPL_set_property(m_estoque,"VALUE_CHECKED","S")     
+    CALL _ADVPL_set_property(m_estoque,"VALUE_NCHECKED","N")     
     CALL _ADVPL_set_property(m_estoque,"VARIABLE",mr_cabec,"ies_estoque")
+
+    LET m_ordem = _ADVPL_create_component(NULL,"LCHECKBOX",m_pan_cabec)
+    CALL _ADVPL_set_property(m_ordem,"POSITION",888,40)     
+    CALL _ADVPL_set_property(m_ordem,"ENABLE",FALSE)    
+    CALL _ADVPL_set_property(m_ordem,"TEXT","Considerar saldo de OP liberada?")    
+    CALL _ADVPL_set_property(m_ordem,"VALUE_CHECKED","S")     
+    CALL _ADVPL_set_property(m_ordem,"VALUE_NCHECKED","N")     
+    CALL _ADVPL_set_property(m_ordem,"VARIABLE",mr_cabec,"ies_ordem")
 
 END FUNCTION
 
@@ -372,6 +447,7 @@ FUNCTION pol1343_deman_info()#
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
    
    LET m_ies_deman = FALSE
+   LET m_ies_info = FALSE
    
    IF NOT pol1343_le_caminho() THEN
       RETURN FALSE
@@ -553,6 +629,14 @@ FUNCTION pol1343_deman_conf()#
       RETURN FALSE
    END IF
 
+   SELECT COUNT(*) INTO m_count FROM w_pedido_temp
+   
+   IF m_count = 0 THEN
+      LET m_msg = 'Não há dados no arquivo informado'
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN FALSE
+   END IF   
+
    LET m_car_deman = TRUE
 
    LET p_status = LOG_progresspopup_start(
@@ -566,6 +650,7 @@ FUNCTION pol1343_deman_conf()#
    END IF
       
    LET m_ies_deman = TRUE
+   LET m_ies_info = TRUE
 
    IF m_qtd_erro > 0 THEN
       LET m_msg = 'Foram encontrados ',m_qtd_erro USING '<<<<', ' registos com erro'
@@ -1052,8 +1137,8 @@ FUNCTION pol1343_exibe_demanda()#
       
    END FOREACH
 
-   LET m_qtd_deman = m_ind - 1
-   CALL _ADVPL_set_property(m_brz_item,"ITEM_COUNT", m_qtd_deman)
+   LET m_qtd_linha = m_ind - 1
+   CALL _ADVPL_set_property(m_brz_item,"ITEM_COUNT", m_qtd_linha)
 
    RETURN TRUE
 
@@ -1101,9 +1186,11 @@ FUNCTION pol1343_informar()#
    CALL _ADVPL_set_property(m_dat_de,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_dat_ate,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_estoque,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_ordem,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_cod_cliente,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",TRUE)
-   CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
+   CALL _ADVPL_set_property(m_pedido,"ENABLE",TRUE)
+   CALL _ADVPL_set_property(m_dat_de,"GET_FOCUS")
    
    RETURN TRUE
    
@@ -1118,8 +1205,10 @@ FUNCTION pol1343_info_canc()#
    CALL _ADVPL_set_property(m_dat_de,"ENABLE",FALSE)
    CALL _ADVPL_set_property(m_dat_ate,"ENABLE",FALSE)
    CALL _ADVPL_set_property(m_estoque,"ENABLE",FALSE)   
+   CALL _ADVPL_set_property(m_ordem,"ENABLE",FALSE)
    CALL _ADVPL_set_property(m_cod_cliente,"ENABLE",FALSE)
    CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",FALSE)
+   CALL _ADVPL_set_property(m_pedido,"ENABLE",FALSE)
    
    RETURN TRUE
 
@@ -1132,9 +1221,31 @@ FUNCTION pol1343_info_conf()#
    DEFINE l_status        SMALLINT
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+
+   IF mr_cabec.cod_cliente IS NULL THEN
+      LET m_msg = 'Informe o cliente:'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
+      RETURN FALSE
+   ELSE
+      CALL pol1343_le_cliente(mr_cabec.cod_cliente)
+      IF m_nom_cliente IS NULL THEN
+         LET m_msg = 'Cliente não existe.'
+         CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+         CALL _ADVPL_set_property(m_cod_cliente,"GET_FOCUS")
+         RETURN FALSE
+      END IF
+   END IF
    
    IF mr_cabec.dat_de IS NULL THEN
       LET m_msg = 'Informe o período de:'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL _ADVPL_set_property(m_dat_de,"GET_FOCUS")
+      RETURN FALSE
+   END IF
+
+   IF mr_cabec.dat_de < TODAY THEN
+      LET m_msg = 'Período de inválido'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
       CALL _ADVPL_set_property(m_dat_de,"GET_FOCUS")
       RETURN FALSE
@@ -1176,6 +1287,14 @@ FUNCTION pol1343_info_conf()#
       RETURN FALSE
    END IF
 
+   SELECT COUNT(*) INTO m_count FROM w_pedido_temp
+   
+   IF m_count = 0 THEN
+      LET m_msg = 'Não há dados para o parâmetros informados'
+      CALL log0030_mensagem(m_msg,'info')
+      RETURN FALSE
+   END IF   
+   
    LET m_car_deman = TRUE
 
    LET p_status = LOG_progresspopup_start(
@@ -1199,9 +1318,10 @@ FUNCTION pol1343_info_conf()#
    CALL _ADVPL_set_property(m_dat_de,"ENABLE",FALSE)
    CALL _ADVPL_set_property(m_dat_ate,"ENABLE",FALSE)
    CALL _ADVPL_set_property(m_estoque,"ENABLE",FALSE)
+   CALL _ADVPL_set_property(m_ordem,"ENABLE",FALSE)
    CALL _ADVPL_set_property(m_cod_cliente,"ENABLE",FALSE)
    CALL _ADVPL_set_property(m_lupa_cli,"EDITABLE",FALSE)
-      
+   CALL _ADVPL_set_property(m_pedido,"ENABLE",FALSE)
    RETURN TRUE   
     
 END FUNCTION
@@ -1225,6 +1345,10 @@ FUNCTION pol1343_monta_select()#
        
    IF mr_cabec.cod_cliente IS NOT NULL THEN
       LET m_query = m_query CLIPPED, " AND p.cod_cliente = '",mr_cabec.cod_cliente,"' "
+   END IF   
+
+   IF mr_cabec.num_pedido IS NOT NULL THEN
+      LET m_query = m_query CLIPPED, " AND p.num_pedido = '",mr_cabec.num_pedido,"' "
    END IF   
       
 END FUNCTION          
@@ -1267,4 +1391,466 @@ FUNCTION pol1343_le_demanda()#
 
 END FUNCTION
 
+#-----------------------#
+FUNCTION pol1343_gerar()#
+#-----------------------#
 
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+
+   IF NOT m_ies_info THEN
+      LET m_msg = 'Carregue um arquivo CSV ou informe os parâmetros previamente'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   LET m_msg = 'Confirma a geração de ordens para\n os pedidos contidos na grade ?'
+   
+   IF NOT LOG_question(m_msg) THEN
+      RETURN FALSE
+   END IF
+
+   LET p_status = LOG_progresspopup_start(
+       "Processando...","pol1343_processa","PROCESS")  
+   
+   IF NOT p_status THEN
+      RETURN FALSE
+   END IF
+   
+   LET m_ies_info = FALSE
+   
+   CALL log0030_mensagem('Operação efetuada com sucesso','info')
+   
+   RETURN TRUE
+   
+END FUNCTION   
+
+#--------------------------#
+FUNCTION pol1343_processa()#
+#--------------------------#
+   
+   DEFINE l_progres    SMALLINT
+   
+   CALL LOG_progresspopup_set_total("PROCESS",m_qtd_linha)
+   
+   LET m_dat_atu = TODAY
+   LET m_hor_atu = TIME
+   LET m_dat_hor = CURRENT
+   
+   FOR m_index = 1 TO m_qtd_linha
+       
+       LET mr_deman.cod_cliente = ma_deman[m_index].cod_cliente
+       LET m_qtd_estoque = ma_deman[m_index].estoque
+       LET m_num_pedido = ma_deman[m_index].num_pedido
+       LET m_cod_item = ma_deman[m_index].cod_item
+       LET m_cod_it_pai = '0'
+       LET m_prz_entrega = ma_deman[m_index].pri_entrega
+       
+       IF mr_cabec.ies_estoque = 'S' THEN
+          LET m_qtd_planej = ma_deman[m_index].demanda - ma_deman[m_index].estoque
+       ELSE
+          LET m_qtd_planej = ma_deman[m_index].demanda
+       END IF
+       
+       LET m_explodiu = 'N'
+       LET m_num_docum = m_num_pedido USING '<<<<<<<<<<'
+
+       IF NOT pol1343_le_tip_item(m_cod_item) THEN
+          RETURN FALSE
+       END IF
+          
+       IF NOT m_ies_kanban THEN
+ 
+          IF NOT pol1343_le_extrut() THEN
+             RETURN FALSE
+          END IF
+
+          CALL LOG_transaction_begin()
+          
+          IF NOT pol1343_proc_ops() THEN
+             CALL LOG_transaction_rollback()
+             RETURN FALSE
+          END IF
+          
+          CALL LOG_transaction_commit()        
+ 
+       END IF
+
+       LET l_progres = LOG_progresspopup_increment("PROCESS")
+      
+   END FOR
+
+   LET l_progres = LOG_progresspopup_increment("PROCESS")
+   
+END FUNCTION
+
+#--------------------------#
+FUNCTION pol1343_le_ordem()#
+#--------------------------#
+   
+   DEFINE l_count     INTEGER
+   
+   SELECT COUNT(*) INTO l_count FROM ordens a     
+    INNER JOIN ordens_547 b           
+      ON b.cod_empresa = b.cod_empresa 
+     AND b.num_ordem = a.num_ordem    
+   WHERE a.cod_empresa = p_cod_empresa    
+     AND a.num_docum = m_num_docum      
+     AND a.cod_item = m_cod_item 
+     AND a.dat_entrega = m_prz_entrega 
+     AND a.ies_situa <> '3'            
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT', 'ordens/ordens_547')
+      RETURN FALSE
+   END IF
+   
+   IF l_count > 0 THEN
+      LET m_gera_op = FALSE
+   END IF
+      
+   {SELECT num_ordem
+     INTO m_num_ordem
+     FROM ordens_547 
+    WHERE cod_empresa = p_cod_empresa
+      AND num_docum = m_num_docum
+      AND cod_item = m_cod_item
+      AND dat_entrega = m_prz_entrega
+       
+   IF STATUS = 0 THEN
+      SELECT ies_situa
+        INTO m_ies_situa
+        FROM ordens_547 
+       WHERE cod_empresa = p_cod_empresa
+         AND num_ordem = m_num_ordem
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT', 'ordens')
+         RETURN FALSE
+      END IF
+   ELSE
+      LET m_num_ordem = 0
+      IF STATUS <> 100 THEN
+         CALL log003_err_sql('SELECT', 'ordens_547')
+          RETURN FALSE
+      END IF
+   END IF}
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------#
+FUNCTION pol1343_le_extrut()#
+#---------------------------#
+
+   DELETE FROM w_item_temp
+
+   IF NOT pol1343_insere_item() THEN
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1343_explod_estrut() THEN
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION
+   
+#-----------------------------#
+FUNCTION pol1343_insere_item()#
+#-----------------------------#
+
+   INSERT INTO w_item_temp
+      VALUES(m_cod_item, m_cod_it_pai, m_qtd_planej, m_lot_fixo, m_explodiu)
+
+   IF STATUS <> 0 THEN 
+      CALL log003_err_sql("Iserindo","w_item_temp")
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION
+
+#-------------------------------#
+FUNCTION pol1343_explod_estrut()#
+#-------------------------------#
+   
+   DEFINE l_count       INTEGER
+   
+   WHILE TRUE
+    
+    SELECT COUNT(cod_item)
+      INTO l_count
+      FROM w_item_temp
+     WHERE explodiu = 'N'
+     
+    IF STATUS <> 0 THEN
+       CALL log003_err_sql('Lendo','w_item_temp')
+       RETURN FALSE
+    END IF
+    
+    IF l_count = 0 THEN
+       EXIT WHILE
+    END IF
+    
+    DECLARE cq_exp CURSOR FOR
+     SELECT cod_item,
+            qtd_planej
+       FROM w_item_temp
+      WHERE explodiu = 'N'
+    
+    FOREACH cq_exp INTO m_cod_it_pai, m_qtd_it_pai       
+    
+       IF STATUS <> 0 THEN
+          CALL log003_err_sql('Lendo','w_item_temp')
+          RETURN FALSE
+       END IF
+              
+       UPDATE w_item_temp
+          SET explodiu = 'S'
+        WHERE cod_item = m_cod_it_pai
+
+       IF STATUS <> 0 THEN
+          CALL log003_err_sql('Atualizando','w_item_temp')
+          RETURN FALSE
+       END IF
+       
+        DECLARE cq_est CURSOR FOR
+        SELECT cod_item_compon,
+               qtd_necessaria
+          FROM estrut_grade
+         WHERE cod_empresa = p_cod_empresa
+           AND cod_item_pai = m_cod_it_pai
+           AND ((dat_validade_ini IS NULL AND dat_validade_fim IS NULL)
+            OR  (dat_validade_ini IS NULL AND dat_validade_fim >= m_dat_atu)
+            OR  (dat_validade_fim IS NULL AND dat_validade_ini <= m_dat_atu)
+            OR  (dat_validade_ini <= m_dat_atu AND dat_validade_fim IS NULL)
+            OR  (m_dat_atu BETWEEN dat_validade_ini AND dat_validade_fim))
+             
+       FOREACH cq_est INTO m_cod_it_comp, m_qtd_it_comp 
+
+          IF STATUS <> 0 THEN
+             CALL log003_err_sql('Lendo','estrut_grade')
+             RETURN FALSE
+          END IF
+          
+          IF NOT pol1343_le_tip_item(m_cod_it_comp) THEN
+             RETURN FALSE
+          END IF
+          
+          IF m_ies_tip_item MATCHES '[CB]' OR m_ies_kanban THEN
+          ELSE
+             LET m_explodiu = 'N'
+             LET m_cod_item = m_cod_it_comp
+             LET m_qtd_planej = m_qtd_it_pai * m_qtd_it_comp
+             IF NOT pol1343_insere_item() THEN
+               RETURN FALSE
+             END IF
+          END IF
+         
+       END FOREACH
+   
+    END FOREACH
+   
+   END WHILE
+   
+   RETURN TRUE
+
+END FUNCTION 
+
+#----------------------------------#
+FUNCTION pol1343_le_tip_item(l_cod)#
+#----------------------------------#
+   
+   DEFINE l_cod         VARCHAR(15),
+          l_ies_planej  CHAR(01)
+   
+   SELECT ies_tip_item, 
+          cod_local_estoq
+     INTO m_ies_tip_item,
+          m_cod_local_estoq
+     FROM item 
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item    = l_cod
+             
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('Lendo','item')
+      RETURN FALSE
+   END IF
+
+   SELECT qtd_prog_fixa,
+          ies_planejamento 
+     INTO m_lot_fixo,
+          l_ies_planej
+     FROM item_man
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item    = l_cod
+              
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('Lendo','item_man')
+      RETURN FALSE
+   END IF
+
+   IF l_ies_planej = '9' THEN
+      LET m_ies_kanban = TRUE
+   ELSE
+      LET m_ies_kanban = FALSE
+   END IF
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#--------------------------#
+FUNCTION pol1343_proc_ops()#
+#--------------------------#   
+   
+   DECLARE cq_w_item CURSOR FOR
+    SELECT cod_item,
+           cod_item_pai,
+           qtd_planej,
+           lot_fixo
+      FROM w_item_temp
+   
+   FOREACH cq_w_item INTO m_cod_item, m_cod_it_pai, m_qtd_deman, m_lot_fixo
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH','w_item_temp:cq_w_item')
+         RETURN FALSE
+      END IF
+               
+      IF NOT pol1343_del_ops_abertas() THEN
+         RETURN FALSE
+      END IF
+      
+      IF NOT pol1343_gera_new_ops() THEN
+         RETURN FALSE
+      END IF
+
+   END FOREACH
+         
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1343_del_ops_abertas()#
+#---------------------------------#
+   
+   DECLARE cq_del CURSOR FOR
+    SELECT num_ordem
+      FROM ordens
+     WHERE cod_empresa = p_cod_empresa
+       AND num_docum = m_num_docum
+       AND cod_item = m_cod_item
+       AND dat_entrega >= mr_cabec.dat_de
+       AND dat_entrega <= mr_cabec.dat_ate
+       AND ies_situa < '4'
+       
+   FOREACH cq_del INTO m_num_ordem
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH','ordens_547:cq_del')
+         RETURN FALSE
+      END IF
+            
+      LET mr_parametro.cod_empresa = p_cod_empresa
+      LET mr_parametro.num_ordem = m_num_ordem
+      LET mr_parametro.ies_transacao = 'N'
+      
+      IF NOT func025_exclui_op(mr_parametro) THEN
+         RETURN FALSE
+      END IF
+      
+   END FOREACH
+   
+   RETURN TRUE
+
+END FUNCTION
+      
+#------------------------------#      
+FUNCTION pol1343_gera_new_ops()#
+#------------------------------#
+   
+   DEFINE l_ind         INTEGER,
+          l_resto       INTEGER,
+          l_saldo_op    DECIMAL(10,3)
+   
+   DEFINE lr_ordem      RECORD
+          cod_empresa   VARCHAR(02),
+          cod_item      VARCHAR(15),
+          cod_item_pai  VARCHAR(15),
+          qtd_planej    DECIMAL(10,3),
+          dat_entrega   DATE,
+          num_docum     VARCHAR(10),
+          ies_situa     VARCHAR(01),
+          ies_transacao VARCHAR(01),
+          num_programa  VARCHAR(08)
+   END RECORD
+      
+   IF mr_cabec.ies_ordem = 'N' THEN
+      LET l_saldo_op = 0
+   ELSE
+      SELECT SUM(qtd_planej - qtd_boas - qtd_refug - qtd_sucata) 
+        INTO l_saldo_op
+        FROM ordens 
+       WHERE cod_empresa = p_cod_empresa
+         AND cod_item = m_cod_item  
+         AND num_docum = m_num_docum
+         AND dat_entrega >= mr_cabec.dat_de
+         AND dat_entrega <=  mr_cabec.dat_ate
+         AND ies_situa = '4'
+
+      IF STATUS <> 0 THEN                                                        
+         CALL log003_err_sql("SELECT","ordens:gno")                                 
+         RETURN FALSE                                                                   
+      END IF        
+      
+      IF l_saldo_op IS NULL THEN
+         LET l_saldo_op = 0
+      END IF
+   END IF                                                                
+   
+   LET m_qtd_deman = m_qtd_deman - l_saldo_op
+   
+   IF m_qtd_deman <= 0 THEN
+      RETURN TRUE
+   END IF
+   
+   IF m_lot_fixo > 0 THEN
+      LET m_num_de_op = m_qtd_deman / m_lot_fixo
+      LET l_resto = (m_qtd_deman MOD m_lot_fixo)   
+      IF l_resto > 0 THEN
+         LET m_num_de_op = m_num_de_op + 1
+      END IF
+   ELSE
+      LET m_num_de_op = 1
+      LET m_lot_fixo = m_qtd_deman
+   END IF
+   
+   LET lr_ordem.cod_empresa = p_cod_empresa
+   LET lr_ordem.cod_item = m_cod_item
+   LET lr_ordem.cod_item_pai = m_cod_it_pai
+   LET lr_ordem.qtd_planej = m_lot_fixo
+   LET lr_ordem.dat_entrega = m_prz_entrega
+   LET lr_ordem.num_docum = m_num_docum
+   LET lr_ordem.ies_situa = '3'
+   LET lr_ordem.ies_transacao = 'N'
+   LET lr_ordem.num_programa = 'POL1343'
+   
+   FOR l_ind = 1 TO m_num_de_op
+   
+      CALL func025_inclui_op(lr_ordem) RETURNING m_num_ordem
+      
+      IF m_num_ordem = 0 THEN
+         RETURN FALSE
+      END IF
+            
+   END FOR   
+  
+   RETURN TRUE
+
+END FUNCTION
+   

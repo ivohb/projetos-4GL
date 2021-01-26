@@ -7,6 +7,10 @@
 # data      Motivo  Versão 18                                      #
 # 25/07/16  fazer rateio dos pesos do romaneio pelos itens         #
 #           do romaneio                                            #
+# 22/01/21  Gravar no campo ped_itens_texto.den_texto_1 a % de FSC #
+#           Paraibuna: FSC Misto 70%     p/ cod composição[1]=B    #
+#           Smurft Kappa: FSC Misto 80%                            #
+#           Cibrapel: FSC reciclado 100% p/ cod composição[1]=K    #
 #------------------------------------------------------------------#
 
 #OBF40060 - modalidade
@@ -85,7 +89,8 @@ DEFINE m_ies_situa             CHAR(01),
        m_ies_fat               SMALLINT,
        m_roma_ltda             CHAR(01),
        m_cli_benef             CHAR(15),
-       m_fornec                CHAR(15)
+       m_fornec                CHAR(15),
+       m_ies_texto             SMALLINT
 
    
    DEFINE p_statusRegistro     LIKE romaneio_885.statusRegistro,
@@ -176,7 +181,8 @@ DEFINE m_ies_situa             CHAR(01),
           l_cod_embal_int      LIKE item_embalagem.cod_embal,
           p_cod_familia        LIKE item.cod_familia,
           p_qtd_baixar         LIKE estoque_lote.qtd_saldo,
-          m_num_nff            LIKE fat_nf_mestre.nota_fiscal
+          m_num_nff            LIKE fat_nf_mestre.nota_fiscal,
+          m_den_texto_1        LIKE ped_itens_texto.den_texto_1
 
            
           
@@ -370,7 +376,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
-   LET p_versao = "pol1271-12.02.65  "
+   LET p_versao = "pol1271-12.02.68  "
    CALL func002_versao_prg(p_versao)
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol1271.iem") RETURNING p_nom_help
@@ -3269,15 +3275,46 @@ FUNCTION pol1271_gera_roma()
          END IF
       END IF   
       
-      SELECT cod_empresa
+      SELECT den_texto_1
+        INTO m_den_texto_1
         FROM ped_itens_texto
        WHERE cod_empresa   = p_cod_empresa
          AND num_pedido    = p_num_pedido
          AND num_sequencia = mr_ordem_montag_item.num_sequencia
-         
+      
       IF STATUS = 0 THEN
+         LET m_ies_texto = TRUE
+      ELSE
+         IF STATUS = 100 THEN
+            LET m_ies_texto = FALSE
+            LET m_den_texto_1 = NULL
+         ELSE
+            CALL log003_err_sql('SELECT','ped_itens_texto')
+            RETURN FALSE
+         END IF
+      END IF
+
+      LET m_num_seq = mr_ordem_montag_item.num_sequencia
+      LET m_num_docum = p_num_pedido USING '<<<<<<','/', m_num_seq USING '<<<'
+
+      IF p_tip_trim = 'B' THEN
+         SELECT DISTINCT cod_empresa
+           FROM item_chapa_885        
+          WHERE cod_empresa   = p_cod_empresa
+            AND num_pedido    = p_numpedido
+            AND num_sequencia = m_num_seq
+   
+         IF STATUS = 0 THEN #É um peido de chapa
+            LET p_status = pol1271_ve_papel(mr_ordem_montag_item.cod_item) 
+         ELSE
+            
+         END IF
+      END IF
+      
+      IF m_ies_texto THEN
          UPDATE ped_itens_texto
-            SET den_texto_3 = p_txt_pacote
+            SET den_texto_1 = m_den_texto_1,
+                den_texto_3 = p_txt_pacote
           WHERE cod_empresa   = p_cod_empresa
             AND num_pedido    = p_num_pedido
             AND num_sequencia = mr_ordem_montag_item.num_sequencia
@@ -3286,10 +3323,12 @@ FUNCTION pol1271_gera_roma()
             cod_empresa,
             num_pedido,
             num_sequencia,
+            den_texto_1,
             den_texto_3)
           VALUES(p_cod_empresa,
                  p_num_pedido,
                  mr_ordem_montag_item.num_sequencia,
+                 m_den_texto_1,
                  p_txt_pacote)
       END IF
       
@@ -3478,6 +3517,87 @@ FUNCTION pol1271_gera_roma()
    RETURN TRUE
 
 END FUNCTION
+
+#------------------------------------#
+FUNCTION pol1271_ve_papel(l_cod_item)#
+#------------------------------------#
+   
+   DEFINE l_cod_item    LIKE ordens.cod_item,
+          l_cod_comp    LIKE ordens.cod_item,
+          l_num_ordem   LIKE ordens.num_ordem,
+          l_txt_nf      VARCHAR(120),
+          l_ies_fsc     VARCHAR(01),
+          l_msg         VARCHAR(120)
+   
+   SELECT num_ordem
+     INTO l_num_ordem
+     FROM ordens
+    WHERE cod_empresa = p_cod_empresa
+      AND num_docum = m_num_docum
+      AND cod_item = l_cod_item
+      AND cod_item_pai = 0
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('Lendo','ordens')
+      RETURN FALSE
+   END IF  
+   
+   LET l_ies_fsc = NULL
+   
+   DECLARE cq_composi CURSOR for
+    SELECT cod_item_compon
+      FROM ord_compon
+    WHERE cod_empresa = p_cod_empresa
+      AND num_ordem = l_num_ordem
+      AND ies_tip_item <> 'C'
+   
+   FOREACH cq_composi INTO l_cod_comp
+      
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('Lendo','cq_composi')
+         RETURN FALSE
+      END IF  
+      
+      IF l_cod_comp[1] MATCHES '[BK]'
+         LET l_ies_fsc = l_cod_comp[1]
+         EXIT FOREACH
+      END IF
+            
+   END FOREACH
+   
+   IF l_ies_fsc IS NULL THEN
+      LET l_msg = 'Não foi possivel identificar a porcentagem do FSC'
+      CALL log0030_mensagem(l_msg,'info')
+      RETURN FALSE
+   END IF
+   
+   IF l_ies_fsc = 'B' THEN
+      SELECT parametro_texto                           
+        INTO l_txt_nf                               
+        FROM min_par_modulo                               
+       WHERE empresa = p_cod_empresa                       
+         AND parametro = 'TXT_NF_PAPEL_BRANCO'                
+       IF STATUS <> 0 THEN                                
+          CALL log003_err_sql('Lendo','min_par_modulo:TXT_NF_PAPEL_BRANCO')   
+          RETURN FALSE                                    
+       END IF                                             
+   ELSE
+      SELECT parametro_texto                           
+        INTO l_txt_nf                               
+        FROM min_par_modulo                               
+       WHERE empresa = p_cod_empresa                       
+         AND parametro = 'TXT_NF_PAPEL_PARDO'                
+       IF STATUS <> 0 THEN                                
+          CALL log003_err_sql('Lendo','min_par_modulo:TXT_NF_PAPEL_PARDO')   
+          RETURN FALSE                                    
+       END IF                                             
+   END IF
+   
+   LET m_den_texto_1 = m_den_texto_1 CLIPPED, ' - ', l_txt_nf
+   
+   RETURN TRUE
+
+END IF  
 
 #-----------------------------#
 FUNCTION pol1271_grava_texto()
@@ -7166,7 +7286,7 @@ END FUNCTION
  FUNCTION pol1271_version_info()
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1271.4gl $|$Revision: 65 $|$Date: 19/11/2020 08:07 $|$Modtime: 03/01/2020 14:07 $" 
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1271.4gl $|$Revision: 67 $|$Date: 21/01/2021 15:41 $|$Modtime: 19/11/2020 08:07 $" 
 
  END FUNCTION
 

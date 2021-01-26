@@ -7,7 +7,12 @@
 #-------------------------------------------------------------------#
 #Lista de preço
 {VPD10102 – Tabela Mestre
-VPD0270 – Item} 
+VPD0270 – Item
+VDP10002 / VDP10003
+VDP10102 / VDP10103
+AEN vdp0340
+C:\Users\administrador.CAIRU\Desktop\Atalhos_Logix
+} 
 
 DATABASE logix
 
@@ -15,7 +20,7 @@ GLOBALS
     DEFINE p_cod_empresa   LIKE empresa.cod_empresa,
            p_user          LIKE usuarios.cod_usuario,
            p_status        SMALLINT,
-           m_panel           VARCHAR(10),
+           m_panel         VARCHAR(10),
            p_versao        CHAR(18)
 END GLOBALS
 
@@ -2058,6 +2063,11 @@ FUNCTION pol1406_emp(l_fpanel)#
     CALL _ADVPL_set_property(l_create,"CONFIRM_EVENT","pol1406_emp_insert_conf")
     CALL _ADVPL_set_property(l_create,"CANCEL_EVENT","pol1406_emp_insert_canc")
 
+    LET l_update = _ADVPL_create_component(NULL,"LUPDATEBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_update,"EVENT","pol1406_emp_update")
+    CALL _ADVPL_set_property(l_update,"CONFIRM_EVENT","pol1406_emp_update_conf")
+    CALL _ADVPL_set_property(l_update,"CANCEL_EVENT","pol1406_emp_update_canc")
+
     LET l_delete = _ADVPL_create_component(NULL,"LDELETEBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_delete,"EVENT","pol1406_emp_delete")
 
@@ -2647,6 +2657,110 @@ END FUNCTION
       CLOSE cq_emp_prende
       RETURN FALSE
    END IF
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1406_emp_update()#
+#-----------------------------#   
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF mr_emp.cnpj IS NULL THEN
+      LET m_msg = 'Selecione previamente um item na grade'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1406_emp_prende() THEN
+      RETURN FALSE
+   END IF
+   
+   LET m_op_sys = 'M'
+   CALL pol1406_sys_ativa(TRUE)
+   LET m_car_sys = TRUE
+   CALL _ADVPL_set_property(m_user_req,"GET_FOCUS")
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1406_emp_update_canc()#
+#---------------------------------#   
+   
+   CLOSE cq_sys_prende
+   CALL LOG_transaction_rollback()
+   
+   INITIALIZE mr_sys.* TO NULL
+          
+   SELECT nom_sys, user_envio, uri_inc_prod, uri_alt_prod,
+          uri_alt_estoq, user_req_serv, 
+          qtd_lin_page, max_lin_page, user_erp, uri_canc_pedido
+    INTO mr_sys.cod_sys,
+         mr_sys.user_envio,
+         mr_sys.uri_inc_prod,
+         mr_sys.uri_alt_prod,
+         mr_sys.uri_alt_estoq,
+         mr_sys.user_req_serv,
+         mr_sys.qtd_lin_page,
+         mr_sys.max_lin_page,
+         mr_sys.user_erp,
+         mr_sys.uri_canc_pedido
+    FROM sys_api_cairu
+   WHERE nom_sys = m_nom_sys
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT', 'sys_api_cairu:suc')
+   END IF
+         
+   CALL pol1406_sys_ativa(FALSE)
+   LET m_car_sys = FALSE
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1406_emp_update_conf()#
+#---------------------------------#   
+
+   UPDATE sys_api_cairu 
+      SET user_envio = mr_sys.user_envio,
+          uri_inc_prod = mr_sys.uri_inc_prod,
+          uri_alt_prod = mr_sys.uri_alt_prod,
+          uri_alt_estoq = mr_sys.uri_alt_estoq,
+          user_req_serv = mr_sys.user_req_serv,
+          qtd_lin_page = mr_sys.qtd_lin_page,
+          max_lin_page = mr_sys.max_lin_page,
+          user_erp = mr_sys.user_erp,
+          uri_canc_pedido = mr_sys.uri_canc_pedido
+    WHERE nom_sys = m_nom_sys
+   
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('UPDATE','de_para_produto:iuc')
+      CALL pol1406_sys_update_canc()
+      RETURN FALSE
+   END IF
+   
+   UPDATE usuario_api_cairu
+      SET codigo_erp = mr_sys.user_erp
+    WHERE codigo = mr_sys.user_req_serv
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('UPDATE','usuario_api_cairu:iuc')
+      CALL pol1406_sys_update_canc()
+      RETURN FALSE
+   END IF
+   
+   CALL LOG_transaction_commit()
+   
+   CLOSE cq_sys_prende
+   CALL pol1406_sys_ativa(FALSE)
+   LET m_car_sys = FALSE
+   CALL pol1406_sys_prepare()   
+   
+   RETURN TRUE
 
 END FUNCTION
 

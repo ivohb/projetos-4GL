@@ -138,10 +138,6 @@ END GLOBALS
       qtd_saldo                 LIKE estoque_lote_ender.qtd_saldo
    END RECORD
 
-   DEFINE ma_doca   ARRAY[1000] OF RECORD
-          cod_doca              CHAR(05)
-   END RECORD
-
    DEFINE p_relat RECORD
       cod_cliente               LIKE clientes.cod_cliente,  
       nom_cliente               LIKE clientes.nom_cliente,  
@@ -195,7 +191,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 7
    DEFER INTERRUPT
-   LET p_versao = "POL0403-10.02.51"
+   LET p_versao = "POL0403-10.02.52"
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol0403.iem") RETURNING p_nom_help
    LET  p_nom_help = p_nom_help CLIPPED
@@ -918,8 +914,9 @@ FUNCTION pol0403_le_doca()#
          AND num_sequencia = l_num_sequencia         
 
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','ped_item_edi:cq_doca')
-         RETURN FALSE
+         #CALL log003_err_sql('SELECT','ped_item_edi:cq_doca')
+         #RETURN FALSE
+         CONTINUE FOREACH
       END IF
       
       IF l_cod_doca IS NULL THEN
@@ -1054,7 +1051,6 @@ END FUNCTION
    LET p_cod_item = NULL
    LET p_qtd_estoque = 0
    INITIALIZE pr_reser TO NULL
-   INITIALIZE ma_doca TO NULL
    LET l_pedido = mr_tela.num_pedido
 
    LET sql_stmt = 

@@ -285,21 +285,6 @@ FUNCTION pol1402_valid_item()#
       RETURN FALSE
    END IF
    
-   SELECT cod_item FROM item_bloqueio_547
-    WHERE cod_empresa = mr_cabec.cod_empresa
-      AND cod_item = mr_cabec.cod_item
-
-   IF STATUS = 0 THEN
-      LET m_msg = 'Item já cadastrado no POL1402'
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
-      RETURN FALSE
-   ELSE
-      IF STATUS <> 100 THEN
-         CALL log003_err_sql('SELECT','item_bloqueio_547')
-         RETURN FALSE
-      END IF
-   END IF
-   
    RETURN TRUE
    
 END FUNCTION

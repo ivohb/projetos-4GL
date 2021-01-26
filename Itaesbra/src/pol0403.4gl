@@ -138,10 +138,6 @@ END GLOBALS
       qtd_saldo                 LIKE estoque_lote_ender.qtd_saldo
    END RECORD
 
-   DEFINE ma_doca   ARRAY[1000] OF RECORD
-          cod_doca              CHAR(05)
-   END RECORD
-
    DEFINE p_relat RECORD
       cod_cliente               LIKE clientes.cod_cliente,  
       nom_cliente               LIKE clientes.nom_cliente,  
@@ -195,7 +191,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 7
    DEFER INTERRUPT
-   LET p_versao = "POL0403-10.02.52"
+   LET p_versao = "POL0403-10.02.53"
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol0403.iem") RETURNING p_nom_help
    LET  p_nom_help = p_nom_help CLIPPED
@@ -525,7 +521,7 @@ END FUNCTION
          END IF 
              
 
-         IF m_ies_gm THEN
+         {IF m_ies_gm THEN
             
             DECLARE cq_omit CURSOR FOR
             SELECT num_sequencia,
@@ -559,7 +555,7 @@ END FUNCTION
                NEXT FIELD num_lote
             END IF
          
-         END IF
+         END IF}
              
       ON KEY (control-z)
          IF INFIELD(cod_transpor) THEN
@@ -604,12 +600,12 @@ END FUNCTION
    IF INT_FLAG <> 0 THEN
       RETURN FALSE 
    ELSE
-      IF m_ies_gm THEN
+      {IF m_ies_gm THEN
          IF NOT pol0403_le_doca() THEN
             LET m_informou = FALSE 
             RETURN FALSE
          END IF
-      END IF   
+      END IF   }
       
       DISPLAY mr_tela.cod_doca TO cod_doca 
       
@@ -723,10 +719,10 @@ END FUNCTION
       RETURN FALSE
    END IF
 
-   {IF mr_pedidos.cod_tip_venda <> p_cod_tip_ant THEN
-      ERROR 'Pedido nãp pertence à mesma DOCA !!!'
+   IF mr_pedidos.cod_tip_venda <> p_cod_tip_ant THEN
+      ERROR 'Pedido nãp pertence à mesma PLANTA !!!'
       RETURN FALSE
-   END IF }
+   END IF 
   
    IF mr_pedidos.ies_sit_pedido = '9' THEN
       ERROR 'Pedido Cancelado.'
@@ -1055,7 +1051,6 @@ END FUNCTION
    LET p_cod_item = NULL
    LET p_qtd_estoque = 0
    INITIALIZE pr_reser TO NULL
-   INITIALIZE ma_doca TO NULL
    LET l_pedido = mr_tela.num_pedido
 
    LET sql_stmt = 
@@ -1097,7 +1092,7 @@ END FUNCTION
          RETURN FALSE
       END IF
 
-      IF m_ies_gm THEN 
+      {IF m_ies_gm THEN 
          SELECT cod_doca 
            INTO l_cod_doca
            FROM ped_item_edi
@@ -1114,7 +1109,7 @@ END FUNCTION
             CONTINUE FOREACH
          END IF
       
-      END IF
+      END IF}
       
  
       SELECT ies_ctr_estoque,

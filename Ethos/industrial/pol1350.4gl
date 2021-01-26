@@ -43,7 +43,7 @@ DEFINE m_item            VARCHAR(10),
        m_dat_ate         VARCHAR(10)
        
 
-DEFINE ma_compon        ARRAY[3000] OF RECORD
+DEFINE ma_compon        ARRAY[10000] OF RECORD
        cod_item         LIKE item.cod_item,
        den_item         LIKE item.den_item,
        cod_compon       LIKE item.cod_item,
@@ -100,7 +100,7 @@ DEFINE mr_Item         RECORD
        den_item        LIKE item.den_item       
 END RECORD
 
-DEFINE ma_produto      ARRAY[3000] OF RECORD
+DEFINE ma_produto      ARRAY[10000] OF RECORD
        cod_item        CHAR(15),
        den_item        CHAR(50)
 END RECORD
@@ -130,7 +130,7 @@ FUNCTION pol1350()#
    SET LOCK MODE TO WAIT 300
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1350-12.00.17  "
+   LET p_versao = "pol1350-12.00.18  "
    CALL func002_versao_prg(p_versao)
    CALL pol1350_menu()
     
@@ -950,7 +950,7 @@ FUNCTION pol1350_le_item_temp()#
       
       LET m_index = m_index + 1
       
-      IF m_index > 3000 THEN
+      IF m_index > 10000 THEN
          LET m_msg = 'Limite de linhas da grade ultrapassou.'
          EXIT FOREACH
       END IF
@@ -1121,7 +1121,7 @@ FUNCTION pol1350_carrega_compon()#
       
       LET m_index = m_index + 1
       
-      IF m_index > 3000 THEN
+      IF m_index > 10000 THEN
          CALL log0030_mensagem('Limite de linhas da grade ultrapassou','info')
          EXIT FOREACH
       END IF

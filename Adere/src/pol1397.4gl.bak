@@ -2,7 +2,7 @@
 # colocar no agendador do windows: taskschd.msc                                #
 #------------------------------------------------------------------------------#
 # PROGRAMA: pol1397                                                            #
-# OBJETIVO: PONTOS DE ENTRADA MAN10021                                         #
+# OBJETIVO: PONTOS DE ENTRADA MAN10021 E VDP30100                              #
 # AUTOR...: IVO H BARBOSA                                                      #
 # DATA....: 21/07/2020                                                         #
 # ALTERADO:                                                                    #
@@ -190,14 +190,79 @@ FUNCTION vdp30100y_after_processar()#
    END IF
    
    IF m_count > 0 THEN
-      LET p_status = LOG_progresspopup_start(
-         "Juntando Ordens...","pol1407_junta_ordens","PROCESS")  
+      IF pol1397_le_pedidos() THEN
+         LET m_msg = LOG_progresspopup_start(
+            "Juntando Ordens...","pol1407_junta_ordens","PROCESS")  
+         IF m_msg IS NOT NULL THEN
+            CALL log0030_mensagem(m_msg,'info')
+         END IF
+      END IF
    END IF
    
    WHENEVER ANY ERROR STOP
    
 END FUNCTION
 
+#----------------------------#
+FUNCTION pol1397_le_pedidos()#
+#----------------------------#
+   
+   DEFINE l_num_om     INTEGER,
+          l_num_pedido INTEGER
+   
+   WHENEVER ANY ERROR CONTINUE
+             
+   DROP TABLE w_pedido_tmp 
+   
+   CREATE TEMP  TABLE w_pedido_tmp(
+      num_pedido      INTEGER
+   );
+
+   IF STATUS <> 0 THEN      
+      CALL log003_err_sql('CREATE','w_pedido_tmp:EPL:vdp30100y_after_processar')
+      RETURN FALSE
+   END IF
+   
+   DELETE FROM w_pedido_tmp
+
+   DECLARE cq_oms CURSOR FOR
+    SELECT num_om
+     FROM w_om_nova
+   
+   FOREACH cq_oms INTO l_num_om
+
+      IF STATUS <> 0 THEN      
+         CALL log003_err_sql('FOREACH','cq_oms:vdp30100y_after_processar')
+         RETURN FALSE
+      END IF
+      
+      DECLARE cq_peds CURSOR FOR
+       SELECT DISTINCT num_pedido
+         FROM ordem_montag_item
+        WHERE cod_empresa = p_cod_empresa
+          AND num_om = l_num_om
+      
+      FOREACH cq_peds INTO l_num_pedido
+
+         IF STATUS <> 0 THEN      
+            CALL log003_err_sql('FOREACH','cq_peds:vdp30100y_after_processar')
+            RETURN FALSE
+         END IF
+         
+         INSERT INTO w_pedido_tmp VALUES(l_num_pedido)
+      
+         IF STATUS <> 0 THEN      
+            CALL log003_err_sql('INSERT','w_pedido_tmp:vdp30100y_after_processar')
+            RETURN FALSE
+         END IF
+      
+      END FOREACH
+   
+   END FOREACH
+   
+   RETURN TRUE
+
+END FUNCTION   
 
 #----------------------------------#
 FUNCTION man100211y_after_incluir()#
@@ -236,3 +301,12 @@ FUNCTION man100211y_after_excluir()#
    LET l_item = LOG_getVar("cod_item") #pega o item excluido no man10021
 
 END FUNCTION
+
+#LOG1700             
+#-------------------------------#
+ FUNCTION pol1397_version_info()
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1397.4gl $|$Revision: 1 $|$Date: 09/12/2020 10:47 $|$Modtime: 4/12/2020 12:30 $"
+
+ END FUNCTION

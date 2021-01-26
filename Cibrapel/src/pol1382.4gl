@@ -65,7 +65,7 @@ FUNCTION pol1382()#
    WHENEVER ANY ERROR CONTINUE
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
-   LET p_versao = "pol1382-12.00.03  "
+   LET p_versao = "pol1382-12.00.04  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1382_menu()
@@ -590,7 +590,7 @@ FUNCTION pol1382_importar()#
       FROM ft_item_885
      WHERE cod_empresa = p_cod_empresa
      AND peso IS NOT NULL
-     AND cod_item = '15490' # IS NOT NULL
+     AND cod_item IS NOT NULL
 
    FOREACH cq_peso INTO l_peso, l_item
 

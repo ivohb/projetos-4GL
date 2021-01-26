@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------#
 #Lista de preço
 {VPD30100 – GERAÇÃO DE ROMANEIO
-POL1407 - UNIFICAÇÃO DE ROMANEIO
+POL1407 - UNIFICAÇÃO DE ROMANEIO 
 VPD20028 – AUDITORIA }
 
 
@@ -1092,7 +1092,7 @@ FUNCTION pol1409_le_itens()#
          LET m_qtd_estoque = m_qtd_estoque - ma_unif[l_ind].saldo         
          
          INSERT INTO w_estoque 
-          VALUES(p_cod_empresa,l_item, m_qtd_estoque)
+          VALUES(p_cod_empresa, ma_unif[l_ind].item, m_qtd_estoque)
           
          IF STATUS <> 0 THEN 
             CALL log003_err_sql('INSERT','w_estoque')

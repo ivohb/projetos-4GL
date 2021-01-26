@@ -2,7 +2,7 @@
 # colocar no agendador do windows: taskschd.msc                                #
 #------------------------------------------------------------------------------#
 # PROGRAMA: pol1397                                                            #
-# OBJETIVO: PONTOS DE ENTRADA MAN10021                                         #
+# OBJETIVO: PONTOS DE ENTRADA MAN10021 E VDP30100                              #
 # AUTOR...: IVO H BARBOSA                                                      #
 # DATA....: 21/07/2020                                                         #
 # ALTERADO:                                                                    #
@@ -209,7 +209,9 @@ FUNCTION pol1397_le_pedidos()#
    
    DEFINE l_num_om     INTEGER,
           l_num_pedido INTEGER
-          
+   
+   WHENEVER ANY ERROR CONTINUE
+             
    DROP TABLE w_pedido_tmp 
    
    CREATE TEMP  TABLE w_pedido_tmp(
@@ -261,7 +263,7 @@ FUNCTION pol1397_le_pedidos()#
    RETURN TRUE
 
 END FUNCTION   
-
+{
 #----------------------------------#
 FUNCTION man100211y_after_incluir()#
 #----------------------------------#
@@ -299,3 +301,13 @@ FUNCTION man100211y_after_excluir()#
    LET l_item = LOG_getVar("cod_item") #pega o item excluido no man10021
 
 END FUNCTION
+}
+
+#LOG1700             
+#-------------------------------#
+ FUNCTION pol1397_version_info()
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1397.4gl $|$Revision: 1 $|$Date: 09/12/2020 10:47 $|$Modtime: 4/12/2020 12:30 $"
+
+ END FUNCTION

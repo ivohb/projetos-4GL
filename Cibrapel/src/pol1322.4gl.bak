@@ -2443,7 +2443,7 @@ FUNCTION pol1322_relatorio()#
    
    CALL pol1322_form_relat()
    
-   IF NOT m_ies_imp THEN
+   IF NOT m_ies_imp() THEN
       RETURN
    END IF
    
@@ -2485,7 +2485,6 @@ FUNCTION pol1322_form_relat()#
     LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_form_relat)
     CALL _ADVPL_set_property(l_panel,"ALIGN","CENTER")
 
-    INITIALIZE mr_imp.* TO NULL
     CALL pol1322_info_dados(l_panel)
 
     LET l_panel = _ADVPL_create_component(NULL,"LPANEL",m_form_relat)

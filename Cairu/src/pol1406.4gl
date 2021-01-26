@@ -7,7 +7,12 @@
 #-------------------------------------------------------------------#
 #Lista de preço
 {VPD10102 – Tabela Mestre
-VPD0270 – Item} 
+VPD0270 – Item
+VDP10002 / VDP10003
+VDP10102 / VDP10103
+AEN vdp0340
+C:\Users\administrador.CAIRU\Desktop\Atalhos_Logix
+} 
 
 DATABASE logix
 
@@ -36,7 +41,8 @@ DEFINE m_count           INTEGER,
        m_ind             INTEGER,
        m_nom_sys         VARCHAR(15),
        m_sen_env_crip    VARCHAR(80),
-       m_sen_req_crip    VARCHAR(80)
+       m_sen_req_crip    VARCHAR(80),
+       m_gerar           VARCHAR(01)
 
                                
 DEFINE mr_sys            RECORD
@@ -114,7 +120,7 @@ DEFINE m_brz_emp         VARCHAR(10),
        m_pan_emp         VARCHAR(10),
        m_cnpj_emp        VARCHAR(10),
        m_emp_emp         VARCHAR(10),
-       m_env_aut         VARCHAR(10),
+       m_ger_om          VARCHAR(10),
        m_emp_construct   VARCHAR(10),
        m_zoom_cnpj       VARCHAR(10),
        m_zoom_emp        VARCHAR(10),
@@ -2058,6 +2064,11 @@ FUNCTION pol1406_emp(l_fpanel)#
     CALL _ADVPL_set_property(l_create,"CONFIRM_EVENT","pol1406_emp_insert_conf")
     CALL _ADVPL_set_property(l_create,"CANCEL_EVENT","pol1406_emp_insert_canc")
 
+    LET l_update = _ADVPL_create_component(NULL,"LUPDATEBUTTON",l_menubar)
+    CALL _ADVPL_set_property(l_update,"EVENT","pol1406_emp_update")
+    CALL _ADVPL_set_property(l_update,"CONFIRM_EVENT","pol1406_emp_update_conf")
+    CALL _ADVPL_set_property(l_update,"CANCEL_EVENT","pol1406_emp_update_canc")
+
     LET l_delete = _ADVPL_create_component(NULL,"LDELETEBUTTON",l_menubar)
     CALL _ADVPL_set_property(l_delete,"EVENT","pol1406_emp_delete")
 
@@ -2146,11 +2157,11 @@ FUNCTION pol1406_emp_campo(l_container)#
     CALL _ADVPL_set_property(l_label,"POSITION",800,10)  
     CALL _ADVPL_set_property(l_label,"TEXT","Gerar romaneio:")    
 
-    LET m_env_aut = _ADVPL_create_component(NULL,"LCOMBOBOX",m_pan_emp)     
-    CALL _ADVPL_set_property(m_env_aut,"POSITION",890,10)     
-    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","S","Sim")
-    CALL _ADVPL_set_property(m_env_aut,"ADD_ITEM","N","Não")
-    CALL _ADVPL_set_property(m_env_aut,"VARIABLE",mr_emp,"gerar_om")
+    LET m_ger_om = _ADVPL_create_component(NULL,"LCOMBOBOX",m_pan_emp)     
+    CALL _ADVPL_set_property(m_ger_om,"POSITION",890,10)     
+    CALL _ADVPL_set_property(m_ger_om,"ADD_ITEM","S","Sim")
+    CALL _ADVPL_set_property(m_ger_om,"ADD_ITEM","N","Não")
+    CALL _ADVPL_set_property(m_ger_om,"VARIABLE",mr_emp,"gerar_om")
 
 
     CALL _ADVPL_set_property(m_pan_emp,"ENABLE",FALSE)
@@ -2647,6 +2658,73 @@ END FUNCTION
       CLOSE cq_emp_prende
       RETURN FALSE
    END IF
+
+END FUNCTION
+
+#-----------------------------#
+FUNCTION pol1406_emp_update()#
+#-----------------------------#   
+   
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF mr_emp.cnpj IS NULL THEN
+      LET m_msg = 'Selecione previamente um item na grade'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+
+   IF NOT pol1406_emp_prende() THEN
+      RETURN FALSE
+   END IF
+   
+   LET m_op_emp = 'M'
+   CALL pol1406_emp_ativa(TRUE)
+   LET m_car_emp = TRUE
+   LET m_gerar = mr_emp.gerar_om
+   CALL _ADVPL_set_property(m_ger_om,"GET_FOCUS")
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1406_emp_update_canc()#
+#---------------------------------#   
+   
+   CLOSE cq_emp_prende
+   CALL LOG_transaction_rollback()
+   LET mr_emp.gerar_om = m_gerar
+   
+   CALL pol1406_emp_ativa(FALSE)
+   LET m_car_emp = FALSE
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1406_emp_update_conf()#
+#---------------------------------#   
+
+   UPDATE empresa_api_cairu 
+      SET gerar_om = mr_emp.gerar_om
+     WHERE cnpj = mr_emp.cnpj
+       AND empresa = mr_emp.empresa
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('UPDATE','empresa_api_cairu:euc')
+      CALL pol1406_emp_update_canc()
+      RETURN FALSE
+   END IF
+      
+   CALL LOG_transaction_commit()
+   
+   CLOSE cq_emp_prende
+   CALL pol1406_emp_ativa(FALSE)
+   LET m_car_emp = FALSE
+   CALL pol1406_emp_prepare()   
+   
+   RETURN TRUE
 
 END FUNCTION
 

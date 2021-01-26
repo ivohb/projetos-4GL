@@ -1,0 +1,294 @@
+#------------------------------------------------------------------------------#
+# colocar no agendador do windows: taskschd.msc                                #
+#------------------------------------------------------------------------------#
+# PROGRAMA: pol1418                                                            #
+# OBJETIVO: EXPORTAÇÃO DE DADOS DE ESTOQUE PARA OPCENTER                       #
+# AUTOR...: IVO H BARBOSA                                                      #
+# DATA....: 11/01/2021                                                         #
+# ALTERADO:                                                                    #
+#------------------------------------------------------------------------------#
+
+DATABASE logix
+
+GLOBALS
+   DEFINE p_cod_empresa          LIKE empresa.cod_empresa,
+          p_user                 LIKE usuario.nom_usuario,
+          p_status               SMALLINT,
+          p_ies_impressao        CHAR(001),
+          g_ies_ambiente         CHAR(001),
+          p_nom_arquivo          CHAR(100),
+          p_versao               CHAR(18),
+          comando                CHAR(080),
+          m_comando              CHAR(080),
+          p_caminho              CHAR(150),
+          m_caminho              CHAR(150),
+          g_tipo_sgbd            CHAR(003),
+          g_msg                  VARCHAR(30)
+END GLOBALS
+
+DEFINE m_msg                     VARCHAR(120),
+       m_erro                    VARCHAR(10),
+       m_count                   INTEGER,
+       m_dat_atu                 DATE,
+       m_hor_atu                 VARCHAR(08),
+       m_dat_proces              VARCHAR(19),
+       m_tip_dados               VARCHAR(20)
+
+DEFINE m_qtd_estoq                INTEGER,
+       m_arq_estoq                VARCHAR(120)
+
+DEFINE mr_estoq                   RECORD                            
+       cod_item          LIKE item.cod_item,
+       den_item_reduz    LIKE item.den_item_reduz,
+       qtd_estoq         DECIMAL(10,3),
+       ordem             VARCHAR(15),
+       tipo              VARCHAR(07),
+       fornecimento      DATE       
+END RECORD
+
+MAIN   
+
+   IF NUM_ARGS() > 0  THEN
+      LET m_msg = 'Chamada por outro aplicativo'
+      IF LOG_connectDatabase("DEFAULT") THEN
+         CALL pol1418_controle()
+      END IF
+      RETURN
+   END IF
+   
+   CALL log0180_conecta_usuario()
+         
+   CALL log001_acessa_usuario("ESPEC999","")
+        RETURNING p_status, p_cod_empresa, p_user
+   
+   IF p_status = 0 THEN    
+      LET m_msg = 'Execução a partir do menu Logix'
+      CALL pol1418_controle()
+      
+      SELECT COUNT(*) INTO m_count
+       FROM export_dados_opcenter_970
+      WHERE cod_empresa = p_cod_empresa
+        AND tip_dados = m_tip_dados
+        AND dat_proces = m_dat_proces
+      
+      IF m_count > 0 THEN
+         LET m_msg = 'Consulte a tabela de mensagem export_dados_opcenter_970'
+         CALL log0030_mensagem(m_msg,'info')         
+      END IF
+      
+   END IF
+         
+END MAIN
+
+#------------------------------#
+FUNCTION pol1418_job(l_rotina) #
+#------------------------------#
+
+   DEFINE l_rotina          CHAR(06),
+          l_den_empresa     CHAR(50),
+          l_param1_empresa  CHAR(02),
+          l_param2_user     CHAR(08),
+          l_param3_user     CHAR(08),
+          l_status          SMALLINT
+
+   CALL JOB_get_parametro_gatilho_tarefa(1,0) RETURNING l_status, l_param1_empresa
+   CALL JOB_get_parametro_gatilho_tarefa(2,0) RETURNING l_status, l_param2_user
+   CALL JOB_get_parametro_gatilho_tarefa(2,2) RETURNING l_status, l_param3_user
+      
+   LET m_msg = 'Chamada via agendador'      
+   LET p_cod_empresa = l_param1_empresa   
+   LET p_user = l_param2_user
+   
+   IF p_cod_empresa IS NULL THEN
+      LET p_cod_empresa = '01'
+   END IF
+   
+   IF p_user IS NULL THEN
+      LET p_user = 'admlog'
+   END IF
+   
+   CALL pol1418_controle()
+   
+   RETURN TRUE
+   
+END FUNCTION   
+   
+#--------------------------#
+FUNCTION pol1418_controle()#
+#--------------------------#
+   
+   WHENEVER ANY ERROR CONTINUE
+   SET ISOLATION TO DIRTY READ
+   SET LOCK MODE TO WAIT 120
+
+   LET m_qtd_estoq = 0
+
+   CALL pol1418_insere_mensagem()
+
+   #logica para chamar as rotinas de exportação   
+   LET p_status = pol1418_exporta_estoq()
+   
+   LET m_msg = 'Fim do processamento'    
+   CALL pol1418_insere_mensagem()
+
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1418_insere_mensagem()#
+#---------------------------------#
+      
+   INSERT INTO export_dados_opcenter_970
+     VALUES(p_cod_empresa, m_tip_dados, m_msg, m_dat_proces)
+
+END FUNCTION
+
+#----------------------------#
+FUNCTION pol1418_le_caminho()#
+#----------------------------#
+
+   SELECT nom_caminho
+     INTO m_caminho
+   FROM path_logix_v2
+   WHERE cod_empresa = p_cod_empresa 
+     AND cod_sistema = 'CSV'
+
+   IF STATUS = 100 THEN
+      LET m_msg = 'Caminho do sistema CSV não cadastrado na LOG1100/LOG00098'
+      CALL pol1418_insere_mensagem()
+      RETURN FALSE
+   ELSE
+      IF STATUS <> 0 THEN
+         LET m_erro = STATUS
+         LET m_msg = 'Erro ',m_erro CLIPPED, ' lendo tabela path_logix_v2'
+         CALL pol1418_insere_mensagem() 
+         RETURN FALSE
+      END IF
+   END IF
+   
+   RETURN TRUE
+   
+END FUNCTION
+
+#---------------------------------------#
+FUNCTION pol1418_export_estoq(l_qtd_reg)#
+#---------------------------------------#
+   
+   DEFINE l_qtd_reg INTEGER
+   
+   LET m_qtd_estoq = l_qtd_reg
+   
+   LET p_status = LOG_progresspopup_start(
+       "Exportando roteiros...","pol1418_exporta_estoq","PROCESS")  
+
+   RETURN p_status, m_arq_estoq
+
+END FUNCTION
+   
+#-------------------------------#
+FUNCTION pol1418_exporta_estoq()#
+#-------------------------------#
+
+   DEFINE l_codigo      VARCHAR(02),
+          l_desc        VARCHAR(30),
+          l_ind         INTEGER,
+          l_nom_arq     VARCHAR(30),
+          l_progres     SMALLINT,
+          l_cent_trab   VARCHAR(15)
+
+   IF m_qtd_estoq > 0 THEN
+      CALL LOG_progresspopup_set_total("PROCESS",m_qtd_estoq)
+   END IF
+
+   LET m_dat_proces = CURRENT
+   LET m_tip_dados = 'ESTOQUE'
+   
+   IF NOT pol1418_le_caminho() THEN
+      RETURN FALSE
+   END IF
+   
+   LET l_nom_arq = '07_estoque.csv'
+   LET m_arq_estoq = m_caminho CLIPPED, l_nom_arq
+               
+   START REPORT pol1418_estoq_relat TO m_arq_estoq    
+   
+   DECLARE cq_le_estoq CURSOR FOR
+    SELECT estoque.cod_item, item.den_item_reduz,
+           ((estoque.qtd_liberada + estoque.qtd_impedida) - 
+             (estoque.qtd_rejeitada + estoque.qtd_lib_excep + 
+              estoque.qtd_disp_venda + estoque.qtd_reservada))
+      FROM estoque
+           INNER JOIN item 
+             ON item.cod_empresa = estoque.cod_empresa
+            AND item.cod_item = estoque.cod_item 
+            AND item.ies_situacao = 'A'
+    WHERE estoque.cod_empresa = p_cod_empresa
+      AND ((estoque.qtd_liberada + estoque.qtd_impedida) -
+           (estoque.qtd_rejeitada + estoque.qtd_lib_excep + 
+            estoque.qtd_disp_venda + estoque.qtd_reservada) > 0 )
+       
+   FOREACH cq_le_estoq INTO
+      mr_estoq.cod_item,
+      mr_estoq.den_item_reduz,
+      mr_estoq.qtd_estoq
+
+      IF STATUS <> 0 THEN
+         LET m_erro = STATUS
+         LET m_msg = 'Erro: ',m_erro, ' lendo estoque a exportar'
+         CALL pol1418_insere_mensagem()
+         RETURN FALSE
+      END IF
+
+      LET ma_estoq.ordem = ma_estoq.cod_item
+      LET ma_estoq.tipo = 'Estoque'
+      LET ma_estoq.fornecimento = TODAY - 1
+         
+      OUTPUT TO REPORT pol1418_estoq_relat() 
+      
+      IF m_qtd_estoq > 0 THEN
+         LET l_progres = LOG_progresspopup_increment("PROCESS") 
+      END IF
+   
+   END FOREACH
+   
+   FINISH REPORT pol1418_estoq_relat  
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#--------------------------#
+REPORT pol1418_estoq_relat()#
+#--------------------------#
+  
+   DEFINE l_qtd_estoq  VARCHAR(12)
+   
+   OUTPUT LEFT   MARGIN 0
+          TOP    MARGIN 0
+          BOTTOM MARGIN 0
+          PAGE   LENGTH 1
+          
+   FORMAT
+      
+      FIRST PAGE HEADER
+      
+      PRINT COLUMN 001, 
+             'Item;',
+             #'Descricao;',
+             'Saldo;',
+             'Ordem;',
+             'Tipo;',
+             'Fornecimento;'
+                            
+      ON EVERY ROW
+      
+      LET l_qtd_estoq = mr_estoq.qtd_estoq
+      
+      PRINT COLUMN 001, 
+            mr_estoq.cod_item CLIPPED,';',
+            #mr_estoq.den_item_reduz CLIPPED,';',
+            l_qtd_estoq CLIPPED,';',
+            mr_estoq.ordem CLIPPED,';',
+            mr_estoq.tipo CLIPPED,';',
+            mr_estoq.fornecimento CLIPPED,';'
+           
+END REPORT

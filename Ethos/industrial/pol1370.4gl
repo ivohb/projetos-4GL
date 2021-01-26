@@ -88,7 +88,8 @@ DEFINE m_caminho         CHAR(80),
        m_ies_processado  SMALLINT,
        m_ies_status      CHAR(01),
        m_num_ped_cli     VARCHAR(30),
-       m_dat_proces      DATE
+       m_dat_proces      DATE,
+       m_atu_pe1         SMALLINT
 
 DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
@@ -363,7 +364,7 @@ FUNCTION pol1370()#
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 300
 
-   LET p_versao = "POL1370-12.00.51  "
+   LET p_versao = "POL1370-12.00.55  "
    CALL func002_versao_prg(p_versao)
    LET m_carregando = TRUE
    
@@ -1121,6 +1122,16 @@ FUNCTION pol1370_carga_info_conf()#
    END IF
    
    CALL pol1370_ativa_desativa(FALSE)
+
+   CALL LOG_transaction_begin()
+
+   IF NOT pol1370_limpa_tabelas() THEN
+      CALL LOG_transaction_rollback()
+      RETURN FALSE
+   END IF
+
+   CALL LOG_transaction_commit()
+
    CALL LOG_transaction_begin()
 
    IF NOT pol1370_ins_arq_edi() THEN
@@ -1160,11 +1171,7 @@ END FUNCTION
 #-------------------------------#
 FUNCTION pol1370_valid_arquivo()#
 #-------------------------------#
-   
-   {IF NOT pol1370_limpa_tabelas() THEN
-      RETURN FALSE
-   END IF}
-        
+           
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
 
    IF mr_arquivo.nom_arquivo = "0" THEN
@@ -1649,11 +1656,7 @@ FUNCTION pol1370_sepa_txt()#
    LET m_index = 0
 
    CALL LOG_progresspopup_set_total("PROCESS",m_count)
-   
-   {IF NOT pol1370_limpa_tabelas() THEN
-      RETURN FALSE
-   END IF}
-   
+      
    LET m_progres = LOG_progresspopup_increment("PROCESS")
    
    LET m_carregando = TRUE
@@ -1679,14 +1682,6 @@ FUNCTION pol1370_sepa_txt()#
       
       LET m_reg_lido = 'ITP'
       
-      {IF NOT pol1370_checa_itp() THEN
-         RETURN FALSE
-      END IF
-      
-      IF m_tem_erro THEN
-         CONTINUE FOREACH
-      END IF}   
-
       IF NOT pol1370_proces_pe() THEN
          RETURN FALSE
       END IF
@@ -1910,127 +1905,131 @@ END FUNCTION
 #-------------------------------#
 FUNCTION pol1370_limpa_tabelas()#
 #-------------------------------#
+   
+   DECLARE cq_del_tat CURSOR FOR
+    SELECT id_arquivo 
+      FROM arquivo_edi_547
+     WHERE cod_empresa = p_cod_empresa
+       AND cod_cliente = m_cod_cliente
+   
+   FOREACH cq_del_tat INTO m_id_arquivo
+   
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','arquivo_edi_547:cq_del_tat')
+         RETURN FALSE
+      END IF
+      
+      DECLARE cq_le_pe1 CURSOR FOR
+       SELECT id_pe1
+         FROM edi_pe1_547
+        WHERE cod_empresa = p_cod_empresa
+          AND id_arquivo = m_id_arquivo
+   
+      FOREACH cq_le_pe1 INTO m_id_pe1
+   
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('SELECT','edi_pe1_547:cq_le_pe1')
+            RETURN FALSE
+         END IF
 
-   DELETE FROM erro_edi_547
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','erro_edi_547')
-      RETURN FALSE
-   END IF
+         DELETE FROM edi_pe2_547 
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = m_id_pe1
+                                                                                        
+         IF STATUS <> 0 THEN                                                            
+            CALL log003_err_sql('DELETE','edi_pe2_547')                                 
+            RETURN FALSE                                                                
+         END IF                                                                         
+                                                                                        
+         DELETE FROM edi_pe3_547                                                        
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = m_id_pe1
+                                                                                        
+         IF STATUS <> 0 THEN                                                            
+            CALL log003_err_sql('DELETE','edi_pe3_547')                                 
+            RETURN FALSE                                                                
+         END IF                                                                         
+                                                                                        
+         DELETE FROM edi_pe5_547                                                        
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = m_id_pe1
+                                                                                        
+         IF STATUS <> 0 THEN                                                            
+            CALL log003_err_sql('DELETE','edi_pe5_547')                                 
+            RETURN FALSE                                                                
+         END IF                                                                         
+                                                                                        
+         DELETE FROM pedidos_edi_547                                                    
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = m_id_pe1
+                                                                                        
+         IF STATUS <> 0 THEN                                                            
+            CALL log003_err_sql('DELETE','pedidos_edi_547')                             
+            RETURN FALSE                                                                
+         END IF                                                                         
+                                                                                        
+         DELETE FROM ped_itens_edi_547                                                  
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = m_id_pe1
+                                                                                        
+         IF STATUS <> 0 THEN                                                            
+            CALL log003_err_sql('DELETE','ped_itens_edi_547')                           
+            RETURN FALSE                                                                
+         END IF                                                                         
+                                                                                        
+         DELETE FROM ped_itens_edi_pe5_547                                              
+          WHERE cod_empresa = p_cod_empresa
+            AND id_pe1 = m_id_pe1
+                                                                                        
+         IF STATUS <> 0 THEN                                                            
+            CALL log003_err_sql('DELETE','ped_itens_edi_pe5_547')                       
+            RETURN FALSE                                                                
+         END IF                                                                         
+         
+      END FOREACH
 
-   DELETE FROM edi_audit_547
+      DELETE FROM edi_pe1_547
+        WHERE cod_empresa = p_cod_empresa
+          AND id_arquivo = m_id_arquivo
    
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','edi_audit_547')
-      RETURN FALSE
-   END IF
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('DELETE','edi_pe1_547')
+         RETURN FALSE
+      END IF
 
-   DELETE FROM edi_pe1_547
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','edi_pe1_547')
-      RETURN FALSE
-   END IF
+      DELETE FROM erro_edi_547                         
+       WHERE cod_empresa = p_cod_empresa
+         AND id_arquivo = m_id_arquivo
+                                                       
+      IF STATUS <> 0 THEN                              
+         CALL log003_err_sql('DELETE','erro_edi_547')  
+         RETURN FALSE                                  
+      END IF                                           
+                                                          
+   END FOREACH
 
-   DELETE FROM edi_pe2_547
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','edi_pe2_547')
-      RETURN FALSE
-   END IF
-
-   DELETE FROM edi_pe3_547
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','edi_pe3_547')
-      RETURN FALSE
-   END IF
-
-   DELETE FROM edi_pe5_547
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','edi_pe5_547')
-      RETURN FALSE
-   END IF
-
-   DELETE FROM pedidos_edi_547
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','pedidos_edi_547')
-      RETURN FALSE
-   END IF
-
-   DELETE FROM ped_itens_edi_547
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','ped_itens_edi_547')
-      RETURN FALSE
-   END IF
-
-   DELETE FROM ped_itens_edi_pe5_547
-   
-   IF STATUS <> 0 THEN
-      CALL log003_err_sql('DELETE','ped_itens_edi_pe5_547')
-      RETURN FALSE
-   END IF
-   
+   DELETE FROM edi_audit_547                          
+    WHERE cod_empresa = p_cod_empresa                    
+      AND cod_cliente = m_cod_cliente                     
+                                                         
+   IF STATUS <> 0 THEN                                   
+      CALL log003_err_sql('DELETE','edi_audit_547')      
+      RETURN FALSE                                       
+   END IF                                                
+                                                      
+   DELETE FROM  arquivo_edi_547                          
+    WHERE cod_empresa = p_cod_empresa                    
+      AND cod_cliente = m_cod_cliente                      
+                                                      
+   IF STATUS <> 0 THEN                                   
+      CALL log003_err_sql('DELETE','arquivo_edi_547')    
+      RETURN FALSE                                       
+   END IF                                                
+     
    RETURN TRUE
 
 END FUNCTION
    
-#---------------------------#
-FUNCTION pol1370_checa_itp()#
-#---------------------------#
- 
-   DEFINE l_cnpj     CHAR(14),
-          l_empresa  CHAR(02)
-
-   LET l_cnpj = m_linha[26,39]
-   LET m_cnpj_cli = '0', l_cnpj[1,2],'.',l_cnpj[3,5],'.',l_cnpj[6,8],'/',l_cnpj[9,12],'-',l_cnpj[13,14]
-   
-   IF m_cnpj_cli = '0' THEN
-      LET m_msg = 'Esse arquivo não contém CNPJ do cliente.'
-      CALL pol1370_add_erro()
-   ELSE
-      IF NOT pol1370_checa_cnpj() THEN
-         RETURN FALSE
-      END IF
-      IF m_cod_cliente IS NULL THEN 
-         LET m_msg = 'CNPJ contido no arquivo não existe no Logix.'
-         CALL pol1370_add_erro()
-      END IF   
-   END IF   
-
-   LET l_cnpj = m_linha[40,53]
-   LET m_cnpj_emp = '0', l_cnpj[1,2],'.',l_cnpj[3,5],'.',l_cnpj[6,8],'/',l_cnpj[9,12],'-',l_cnpj[13,14]
-   
-   IF m_cnpj_emp = '0' THEN
-      LET m_msg = 'Esse arquivo não contém CNPJ da empresa.'
-      CALL pol1370_add_erro()
-   ELSE
-      SELECT cod_empresa 
-        INTO l_empresa
-        FROM empresa
-       WHERE num_cgc = m_cnpj_emp   
-      IF STATUS = 100 THEN
-         LET m_msg = 'CNPJ da empresa informado nesse arquivo não cadastrado no Logix.'
-         CALL pol1370_add_erro()
-      ELSE
-         IF STATUS <> 0 THEN 
-            CALL log003_err_sql("SELECT",'empresa')
-            RETURN FALSE
-         ELSE
-           IF l_empresa <> p_cod_empresa THEN 
-              LET m_msg = 'CNPJ da empresa dese arquivo não é o da empresa selecionada no login'
-              CALL pol1370_add_erro()
-           END IF
-         END IF 
-      END IF
-   END IF
-   
-   RETURN TRUE
-
-END FUNCTION   
 
 #---------------------------#
 FUNCTION pol1370_le_id_pe1()#
@@ -3444,10 +3443,6 @@ FUNCTION pol1370_monta_grades()#
    END FOREACH
    
    LET m_qtd_itens_edi = m_ind - 1
-   #LET ma_pedido[m_ind].mensagem = 'PEDIDOS/ITENS NÃO ENVIADOS NO EDI'
-   #CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,255,0,0)
-
-   #LET m_ind = m_ind + 1
    CALL pol1370_le_carteira() 
    
    LET m_qtd_item = m_ind - 1
@@ -3548,15 +3543,6 @@ FUNCTION pol1370_le_carteira()#
       END FOREACH 
 
       CALL _ADVPL_set_property(m_brz_pedido,"LINE_FONT_COLOR",m_ind,255,0,0)
-
-      IF m_ies_carga THEN
-         LET m_id_pe1 = ma_pedido[m_ind].id_pe1
-         LET m_item_cliente = ma_pedido[m_ind].item_cliente
-         LET m_num_pedido = ma_pedido[m_ind].num_pedido
-         LET m_cod_item = ma_pedido[m_ind].cod_item
-         LET m_ies_situa = 'L' #pedidos da carteira Logi
-         CALL pol1370_prog_da_carteira()
-      END IF
                
       LET m_ind = m_ind + 1
       
@@ -3673,7 +3659,11 @@ FUNCTION pol1370_le_programacao()#
       
         IF NOT pol1370_le_ped_itens() THEN                     
            RETURN FALSE                                        
-        END IF                                                 
+        END IF                  
+        
+        IF m_qtd_saldo = 0 AND ma_prog[m_ind].qtd_solic_nova = 0 THEN
+           CONTINUE FOREACH
+        END IF                           
                                                                
         LET ma_prog[m_ind].qtd_solic = m_qtd_solic             
         LET ma_prog[m_ind].qtd_saldo = m_qtd_saldo             
@@ -3736,116 +3726,112 @@ FUNCTION pol1370_le_programacao()#
            CALL log003_err_sql('INSERT','w_progs_edi:cq_le_prog')
            EXIT FOREACH                                          
         END IF                                                   
-        
-        CALL pol1370_atuali_audit()
-        
+
+        CALL pol1370_atuali_audit()                
+      
       END FOREACH    
                      
       FREE cq_le_prog
 
    END IF
       
-   IF l_num_pedido IS NOT NULL THEN
-   
-      DECLARE cq_prog_antes CURSOR FOR
-       SELECT num_pedido, prz_entrega, 'NAO ENVIADA', qtd_pecas_solic,
-              (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio),
-              'CANCELAR',  num_sequencia
-         FROM ped_itens 
-        WHERE cod_empresa = p_cod_empresa 
-          AND num_pedido = l_num_pedido
-          AND cod_item = l_cod_item
-          AND qtd_pecas_atend = 0
-          AND qtd_pecas_romaneio = 0
-          AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio) > 0
-          AND prz_entrega NOT IN (select prz_entrega from w_progs_edi)
-
-      FOREACH cq_prog_antes INTO 
-         ma_prog[1].num_pedido,  
-         ma_prog[1].prz_entrega, 
-         ma_prog[1].programacao, 
-         ma_prog[1].qtd_solic,   
-         ma_prog[1].qtd_saldo,   
-         ma_prog[1].mensagem,    
-         ma_prog[1].num_sequencia
-
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('SELECT','ped_itens:cq_prog_antes')
-            EXIT FOREACH
-         END IF
-
-         LET ma_prog[1].qtd_solic_nova = NULL
-         LET ma_prog[1].ies_select = 'N'
-
-         INSERT INTO w_progs_edi VALUES(ma_prog[1].*)
-
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('INSERT','w_progs_edi:cq_prog_antes')
-            EXIT FOREACH
-         END IF
-      
-      END FOREACH
-      
-      FREE cq_prog_antes
-      
-      LET m_ies_processado = TRUE
-      LET m_ind = 1
-      
-      INITIALIZE ma_prog TO NULL
-      CALL _ADVPL_set_property(m_brz_prog,"CLEAR")
-
-      CALL _ADVPL_set_property(m_brz_prog,"CLEAR_ALL_LINE_FONT_COLOR")
-
-      LET m_count = _ADVPL_get_property(m_brz_prog,"ITEM_COUNT")
-
-      IF l_count > 0 THEN
-         LET m_msg = 'Erro limpando grade m_brz_prog'
-         CALL log0030_mensagem(m_msg,'info')
-         RETURN
-      END IF      
-
-      DECLARE cq_prog_temp CURSOR FOR
-       SELECT *
-         FROM w_progs_edi
-        ORDER BY prz_entrega        
-
-      FOREACH cq_prog_temp INTO ma_prog[m_ind].*
-
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('SELECT','w_progs_edi:cq_prog_temp')
-            EXIT FOREACH
-         END IF
-         
-         IF ma_prog[m_ind].programacao = 'FIRME' THEN 
-            CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,34,177,76)
-         ELSE
-            CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,0,0,0)
-         END IF
-         
-         IF ma_prog[m_ind].mensagem = 'CANCELAR' THEN 
-            CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,255,0,0)
-         END IF
-
-         IF ma_prog[m_ind].mensagem = 'INCLUIR' OR 
-            ma_prog[m_ind].mensagem = 'ATUALIZAR' OR
-            ma_prog[m_ind].mensagem = 'CANCELAR' OR
-            ma_prog[m_ind].mensagem = 'C/FATURAMENTO' THEN
-            LET m_ies_processado = FALSE
-         END IF
-
-         LET m_ind = m_ind + 1
-      
-         IF m_ind > 3000 THEN
-            LET m_msg = 'Limite de programações previstas ultrapassou.'
-            CALL log0030_mensagem(m_msg,'info')
-            EXIT FOREACH
-         END IF
-      
-      END FOREACH
-      
-      FREE cq_prog_temp     
-      
-   END IF
+   DECLARE cq_prog_antes CURSOR FOR                                                                      
+    SELECT num_pedido, prz_entrega, 'NAO ENVIADA', qtd_pecas_solic,                                      
+           (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio),                     
+           'CANCELAR',  num_sequencia                                                                       
+      FROM ped_itens                                                                                        
+     WHERE cod_empresa = p_cod_empresa                                                                      
+       AND num_pedido = l_num_pedido                                                                        
+       AND cod_item = l_cod_item                                                                            
+       AND qtd_pecas_atend = 0                                                                              
+       AND qtd_pecas_romaneio = 0                                                                           
+       AND (qtd_pecas_solic - qtd_pecas_cancel) > 0                  
+       AND prz_entrega NOT IN (select prz_entrega from w_progs_edi)                                         
+                                                                                                            
+   FOREACH cq_prog_antes INTO                                                                            
+      ma_prog[1].num_pedido,                                                                                
+      ma_prog[1].prz_entrega,                                                                               
+      ma_prog[1].programacao,                                                                               
+      ma_prog[1].qtd_solic,                                                                                 
+      ma_prog[1].qtd_saldo,                                                                                 
+      ma_prog[1].mensagem,                                                                                  
+      ma_prog[1].num_sequencia                                                                              
+                                                                                                            
+      IF STATUS <> 0 THEN                                                                                
+         CALL log003_err_sql('SELECT','ped_itens:cq_prog_antes')                                            
+         EXIT FOREACH                                                                                       
+      END IF                                                                                                
+                                                                                                            
+      LET ma_prog[1].qtd_solic_nova = NULL                                                               
+      LET ma_prog[1].ies_select = 'N'                                                                       
+                                                                                                            
+      INSERT INTO w_progs_edi VALUES(ma_prog[1].*)                                                       
+                                                                                                            
+      IF STATUS <> 0 THEN                                                                                
+         CALL log003_err_sql('INSERT','w_progs_edi:cq_prog_antes')                                          
+         EXIT FOREACH                                                                                       
+      END IF                                                                                                
+                                                                                                            
+   END FOREACH                                                                                              
+                                                                                                            
+   FREE cq_prog_antes                                                                                       
+                                                                                                            
+   LET m_ies_processado = TRUE                                                                              
+   LET m_ind = 1                                                                                            
+                                                                                                            
+   INITIALIZE ma_prog TO NULL                                                                               
+   CALL _ADVPL_set_property(m_brz_prog,"CLEAR")                                                             
+                                                                                                            
+   CALL _ADVPL_set_property(m_brz_prog,"CLEAR_ALL_LINE_FONT_COLOR")                                      
+                                                                                                            
+   LET m_count = _ADVPL_get_property(m_brz_prog,"ITEM_COUNT")                                            
+                                                                                                            
+   IF l_count > 0 THEN                                                                                   
+      LET m_msg = 'Erro limpando grade m_brz_prog'                                                          
+      CALL log0030_mensagem(m_msg,'info')                                                                   
+      RETURN                                                                                                
+   END IF                                                                                                   
+                                                                                                            
+   DECLARE cq_prog_temp CURSOR FOR                                                                       
+    SELECT *                                                                                                
+      FROM w_progs_edi                                                                                      
+     ORDER BY prz_entrega                                                                                   
+                                                                                                            
+   FOREACH cq_prog_temp INTO ma_prog[m_ind].*                                                            
+                                                                                                            
+      IF STATUS <> 0 THEN                                                                                
+         CALL log003_err_sql('SELECT','w_progs_edi:cq_prog_temp')                                           
+         EXIT FOREACH                                                                                       
+      END IF                                                                                                
+                                                                                                            
+      IF ma_prog[m_ind].programacao = 'FIRME' THEN                                                          
+         CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,34,177,76)                             
+      ELSE                                                                                                  
+         CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,0,0,0)                                 
+      END IF                                                                                                
+                                                                                                            
+      IF ma_prog[m_ind].mensagem = 'CANCELAR' THEN                                                          
+         CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,255,0,0)                               
+      END IF                                                                                                
+                                                                                                            
+      IF ma_prog[m_ind].mensagem = 'INCLUIR' OR                                                          
+         ma_prog[m_ind].mensagem = 'ATUALIZAR' OR                                                           
+         ma_prog[m_ind].mensagem = 'CANCELAR' OR                                                            
+         ma_prog[m_ind].mensagem = 'C/FATURAMENTO' THEN                                                     
+         LET m_ies_processado = FALSE                                                                       
+      END IF                                                                                                
+                                                                                                            
+      LET m_ind = m_ind + 1                                                                              
+                                                                                                            
+      IF m_ind > 3000 THEN                                                                                  
+         LET m_msg = 'Limite de programações previstas ultrapassou.'                                        
+         CALL log0030_mensagem(m_msg,'info')                                                                
+         EXIT FOREACH                                                                                       
+      END IF                                                                                                
+                                                                                                            
+   END FOREACH                                                                                              
+                                                                                                            
+   FREE cq_prog_temp                                                                                                    
    
    LET m_qtd_prog = m_ind - 1
    CALL _ADVPL_set_property(m_brz_prog,"ITEM_COUNT", m_qtd_prog)
@@ -3877,9 +3863,6 @@ FUNCTION pol1370_atuali_audit()#
       RETURN
    END IF
 
-   LET ma_prog[m_ind].qtd_solic = m_qtd_solic             
-   LET ma_prog[m_ind].qtd_saldo = m_qtd_saldo                  
-                                                      
    UPDATE edi_audit_547                                   
     SET mensagem = ma_prog[m_ind].mensagem             
    WHERE cod_empresa = p_cod_empresa                      
@@ -3920,6 +3903,7 @@ FUNCTION pol1370_grava_cenario()#
     LET mr_audit.id_pe1 = m_id_pe1
     LET mr_audit.item_cliente = m_item_cliente
     LET mr_audit.situacao = m_ies_situa
+    LET mr_audit.operacao = NULL                     
     
     DECLARE cq_cenario CURSOR FOR
     SELECT ped_itens_edi_547.prz_entrega,
@@ -3958,18 +3942,7 @@ FUNCTION pol1370_grava_cenario()#
       IF l_dat_abertura IS NOT NULL THEN
          LET mr_audit.prz_entrega = l_dat_abertura
       END IF      
-      
-      CASE l_ies_prog
-         WHEN '1' 
-            LET ma_prog[m_ind].programacao = 'FIRME'
-         WHEN '3' 
-            LET ma_prog[m_ind].programacao = 'REQUISIC.'
-         WHEN '4' 
-            LET ma_prog[m_ind].programacao = 'PLANEJADO'
-         OTHERWISE
-            LET ma_prog[m_ind].programacao = 'INDEFINIDA'
-      END CASE
-      
+            
       LET mr_audit.qtd_atual = mr_audit.qtd_antes
       
       INSERT INTO edi_audit_547 VALUES(mr_audit.*)
@@ -3999,7 +3972,7 @@ FUNCTION pol1370_grava_cenario()#
        AND cod_item = m_cod_item                                                       
        AND qtd_pecas_atend = 0                                                                  
        AND qtd_pecas_romaneio = 0                                                               
-       AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio) > 0      
+       AND (qtd_pecas_solic - qtd_pecas_cancel) > 0      
                                                                                              
    FOREACH cq_na_cart INTO                                                                      
       mr_audit.prz_entrega,                                                                     
@@ -4040,78 +4013,6 @@ FUNCTION pol1370_grava_cenario()#
    END FOREACH
       
    FREE cq_na_cart
-               
-END FUNCTION
-
-#----------------------------------#
-FUNCTION pol1370_prog_da_carteira()#
-#----------------------------------#
-
-    INITIALIZE mr_audit TO NULL
-    LET mr_audit.cod_empresa = p_cod_empresa
-    LET mr_audit.id_registro = 0
-    LET mr_audit.usuario = p_user
-    LET mr_audit.num_pedido = m_num_pedido
-    LET mr_audit.cod_item = m_cod_item
-    LET mr_audit.dat_operacao = mr_arquivo.dat_carga
-    LET mr_audit.cod_cliente = mr_arquivo.cod_cliente
-    LET mr_audit.id_arquivo = m_id_arquivo
-    LET mr_audit.id_pe1 = m_id_pe1
-    LET mr_audit.item_cliente = m_item_cliente
-    LET mr_audit.situacao = m_ies_situa
-                                                                          
-   DECLARE cq_na_ped_it CURSOR FOR                                                                
-    SELECT prz_entrega, qtd_pecas_solic,                                              
-           (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio),         
-           'CANCELAR'                                                                           
-      FROM ped_itens                                                                            
-     WHERE cod_empresa = p_cod_empresa                                                          
-       AND num_pedido = m_num_pedido     
-       AND cod_item = m_cod_item                                                       
-       AND qtd_pecas_atend = 0                                                                  
-       AND qtd_pecas_romaneio = 0                                                               
-       AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel - qtd_pecas_romaneio) > 0      
-                                                                                             
-   FOREACH cq_na_ped_it INTO                                                                      
-      mr_audit.prz_entrega,                                                                     
-      mr_audit.qtd_solic,                                                                       
-      mr_audit.qtd_antes,                                                                       
-      mr_audit.mensagem                                                                         
-                                                                                             
-      IF STATUS <> 0 THEN                                                                       
-         CALL log003_err_sql('SELECT','ped_itens:cq_na_ped_it')                                   
-         EXIT FOREACH                                                                           
-      END IF                                                                                    
-         
-      SELECT COUNT(*) INTO m_count                                    
-        FROM edi_audit_547                                               
-       WHERE cod_empresa = p_cod_empresa                                 
-         AND num_pedido = m_num_pedido                                   
-         AND cod_item = mr_audit.cod_item                        
-         AND prz_entrega = mr_audit.prz_entrega  
-         AND id_arquivo = m_id_arquivo
-                                                                
-      IF STATUS <> 0 THEN                                                
-         CALL log003_err_sql('SELECT','edi_audit_547:cq_na_ped_it')        
-         EXIT FOREACH                                                    
-      END IF                                                             
-                                                                         
-      IF m_count = 0 THEN                                                
-         LET mr_audit.qtd_operacao = 0    
-         LET mr_audit.qtd_atual = mr_audit.qtd_antes                               
-         LET mr_audit.programacao = 'NAO ENVIADA'
-                                                                      
-         INSERT INTO edi_audit_547 VALUES(mr_audit.*)                    
-                                                                      
-         IF STATUS <> 0 THEN                                             
-            CALL log003_err_sql('INSERT','edi_audit_547:cq_na_ped_it')     
-            EXIT FOREACH                                                 
-         END IF                                                          
-      END IF                                                             
-      
-   END FOREACH
-      
-   FREE cq_na_ped_it
                
 END FUNCTION
 
@@ -4754,8 +4655,11 @@ FUNCTION pol1370_proc_edi()#
 #--------------------------#
    
    DEFINE l_progres      SMALLINT,
-          l_ind          INTEGER
-          
+          l_ind          INTEGER,
+          l_atu_pe1      SMALLINT
+   
+   LET l_atu_pe1 = TRUE
+   
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')   
    
    CALL LOG_progresspopup_set_total("PROCESS",m_qtd_prog)
@@ -4764,15 +4668,18 @@ FUNCTION pol1370_proc_edi()#
    
        LET l_progres = LOG_progresspopup_increment("PROCESS")
 
+       LET m_qtd_solic = ma_prog[l_ind].qtd_solic     
+       LET m_qtd_nova = ma_prog[l_ind].qtd_solic_nova    
+       LET m_qtd_saldo = ma_prog[l_ind].qtd_saldo        
+       LET m_qtd_antes = m_qtd_saldo                     
+       LET m_qtd_atual = m_qtd_nova                      
+       LET m_tip_prog = ma_prog[l_ind].programacao       
+       LET m_prz_entrega = ma_prog[l_ind].prz_entrega    
+       LET m_seq_prog = ma_prog[l_ind].num_sequencia     
+       LET mr_audit.operacao = 'DESCARTADO'                      
+       LET mr_audit.situacao = NULL                      
+
        IF ma_prog[l_ind].ies_select = 'S' THEN
-          LET m_qtd_solic = ma_prog[l_ind].qtd_solic
-          LET m_qtd_nova = ma_prog[l_ind].qtd_solic_nova
-          LET m_qtd_saldo = ma_prog[l_ind].qtd_saldo
-          LET m_qtd_antes = m_qtd_saldo
-          LET m_qtd_atual = m_qtd_nova 
-          LET m_tip_prog = ma_prog[l_ind].programacao
-          LET m_prz_entrega = ma_prog[l_ind].prz_entrega
-          LET m_seq_prog = ma_prog[l_ind].num_sequencia
           
           IF ma_prog[l_ind].mensagem = 'CANCELAR' THEN          
              UPDATE ped_itens 
@@ -4801,23 +4708,29 @@ FUNCTION pol1370_proc_edi()#
                 RETURN FALSE
              END IF
           ELSE
-             IF m_qtd_nova <> m_qtd_saldo THEN
-                IF NOT pol1370_grv_programacao() THEN
-                   RETURN FALSE
-                END IF
+             IF NOT pol1370_grv_programacao() THEN
+                RETURN FALSE
              END IF
           END IF      
+       ELSE
+          IF (ma_prog[l_ind].mensagem = 'CANCELAR') OR (m_qtd_nova <> m_qtd_saldo) THEN
+             LET l_atu_pe1 = FALSE
+          ELSE
+             LET m_qtd_antes = m_qtd_saldo                     
+             LET m_qtd_atual = m_qtd_antes                      
+             IF NOT pol1370_ins_audit() THEN
+                RETURN FALSE
+             END IF             
+          END IF
        END IF
        
    END FOR
-      
-   {IF NOT pol1370_atu_pe1() THEN
-      RETURN FALSE
-   END IF}
-
-   {IF NOT pol1370_atu_arq_edi() THEN
-      RETURN FALSE
-   END IF}
+   
+   IF l_atu_pe1 THEN   
+      IF NOT pol1370_atu_pe1() THEN
+         RETURN FALSE
+      END IF
+   END IF
    
    RETURN TRUE
    
@@ -4956,45 +4869,25 @@ FUNCTION pol1370_ins_audit()#
    LET mr_audit.qtd_operacao = m_qtd_nova
    LET mr_audit.programacao = m_tip_prog
    
-   SELECT id_registro INTO l_ld
-     FROM edi_audit_547
+   DELETE FROM edi_audit_547
     WHERE cod_empresa = p_cod_empresa
       AND id_arquivo = m_id_arquivo
       AND id_pe1 = m_id_pe1
       AND num_pedido = m_num_pedido
       AND cod_item = m_cod_item
       AND prz_entrega = m_prz_entrega
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('DELETE','edi_audit_547:1')
+      RETURN FALSE
+   END IF
    
-   IF STATUS = 100 THEN
-      INSERT INTO edi_audit_547
-       VALUES(mr_audit.*)
-      IF STATUS <> 0 THEN
-         CALL log003_err_sql('INSERT','edi_audit_547:1')
-         RETURN FALSE
-      END IF
-   ELSE 
-      DECLARE cq_audit CURSOR FOR
-       SELECT id_registro FROM edi_audit_547
-        WHERE cod_empresa = p_cod_empresa
-          AND id_arquivo = m_id_arquivo
-          AND id_pe1 = m_id_pe1
-          AND num_pedido = m_num_pedido
-          AND cod_item = m_cod_item
-          AND prz_entrega = m_prz_entrega      
-      FOREACH cq_audit INTO l_ld      
-         UPDATE edi_audit_547
-          SET operacao = mr_audit.operacao,
-              dat_operacao = mr_audit.dat_operacao,
-              qtd_solic = m_qtd_solic,
-              qtd_atual = m_qtd_atual,
-              qtd_antes = m_qtd_antes
-         WHERE cod_empresa = p_cod_empresa
-           AND id_registro = l_ld
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('UPDATE','edi_audit_547:3')
-            RETURN FALSE
-         END IF
-      END FOREACH
+   INSERT INTO edi_audit_547
+    VALUES(mr_audit.*)
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('INSERT','edi_audit_547:1')
+      RETURN FALSE
    END IF
       
    RETURN TRUE
@@ -5321,8 +5214,7 @@ FUNCTION pol1370_proc_todos()#
    
        LET l_progres = LOG_progresspopup_increment("PROCESS")
        
-       IF ma_pedido[m_ind].situacao = 'C' OR ma_pedido[m_ind].situacao = ' ' THEN
-       ELSE
+       IF ma_pedido[m_ind].situacao = 'N' THEN
           LET m_id_pe1 = ma_pedido[m_ind].id_pe1
           LET p_num_pedido = ma_pedido[m_ind].num_pedido
           LET p_cod_item = ma_pedido[m_ind].cod_item
@@ -5331,15 +5223,17 @@ FUNCTION pol1370_proc_todos()#
           IF NOT pol1370_atu_carteira() THEN
              RETURN FALSE
           END IF
-          IF NOT pol1370_atu_pe1() THEN
-             RETURN FALSE
+          IF m_atu_pe1 THEN
+             IF NOT pol1370_atu_pe1() THEN
+                RETURN FALSE
+             END IF
           END IF
        END IF       
    END FOR
 
-   IF NOT pol1370_atu_arq_edi() THEN
-      RETURN FALSE
-   END IF
+   #IF NOT pol1370_atu_arq_edi() THEN
+   #   RETURN FALSE
+   #END IF
    
    LET m_ind_canc = m_qtd_itens_edi + 1
 
@@ -5364,7 +5258,9 @@ END FUNCTION
 #------------------------------#
 FUNCTION pol1370_atu_carteira()#
 #------------------------------#
-         
+   
+   LET m_atu_pe1 = TRUE
+   
    DECLARE cq_progs CURSOR FOR
     SELECT ped_itens_edi_547.num_pedido, 
            ped_itens_edi_547.num_sequencia,
@@ -5401,26 +5297,34 @@ FUNCTION pol1370_atu_carteira()#
       IF m_dat_abertura IS NOT NULL THEN
          LET m_prz_entrega = m_dat_abertura
       END IF
-      
-      #IF m_prz_entrega < m_dat_proces THEN
-      #   CONTINUE FOREACH
-      #END IF
 
-      IF m_prz_entrega < mr_arquivo.peri_de OR m_prz_entrega > mr_arquivo.peri_ate  THEN
-         CONTINUE FOREACH
-      END IF      
-      
+       LET mr_audit.operacao = NULL                      
+       LET mr_audit.situacao = NULL                      
+            
       IF NOT pol1370_le_ped_itens() THEN
          RETURN FALSE
       END IF
 
-      IF m_qtd_nova = m_qtd_saldo THEN
+      IF m_qtd_nova = 0 AND m_qtd_saldo = 0 THEN
          CONTINUE FOREACH
       END IF
-      
+
       LET m_qtd_antes = m_qtd_saldo
       LET m_qtd_atual = m_qtd_nova
-      
+      LET mr_audit.operacao = NULL
+
+      IF m_prz_entrega < mr_arquivo.peri_de OR m_prz_entrega > mr_arquivo.peri_ate  THEN
+         LET m_atu_pe1 = FALSE         
+         CONTINUE FOREACH
+      END IF      
+
+      IF m_qtd_nova = m_qtd_saldo THEN
+         IF NOT pol1370_ins_audit() THEN
+            RETURN FALSE
+         END IF
+         CONTINUE FOREACH
+      END IF
+            
       IF NOT pol1370_grv_programacao() THEN
          RETURN FALSE
       END IF
@@ -5475,6 +5379,8 @@ FUNCTION pol1370_canc_all()#
        AND cod_item  = m_cod_item
        AND qtd_pecas_atend = 0
        AND qtd_pecas_romaneio = 0
+       AND prz_entrega >= mr_arquivo.peri_de
+       AND prz_entrega <= mr_arquivo.peri_ate
   
   FOREACH cq_canc_all INTO m_num_seq, m_prz_entrega, m_qtd_saldo
 
@@ -5486,10 +5392,6 @@ FUNCTION pol1370_canc_all()#
       IF m_qtd_saldo <= 0 THEN
          CONTINUE FOREACH
       END IF
-
-      IF m_prz_entrega < mr_arquivo.peri_de OR m_prz_entrega > mr_arquivo.peri_ate  THEN
-         CONTINUE FOREACH
-      END IF      
 
       IF NOT pol1370_canc_prog() THEN
          RETURN FALSE
@@ -5507,28 +5409,6 @@ FUNCTION pol1370_canc_prog()#
    
    DEFINE l_qtd_dias   INTEGER,
           l_dias_param INTEGER
-    {  
-   SELECT parametro_numerico 
-     INTO l_dias_param
-     FROM min_par_modulo
-    WHERE empresa = p_cod_empresa 
-      AND parametro = 'DIAS_PARA_CANC_PROG'
-
-   IF STATUS <> 0 THEN                                        
-      CALL log003_err_sql('SELECT','min_par_modulo')   
-      RETURN FALSE                                            
-   END IF                                                     
-   
-   LET l_qtd_dias = 0
-   
-   IF m_prz_entrega > TODAY THEN
-      LET l_qtd_dias = m_prz_entrega - TODAY
-   END IF
-      
-   IF l_qtd_dias <= l_dias_param THEN
-      RETURN TRUE
-   END IF
-}
 
    UPDATE ped_itens                                        
       SET qtd_pecas_cancel = qtd_pecas_cancel + m_qtd_saldo   
@@ -5755,10 +5635,10 @@ FUNCTION pol1370_par_print(l_container)#
    CALL _ADVPL_set_property(l_label,"FONT",NULL,NULL,FALSE,TRUE)
 
     LET m_tip_proces = _ADVPL_create_component(NULL,"LCOMBOBOX",l_layout)
-    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","0"," ")     
-    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","1","Alterados")     
-    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","2","Não Alterados")     
-    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","3","Todos")     
+    #CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","0"," ")     
+    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","1","Todos")     
+    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","2","Alterados")     
+    CALL _ADVPL_set_property(m_tip_proces,"ADD_ITEM","3","Não Alterados")     
     CALL _ADVPL_set_property(m_tip_proces,"VARIABLE",mr_print,"tip_proces")    
     CALL _ADVPL_set_property(m_tip_proces,"VALID","pol1370_valida_processo")     
 
@@ -5923,10 +5803,10 @@ FUNCTION pol1370_le_audit()#
       LET l_sql = l_sql CLIPPED, " AND prz_entrega <= '",mr_print.prz_ate,"' "
    END IF
 
-   IF mr_print.tip_proces = '1' THEN
+   IF mr_print.tip_proces = '2' THEN
       LET l_sql = l_sql CLIPPED, " AND operacao IS NOT NULL "
    ELSE
-      IF mr_print.tip_proces = '2' THEN
+      IF mr_print.tip_proces = '3' THEN
          LET l_sql = l_sql CLIPPED, " AND operacao IS NULL "
       END IF
    END IF
@@ -5958,7 +5838,7 @@ FUNCTION pol1370_le_audit()#
    
    IF m_count = 0 THEN
       LET m_msg = 'Não há dados p/ o parêmtros informados.'
-      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      CALL log0030_mensagem(m_msg,'info')
       RETURN FALSE
    END IF
    
@@ -6025,11 +5905,11 @@ FUNCTION pol1370_relatorio(l_report)#
       LET l_sql = l_sql CLIPPED, " AND prz_entrega <= '",mr_print.prz_ate,"' "
    END IF
 
-   IF mr_print.tip_proces = '1' THEN
+   IF mr_print.tip_proces = '2' THEN
       LET l_sql = l_sql CLIPPED, " AND operacao IS NOT NULL "
    ELSE
-      IF mr_print.tip_proces = '2' THEN
-         LET l_sql = l_sql CLIPPED, " AND operacao IS NULL "
+      IF mr_print.tip_proces = '3' THEN
+         LET l_sql = l_sql CLIPPED, " AND operacao IS NULL"
       END IF
    END IF
    
@@ -6174,7 +6054,7 @@ REPORT pol1370_relat(l_cod_cliente)#
       SKIP 1 LINE
       PRINT COLUMN 001, l_cod_cliente CLIPPED, ' - ', mr_relat.nom_cliente
       PRINT 
-      PRINT COLUMN 001, 'DT ACAO    ACAO                 PEDIDO ITEM            DESCRICAO             ITEM CLIETE   PRZ ENTREG QTD ANT  QTD ATU VARIACAO  INDICACAO   USUARIO'
+      PRINT COLUMN 001, 'DT ACAO    ACAO                 PEDIDO ITEM            DESCRICAO             ITEM CLIETE   PRZ ENTREG QTD ANT  QTD ATU VARIACAO  QTD ENVIADA USUARIO'
       PRINT COLUMN 001, '---------- -------------------- ------ --------------- ------------------  --------------- ---------- -------  ------- --------  ----------- --------'
            
     ON EVERY ROW
@@ -6189,7 +6069,7 @@ REPORT pol1370_relat(l_cod_cliente)#
               COLUMN 112, mr_relat.qtd_atual USING '######&',              
               COLUMN 120, mr_relat.variacao USING '######&',     
               COLUMN 127, mr_relat.sinal,                            
-              COLUMN 130, mr_relat.mensagem,
+              COLUMN 130, mr_relat.qtd_operacao USING '######&',
               COLUMN 142, mr_relat.usuario
 
 END REPORT
@@ -6253,9 +6133,7 @@ FUNCTION pol1370_sepa_csv()#
       LET mr_edi_pe1.situacao = 'N'
       LET mr_edi_pe1.cod_item_cliente = l_it_cliente
       LET mr_edi_pe1.id_arquivo = m_id_arquivo
-      
-      INITIALIZE m_prz_entrega, m_qtd_solic TO NULL
-      
+           
       LET m_prz_entrega = l_prz_entrega
       LET m_qtd_entrega = l_qtd_solict
       
@@ -6314,9 +6192,24 @@ FUNCTION pol1370_sepa_csv()#
          LET m_id_pe1 = m_id_pe1 + 1
          LET mr_edi_pe1.id_pe1 = m_id_pe1 
          LET m_num_seq = 0
+         
+         IF mr_edi_pe1.num_pedido IS NOT NULL AND mr_edi_pe1.num_pedido > 0 THEN 
+            SELECT num_pedido_cli 
+              INTO mr_edi_pe1.num_pedido_compra
+              FROM pedidos 
+             WHERE cod_empresa = p_cod_empresa
+               AND num_pedido = mr_edi_pe1.num_pedido 
+
+            IF STATUS <> 0 THEN                                                  
+               CALL log003_err_sql("SELECT",'pedidos:cq_qfp')  
+               RETURN FALSE                                                      
+            END IF                                                               
+         END IF
+         
          IF NOT pol1370_ins_pe1() THEN
             RETURN FALSE
          END IF
+         
          IF NOT pol1370_ins_pedidos_edi() THEN
             RETURN FALSE
          END IF         

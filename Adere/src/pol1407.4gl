@@ -2,7 +2,7 @@
 # colocar no agendador do windows: taskschd.msc                                #
 #------------------------------------------------------------------------------#
 # PROGRAMA: pol1407                                                            #
-# OBJETIVO: PONTOS DE ENTRADA MAN10021                                         #
+# OBJETIVO: UNIFICAÇÃO DE ORDENS DE MONTAGEM                                   #
 # AUTOR...: IVO H BARBOSA                                                      #
 # DATA....: 21/07/2020                                                         #
 # ALTERADO:                                                                    #
@@ -40,8 +40,8 @@ DEFINE m_num_om                  INTEGER,
        m_processo                INTEGER,
        m_dat_atu                 DATE,
        m_hor_atu                 VARCHAR(08),
-       m_texto                   VARCHAR(200)
-
+       m_texto                   VARCHAR(200),
+       m_dat_proces              VARCHAR(19)
 MAIN   
 
    IF NUM_ARGS() > 0  THEN
@@ -109,7 +109,8 @@ FUNCTION pol1407_cria_tab_erro()#
    CREATE TABLE pedido_erro_adere (
       empresa      CHAR(02),
       pedido       INTEGER,
-      erro         varchar(120)
+      erro         varchar(120),
+      dat_proces   varchar(19)
    );
 
    IF STATUS <> 0 THEN
@@ -129,6 +130,33 @@ FUNCTION pol1407_cria_tab_erro()#
 
 END FUNCTION   
 
+#-------------------------------#
+FUNCTION pol1407_cria_tab_unif()#
+#-------------------------------#
+
+   CREATE TABLE pedido_unif_adere (
+      empresa      CHAR(02),
+      pedido       INTEGER,
+      data         varchar(19)
+   );
+
+   IF STATUS <> 0 THEN
+      LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' criando tabela pedido_unif_adere'
+      RETURN FALSE
+   END IF
+   
+   CREATE unique INDEX ix_pedido_unif_adere 
+   ON pedido_unif_adere (empresa, pedido);
+
+   IF STATUS <> 0 THEN
+      LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' criando indice ix_pedido_unif_adere'
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION   
+
 #---------------------------------------------#
 FUNCTION pol1407_insere_erro(l_pedido, l_erro)#
 #---------------------------------------------#
@@ -137,7 +165,7 @@ FUNCTION pol1407_insere_erro(l_pedido, l_erro)#
           l_erro       VARCHAR(120)
           
    INSERT INTO pedido_erro_adere
-    VALUES(p_cod_empresa, l_pedido, l_erro)
+    VALUES(p_cod_empresa, l_pedido, l_erro, m_dat_proces)
 
    IF STATUS <> 0 THEN
       LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' inserindo dados na tabela pedido_erro_adere'
@@ -153,7 +181,9 @@ FUNCTION pol1407_controle()#
 #--------------------------#
    
    DEFINE l_num_pedido    INTEGER,
-          l_count         INTEGER
+          l_count         INTEGER,
+          l_carteira      VARCHAR(02),
+          l_dat_corte     DATE
    
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
@@ -161,6 +191,12 @@ FUNCTION pol1407_controle()#
 
    IF NOT log0150_verifica_se_tabela_existe("pedido_erro_adere") THEN 
       IF NOT pol1407_cria_tab_erro() THEN
+         RETURN 
+      END IF
+   END IF
+
+   IF NOT log0150_verifica_se_tabela_existe("pedido_unif_adere") THEN 
+      IF NOT pol1407_cria_tab_unif() THEN
          RETURN 
       END IF
    END IF
@@ -178,6 +214,8 @@ FUNCTION pol1407_controle()#
    DELETE FROM w_pedido_tmp
       
    LET m_erro = NULL
+   LET l_dat_corte = TODAY - 90
+   LET m_dat_proces = CURRENT
    
    DECLARE cq_oms CURSOR FOR
     SELECT distinct i.num_pedido
@@ -190,7 +228,7 @@ FUNCTION pol1407_controle()#
       INNER JOIN om_list l
         ON l.cod_empresa = i.cod_empresa
         AND l.num_om = i.num_om
-        AND l.dat_emis >= '01/01/2020'
+        AND l.dat_emis >= l_dat_corte
    WHERE i.cod_empresa = p_cod_empresa
 
     FOREACH cq_oms INTO l_num_pedido
@@ -198,6 +236,61 @@ FUNCTION pol1407_controle()#
       IF STATUS <> 0 THEN
          LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ordem_montag_mest:cq_oms '
          RETURN 
+      END IF
+      
+      DELETE FROM pedido_erro_adere 
+       WHERE empresa = p_cod_empresa AND pedido = l_num_pedido
+      
+      SELECT cod_tip_carteira
+         INTO l_carteira
+         FROM pedidos 
+        WHERE cod_empresa = p_cod_empresa
+          AND num_pedido = l_num_pedido 
+          AND ies_sit_pedido <> '9'
+      
+      IF STATUS = 100 THEN
+         LET m_msg = 'Pedido não existe ou está cancelado'
+         IF NOT pol1407_insere_erro(l_num_pedido, m_msg) THEN
+            RETURN 
+         END IF
+         CONTINUE FOREACH
+      ELSE
+         IF STATUS <> 0 THEN
+            LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela pedidos:cq_oms '
+            RETURN 
+         END IF
+      END IF
+
+      SELECT 1
+         FROM pedido_unif_adere 
+        WHERE empresa = p_cod_empresa
+          AND pedido = l_num_pedido 
+      
+      IF STATUS = 0 THEN
+         CONTINUE FOREACH
+      ELSE
+         IF STATUS <> 0 THEN
+            LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela pedido_unif_adere:cq_oms '
+            RETURN 
+         END IF
+      END IF
+
+      SELECT 1
+         FROM empresa_carteira_adere 
+        WHERE empresa = p_cod_empresa
+          AND carteira = l_carteira 
+      
+      IF STATUS = 100 THEN
+         LET m_msg = 'Carteira do pedido não consta dos parâmetros'
+         IF NOT pol1407_insere_erro(l_num_pedido, m_msg) THEN
+            RETURN 
+         END IF
+         CONTINUE FOREACH
+      ELSE
+         IF STATUS <> 0 THEN
+            LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela empresa_carteira_adere:cq_oms '
+            RETURN 
+         END IF
       END IF
 
       SELECT COUNT(*) 
@@ -208,12 +301,32 @@ FUNCTION pol1407_controle()#
          AND qtd_pecas_atend > 0
 
       IF STATUS <> 0 THEN
-         LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ped_itens:cq_oms '
+         LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ped_itens(1):cq_oms '
          RETURN 
       END IF
 
       IF l_count > 0 THEN
          LET m_erro = 'Pedido já contém faturamento'
+         IF NOT pol1407_insere_erro(l_num_pedido, m_erro) THEN
+            RETURN
+         END IF
+         CONTINUE FOREACH
+      END IF
+
+      SELECT COUNT(*) 
+        INTO l_count
+        FROM ped_itens 
+       WHERE cod_empresa = p_cod_empresa
+         AND num_pedido = l_num_pedido
+         AND (qtd_pecas_solic - qtd_pecas_cancel) > qtd_pecas_romaneio
+
+      IF STATUS <> 0 THEN
+         LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ped_itens(2):cq_oms '
+         RETURN 
+      END IF
+      
+      IF l_count > 0 THEN
+         LET m_erro = 'Pedido ainda tem saldo a faturar'
          IF NOT pol1407_insere_erro(l_num_pedido, m_erro) THEN
             RETURN
          END IF
@@ -257,11 +370,13 @@ END FUNCTION
 FUNCTION pol1407_junta_ordens()#
 #------------------------------#
    
-   DEFINE l_dat_proces     VARCHAR(19)
-   
    LET m_hor_atu = TIME
    LET m_dat_atu = TODAY
-   LET l_dat_proces = CURRENT
+   
+   IF m_dat_proces IS NULL THEN
+      LET m_dat_proces = CURRENT
+   END IF
+   
    LET m_msg = NULL
    
    IF g_msg IS NULL THEN
@@ -269,7 +384,7 @@ FUNCTION pol1407_junta_ordens()#
    END IF
    
    INSERT INTO proces_pol1407_adere
-    VALUES(l_dat_proces, g_msg)
+    VALUES(m_dat_proces, g_msg)
    
    SELECT COUNT(*) INTO m_count
     FROM w_pedido_tmp
@@ -303,8 +418,9 @@ FUNCTION pol1407_processa()#
 
    DEFINE m_progres      SMALLINT,
           l_qtd_item     INTEGER,
-          l_carteira     CHAR(02)
-
+          l_carteira     CHAR(02),
+          l_count        integer
+          
    DECLARE cq_w_temp CURSOR FOR
     SELECT num_pedido
       FROM w_pedido_tmp
@@ -331,6 +447,26 @@ FUNCTION pol1407_processa()#
             LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela pedidos:cq_w_temp '
             RETURN FALSE
          END IF
+      END IF
+
+      SELECT COUNT(*) 
+        INTO l_count
+        FROM ped_itens 
+       WHERE cod_empresa = p_cod_empresa 
+         AND num_pedido = m_num_pedido 
+         AND qtd_pecas_atend > 0
+
+      IF STATUS <> 0 THEN
+         LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ped_itens:cq_w_temp '
+         RETURN 
+      END IF
+
+      IF l_count > 0 THEN
+         LET m_erro = 'Pedido já contém faturamento'
+         IF NOT pol1407_insere_erro(m_num_pedido, m_erro) THEN
+            RETURN
+         END IF
+         CONTINUE FOREACH
       END IF
 
       SELECT 1
@@ -521,7 +657,36 @@ FUNCTION pol1407_ins_om_adere(l_op)#
    DEFINE l_op CHAR(01)
    
    INSERT INTO om_x_oms_adere
-    VALUES(m_processo, p_cod_empresa, m_num_ordem, l_op)
+    VALUES(m_processo, p_cod_empresa, m_num_ordem, l_op, m_num_pedido)
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' inserindo dados tab om_x_oms_adere '
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+
+#------------------------------#
+FUNCTION pol1407_ins_ped_unif()#
+#------------------------------#
+   
+   SELECT 1 FROM pedido_unif_adere
+    WHERE empresa = p_cod_empresa
+      AND pedido = m_num_pedido
+   
+   IF STATUS = 0 THEN
+      RETURN TRUE
+   ELSE
+      IF STATUS <> 100 THEN
+         LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' LENDO dados tab pedido_unif_adere '
+         RETURN FALSE
+      END IF
+   END IF
+         
+   INSERT INTO pedido_unif_adere
+    VALUES(p_cod_empresa, m_num_pedido, m_dat_proces)
 
    IF STATUS <> 0 THEN
       LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' inserindo dados tab om_x_oms_adere '
@@ -712,7 +877,11 @@ FUNCTION pol1407_cria_om_unica()#
       RETURN FALSE
    END IF
 
-   CALL pol1407_insere_erro(m_num_pedido, m_msg) RETURN p_status
+   IF NOT pol1407_ins_ped_unif() THEN
+      RETURN FALSE
+   END IF
+
+   CALL pol1407_insere_erro(m_num_pedido, m_msg) RETURNING p_status
 
    RETURN TRUE
 
@@ -723,7 +892,7 @@ END FUNCTION
  FUNCTION pol1407_version_info()
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1407.4gl $|$Revision: 4 $|$Date: 08/12/2020 12:00 $|$Modtime: 4/12/2020 12:30 $"
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1407.4gl $|$Revision: 6 $|$Date: 08/12/2020 15:07 $|$Modtime: 08/12/2020 12:00 $"
 
  END FUNCTION
    

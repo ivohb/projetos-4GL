@@ -600,7 +600,7 @@ FUNCTION pol0922_ins_erro(l_num_op, l_item)#
 END FUNCTION    
 
 #----------------------------------#
- FUNCTION pol1311_prende_registro()#
+ FUNCTION pol0922_prende_registro()#
 #----------------------------------#
    
    DECLARE cq_prende CURSOR FOR
@@ -1162,7 +1162,7 @@ FUNCTION pol0922_gera_novas_ordens(lr_man_ordem_drummer_new)
 
    LET lr_ordens.cod_empresa        = p_cod_empresa
    
-   IF NOT pol1311_prende_registro() THEN
+   IF NOT pol0922_prende_registro() THEN
       RETURN
    END IF      
    

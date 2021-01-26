@@ -481,7 +481,7 @@ END MAIN
          SHOW OPTION "1-apont desp/SOS"
          SHOW OPTION "apont Km/horas"
          SHOW OPTION "apont Desp terceiros"
-         SHOW OPTION "apont NF terceiros"
+         #SHOW OPTION "apont NF terceiros"
          SHOW OPTION "Resumo"
          SHOW OPTION "finalizar acertO"
          LET m_inicia_acerto = TRUE
@@ -541,7 +541,7 @@ END MAIN
          SHOW OPTION "1-apont desp/SOS"
          SHOW OPTION "apont Km/horas"
          SHOW OPTION "apont Desp terceiros"
-         SHOW OPTION "apont NF terceiros"
+         #SHOW OPTION "apont NF terceiros"
          SHOW OPTION "Resumo"
          SHOW OPTION "finalizar acertO"
          CALL cdv2000_consulta()
@@ -554,7 +554,7 @@ END MAIN
       SHOW OPTION "1-apont desp/SOS"
       SHOW OPTION "apont Km/horas"
       SHOW OPTION "apont Desp terceiros"
-      SHOW OPTION "apont NF terceiros"
+      #SHOW OPTION "apont NF terceiros"
       SHOW OPTION "Resumo"
       SHOW OPTION "finalizar acertO"
       CALL cdv2000_paginacao("SEGUINTE")
@@ -566,7 +566,7 @@ END MAIN
       SHOW OPTION "1-apont desp/SOS"
       SHOW OPTION "apont Km/horas"
       SHOW OPTION "apont Desp terceiros"
-      SHOW OPTION "apont NF terceiros"
+      #SHOW OPTION "apont NF terceiros"
       SHOW OPTION "Resumo"
       SHOW OPTION "finalizar acertO"
       CALL cdv2000_paginacao("ANTERIOR")
@@ -609,7 +609,7 @@ END MAIN
                   HIDE OPTION "1-apont desp/SOS"
                   HIDE OPTION "apont Km/horas"
                   HIDE OPTION "apont Desp terceiros"
-                  SHOW OPTION "apont NF terceiros"
+                  #SHOW OPTION "apont NF terceiros"
                   HIDE OPTION "finalizar acertO"
                END IF
             ELSE
@@ -621,7 +621,7 @@ END MAIN
 			                  HIDE OPTION "1-apont desp/SOS"
 			                  HIDE OPTION "apont Km/horas"
 			                  HIDE OPTION "apont Desp terceiros"
-			                  SHOW OPTION "apont NF terceiros"
+			                  #SHOW OPTION "apont NF terceiros"
 			                  HIDE OPTION "finalizar acertO"
 			               END IF
                ELSE
@@ -701,7 +701,7 @@ END MAIN
          END IF
       END IF
 
-    COMMAND KEY('T') "apont NF Terceiros"   "Despesas de terceiros com nota fical"
+    {COMMAND KEY('T') "apont NF Terceiros"   "Despesas de terceiros com nota fical"
       HELP 012
       MESSAGE ""
       LET m_tip_docum = 'N'
@@ -726,7 +726,7 @@ END MAIN
             CALL log0030_mensagem('Não existe nenhuma consulta ativa.','exclamation')
             NEXT OPTION "Consultar"
          END IF
-      END IF
+      END IF}
             
     COMMAND KEY('R') "Resumo"   "Apresentação resumo das despesas X adiantamentos."
       HELP 013
@@ -17115,7 +17115,9 @@ FUNCTION cdv2000_ve_nf_terc()#
     END IF     
 
  END FOREACH
- 
+
+END FUNCTION
+
 #---------------------------#
 FUNCTION cdv2000_exclui_nf()#
 #---------------------------#
@@ -17239,7 +17241,7 @@ END FUNCTION
  FUNCTION cdv2000_version_info()
 #-------------------------------#
 
- RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/cdv2000.4gl $|$Revision: 26 $|$Date: 26/12/2019 16:45 $|$Modtime: 18/12/2019 19:12 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/cdv2000.4gl $|$Revision: 27 $|$Date: 08/01/2021 11:06 $|$Modtime: 26/12/2019 16:45 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
 
  END FUNCTION
 

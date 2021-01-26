@@ -162,7 +162,7 @@ FUNCTION pol1342_le_caminho()#
      AND cod_sistema = 'CSR'
 
    IF STATUS = 100 THEN
-      LET m_msg = 'Caminho do sistema VDPEDI não cadastrado na LOG1100/LOG00098'
+      LET m_msg = 'Caminho do sistema CSR não cadastrado na LOG1100/LOG00098'
       CALL pol1342_ins_processo()   
       RETURN FALSE
    ELSE

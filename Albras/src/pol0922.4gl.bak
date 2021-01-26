@@ -923,6 +923,7 @@ FUNCTION pol0922_del_ordens()#
       END IF
       
       BEGIN WORK
+      
       IF NOT pol0922_deleta_op(m_num_ordem) THEN
          ROLLBACK WORK
          RETURN FALSE

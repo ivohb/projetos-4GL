@@ -58,7 +58,9 @@ DEFINE m_dialog          VARCHAR(10),
        m_pnl_item        VARCHAR(10),
        m_dlg_nf          VARCHAR(10),
        m_bar_nf          VARCHAR(10),
-       m_brz_nf          VARCHAR(10)
+       m_brz_nf          VARCHAR(10),
+       m_new_fornec      VARCHAR(10),
+       m_zoom_fornecedor VARCHAR(10)
 
 
 DEFINE m_titulo          VARCHAR(10),
@@ -72,7 +74,8 @@ DEFINE mr_cabec          RECORD
        num_nf            LIKE ad_mestre.num_nf,
        ser_nf            LIKE ad_mestre.ser_nf,
        ssr_nf            LIKE ad_mestre.ssr_nf,
-       fornec_nf         LIKE nf_sup.cod_fornecedor
+       fornec_nf         LIKE nf_sup.cod_fornecedor,
+       raz_social        LIKE fornecedor.raz_social
 END RECORD
        
 DEFINE ma_item           ARRAY[50] OF RECORD
@@ -121,7 +124,7 @@ FUNCTION pol1373()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1373-12.00.00  "   
+   LET p_versao = "pol1373-12.00.03  "   
    CALL pol1373_menu()
 
 END FUNCTION
@@ -179,7 +182,8 @@ FUNCTION pol1373_monta_cabec(l_container)#
     DEFINE l_container       VARCHAR(10),
            l_layout          VARCHAR(10),
            l_label           VARCHAR(10),
-           l_caixa           VARCHAR(10)
+           l_caixa           VARCHAR(10),
+           l_lupa            VARCHAR(10)
 
     LET m_pnl_cabec = _ADVPL_create_component(NULL,"LPANEL",l_container)
     CALL _ADVPL_set_property(m_pnl_cabec,"ALIGN","TOP")
@@ -188,7 +192,7 @@ FUNCTION pol1373_monta_cabec(l_container)#
     #CALL _ADVPL_set_property(m_panel,"BACKGROUND_COLOR",231,237,237)
     
     LET l_layout = _ADVPL_create_component(NULL,"LLAYOUTMANAGER",m_pnl_cabec)
-    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",16)
+    CALL _ADVPL_set_property(l_layout,"COLUMNS_COUNT",18)
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
     CALL _ADVPL_set_property(l_label,"TEXT","Empresa:")    
@@ -204,6 +208,7 @@ FUNCTION pol1373_monta_cabec(l_container)#
 
     LET m_titulo = _ADVPL_create_component(NULL,"LNUMERICFIELD",l_layout)
     CALL _ADVPL_set_property(m_titulo,"VARIABLE",mr_cabec,"num_ad")
+    CALL _ADVPL_set_property(m_titulo,"LENGTH",10)
     CALL _ADVPL_set_property(m_titulo,"VAlid","pol1373_valid_titulo")
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
@@ -223,6 +228,7 @@ FUNCTION pol1373_monta_cabec(l_container)#
     LET m_nota = _ADVPL_create_component(NULL,"LNUMERICFIELD",l_layout)
     CALL _ADVPL_set_property(m_nota,"VARIABLE",mr_cabec,"num_nf")
     CALL _ADVPL_set_property(m_nota,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(m_nota,"CAN_GOT_FOCUS",FALSE)
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
     CALL _ADVPL_set_property(l_label,"TEXT","   Série:")    
@@ -231,6 +237,7 @@ FUNCTION pol1373_monta_cabec(l_container)#
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_cabec,"ser_nf")
     CALL _ADVPL_set_property(l_caixa,"LENGTH",3)
     CALL _ADVPL_set_property(l_caixa,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(l_caixa,"CAN_GOT_FOCUS",FALSE)
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
     CALL _ADVPL_set_property(l_label,"TEXT","  Sub série:")    
@@ -238,14 +245,27 @@ FUNCTION pol1373_monta_cabec(l_container)#
     LET l_caixa = _ADVPL_create_component(NULL,"LNUMERICFIELD",l_layout)
     CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_cabec,"ssr_nf")
     CALL _ADVPL_set_property(l_caixa,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(l_caixa,"CAN_GOT_FOCUS",FALSE)
 
     LET l_label = _ADVPL_create_component(NULL,"LLABEL",l_layout)
-    CALL _ADVPL_set_property(l_label,"TEXT","   Fornec NF:")    
+    CALL _ADVPL_set_property(l_label,"TEXT","   Novo fornec:")    
+
+    LET m_new_fornec = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
+    CALL _ADVPL_set_property(m_new_fornec,"VARIABLE",mr_cabec,"fornec_nf")
+    CALL _ADVPL_set_property(m_new_fornec,"LENGTH",15)
+    CALL _ADVPL_set_property(m_new_fornec,"VAlid","pol1373_valid_new_fornec")
+
+    LET l_lupa = _ADVPL_create_component(NULL,"LIMAGEBUTTON",l_layout)
+    CALL _ADVPL_set_property(l_lupa,"IMAGE","BTPESQ")
+    CALL _ADVPL_set_property(l_lupa,"SIZE",24,20)
+    CALL _ADVPL_set_property(l_lupa,"CLICK_EVENT","pol1373_zoom_fornecedor")
 
     LET l_caixa = _ADVPL_create_component(NULL,"LTEXTFIELD",l_layout)
-    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_cabec,"fornec_nf")
-    CALL _ADVPL_set_property(l_caixa,"LENGTH",15)
+    CALL _ADVPL_set_property(l_caixa,"VARIABLE",mr_cabec,"raz_social")
+    CALL _ADVPL_set_property(l_caixa,"LENGTH",20)
     CALL _ADVPL_set_property(l_caixa,"EDITABLE",FALSE) 
+    CALL _ADVPL_set_property(l_caixa,"CAN_GOT_FOCUS",FALSE)
+
 
 END FUNCTION
 
@@ -343,7 +363,7 @@ FUNCTION pol1373_valid_titulo()#
       END IF
    END IF
    
-   SELECT cod_fornecedor
+   {SELECT cod_fornecedor
      INTO mr_cabec.fornec_nf
      FROM nf_sup
     WHERE cod_empresa = mr_cabec.cod_empresa
@@ -373,11 +393,69 @@ FUNCTION pol1373_valid_titulo()#
       RETURN FALSE
    END IF
    
-   LET mr_cabec.fornec_nf = m_cod_fornecedor
+   LET mr_cabec.fornec_nf = m_cod_fornecedor}
+   
+   CALL _ADVPL_set_property(m_new_fornec,"GET_FOCUS")
    
    RETURN TRUE
 
 END FUNCTION   
+
+#----------------------------------#
+FUNCTION pol1373_valid_new_fornec()#
+#----------------------------------#
+
+   CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
+   
+   IF mr_cabec.fornec_nf IS NULL THEN
+      LET m_msg = 'Informe o novo fornecedor.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   END IF
+   
+   SELECT raz_social INTO mr_cabec.raz_social
+     FROM fornecedor where cod_fornecedor = mr_cabec.fornec_nf
+
+   IF STATUS = 100 THEN
+      LET m_msg = 'Fornecedor não existe.'
+      CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)
+      RETURN FALSE
+   ELSE
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('SELECT','fornecedor')
+         RETURN FALSE
+      END IF
+   END IF
+   
+   RETURN TRUE
+      
+END FUNCTION
+
+#---------------------------------#
+FUNCTION pol1373_zoom_fornecedor()#
+#---------------------------------#
+
+    DEFINE l_codigo         LIKE fornecedor.cod_fornecedor,
+           l_descri         LIKE fornecedor.raz_social
+    
+    IF m_zoom_fornecedor IS NULL THEN
+       LET m_zoom_fornecedor = _ADVPL_create_component(NULL,"LZOOMMETADATA")
+       CALL _ADVPL_set_property(m_zoom_fornecedor,"ZOOM","zoom_fornecedor")
+    END IF
+    
+    CALL _ADVPL_get_property(m_zoom_fornecedor,"ACTIVATE")
+    
+    LET l_codigo = _ADVPL_get_property(m_zoom_fornecedor,"RETURN_BY_TABLE_COLUMN","fornecedor","cod_fornecedor")
+    LET l_descri = _ADVPL_get_property(m_zoom_fornecedor,"RETURN_BY_TABLE_COLUMN","fornecedor","raz_social")
+    
+    IF l_codigo IS NOT NULL THEN
+       LET mr_cabec.fornec_nf = l_codigo
+       LET mr_cabec.raz_social = l_descri
+    END IF        
+
+    CALL _ADVPL_set_property(m_new_fornec,"GET_FOCUS")
+    
+END FUNCTION
                
 #------------------------------------#
 FUNCTION pol1373_set_compon(l_status)#
@@ -569,7 +647,14 @@ FUNCTION pol1373_update()#
       RETURN FALSE
    END IF
       
-   IF NOT pol1373_prende() THEN
+   #IF NOT pol1373_prende() THEN
+   #   RETURN FALSE
+   #END IF
+
+   CALL log085_transacao("BEGIN")
+
+   IF NOT pol1373_atu_adiant() THEN
+      CALL log085_transacao("ROLLBACK")   
       RETURN FALSE
    END IF
 
@@ -591,6 +676,48 @@ FUNCTION pol1373_update()#
 
 END FUNCTION
 
+#----------------------------#
+FUNCTION pol1373_atu_adiant()#
+#----------------------------#
+   
+   DEFINE l_count INTEGER
+   
+   SELECT COUNT(*) INTO l_count
+     FROM adiant
+    WHERE cod_empresa = mr_cabec.cod_empresa
+      AND num_ad_nf_orig = mr_cabec.num_ad
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('SELECT','adiant')
+      RETURN FALSE
+   END IF
+   
+   IF l_count = 0 THEN
+      RETURN TRUE
+   END IF
+   
+   UPDATE adiant SET cod_fornecedor = mr_cabec.fornec_nf
+    WHERE cod_empresa = mr_cabec.cod_empresa
+      AND num_ad_nf_orig = mr_cabec.num_ad
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('UPDATE','adiant')
+      RETURN FALSE
+   END IF
+
+   UPDATE mov_adiant SET cod_fornecedor = mr_cabec.fornec_nf
+    WHERE cod_empresa = mr_cabec.cod_empresa
+      AND num_ad_nf_orig = mr_cabec.num_ad
+
+   IF STATUS <> 0 THEN
+      CALL log003_err_sql('UPDATE','mov_adiant')
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION
+   
 #----------------------------#
 FUNCTION pol1373_atu_titulo()#
 #----------------------------#
@@ -623,6 +750,7 @@ FUNCTION pol1373_atu_titulo()#
           RETURN FALSE
        END IF   
    END FOR   
+
    
    RETURN TRUE
 
@@ -928,4 +1056,5 @@ FUNCTION pol1373_canc_nf()#
    RETURN TRUE
 
 END FUNCTION
+
    

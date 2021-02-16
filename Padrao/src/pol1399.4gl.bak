@@ -122,7 +122,8 @@ DEFINE mr_lembrete       RECORD
        repetir_lembrete  CHAR(01),  
        repetir_lemb_apos DECIMAL(3,0),   
        vencer_ate        DECIMAL(3,0),
-       emitente_email    VARCHAR(08)
+       emitente_email    VARCHAR(08),
+       grupo_env_email   DECIMAL(3,0)
 END RECORD
 
 DEFINE m_panel_aba           VARCHAR(10),
@@ -2152,26 +2153,30 @@ FUNCTION pol1399_valida_cli_lembre()#
           repetir_lembrete, 
           repetir_lemb_apos,
           vencer_ate,                    
-          emitente_email                                       
+          emitente_email,
+          grupo_env_email                                    
      INTO mr_lembrete.enviar_lembrete,  
           mr_lembrete.repetir_lembrete, 
           mr_lembrete.repetir_lemb_apos,
           mr_lembrete.vencer_ate,       
-          mr_lembrete.emitente_email    
+          mr_lembrete.emitente_email,
+          mr_lembrete.grupo_env_email              
      FROM param_cobranca_912
-    WHERE cod_cliente = mr_cobranca.cod_cliente
+    WHERE cod_cliente = mr_lembrete.cod_cliente
 
    IF STATUS = 100 THEN
       SELECT enviar_lembrete,              
              repetir_lembrete,             
              repetir_lemb_apos,            
              vencer_ate,                   
-             emitente_email                
+             emitente_email,
+             grupo_env_email              
         INTO mr_lembrete.enviar_lembrete,  
              mr_lembrete.repetir_lembrete, 
              mr_lembrete.repetir_lemb_apos,
              mr_lembrete.vencer_ate,       
-             mr_lembrete.emitente_email    
+             mr_lembrete.emitente_email,    
+             mr_lembrete.grupo_env_email              
         FROM param_cobranca_912                   
        WHERE cod_cliente IS NULL
 
@@ -2211,6 +2216,8 @@ FUNCTION pol1399_info_lembrete()#
    CALL _ADVPL_set_property(m_pnl_cab_lembre,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_cli_lembrete,"GET_FOCUS")
 
+   RETURN TRUE
+
 END FUNCTION
 
 #----------------------------------#
@@ -2220,7 +2227,9 @@ FUNCTION pol1399_info_lembrete_no()#
    INITIALIZE mr_lembrete TO NULL
    CALL _ADVPL_set_property(m_pnl_cab_lembre,"ENABLE",FALSE)
    LET m_ies_lembrete = FALSE
-
+   
+   RETURN TRUE
+   
 END FUNCTION
 
 #-----------------------------------#

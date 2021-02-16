@@ -69,7 +69,8 @@ DEFINE    m_msg                  CHAR(255),
           m_le_ap                SMALLINT,
           m_val_tol              DECIMAL(12,2),
           m_sem_ap               INTEGER,
-          m_seq_txt              INTEGER     
+          m_seq_txt              INTEGER,
+          m_enviou_conta         SMALLINT
 
 DEFINE    m_cod_item             LIKE item.cod_item,
           m_num_nf               LIKE nf_sup.num_nf,
@@ -163,7 +164,10 @@ DEFINE mr_gi_ap                    RECORD
        val_nom_ap                  DECIMAL(15,2),  
        dt_vencimento               DATE,           
        dt_pagamento                DATE,
-       ies_banco                   CHAR(01)
+       ies_banco                   CHAR(01),
+       cod_banco_fav               LIKE cap_info_bancaria.banco,
+       num_agencia_fav             LIKE cap_info_bancaria.agencia,
+       num_conta_banco_fav         LIKE cap_info_bancaria.cta_bancaria      
 END RECORD
 
 DEFINE mr_nf_sup                   RECORD LIKE nf_sup.*,
@@ -236,7 +240,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.134 "
+   LET p_versao = "pol1328-12.00.135 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -1823,21 +1827,34 @@ FUNCTION pol1328_consiste_ap()#
           l_fornec    CHAR(15),
           l_favorec   CHAR(15),
           l_val_ap    DECIMAL(12,2),
-          l_difer     DECIMAL(12,2)
+          l_difer     DECIMAL(12,2),
+          l_count     INTEGER
 
    LET l_ies_ap = FALSE
    LET l_val_ap = 0
    LET m_min_dat_venct_ap = NULL
    
    DECLARE cq_ap CURSOR FOR
-    SELECT id_ap, val_nom_ap, dt_vencimento,
-           cod_fornecedor, cod_favorecido
+    SELECT id_ap, val_nom_ap, 
+           dt_vencimento,
+           cod_fornecedor, 
+           cod_favorecido,
+           cod_banco_fav,      
+           num_agencia_fav,    
+           num_conta_banco_fav,
       FROM gi_ap_912
      WHERE id_ad = mr_nota.id_ad
      ORDER BY dt_vencimento
    
    FOREACH cq_ap INTO 
-      l_id_ap, l_valor, l_min_venc, l_fornec, l_favorec
+      l_id_ap, 
+      l_valor, 
+      l_min_venc, 
+      l_fornec, 
+      l_favorec,
+      mr_gi_ap.cod_banco_fav,     
+      mr_gi_ap.num_agencia_fav,   
+      mr_gi_ap.num_conta_banco_fav
 
       IF STATUS <> 0 THEN
          LET m_erro = STATUS USING '<<<<<'
@@ -1847,6 +1864,58 @@ FUNCTION pol1328_consiste_ap()#
          RETURN FALSE
       END IF
       
+      LET l_cod_for = NULL
+      
+      IF l_favorec IS NOT NULL THEN
+         LET l_cod_for = l_favorec
+      ELSE
+         IF l_fornec IS NOT NULL THEN
+            LET l_cod_for = l_fornec
+         END IF
+      END IF
+      
+      IF l_cod_for IS NOT NULL THEN
+         IF mr_gi_ap.cod_banco_fav IS NOT NULL AND
+            mr_gi_ap.num_agencia_fav IS NOT NULL AND
+            mr_gi_ap.num_conta_banco_fav IS NOT NULL THEN
+            SELECT COUNT(*) INTO l_count
+              FROM cap_info_bancaria
+             WHERE fornecedor = l_cod_for
+               AND banco = mr_gi_ap.cod_banco_fav
+               AND agencia = mr_gi_ap.num_agencia_fav
+               AND cta_bancaria = mr_gi_ap.num_conta_banco_fav
+            IF STATUS <> 0 THEN
+               LET m_erro = STATUS USING '<<<<<'
+               LET m_msg = 'Erro de status: ',m_erro
+               LET m_msg = m_msg CLIPPED, ' lendo tabela cap_info_bancaria, '
+               RETURN FALSE
+            END IF
+            
+            IF l_count = 0 THEN
+               LET m_msg = 'Dados banários enviados não são do fornecedor/favorecido'
+               IF NOT pol1328_grava_erro() THEN
+                  RETURN FALSE
+               END IF            
+            END IF
+         ELSE
+            IF mr_gi_ap.cod_banco_fav IS NOT NULL THEN
+               IF mr_gi_ap.num_agencia_fav IS NULL OR mr_gi_ap.num_conta_banco_fav IS NULL THEN
+                  LET m_msg = 'Dados banários da tabela gi_ap_9a2 estão imcompletos'
+                  IF NOT pol1328_grava_erro() THEN
+                     RETURN FALSE
+                  END IF            
+               END IF
+            ELSE
+               IF mr_gi_ap.num_agencia_fav IS NOT NULL OR mr_gi_ap.num_conta_banco_fav IS NOT NULL THEN
+                  LET m_msg = 'Dados banários da tabela gi_ap_9a2 estão imcompletos'
+                  IF NOT pol1328_grava_erro() THEN
+                     RETURN FALSE
+                  END IF            
+               END IF            
+            END IF
+         END IF
+      END IF
+            
       LET l_val_ap = l_val_ap + l_valor
       
       IF m_min_dat_venct_ap IS NULL THEN
@@ -4445,22 +4514,22 @@ FUNCTION pol1328_le_conta(l_cod)#
 #-------------------------------#
    
    DEFINE l_cod        CHAR(15)
-   
-   SELECT cod_banco,
-          num_agencia,
-          num_conta_banco
-     INTO m_cod_banco,
-          m_num_agencia,
-          m_num_conta_banco
-     FROM fornecedor
-    WHERE cod_fornecedor = l_cod
 
-   IF STATUS <> 0 AND STATUS <> 100 THEN
-      LET m_erro = STATUS USING '<<<<<'
-      LET m_msg = 'Erro de status: ',m_erro
-      LET m_msg = m_msg CLIPPED, ' lendo dados bancários da tabela fornecedor.'
-      RETURN FALSE
-   END IF
+   SELECT cod_banco,                                                            
+          num_agencia,                                                          
+          num_conta_banco                                                       
+     INTO m_cod_banco,                                                          
+          m_num_agencia,                                                        
+          m_num_conta_banco                                                     
+     FROM fornecedor                                                            
+    WHERE cod_fornecedor = l_cod                                                
+                                                                                   
+   IF STATUS <> 0 AND STATUS <> 100 THEN                                        
+      LET m_erro = STATUS USING '<<<<<'                                         
+      LET m_msg = 'Erro de status: ',m_erro                                     
+      LET m_msg = m_msg CLIPPED, ' lendo dados bancários da tabela fornecedor.' 
+      RETURN FALSE                                                              
+   END IF                                                                       
    
    RETURN TRUE
 
@@ -4482,13 +4551,21 @@ FUNCTION pol1328_insere_ap()#
     IF NOT pol1328_le_par_ap() THEN 
        RETURN FALSE
     END IF
+
+    IF mr_gi_ap.cod_banco_fav IS NOT NULL AND         
+        mr_gi_ap.num_agencia_fav IS NOT NULL AND          
+        mr_gi_ap.num_conta_banco_fav IS NOT NULL THEN                                                           
+        LET m_cod_banco = mr_gi_ap.cod_banco_fav              
+        LET m_cod_banco = mr_gi_ap.num_agencia_fav            
+        LET m_cod_banco = mr_gi_ap.num_conta_banco_fav         
+    ELSE                                          
+       IF mr_gi_ap.cod_favorecido IS NULL THEN
+          LET l_status = pol1328_le_conta(mr_gi_ap.cod_fornecedor)
+       ELSE
+          LET l_status = pol1328_le_conta(mr_gi_ap.cod_favorecido)
+       END IF    
+    END IF
     
-    IF mr_gi_ap.cod_favorecido IS NULL THEN
-       LET l_status = pol1328_le_conta(mr_gi_ap.cod_fornecedor)
-    ELSE
-       LET l_status = pol1328_le_conta(mr_gi_ap.cod_favorecido)
-    END IF    
- 
     IF NOT l_status THEN
       RETURN FALSE                                                                                      
     END IF

@@ -379,3 +379,10 @@ REPORT pol1416_ordem_relat()#
                        
 END REPORT
 
+#-------------------------------#
+ FUNCTION pol1416_version_info()#
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1416.4gl $|$Revision: 02 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
+
+ END FUNCTION

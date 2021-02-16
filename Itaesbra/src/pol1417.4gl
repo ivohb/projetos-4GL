@@ -222,34 +222,12 @@ FUNCTION pol1417_exporta_mat()#
                
    START REPORT pol1417_mat_relat TO m_arq_mat    
       
-   SELECT * INTO mr_mat.*
-     FROM mat_status_970
-    WHERE cod_empresa = p_cod_empresa
-
-   IF STATUS <> 0 THEN
-      LET m_erro = STATUS
-      LET m_msg = 'Erro: ',m_erro, ' lendo parametros da tabela mat_status_970'
-      CALL pol1415_insere_mensagem()
-      RETURN FALSE
-   END IF
-   
-   LET m_mat_situa = "('0'"
-   
-   IF mr_mat.ies_produzido = 'S' THEN
-      LET m_mat_situa = m_mat_situa CLIPPED,",'P'"
-   END IF
-   
-   IF mr_mat.ies_final = 'S' THEN
-      LET m_mat_situa = m_mat_situa CLIPPED,",'F'"
-   END IF
-
-   LET m_mat_situa = m_mat_situa CLIPPED,")"
-                                
    LET l_sql_where = 
-    "SELECT item.cod_item FROM item ",
-    " WHERE item.cod_empresa = '",p_cod_empresa,"' ",
-       "AND item.ies_tip_item IN ",m_mat_situa,
-       "AND item.ies_situacao = 'A' "
+       " SELECT eg.cod_item_pai, eg.cod_item_compon, eg.qtd_necessaria FROM estrut_grade eg ",
+       " LEFT JOIN item i ON i.cod_empresa = eg.cod_empresa AND i.cod_item = eg.cod_item_pai ",
+       " LEFT JOIN man_processo_item mp ON mp.empresa = eg.cod_empresa AND mp.item = eg.cod_item_pai ",
+       " WHERE eg.cod_empresa = '",p_cod_empresa,"' ",
+       " AND i.ies_situacao = 'A' AND i.ies_tip_item = 'P' AND mp.validade_final IS NULL "
 
    PREPARE var_itens FROM l_sql_where
 
@@ -263,7 +241,7 @@ FUNCTION pol1417_exporta_mat()#
    DECLARE cq_itens CURSOR FOR var_itens
        
    FOREACH cq_itens INTO
-      mr_relat.item_pai
+      mr_relat.item_pai, mr_relat.item_compon, mr_relat.qtd_necessaria
    
       IF STATUS <> 0 THEN
          LET m_erro = STATUS
@@ -275,32 +253,12 @@ FUNCTION pol1417_exporta_mat()#
       IF m_qtd_mat > 0 THEN
          LET l_progres = LOG_progresspopup_increment("PROCESS") 
       END IF
-   
-      DECLARE cq_estrut CURSOR FOR
-       SELECT cod_item_compon, qtd_necessaria           
-         FROM estrut_grade
-        WHERE cod_empresa = p_cod_empresa
-          AND cod_item_pai = mr_relat.item_pai
-          AND ((dat_validade_ini IS NULL AND dat_validade_fim IS NULL)
-           OR  (dat_validade_ini IS NULL AND dat_validade_fim >= l_dat_atu)
-           OR  (dat_validade_fim IS NULL AND dat_validade_ini <= l_dat_atu)
-           OR  (dat_validade_ini <= l_dat_atu AND dat_validade_fim IS NULL)
-           OR  (l_dat_atu BETWEEN dat_validade_ini AND dat_validade_fim))
-   
-      FOREACH cq_estrut INTO mr_relat.item_compon, mr_relat.qtd_necessaria
-      
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('SELECT', 'estrut_grade:cq_estrut')
-            RETURN FALSE
-         END IF
-         
-         LET mr_relat.multil = 'SIM'
-         LET mr_relat.ignorar = 'NAO'
             
-         OUTPUT TO REPORT pol1417_mat_relat() 
+      LET mr_relat.multil = 'SIM'
+      LET mr_relat.ignorar = 'NAO'
+            
+      OUTPUT TO REPORT pol1417_mat_relat() 
       
-      END FOREACH
-         
    END FOREACH
    
    FINISH REPORT pol1417_mat_relat  
@@ -344,3 +302,10 @@ REPORT pol1417_mat_relat()#
                        
 END REPORT
 
+#-------------------------------#
+ FUNCTION pol1417_version_info()#
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1417.4gl $|$Revision: 02 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
+
+ END FUNCTION

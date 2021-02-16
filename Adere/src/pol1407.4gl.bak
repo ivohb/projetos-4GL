@@ -2,7 +2,7 @@
 # colocar no agendador do windows: taskschd.msc                                #
 #------------------------------------------------------------------------------#
 # PROGRAMA: pol1407                                                            #
-# OBJETIVO: PONTOS DE ENTRADA MAN10021                                         #
+# OBJETIVO: UNIFICAÇÃO DE ORDENS DE MONTAGEM                                   #
 # AUTOR...: IVO H BARBOSA                                                      #
 # DATA....: 21/07/2020                                                         #
 # ALTERADO:                                                                    #
@@ -23,7 +23,10 @@ GLOBALS
           p_caminho              CHAR(150),
           m_caminho              CHAR(150),
           g_tipo_sgbd            CHAR(003),
-          g_msg                  VARCHAR(30)
+          g_msg                  VARCHAR(30),
+          p_nom_tela             CHAR(200),
+          p_ies_cons             SMALLINT
+
 END GLOBALS
 
 DEFINE m_num_om                  INTEGER,
@@ -42,6 +45,11 @@ DEFINE m_num_om                  INTEGER,
        m_hor_atu                 VARCHAR(08),
        m_texto                   VARCHAR(200),
        m_dat_proces              VARCHAR(19)
+
+DEFINE p_tela                    RECORD
+       num_pedido                LIKE pedidos.num_pedido
+END RECORD
+              
 MAIN   
 
    IF NUM_ARGS() > 0  THEN
@@ -61,13 +69,100 @@ MAIN
    
    IF p_status = 0 THEN    
       LET g_msg = 'Execução a partir do menu Logix'
-      CALL pol1407_controle()
-      IF m_erro IS NOT NULL THEN
-         CALL log0030_mensagem(m_erro,'info')
-      END IF
+      CALL pol1407_menu()
+      #IF m_erro IS NOT NULL THEN
+      #   CALL log0030_mensagem(m_erro,'info')
+      #END IF
    END IF
          
 END MAIN
+
+#----------------------#
+FUNCTION pol1407_menu()#
+#----------------------#
+
+   CALL log006_exibe_teclas("01",p_versao)
+   INITIALIZE p_nom_tela TO NULL 
+   CALL log130_procura_caminho("pol1407") RETURNING p_nom_tela
+   LET p_nom_tela = p_nom_tela CLIPPED 
+   OPEN WINDOW w_pol1407 AT 2,2 WITH FORM p_nom_tela
+      ATTRIBUTE(BORDER, MESSAGE LINE LAST, PROMPT LINE LAST)
+    
+   DISPLAY p_cod_empresa TO cod_empresa
+   LET p_ies_cons = FALSE
+   
+   MENU "OPCAO"
+      COMMAND "Informar" "Informar pedido para o processamento"
+         LET p_ies_cons = FALSE
+         CALL pol1407_informar() RETURNING p_status
+         IF p_status THEN
+            ERROR 'Operaçãoo efetuada com sucesso !!!'
+         ELSE
+            ERROR 'Operação cancelada !!!'
+         END IF 
+      COMMAND "Processar" "Processa a unificação"
+         LET m_erro = NULL
+         CALL pol1407_controle() 
+         IF m_erro IS NULL THEN
+            LET m_erro = 'Operação efetuada com sucesso.'
+         END IF
+         ERROR m_erro
+         LET p_ies_cons = FALSE
+      COMMAND KEY ("O") "sObre" "Exibe a versão do programa"
+				CALL pol1407_sobre()
+      COMMAND "Fim"       "Retorna ao menu anterior."
+         EXIT MENU
+   END MENU
+   
+   CLOSE WINDOW w_pol1407
+
+END FUNCTION
+
+#--------------------------#
+ FUNCTION pol1407_informar()
+#--------------------------#
+
+   CLEAR FORM
+   DISPLAY p_cod_empresa TO cod_empresa
+   INITIALIZE p_tela.* TO NULL
+   LET INT_FLAG  = FALSE
+
+   INPUT p_tela.num_pedido
+      WITHOUT DEFAULTS
+         FROM num_pedido
+                             
+      AFTER FIELD num_pedido
+      
+      IF p_tela.num_pedido IS NOT NULL THEN 
+         SELECT COUNT(*) INTO m_count FROM ordem_montag_item
+          WHERE cod_empresa = p_cod_empresa
+            AND num_pedido = p_tela.num_pedido
+         
+         IF STATUS <> 0 THEN
+            CALL log003_err_sql('SELECT','ordem_montag_item')
+            RETURN FALSE
+         END IF
+         
+         IF m_count = 0 THEN
+            ERROR "Pedido sem romaneio ou não exsiste !!!"
+            NEXT FIELD num_pedido
+         END IF
+      END IF
+          
+
+   END INPUT 
+
+   IF INT_FLAG OR p_tela.num_pedido IS NULL THEN
+      CLEAR FORM
+      DISPLAY p_cod_empresa TO cod_empresa
+      RETURN FALSE
+   END IF
+
+   LET p_ies_cons = TRUE
+
+   RETURN TRUE
+
+END FUNCTION
 
 #------------------------------#
 FUNCTION pol1407_job(l_rotina) #
@@ -217,19 +312,36 @@ FUNCTION pol1407_controle()#
    LET l_dat_corte = TODAY - 90
    LET m_dat_proces = CURRENT
    
-   DECLARE cq_oms CURSOR FOR
-    SELECT distinct i.num_pedido
-     FROM ordem_montag_item i
-      INNER JOIN ordem_montag_mest m
-        ON m.cod_empresa = i.cod_empresa
-        AND m.num_om = i.num_om
-        AND m.ies_sit_om = 'N'
-        AND m.num_nff IS NULL
-      INNER JOIN om_list l
-        ON l.cod_empresa = i.cod_empresa
-        AND l.num_om = i.num_om
-        AND l.dat_emis >= l_dat_corte
-   WHERE i.cod_empresa = p_cod_empresa
+   IF NOT p_ies_cons THEN
+      DECLARE cq_oms CURSOR FOR            
+       SELECT distinct i.num_pedido        
+        FROM ordem_montag_item i           
+         INNER JOIN ordem_montag_mest m    
+           ON m.cod_empresa = i.cod_empresa
+           AND m.num_om = i.num_om         
+           AND m.ies_sit_om = 'N'          
+           AND m.num_nff IS NULL           
+         INNER JOIN om_list l              
+           ON l.cod_empresa = i.cod_empresa
+           AND l.num_om = i.num_om         
+           AND l.dat_emis >= l_dat_corte   
+      WHERE i.cod_empresa = p_cod_empresa  
+   ELSE
+      DECLARE cq_oms CURSOR FOR            
+       SELECT distinct i.num_pedido        
+        FROM ordem_montag_item i           
+         INNER JOIN ordem_montag_mest m    
+           ON m.cod_empresa = i.cod_empresa
+           AND m.num_om = i.num_om         
+           AND m.ies_sit_om = 'N'          
+           AND m.num_nff IS NULL           
+         INNER JOIN om_list l              
+           ON l.cod_empresa = i.cod_empresa
+           AND l.num_om = i.num_om         
+           AND l.dat_emis >= l_dat_corte   
+      WHERE i.cod_empresa = p_cod_empresa  
+        AND i.num_pedido = p_tela.num_pedido
+   END IF
 
     FOREACH cq_oms INTO l_num_pedido
 
@@ -249,14 +361,14 @@ FUNCTION pol1407_controle()#
           AND ies_sit_pedido <> '9'
       
       IF STATUS = 100 THEN
-         LET m_msg = 'Pedido não existe ou está cancelado'
-         IF NOT pol1407_insere_erro(l_num_pedido, m_msg) THEN
+         LET m_erro = 'Pedido não existe ou está cancelado'
+         IF NOT pol1407_insere_erro(l_num_pedido, m_erro) THEN
             RETURN 
          END IF
          CONTINUE FOREACH
       ELSE
          IF STATUS <> 0 THEN
-            LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela pedidos:cq_oms '
+            LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela pedidos:cq_oms '
             RETURN 
          END IF
       END IF
@@ -269,8 +381,8 @@ FUNCTION pol1407_controle()#
       IF STATUS = 0 THEN
          CONTINUE FOREACH
       ELSE
-         IF STATUS <> 0 THEN
-            LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela pedido_unif_adere:cq_oms '
+         IF STATUS <> 100 THEN
+            LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela pedido_unif_adere:cq_oms '
             RETURN 
          END IF
       END IF
@@ -281,19 +393,19 @@ FUNCTION pol1407_controle()#
           AND carteira = l_carteira 
       
       IF STATUS = 100 THEN
-         LET m_msg = 'Carteira do pedido não consta dos parâmetros'
-         IF NOT pol1407_insere_erro(l_num_pedido, m_msg) THEN
+         LET m_erro = 'Carteira do pedido não consta dos parâmetros'
+         IF NOT pol1407_insere_erro(l_num_pedido, m_erro) THEN
             RETURN 
          END IF
          CONTINUE FOREACH
       ELSE
          IF STATUS <> 0 THEN
-            LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela empresa_carteira_adere:cq_oms '
+            LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela empresa_carteira_adere:cq_oms '
             RETURN 
          END IF
       END IF
 
-      SELECT COUNT(*) 
+      {SELECT COUNT(*) 
         INTO l_count
         FROM ped_itens 
        WHERE cod_empresa = p_cod_empresa 
@@ -311,7 +423,7 @@ FUNCTION pol1407_controle()#
             RETURN
          END IF
          CONTINUE FOREACH
-      END IF
+      END IF}
 
       SELECT COUNT(*) 
         INTO l_count
@@ -321,7 +433,7 @@ FUNCTION pol1407_controle()#
          AND (qtd_pecas_solic - qtd_pecas_cancel) > qtd_pecas_romaneio
 
       IF STATUS <> 0 THEN
-         LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ped_itens(2):cq_oms '
+         LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ped_itens(2):cq_oms '
          RETURN 
       END IF
       
@@ -449,7 +561,7 @@ FUNCTION pol1407_processa()#
          END IF
       END IF
 
-      SELECT COUNT(*) 
+      {SELECT COUNT(*) 
         INTO l_count
         FROM ped_itens 
        WHERE cod_empresa = p_cod_empresa 
@@ -467,7 +579,7 @@ FUNCTION pol1407_processa()#
             RETURN
          END IF
          CONTINUE FOREACH
-      END IF
+      END IF}
 
       SELECT 1
          FROM empresa_carteira_adere 
@@ -886,13 +998,13 @@ FUNCTION pol1407_cria_om_unica()#
    RETURN TRUE
 
 END FUNCTION
-   
+
 #LOG1700             
 #-------------------------------#
  FUNCTION pol1407_version_info()
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1407.4gl $|$Revision: 6 $|$Date: 08/12/2020 15:07 $|$Modtime: 08/12/2020 12:00 $"
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1407.4gl $|$Revision: 7 $|$Date: 08/02/2021 14:18 $|$Modtime: 29/01/2021 13:31 $" 
 
  END FUNCTION
-   
+      

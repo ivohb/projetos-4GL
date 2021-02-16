@@ -206,7 +206,7 @@ FUNCTION pol1418_exporta_estoq()#
       RETURN FALSE
    END IF
    
-   LET l_nom_arq = 'estoque.csv'
+   LET l_nom_arq = '07_estoque.csv'
    LET m_arq_estoq = m_caminho CLIPPED, l_nom_arq
                
    START REPORT pol1418_estoq_relat TO m_arq_estoq    
@@ -292,3 +292,11 @@ REPORT pol1418_estoq_relat()#
             mr_estoq.fornecimento CLIPPED,';'
            
 END REPORT
+
+#-------------------------------#
+ FUNCTION pol1418_version_info()#
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1418.4gl $|$Revision: 02 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
+
+ END FUNCTION

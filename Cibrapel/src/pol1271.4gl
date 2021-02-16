@@ -90,7 +90,9 @@ DEFINE m_ies_situa             CHAR(01),
        m_roma_ltda             CHAR(01),
        m_cli_benef             CHAR(15),
        m_fornec                CHAR(15),
-       m_ies_texto             SMALLINT
+       m_ies_texto             SMALLINT,
+       m_num_seq               INTEGER,
+       m_num_docum             VARCHAR(15)
 
    
    DEFINE p_statusRegistro     LIKE romaneio_885.statusRegistro,
@@ -376,7 +378,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
-   LET p_versao = "pol1271-12.02.68  "
+   LET p_versao = "pol1271-12.02.69  "
    CALL func002_versao_prg(p_versao)
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol1271.iem") RETURNING p_nom_help
@@ -3305,9 +3307,11 @@ FUNCTION pol1271_gera_roma()
             AND num_sequencia = m_num_seq
    
          IF STATUS = 0 THEN #É um peido de chapa
-            LET p_status = pol1271_ve_papel(mr_ordem_montag_item.cod_item) 
-         ELSE
             
+         ELSE
+            IF NOT pol1271_ve_papel(mr_ordem_montag_item.cod_item) THEN
+               RETURN FALSE
+            END IF
          END IF
       END IF
       
@@ -3525,7 +3529,7 @@ FUNCTION pol1271_ve_papel(l_cod_item)#
    DEFINE l_cod_item    LIKE ordens.cod_item,
           l_cod_comp    LIKE ordens.cod_item,
           l_num_ordem   LIKE ordens.num_ordem,
-          l_txt_nf      VARCHAR(120),
+          l_txt_fsc     VARCHAR(50),
           l_ies_fsc     VARCHAR(01),
           l_msg         VARCHAR(120)
    
@@ -3535,7 +3539,7 @@ FUNCTION pol1271_ve_papel(l_cod_item)#
     WHERE cod_empresa = p_cod_empresa
       AND num_docum = m_num_docum
       AND cod_item = l_cod_item
-      AND cod_item_pai = 0
+      AND cod_item_pai = '0'
    
    IF STATUS <> 0 THEN
       CALL log003_err_sql('Lendo','ordens')
@@ -3558,46 +3562,33 @@ FUNCTION pol1271_ve_papel(l_cod_item)#
          RETURN FALSE
       END IF  
       
-      IF l_cod_comp[1] MATCHES '[BK]'
+      IF l_cod_comp[1] MATCHES '[BK]' THEN
          LET l_ies_fsc = l_cod_comp[1]
          EXIT FOREACH
       END IF
             
    END FOREACH
    
-   IF l_ies_fsc IS NULL THEN
-      LET l_msg = 'Não foi possivel identificar a porcentagem do FSC'
-      CALL log0030_mensagem(l_msg,'info')
-      RETURN FALSE
-   END IF
-   
-   IF l_ies_fsc = 'B' THEN
-      SELECT parametro_texto                           
-        INTO l_txt_nf                               
-        FROM min_par_modulo                               
-       WHERE empresa = p_cod_empresa                       
-         AND parametro = 'TXT_NF_PAPEL_BRANCO'                
-       IF STATUS <> 0 THEN                                
-          CALL log003_err_sql('Lendo','min_par_modulo:TXT_NF_PAPEL_BRANCO')   
-          RETURN FALSE                                    
-       END IF                                             
+   IF l_ies_fsc MATCHES '[BK]'  THEN
    ELSE
-      SELECT parametro_texto                           
-        INTO l_txt_nf                               
-        FROM min_par_modulo                               
-       WHERE empresa = p_cod_empresa                       
-         AND parametro = 'TXT_NF_PAPEL_PARDO'                
-       IF STATUS <> 0 THEN                                
-          CALL log003_err_sql('Lendo','min_par_modulo:TXT_NF_PAPEL_PARDO')   
-          RETURN FALSE                                    
-       END IF                                             
+      RETURN TRUE
    END IF
    
-   LET m_den_texto_1 = m_den_texto_1 CLIPPED, ' - ', l_txt_nf
+   SELECT texto_fsc INTO l_txt_fsc
+     FROM papelao_fsc_885
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_tip_papel = l_ies_fsc
+   
+   IF STATUS <> 0 THEN                                
+      CALL log003_err_sql('Lendo','papelao_fsc_885:texto fsc da nota')   
+      RETURN FALSE                                    
+   END IF                                             
+   
+   LET m_den_texto_1 = m_den_texto_1 CLIPPED, ' - ', l_txt_fsc CLIPPED
    
    RETURN TRUE
 
-END IF  
+END FUNCTION  
 
 #-----------------------------#
 FUNCTION pol1271_grava_texto()
@@ -7280,15 +7271,6 @@ FUNCTION pol1271_le_itens()#
    RETURN TRUE
 
 END FUNCTION
-
-#LOG1700             
-#-------------------------------#
- FUNCTION pol1271_version_info()
-#-------------------------------#
-
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1271.4gl $|$Revision: 67 $|$Date: 21/01/2021 15:41 $|$Modtime: 19/11/2020 08:07 $" 
-
- END FUNCTION
 
 #-----------------------------# 
 FUNCTION pol1271_inc_nf_terc()#

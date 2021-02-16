@@ -238,9 +238,9 @@ FUNCTION pol1418_exporta_estoq()#
          RETURN FALSE
       END IF
 
-      LET ma_estoq.ordem = ma_estoq.cod_item
-      LET ma_estoq.tipo = 'Estoque'
-      LET ma_estoq.fornecimento = TODAY - 1
+      LET mr_estoq.ordem = mr_estoq.cod_item
+      LET mr_estoq.tipo = 'Estoque'
+      LET mr_estoq.fornecimento = TODAY - 1
          
       OUTPUT TO REPORT pol1418_estoq_relat() 
       
@@ -292,3 +292,11 @@ REPORT pol1418_estoq_relat()#
             mr_estoq.fornecimento CLIPPED,';'
            
 END REPORT
+
+#-------------------------------#
+ FUNCTION pol1418_version_info()#
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1418.4gl $|$Revision: 02 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
+
+ END FUNCTION

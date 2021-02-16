@@ -114,7 +114,7 @@ FUNCTION pol1410()#
    
    LET g_tipo_sgbd = LOG_getCurrentDBType()
    
-   LET p_versao = "pol1410-12.00.01  "
+   LET p_versao = "pol1410-12.00.03  "
    CALL func002_versao_prg(p_versao)
    
    IF pol1410_cria_tab_con() THEN
@@ -500,7 +500,9 @@ FUNCTION pol1410_prepare_query()#
    
    LET m_query = m_query CLIPPED,
        " where o.cod_empresa = '",p_cod_empresa,"' ",
-       " and o.ies_situa = '5' "
+       " and o.ies_situa = '5' ",
+       " and o.cod_item[1,3] <> 'SOL' ",
+       " and o.cod_item[1,3] <> 'EMB' "
        
    IF mr_param.num_ordem IS NOT NULL THEN    
       LET l_num_ordem = mr_param.num_ordem
@@ -735,6 +737,8 @@ FUNCTION pol1410_le_consumo()#
       FROM ord_compon 
      WHERE cod_empresa = p_cod_empresa
        AND num_ordem = m_num_ordem
+       AND cod_item_compon[1,3] <> 'SOL' 
+       AND cod_item_compon[1,3] <> 'EMB' 
      GROUP BY cod_item_compon
 
    FOREACH cq_it_comp INTO l_compon, l_qtd_prev

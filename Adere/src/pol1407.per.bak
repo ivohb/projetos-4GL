@@ -1,0 +1,36 @@
+DATABASE logix
+SCREEN
+{
+------------------------------------------------------------------------------
+[a ]                  BANCOS PARA EMPRÉSTIMOS CONSIGNADOS
+  
+            Cód. banco:[b  ] [c                             ]              
+
+         Nome reduzido:[c1             ]
+            
+               Contato:[d                             ]
+
+           Num agência:[e     ]
+
+          Nome agência:[f                             ]                               
+
+             Num conta:[g              ]
+          
+               Término:[i         ]
+
+
+}
+
+ATTRIBUTES
+a = FORMONLY.cod_empresa, UPSHIFT, NOENTRY;
+b = FORMONLY.cod_banco, UPSHIFT, AUTONEXT
+--# ,WIDGET='FIELD_BMP', CONFIG='combo.bmp Control-z';
+c = FORMONLY.nom_banco,   NOENTRY, REVERSE, color = blue;
+c1= FORMONLY.den_reduz,   UPSHIFT, AUTONEXT;
+d = FORMONLY.nom_contato, UPSHIFT, AUTONEXT;
+e = FORMONLY.num_agencia, UPSHIFT, AUTONEXT;
+f = FORMONLY.nom_agencia, UPSHIFT, AUTONEXT;
+g = FORMONLY.num_conta, UPSHIFT, AUTONEXT;
+i = FORMONLY.dat_termino, UPSHIFT, AUTONEXT;
+
+END

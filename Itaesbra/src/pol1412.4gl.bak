@@ -49,8 +49,8 @@ DEFINE mr_rot                    RECORD
        qtd_pecas_ciclo           LIKE man_processo_item.qtd_pecas_ciclo,        
        descricao                 VARCHAR(30), #item_2dig_clientes_970.descricao 
        horas                     VARCHAR(15), #'Horas 00 Mins'                   
-       cod_gemea                 LIKE peca_geme_man912.cod_peca_princ,
-       cod_item_cliente          LIKE cliente_item.cod_item_cliente,
+       cod_peca_princ            LIKE peca_geme_man912.cod_peca_princ,
+       cod_item_cliente          LIKE cliente_item.cod_item_cliente
 END RECORD
 
 MAIN   
@@ -302,13 +302,13 @@ FUNCTION pol1412_exporta_roteiro()#
       
       END FOREACH
       
-      LET ma_rot.cod_gemea = NULL
+      LET ma_rot.cod_peca_princ = NULL
       
       DECLARE cq_gemea CURSOR FOR
-      SELECT cod_peca_gemea 
+      SELECT cod_peca_princ 
         FROM peca_geme_man912
        WHERE cod_empresa = p_cod_empresa
-         AND cod_peca_princ = ma_rot.cod_item
+         AND cod_peca_gemea = ma_rot.cod_item
       FOREACH cq_gemea INTO l_desc
 
          IF STATUS <> 0 THEN
@@ -316,7 +316,7 @@ FUNCTION pol1412_exporta_roteiro()#
             RETURN FALSE
          END IF
          
-         LET ma_rot.cod_gemea = l_desc
+         LET ma_rot.cod_peca_princ = l_desc
          EXIT FOREACH
       
       END FOREACH
@@ -351,6 +351,7 @@ REPORT pol1412_relat()#
       PRINT COLUMN 001, 
              'Item;',
              'Decrição;',
+             'Sequencia;',
              'Operação;',
              'Decrição;',          
              'Grupo;',         
@@ -358,13 +359,16 @@ REPORT pol1412_relat()#
              'Tipo;',     
              'Peças/ciclo;',          
              'Descrição;',       
-             'Horas;'
+             'Horas;',
+             'Gemea(Principal);',
+             'Cod do cliente;'
                             
       ON EVERY ROW
 
       PRINT COLUMN 001, 
             mr_rot.cod_item CLIPPED,';',       
             mr_rot.den_item_reduz CLIPPED,';',  
+            mr_rot.seq_operacao,';',  
             mr_rot.cod_operac CLIPPED,';',      
             mr_rot.den_operac CLIPPED,';',      
             mr_rot.den_cent_trab CLIPPED,';',   
@@ -372,7 +376,9 @@ REPORT pol1412_relat()#
             mr_rot.tipo CLIPPED,';',            
             mr_rot.qtd_pecas_ciclo CLIPPED,';', 
             mr_rot.descricao CLIPPED,';',       
-            mr_rot.horas CLIPPED,';'   
+            mr_rot.horas CLIPPED,';', 
+            mr_rot.cod_peca_princ,';', 
+            mr_rot.cod_item_cliente,';'
            
 END REPORT
 
@@ -381,6 +387,6 @@ END REPORT
  FUNCTION pol1412_version_info()#
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1412.4gl $|$Revision: 01 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1412.4gl $|$Revision: 02 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
 
  END FUNCTION

@@ -273,6 +273,10 @@ FUNCTION pol1402_valid_item()#
    
    CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",'')
 
+   IF m_opcao <> 'I' THEN
+      RETURN TRUE
+   END IF
+
    IF mr_cabec.cod_item IS NULL THEN
       LET m_msg = 'Informe o item'
       CALL _ADVPL_set_property(m_statusbar,"ERROR_TEXT",m_msg)

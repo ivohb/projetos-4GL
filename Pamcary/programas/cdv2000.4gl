@@ -13171,7 +13171,7 @@ END FUNCTION
      IF lr_campos_lanc.eh_reembolso = 'S'THEN
         LET t_wlancon323[l_ind_lanc].num_conta_cont = lr_campos_lanc.cctbl_contab_ad
      ELSE
-        LET l_char1 = l_cc_debitar
+        LET l_char1 = l_cc_debitar USING "&&&&"
         LET l_char2 = lr_campos_lanc.tip_despesa_contab USING "&&&&"
         LET t_wlancon323[l_ind_lanc].num_conta_cont = l_char1 CLIPPED, l_char2 CLIPPED
      END IF
@@ -13265,13 +13265,13 @@ END FUNCTION
      IF lr_campos_lanc.eh_reembolso = 'S'THEN
         LET t_wlancon323[l_ind_lanc].num_conta_cont = lr_campos_lanc.cctbl_contab_ad
      ELSE
-        LET l_char1 = l_cc_debitar
+        LET l_char1 = l_cc_debitar USING "&&&&"
         LET l_char2 = lr_campos_lanc.tip_despesa_contab USING "&&&&"
         LET t_wlancon323[l_ind_lanc].num_conta_cont = l_char1 CLIPPED, l_char2 CLIPPED
      END IF
 
      IF l_eh_valorizado_km = 'S' THEN    #Monta conta_contab
-        LET l_char1 = l_cc_debitar
+        LET l_char1 = l_cc_debitar USING "&&&&"
         LET l_char2 = lr_campos_lanc.tip_despesa_contab USING "&&&&"
         LET t_wlancon323[l_ind_lanc].num_conta_cont = l_char1 CLIPPED, l_char2 CLIPPED
      END IF
@@ -13511,13 +13511,13 @@ END FUNCTION
            IF l_eh_reembolso = 'S'THEN
               LET t_wlancon323[l_ind].num_conta_cont = l_conta_contab
            ELSE
-              LET l_char1 = l_cc_debitar
+              LET l_char1 = l_cc_debitar USING "&&&&"
               LET l_char2 = l_tipo_despesa_contab USING "&&&&"
               LET t_wlancon323[l_ind].num_conta_cont = l_char1 CLIPPED, l_char2 CLIPPED
            END IF
 
            IF l_eh_valorizado_km = 'S' THEN    #Monta conta_contab
-              LET l_char1 = l_cc_debitar
+              LET l_char1 = l_cc_debitar USING "&&&&"
               LET l_char2 = l_tipo_despesa_contab USING "&&&&"
               LET t_wlancon323[l_ind].num_conta_cont = l_char1 CLIPPED, l_char2 CLIPPED
            END IF
@@ -17241,7 +17241,7 @@ END FUNCTION
  FUNCTION cdv2000_version_info()
 #-------------------------------#
 
- RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/cdv2000.4gl $|$Revision: 27 $|$Date: 08/01/2021 11:06 $|$Modtime: 26/12/2019 16:45 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+ RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/cdv2000.4gl $|$Revision: 30 $|$Date: 08/02/2021 11:06 $|$Modtime: 26/12/2019 16:45 $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
 
  END FUNCTION
 

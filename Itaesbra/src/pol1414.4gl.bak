@@ -201,7 +201,7 @@ FUNCTION pol1414_exporta_grupo()#
       RETURN FALSE
    END IF
    
-   LET l_nom_arq = 'grupo.csv'
+   LET l_nom_arq = '03_grupo.csv'
    LET m_arq_grup = m_caminho CLIPPED, l_nom_arq
                
    START REPORT pol1414_grup_relat TO m_arq_grup    

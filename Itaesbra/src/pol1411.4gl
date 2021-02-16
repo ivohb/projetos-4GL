@@ -2061,18 +2061,16 @@ FUNCTION pol1411_rec_count_reg()#
 
    SELECT COUNT(*) INTO m_count
      FROM equipamento 
-          INNER JOIN cent_trabalho
-             ON cent_trabalho.cod_empresa=equipamento.cod_empresa
-            AND cent_trabalho.cod_cent_trab=equipamento.cod_cent_trab
-          INNER JOIN uni_funcio_970
-             ON uni_funcio_970.cod_empresa = equipamento.cod_empresa
-            AND uni_funcio_970.cod_uni_funcio = equipamento.cod_uni_funcio            
+           LEFT JOIN cent_trabalho
+             ON cent_trabalho.cod_empresa = equipamento.cod_empresa
+            AND cent_trabalho.cod_cent_trab = equipamento.cod_cent_trab
           INNER JOIN min_eqpto_compl
              ON equipamento.cod_empresa = min_eqpto_compl.empresa
             AND equipamento.cod_equip = min_eqpto_compl.eqpto
             AND min_eqpto_compl.val_logico = 'S'
             AND min_eqpto_compl.campo = 'ATIVO'   
     WHERE equipamento.cod_empresa = p_cod_empresa
+      AND equipamento.cod_uni_funcio[1,7] IN ('1171401','1171501','1171601')
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('SELECT','equipamento:contando registros')
@@ -2102,30 +2100,36 @@ FUNCTION pol1411_rec_exibe()#
    DECLARE cq_le_rec CURSOR FOR
    SELECT equipamento.cod_equip, 
           cent_trabalho.den_cent_trab, 
-          uni_funcio_970.posicao,
-          uni_funcio_970.setor,
-          cent_trabalho.cod_cent_trab
+          cent_trabalho.cod_cent_trab,
+          CASE
+             WHEN equipamento.cod_uni_funcio[1,5]='11714' THEN "1"
+             WHEN equipamento.cod_uni_funcio[1,5]='11715' THEN "2"
+             WHEN equipamento.cod_uni_funcio[1,5]='11716' THEN "3"
+          END AS posicao,
+          CASE
+             WHEN equipamento.cod_uni_funcio[1,5]='11714' THEN "ESTAMPARIA"
+             WHEN equipamento.cod_uni_funcio[1,5]='11715' THEN "SOLDA"
+             WHEN equipamento.cod_uni_funcio[1,5]='11716' THEN "USINAGEM"
+          END AS setor
      FROM equipamento 
-          INNER JOIN cent_trabalho
-             ON cent_trabalho.cod_empresa=equipamento.cod_empresa
-            AND cent_trabalho.cod_cent_trab=equipamento.cod_cent_trab
-          INNER JOIN uni_funcio_970
-             ON uni_funcio_970.cod_empresa = equipamento.cod_empresa
-            AND uni_funcio_970.cod_uni_funcio = equipamento.cod_uni_funcio            
+          LEFT JOIN cent_trabalho
+             ON cent_trabalho.cod_empresa = equipamento.cod_empresa
+            AND cent_trabalho.cod_cent_trab = equipamento.cod_cent_trab
           INNER JOIN min_eqpto_compl
              ON equipamento.cod_empresa = min_eqpto_compl.empresa
             AND equipamento.cod_equip = min_eqpto_compl.eqpto
             AND min_eqpto_compl.val_logico = 'S'
             AND min_eqpto_compl.campo = 'ATIVO'   
     WHERE equipamento.cod_empresa = p_cod_empresa
-    ORDER BY uni_funcio_970.setor, cent_trabalho.cod_cent_trab DESC
+      AND equipamento.cod_uni_funcio[1,7] IN ('1171401','1171501','1171601')
+    ORDER BY setor, cent_trabalho.cod_cent_trab desc
        
    FOREACH cq_le_rec INTO
       ma_rec[l_ind].cod_equip,       
       ma_rec[l_ind].den_cent_trab, 
+      l_cent_trab,
       ma_rec[l_ind].posicao,     
-      ma_rec[l_ind].setor,
-      l_cent_trab
+      ma_rec[l_ind].setor
 
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','equipamento:lendo registros')
@@ -2528,14 +2532,10 @@ FUNCTION pol1411_rgrup_count_reg()#
 #--------------------------------#
 
    SELECT COUNT(*) INTO m_count
-     FROM equipamento
-         INNER JOIN cent_trabalho
-            ON cent_trabalho.cod_empresa = equipamento.cod_empresa
-           AND cent_trabalho.cod_cent_trab = equipamento.cod_cent_trab
-         INNER JOIN uni_funcio_970
-            ON uni_funcio_970.cod_empresa = equipamento.cod_empresa
-           AND uni_funcio_970.cod_uni_funcio = equipamento.cod_uni_funcio
-    WHERE equipamento.cod_empresa = p_cod_empresa
+      FROM equipamento,cent_trabalho
+     WHERE equipamento.cod_cent_trab = cent_trabalho.cod_cent_trab
+       AND equipamento.cod_empresa = p_cod_empresa
+       AND equipamento.cod_uni_funcio[1,5] IN ('11714','11715','11716')
 
    IF STATUS <> 0 THEN
       CALL log003_err_sql('SELECT','equipamento:contando registros')
@@ -2562,18 +2562,17 @@ FUNCTION pol1411_rgrup_exibe()#
    CALL LOG_progresspopup_set_total("PROCESS",m_count)
 
    DECLARE cq_le_rgrup CURSOR FOR
-    SELECT cent_trabalho.den_cent_trab,
-           equipamento.cod_equip,
-           uni_funcio_970.setor
-      FROM equipamento
-         INNER JOIN cent_trabalho
-            ON cent_trabalho.cod_empresa = equipamento.cod_empresa
-           AND cent_trabalho.cod_cent_trab = equipamento.cod_cent_trab
-         INNER JOIN uni_funcio_970
-            ON uni_funcio_970.cod_empresa = equipamento.cod_empresa
-           AND uni_funcio_970.cod_uni_funcio = equipamento.cod_uni_funcio
-     WHERE equipamento.cod_empresa = p_cod_empresa
-     ORDER BY cent_trabalho.den_cent_trab
+    SELECT den_cent_trab, cod_equip,
+           CASE
+              WHEN equipamento.cod_uni_funcio[1,5] = '11714' THEN "ESTAMPARIA"
+              WHEN equipamento.cod_uni_funcio[1,5] = '11715' THEN "SOLDA"
+              WHEN equipamento.cod_uni_funcio[1,5] = '11716' THEN "USINAGEM"
+           END AS setor
+      FROM equipamento,cent_trabalho
+     WHERE equipamento.cod_cent_trab = cent_trabalho.cod_cent_trab
+       AND equipamento.cod_empresa = p_cod_empresa
+       AND equipamento.cod_uni_funcio[1,5] IN ('11714','11715','11716')
+     ORDER BY 1
        
    FOREACH cq_le_rgrup INTO
       ma_rgrup[l_ind].den_cent_trab,
@@ -2926,6 +2925,9 @@ FUNCTION pol1411_ordem_ins_conf()#
    IF NOT pol1411_ordem_inserir() THEN
       RETURN FALSE
    END IF
+
+   CALL pol1411_ordem_ativa(FALSE)
+   CALL pol1411_ativa_folder()
    
    LET m_ies_ordem = TRUE
    
@@ -3857,32 +3859,14 @@ FUNCTION pol1411_mat_count_reg()#
 #--------------------------------#
    
    DEFINE l_sql_where       VARCHAR(1000)
-   
-   IF NOT pol1411_mat_find() THEN
-      RETURN FALSE
-   END IF
-   
-   LET m_mat_situa = "('0'"
-   
-   IF mr_mat.ies_produzido = 'S' THEN
-      LET m_mat_situa = m_mat_situa CLIPPED,",'P'"
-   END IF
-   
-   IF mr_mat.ies_final = 'S' THEN
-      LET m_mat_situa = m_mat_situa CLIPPED,",'F'"
-   END IF
-
-   LET m_mat_situa = m_mat_situa CLIPPED,")"
-                                
-   LET m_sql = "SELECT COUNT(*) FROM item "
-   
-   LET m_mat_where =
-    " WHERE item.cod_empresa = '",p_cod_empresa,"' ",
-      "AND item.ies_tip_item IN ",m_mat_situa,
-      "AND item.ies_situacao = 'A' "
-   
-   LET l_sql_where = m_sql CLIPPED, m_mat_where CLIPPED
-   
+      
+   LET l_sql_where = 
+       " SELECT COUNT(*) FROM estrut_grade eg ",
+       " LEFT JOIN item i ON i.cod_empresa = eg.cod_empresa AND i.cod_item = eg.cod_item_pai ",
+       " LEFT JOIN man_processo_item mp ON mp.empresa = eg.cod_empresa AND mp.item = eg.cod_item_pai ",
+       " WHERE eg.cod_empresa = '",p_cod_empresa,"' ",
+       " AND i.ies_situacao = 'A' AND i.ies_tip_item = 'P' AND mp.validade_final IS NULL "
+                                   
    PREPARE var_count FROM l_sql_where
                                                                                                                                                               
    IF STATUS <> 0 THEN
@@ -3929,10 +3913,12 @@ FUNCTION pol1411_mat_exibe()#
 
    CALL LOG_progresspopup_set_total("PROCESS",m_count)
 
-   LET m_sql = 
-    "SELECT item.cod_item FROM item "
-
-   LET l_sql_where = m_sql CLIPPED, m_mat_where CLIPPED
+   LET l_sql_where = 
+       " SELECT eg.cod_item_pai, eg.cod_item_compon, eg.qtd_necessaria FROM estrut_grade eg ",
+       " LEFT JOIN item i ON i.cod_empresa = eg.cod_empresa AND i.cod_item = eg.cod_item_pai ",
+       " LEFT JOIN man_processo_item mp ON mp.empresa = eg.cod_empresa AND mp.item = eg.cod_item_pai ",
+       " WHERE eg.cod_empresa = '",p_cod_empresa,"' ",
+       " AND i.ies_situacao = 'A' AND i.ies_tip_item = 'P' AND mp.validade_final IS NULL "
    
    PREPARE var_itens FROM l_sql_where
                                                                                                                                                               
@@ -3947,50 +3933,26 @@ FUNCTION pol1411_mat_exibe()#
       CALL log003_err_sql('PREPARE','item:lendo registros(DECLARE)')
       RETURN FALSE
    END IF
-       
-   FOREACH cq_itens INTO
-      ma_mat[l_ind].item_pai
 
+   FOREACH cq_itens INTO 
+      ma_mat[l_ind].item_pai, 
+      ma_mat[l_ind].item_compon, 
+      ma_mat[l_ind].qtd_necessaria
+      
       IF STATUS <> 0 THEN
-         CALL log003_err_sql('SELECT','item:lendo registros(FOREACH)')
+         CALL log003_err_sql('SELECT', 'estrut_grade:cq_itens')
          RETURN FALSE
       END IF
-      
-      LET l_progres = LOG_progresspopup_increment("PROCESS")
-      
-      DECLARE cq_estrut CURSOR FOR
-       SELECT cod_item_compon, qtd_necessaria           
-         FROM estrut_grade
-        WHERE cod_empresa = p_cod_empresa
-          AND cod_item_pai = ma_mat[l_ind].item_pai
-          AND ((dat_validade_ini IS NULL AND dat_validade_fim IS NULL)
-           OR  (dat_validade_ini IS NULL AND dat_validade_fim >= l_dat_atu)
-           OR  (dat_validade_fim IS NULL AND dat_validade_ini <= l_dat_atu)
-           OR  (dat_validade_ini <= l_dat_atu AND dat_validade_fim IS NULL)
-           OR  (l_dat_atu BETWEEN dat_validade_ini AND dat_validade_fim))
-   
-      FOREACH cq_estrut INTO ma_mat[l_ind].item_compon, ma_mat[l_ind].qtd_necessaria
-      
-         IF STATUS <> 0 THEN
-            CALL log003_err_sql('SELECT', 'estrut_grade:cq_estrut')
-            RETURN FALSE
-         END IF
          
-         LET ma_mat[l_ind].multil = 'SIM'
-         LET ma_mat[l_ind].ignorar = 'NAO'
+      LET ma_mat[l_ind].multil = 'SIM'
+      LET ma_mat[l_ind].ignorar = 'NAO'
+      LET l_progres = LOG_progresspopup_increment("PROCESS")
+      LET l_ind = l_ind + 1
       
-         LET l_ind = l_ind + 1
-      
-         IF l_ind > 10000 THEN
-            LET m_msg = 'Limite de linhas da grade ultrapassou.\n',
-                        'Serão exibidos somete 10000 registros.'
-            CALL log0030_mensagem(m_msg,'info')
-            EXIT FOREACH
-         END IF
-      
-      END FOREACH
-
       IF l_ind > 10000 THEN
+         LET m_msg = 'Limite de linhas da grade ultrapassou.\n',
+                     'Serão exibidos somete 10000 registros.'
+         CALL log0030_mensagem(m_msg,'info')
          EXIT FOREACH
       END IF
       

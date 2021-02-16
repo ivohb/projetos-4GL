@@ -210,19 +210,18 @@ FUNCTION pol1415_exporta_rgrupo()#
    START REPORT pol1415_rgrup_relat TO m_arq_rgrup    
    
    DECLARE cq_le_rgrup CURSOR FOR
-    SELECT cent_trabalho.den_cent_trab,
-           equipamento.cod_equip,
-           uni_funcio_970.setor
-      FROM equipamento
-         INNER JOIN cent_trabalho
-            ON cent_trabalho.cod_empresa = equipamento.cod_empresa
-           AND cent_trabalho.cod_cent_trab = equipamento.cod_cent_trab
-         INNER JOIN uni_funcio_970
-            ON uni_funcio_970.cod_empresa = equipamento.cod_empresa
-           AND uni_funcio_970.cod_uni_funcio = equipamento.cod_uni_funcio
-     WHERE equipamento.cod_empresa = p_cod_empresa
-     ORDER BY cent_trabalho.den_cent_trab
-       
+    SELECT den_cent_trab, cod_equip,
+           CASE
+              WHEN equipamento.cod_uni_funcio[1,5] = '11714' THEN "ESTAMPARIA"
+              WHEN equipamento.cod_uni_funcio[1,5] = '11715' THEN "SOLDA"
+              WHEN equipamento.cod_uni_funcio[1,5] = '11716' THEN "USINAGEM"
+           END AS setor
+      FROM equipamento,cent_trabalho
+     WHERE equipamento.cod_cent_trab = cent_trabalho.cod_cent_trab
+       AND equipamento.cod_empresa = p_cod_empresa
+       AND equipamento.cod_uni_funcio[1,5] IN ('11714','11715','11716')
+     ORDER BY 1
+             
    FOREACH cq_le_rgrup INTO
       mr_rgrup.den_cent_trab,
       mr_rgrup.cod_equip,
@@ -276,3 +275,10 @@ REPORT pol1415_rgrup_relat()#
            
 END REPORT
 
+#-------------------------------#
+ FUNCTION pol1415_version_info()#
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1415.4gl $|$Revision: 02 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
+
+ END FUNCTION

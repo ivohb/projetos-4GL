@@ -50,7 +50,7 @@ DEFINE mr_rot                    RECORD
        descricao                 VARCHAR(30), #item_2dig_clientes_970.descricao 
        horas                     VARCHAR(15), #'Horas 00 Mins'                   
        cod_peca_princ            LIKE peca_geme_man912.cod_peca_princ,
-       cod_item_cliente          LIKE cliente_item.cod_item_cliente,
+       cod_item_cliente          LIKE cliente_item.cod_item_cliente
 END RECORD
 
 MAIN   
@@ -245,7 +245,7 @@ FUNCTION pol1412_exporta_roteiro()#
    FOREACH cq_le_rot INTO
       mr_rot.cod_item,       
       mr_rot.den_item_reduz, 
-      ma_rot.seq_operacao,
+      mr_rot.seq_operacao,
       mr_rot.cod_operac,     
       mr_rot.den_operac,     
       mr_rot.den_cent_trab,  
@@ -283,13 +283,13 @@ FUNCTION pol1412_exporta_roteiro()#
       
       END FOREACH
 
-      LET ma_rot.cod_item_cliente = NULL
+      LET mr_rot.cod_item_cliente = NULL
       
       DECLARE cq_it_cli CURSOR FOR
       SELECT cod_item_cliente 
         FROM cliente_item
        WHERE cod_empresa = p_cod_empresa
-         AND cod_item = ma_rot.cod_item
+         AND cod_item = mr_rot.cod_item
       FOREACH cq_it_cli INTO l_desc
 
          IF STATUS <> 0 THEN
@@ -297,18 +297,18 @@ FUNCTION pol1412_exporta_roteiro()#
             RETURN FALSE
          END IF
          
-         LET ma_rot.cod_item_cliente = l_desc
+         LET mr_rot.cod_item_cliente = l_desc
          EXIT FOREACH
       
       END FOREACH
       
-      LET ma_rot.cod_peca_princ = NULL
+      LET mr_rot.cod_peca_princ = NULL
       
       DECLARE cq_gemea CURSOR FOR
       SELECT cod_peca_princ 
         FROM peca_geme_man912
        WHERE cod_empresa = p_cod_empresa
-         AND cod_peca_gemea = ma_rot.cod_item
+         AND cod_peca_gemea = mr_rot.cod_item
       FOREACH cq_gemea INTO l_desc
 
          IF STATUS <> 0 THEN
@@ -316,7 +316,7 @@ FUNCTION pol1412_exporta_roteiro()#
             RETURN FALSE
          END IF
          
-         LET ma_rot.cod_peca_princ = l_desc
+         LET mr_rot.cod_peca_princ = l_desc
          EXIT FOREACH
       
       END FOREACH
@@ -387,6 +387,6 @@ END REPORT
  FUNCTION pol1412_version_info()#
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1412.4gl $|$Revision: 01 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1412.4gl $|$Revision: 02 $|$Date: 26/01/2021 13:26 $|$Modtime: 06/01/2021 13:26 $" 
 
  END FUNCTION

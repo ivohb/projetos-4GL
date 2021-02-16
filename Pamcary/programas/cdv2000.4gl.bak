@@ -391,7 +391,7 @@ MAIN
 
   CALL log0180_conecta_usuario()
 
-  LET p_versao = "CDV2000-10.02.26"
+  LET p_versao = "CDV2000-10.02.27"
 
   WHENEVER ERROR CONTINUE
    CALL log1400_isolation()

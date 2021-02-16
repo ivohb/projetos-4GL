@@ -197,7 +197,7 @@ FUNCTION pol1399()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1399-12.00.00  "
+   LET p_versao = "pol1399-12.00.01  "
    CALL func002_versao_prg(p_versao)
     
    CALL pol1399_menu()
@@ -2162,7 +2162,7 @@ FUNCTION pol1399_valida_cli_lembre()#
           mr_lembrete.emitente_email,
           mr_lembrete.grupo_env_email              
      FROM param_cobranca_912
-    WHERE cod_cliente = mr_cobranca.cod_cliente
+    WHERE cod_cliente = mr_lembrete.cod_cliente
 
    IF STATUS = 100 THEN
       SELECT enviar_lembrete,              
@@ -2216,6 +2216,8 @@ FUNCTION pol1399_info_lembrete()#
    CALL _ADVPL_set_property(m_pnl_cab_lembre,"ENABLE",TRUE)
    CALL _ADVPL_set_property(m_cli_lembrete,"GET_FOCUS")
 
+   RETURN TRUE
+
 END FUNCTION
 
 #----------------------------------#
@@ -2225,7 +2227,9 @@ FUNCTION pol1399_info_lembrete_no()#
    INITIALIZE mr_lembrete TO NULL
    CALL _ADVPL_set_property(m_pnl_cab_lembre,"ENABLE",FALSE)
    LET m_ies_lembrete = FALSE
-
+   
+   RETURN TRUE
+   
 END FUNCTION
 
 #-----------------------------------#

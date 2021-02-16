@@ -257,7 +257,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 15
    DEFER INTERRUPT
-   LET p_versao = "pol1158-10.02.71"
+   LET p_versao = "pol1158-10.02.72"
    OPTIONS 
       NEXT KEY control-f,
       INSERT KEY control-i,
@@ -6383,7 +6383,6 @@ FUNCTION pol1158_compras()#
        "  FROM ordem_sup o, pedido_sup p ",
        " WHERE o.cod_empresa = p.cod_empresa ",
        "   AND o.num_pedido = p.num_pedido ",
-       "   AND o.num_versao_pedido = p.num_versao ",
        "   AND o.ies_versao_atual = 'S' ",
        "   AND o.ies_situa_oc <> 'C' ",
        "   AND p.num_pedido  = '",m_num_docum,"' ",

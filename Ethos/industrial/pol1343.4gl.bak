@@ -182,7 +182,7 @@ FUNCTION pol1343_cria_temp()#
 
    DROP TABLE w_item_temp
    
-   CREATE TEMP TABLE w_item_temp (
+   CREATE TABLE w_item_temp (
        cod_item       VARCHAR(15),
        cod_item_pai   VARCHAR(15),
        qtd_planej     DECIMAL(10,3),

@@ -378,7 +378,7 @@ MAIN
       SET ISOLATION TO DIRTY READ
       SET LOCK MODE TO WAIT 5
    DEFER INTERRUPT
-   LET p_versao = "pol1271-12.02.69  "
+   LET p_versao = "pol1271-12.02.70  "
    CALL func002_versao_prg(p_versao)
    INITIALIZE p_nom_help TO NULL  
    CALL log140_procura_caminho("pol1271.iem") RETURNING p_nom_help
@@ -3296,23 +3296,28 @@ FUNCTION pol1271_gera_roma()
          END IF
       END IF
 
-      LET m_num_seq = mr_ordem_montag_item.num_sequencia
-      LET m_num_docum = p_num_pedido USING '<<<<<<','/', m_num_seq USING '<<<'
-
+      #LET m_num_seq = mr_ordem_montag_item.num_sequencia
+      #LET m_num_docum = p_num_pedido USING '<<<<<<','/', m_num_seq USING '<<<'
+     
       IF p_tip_trim = 'B' THEN
-         SELECT DISTINCT cod_empresa
-           FROM item_chapa_885        
-          WHERE cod_empresa   = p_cod_empresa
-            AND num_pedido    = p_numpedido
-            AND num_sequencia = m_num_seq
-   
-         IF STATUS = 0 THEN #É um peido de chapa
-            
-         ELSE
-            IF NOT pol1271_ve_papel(mr_ordem_montag_item.cod_item) THEN
-               RETURN FALSE
-            END IF
+        SELECT DISTINCT numlote
+           INTO m_num_docum
+           FROM roma_item_885
+          WHERE codempresa = p_cod_empresa
+          	 AND numseqpai  = p_roma.numsequencia
+	           AND numpedido  = p_num_pedido
+	           AND numseqitem = p_item_roma.num_sequencia
+	           AND coditem    = p_item_roma.cod_item
+	          AND numromaneio  = p_num_solicit 
+
+        IF STATUS <> 0 THEN
+            CALL log003_err_sql('SELECT','roma_item_885:lote')
+            RETURN FALSE
          END IF
+
+         IF NOT pol1271_ve_papel(mr_ordem_montag_item.cod_item) THEN
+            RETURN FALSE
+         END IF      
       END IF
       
       IF m_ies_texto THEN
@@ -3539,9 +3544,10 @@ FUNCTION pol1271_ve_papel(l_cod_item)#
     WHERE cod_empresa = p_cod_empresa
       AND num_docum = m_num_docum
       AND cod_item = l_cod_item
-      AND cod_item_pai = 0
+      AND cod_item_pai = '0'
    
    IF STATUS <> 0 THEN
+      RETURN TRUE
       CALL log003_err_sql('Lendo','ordens')
       RETURN FALSE
    END IF  

@@ -44,7 +44,9 @@ DEFINE m_num_om                  INTEGER,
        m_dat_atu                 DATE,
        m_hor_atu                 VARCHAR(08),
        m_texto                   VARCHAR(200),
-       m_dat_proces              VARCHAR(19)
+       m_dat_proces              VARCHAR(19),
+       m_chamada                 CHAR(01),
+       m_progres                 SMALLINT
 
 DEFINE p_tela                    RECORD
        num_pedido                LIKE pedidos.num_pedido
@@ -56,6 +58,7 @@ MAIN
       LET m_oms = ARG_VAL(1)
       LET g_msg = 'Chamada por outro aplicativo'
       IF LOG_connectDatabase("DEFAULT") THEN
+         LET m_chamada = 'P'
          CALL pol1407_controle()
       END IF
       RETURN
@@ -70,9 +73,6 @@ MAIN
    IF p_status = 0 THEN    
       LET g_msg = 'Execução a partir do menu Logix'
       CALL pol1407_menu()
-      #IF m_erro IS NOT NULL THEN
-      #   CALL log0030_mensagem(m_erro,'info')
-      #END IF
    END IF
          
 END MAIN
@@ -102,11 +102,15 @@ FUNCTION pol1407_menu()#
          END IF 
       COMMAND "Processar" "Processa a unificação"
          LET m_erro = NULL
+         LET m_chamada = 'M'
+         ERROR 'Processand...'
          CALL pol1407_controle() 
          IF m_erro IS NULL THEN
             LET m_erro = 'Operação efetuada com sucesso.'
-         END IF
-         ERROR m_erro
+            ERROR m_erro
+         ELSE
+            CALL log0030_mensagem(m_erro,'info')
+         END IF         
          LET p_ies_cons = FALSE
       COMMAND KEY ("O") "sObre" "Exibe a versão do programa"
 				CALL pol1407_sobre()
@@ -190,7 +194,7 @@ FUNCTION pol1407_job(l_rotina) #
    IF p_user IS NULL THEN
       LET p_user = 'admlog'
    END IF
-   
+   LET m_chamada = 'J'
    CALL pol1407_controle()
    
    RETURN TRUE
@@ -430,7 +434,7 @@ FUNCTION pol1407_controle()#
         FROM ped_itens 
        WHERE cod_empresa = p_cod_empresa
          AND num_pedido = l_num_pedido
-         AND (qtd_pecas_solic - qtd_pecas_cancel) > qtd_pecas_romaneio
+         AND (qtd_pecas_solic - qtd_pecas_atend - qtd_pecas_cancel) > qtd_pecas_romaneio
 
       IF STATUS <> 0 THEN
          LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ped_itens(2):cq_oms '
@@ -473,15 +477,27 @@ FUNCTION pol1407_controle()#
       END IF
    
    END FOREACH
-   
-   LET m_erro = pol1407_junta_ordens()         
+
+   LET m_erro = pol1407_junta_ordens()    
 
 END FUNCTION
+
+#-------------------------#
+FUNCTION pol1407_unifica()#
+#-------------------------#
+
+   LET m_chamada = 'E'
+   LET g_msg = 'Chamada pela EPL'
+   LET m_erro = pol1407_junta_ordens()
+   
+   RETURN m_erro
+
+END FUNCTION      
 
 #------------------------------#
 FUNCTION pol1407_junta_ordens()#
 #------------------------------#
-   
+      
    LET m_hor_atu = TIME
    LET m_dat_atu = TODAY
    
@@ -490,11 +506,7 @@ FUNCTION pol1407_junta_ordens()#
    END IF
    
    LET m_msg = NULL
-   
-   IF g_msg IS NULL THEN
-      LET g_msg = 'Chamada pela EPL'
-   END IF
-   
+      
    INSERT INTO proces_pol1407_adere
     VALUES(m_dat_proces, g_msg)
    
@@ -506,18 +518,27 @@ FUNCTION pol1407_junta_ordens()#
       RETURN m_msg
    END IF
 
-   CALL LOG_progresspopup_set_total("PROCESS",m_count)
-
    IF m_count = 0 THEN
+      LET m_msg = 'Não há pedidos a unificar'
       RETURN m_msg
    END IF
-   
+
    CALL LOG_transaction_begin()
    
-   IF NOT pol1407_processa() THEN
+   IF m_chamada = 'E' THEN
+      LET m_count = m_count + 10
+      LET p_status = LOG_progresspopup_start(
+          "Unificando romaneios...","pol1407_processa","PROCESS")  
+   ELSE
+      LET p_status =  pol1407_processa()
+   END IF
+   
+   IF NOT p_status THEN
       CALL LOG_transaction_rollback()
+      CALL pol1407_insere_erro(m_num_pedido, m_msg)
    ELSE
       CALL LOG_transaction_commit()
+      LET m_msg = NULL
    END IF
    
    RETURN m_msg
@@ -528,10 +549,14 @@ END FUNCTION
 FUNCTION pol1407_processa()#
 #--------------------------#
 
-   DEFINE m_progres      SMALLINT,
-          l_qtd_item     INTEGER,
+   DEFINE l_qtd_item     INTEGER,
           l_carteira     CHAR(02),
-          l_count        integer
+          l_count        INTEGER,
+          l_progres      SMALLINT
+   
+   IF m_chamada = 'E' THEN
+      CALL LOG_progresspopup_set_total("PROCESS",m_count)
+   END IF
           
    DECLARE cq_w_temp CURSOR FOR
     SELECT num_pedido
@@ -542,8 +567,10 @@ FUNCTION pol1407_processa()#
           LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela w_pedido_tmp:cq_w_temp '
          RETURN FALSE
       END IF
-   
-      LET m_progres = LOG_progresspopup_increment("PROCESS")   
+      
+      IF m_chamada = 'E' THEN
+         LET m_progres = LOG_progresspopup_increment("PROCESS")   
+      END IF
       
       SELECT cod_tip_carteira
          INTO l_carteira
@@ -561,26 +588,6 @@ FUNCTION pol1407_processa()#
          END IF
       END IF
 
-      {SELECT COUNT(*) 
-        INTO l_count
-        FROM ped_itens 
-       WHERE cod_empresa = p_cod_empresa 
-         AND num_pedido = m_num_pedido 
-         AND qtd_pecas_atend > 0
-
-      IF STATUS <> 0 THEN
-         LET m_erro = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ped_itens:cq_w_temp '
-         RETURN 
-      END IF
-
-      IF l_count > 0 THEN
-         LET m_erro = 'Pedido já contém faturamento'
-         IF NOT pol1407_insere_erro(m_num_pedido, m_erro) THEN
-            RETURN
-         END IF
-         CONTINUE FOREACH
-      END IF}
-
       SELECT 1
          FROM empresa_carteira_adere 
         WHERE empresa = p_cod_empresa
@@ -595,6 +602,15 @@ FUNCTION pol1407_processa()#
          END IF
       END IF
 
+      SELECT COUNT(DISTINCT ordem_montag_item.num_om)
+         FROM ordem_montag_item
+         INNER JOIN ordem_montag_mest
+            ON ordem_montag_mest.cod_empresa = ordem_montag_item.cod_empresa
+           AND ordem_montag_mest.num_om = ordem_montag_item.num_om
+           AND ordem_montag_mest.ies_sit_om = 'N'
+        WHERE ordem_montag_item.cod_empresa = p_cod_empresa
+          AND ordem_montag_item.num_pedido = m_num_pedido
+          
       SELECT COUNT(DISTINCT num_om)
          INTO m_qtd_om
          FROM ordem_montag_item 
@@ -626,12 +642,24 @@ FUNCTION pol1407_processa()#
          CONTINUE FOREACH
       END IF
 
+      IF m_chamada = 'E' THEN
+         LET m_progres = LOG_progresspopup_increment("PROCESS")   
+      END IF
+
       IF NOT pol1407_exclui_oms() THEN
          RETURN FALSE
       END IF
 
+      IF m_chamada = 'E' THEN
+         LET m_progres = LOG_progresspopup_increment("PROCESS")   
+      END IF
+
       IF NOT pol1407_cria_om_unica() THEN
          RETURN FALSE
+      END IF
+
+      IF m_chamada = 'E' THEN
+         LET m_progres = LOG_progresspopup_increment("PROCESS")   
       END IF
    
    END FOREACH
@@ -677,6 +705,10 @@ FUNCTION pol1407_exclui_oms()#
       IF STATUS <> 0 THEN
          LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo tabela ordem_montag_item:cq_exc_om '
          RETURN FALSE
+      END IF
+
+      IF m_chamada = 'E' THEN
+         LET m_progres = LOG_progresspopup_increment("PROCESS")   
       END IF
 
       IF NOT pol1407_grava_hist_oms() THEN
@@ -980,6 +1012,10 @@ FUNCTION pol1407_cria_om_unica()#
    LET m_msg = NULL
    
    CALL func015_gera_om(m_num_pedido, 'POL1407') RETURNING m_num_ordem, m_msg
+
+   IF m_chamada = 'E' THEN
+      LET m_progres = LOG_progresspopup_increment("PROCESS")   
+   END IF
    
    IF m_num_ordem = 0 THEN
       RETURN FALSE
@@ -992,7 +1028,11 @@ FUNCTION pol1407_cria_om_unica()#
    IF NOT pol1407_ins_ped_unif() THEN
       RETURN FALSE
    END IF
-
+   
+   DELETE FROM pedido_erro_adere 
+    WHERE empresa = p_cod_empresa
+      AND pedido = m_num_pedido
+   
    CALL pol1407_insere_erro(m_num_pedido, m_msg) RETURNING p_status
 
    RETURN TRUE
@@ -1004,7 +1044,7 @@ END FUNCTION
  FUNCTION pol1407_version_info()
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1407.4gl $|$Revision: 7 $|$Date: 08/02/2021 14:18 $|$Modtime: 29/01/2021 13:31 $" 
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1407.4gl $|$Revision: 10 $|$Date: 08/02/2021 14:43 $|$Modtime: 29/01/2021 13:31 $" 
 
  END FUNCTION
       

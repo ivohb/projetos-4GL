@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------#
 #Lista de preço
 {VPD30100 – GERAÇÃO DE ROMANEIO
-POL1407 - UNIFICAÇÃO DE ROMANEIO 
+POL1407 - UNIFICAÇÃO DE ROMANEIO
 VPD20028 – AUDITORIA }
 
 
@@ -81,6 +81,8 @@ DEFINE ma_unif            ARRAY[1000] OF RECORD
        cancelado          DECIMAL(10,3),
        romaneado          DECIMAL(10,3),
        romaneio           INTEGER,
+       ies_situa          CHAR(01),
+       num_nff            INTEGER,
        saldo              DECIMAL(10,3),
        estoque            DECIMAL(10,3),
        filler             CHAR(01)
@@ -98,7 +100,7 @@ FUNCTION pol1409()#
 
    WHENEVER ANY ERROR CONTINUE
 
-   LET p_versao = "pol1409-12.00.00  "
+   LET p_versao = "pol1409-12.00.01  "
    CALL pol1409_tab_temp()
       
    LET m_car_cart = TRUE
@@ -843,6 +845,16 @@ FUNCTION pol1409_unif_grade(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","romaneio")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_unif)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Status")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","ies_situa")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_unif)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Num NF")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)    
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","num_nff")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_unif)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Sdo pedido")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)    
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","saldo")
@@ -1075,6 +1087,24 @@ FUNCTION pol1409_le_itens()#
       
       LET l_progres = LOG_progresspopup_increment("PROCESS") 
       
+      IF ma_unif[l_ind].romaneio IS NULL OR ma_unif[l_ind].romaneio = 0 THEN
+         LET ma_unif[l_ind].ies_situa = NULL
+         LET ma_unif[l_ind].num_nff = NULL
+      ELSE
+         SELECT ies_sit_om,                                             
+                num_nff                                                 
+           INTO ma_unif[l_ind].ies_situa,                               
+                ma_unif[l_ind].num_nff                                  
+           FROM ordem_montag_mest                                       
+          WHERE cod_empresa = p_cod_empresa                             
+            AND num_om = ma_unif[l_ind].romaneio                        
+                                                                        
+         IF STATUS <> 0 THEN                                            
+            CALL log003_err_sql('SELECT','ordem_montag_mest:cq_unif')   
+            EXIT FOREACH                                                
+         END IF                                                         
+      END IF
+      
       LET ma_unif[l_ind].saldo = ma_unif[l_ind].solicitado -
           ma_unif[l_ind].atendido - ma_unif[l_ind].cancelado - ma_unif[l_ind].romaneado
 
@@ -1089,7 +1119,11 @@ FUNCTION pol1409_le_itens()#
          END IF
 
          LET ma_unif[l_ind].estoque = m_qtd_estoque
-         LET m_qtd_estoque = m_qtd_estoque - ma_unif[l_ind].saldo         
+         LET m_qtd_estoque = m_qtd_estoque - ma_unif[l_ind].saldo     
+         
+         IF m_qtd_estoque < 0 THEN
+            LET m_qtd_estoque = 0
+         END IF    
          
          INSERT INTO w_estoque 
           VALUES(p_cod_empresa, ma_unif[l_ind].item, m_qtd_estoque)

@@ -30,24 +30,18 @@ DEFINE m_num_om                  INTEGER,
        m_msg                     VARCHAR(120),
        m_count                   INTEGER
 
-MAIN   
-
-   
-   CALL log0180_conecta_usuario()
-         
-   CALL log001_acessa_usuario("ESPEC999","")
-        RETURNING p_status, p_cod_empresa, p_user
-   
-   IF p_status = 0 THEN    
-      CALL pol1397_controle()
+#-----------------#
+FUNCTION pol1397()#
+#-----------------#
+          
+   IF LOG_initApp("PADRAO") <> 0 THEN
+      RETURN
    END IF
-         
-END MAIN
 
-#--------------------------#
-FUNCTION pol1397_controle()#
-#--------------------------#
+   #CALL LOG_connectDatabase("DEFAULT")
 
+   WHENEVER ANY ERROR CONTINUE
+      
 END FUNCTION
 
 #------------------------------------#
@@ -144,6 +138,12 @@ FUNCTION vdp30100y_after_processar()#
    
    DEFINE l_ind       INTEGER
    
+   LET m_msg = 'POL1407 vai verificar a possibilidade de\n unificar as Oms. Autoriza a verificação?'
+      
+   IF NOT LOG_question(m_msg) THEN
+      RETURN 
+   END IF
+   
    WHENEVER ANY ERROR CONTINUE
    
    DROP TABLE w_om_nova 
@@ -191,14 +191,13 @@ FUNCTION vdp30100y_after_processar()#
    
    IF m_count > 0 THEN
       IF pol1397_le_pedidos() THEN
-         LET m_msg = LOG_progresspopup_start(
-            "Juntando Ordens...","pol1407_junta_ordens","PROCESS")  
+         LET m_msg = pol1407_unifica()    
          IF m_msg IS NOT NULL THEN
             CALL log0030_mensagem(m_msg,'info')
          END IF
       END IF
    END IF
-   
+      
    WHENEVER ANY ERROR STOP
    
 END FUNCTION
@@ -263,6 +262,41 @@ FUNCTION pol1397_le_pedidos()#
    RETURN TRUE
 
 END FUNCTION   
+
+#-------------------------#
+FUNCTION pol1397_le_erro()#
+#-------------------------#
+   
+   DEFINE l_num_pedido INTEGER,
+          l_erro       VARCHAR(120)
+   
+   LET m_msg = NULL
+   
+   DECLARE cq_w_temp CURSOR FOR
+    SELECT num_pedido
+      FROM w_pedido_tmp
+   FOREACH cq_w_temp INTO l_num_pedido
+
+      IF STATUS <> 0 THEN
+          RETURN
+      END IF
+      
+      SELECT erro INTO l_erro
+        FROM pedido_erro_adere
+       WHERE empresa = p_cod_empresa
+         AND pedido = l_num_pedido
+      
+      IF STATUS = 0 THEN
+         LET m_msg =  m_msg CLIPPED, l_erro CLIPPED
+      END IF
+   
+   END FOREACH
+
+END FUNCTION   
+
+      
+
+
 {
 #----------------------------------#
 FUNCTION man100211y_after_incluir()#
@@ -308,6 +342,6 @@ END FUNCTION
  FUNCTION pol1397_version_info()
 #-------------------------------#
 
-  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1397.4gl $|$Revision: 1 $|$Date: 09/12/2020 10:47 $|$Modtime: 4/12/2020 12:30 $"
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/pol1397.4gl $|$Revision: 10 $|$Date: 19/02/2021 12:02 $|$Modtime: 09/12/2020 10:47 $"
 
  END FUNCTION

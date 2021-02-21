@@ -6,6 +6,23 @@
 # DATA....: 27/01/21                                                #
 #-------------------------------------------------------------------#
 
+
+{
+Segue as anotações que fiz durante a apresentação do EDI KOMATSU
+
+
+1-	Num mesmo arquivo tem programação de mais de um código de cliente LUGAR GEOGRAFICO , SUZ E ARU.
+2-	Fazer programa de cadastro que liga LUGAR GEOGRAFICO  com CODIGO DE CLIENTE, SUZ E ARU.
+3-	Criar filtro pra permitir seleção para processamento, Cancelamento, Erro, Inclusão
+4-	Pedir confirmação no botão PROCESSAR TOTAL 
+5-	Agravar texto item e tabela XPED ITEMPED
+6-	Incluir seq no relatório
+7-	Tem que haver a relação entre o ITEM DO CLIENTE x ITEM LOGIX, se não houver consistir e não carregar nada desse item.
+8-	Se  encontrar mais de um pedido no Logix para o item do cliente, usar o de data de emissão mais atual
+9-	Se encontrar dois itens num mesmo pedido de venda, dar mensagem para a Raissa cancelar o saldo do item que não pode estar naquele pedido, então tem que fazer essa validação apenas para itens com saldo, senão a Raissa vai cancelar o saldo e a consistência vai continuar continuar considerando dois itens para um pedido. 
+
+}
+
 DATABASE logix
 
 GLOBALS
@@ -604,6 +621,7 @@ FUNCTION pol1420_pedidos(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Mensagem")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",280)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","mensagem")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
 
     CALL _ADVPL_set_property(m_brz_pedido,"SET_ROWS",ma_pedido,1)
     CALL _ADVPL_set_property(m_brz_pedido,"CAN_ADD_ROW",FALSE)
@@ -1867,6 +1885,7 @@ FUNCTION pol1420_pega_pedido()#
              ON pedidos.cod_empresa = ped_itens.cod_empresa
             AND pedidos.num_pedido = ped_itens.num_pedido
             AND pedidos.ies_sit_pedido <> '9'
+            AND pedidos.cod_cliente = mr_pedido.cod_cliente
     WHERE ped_itens.cod_empresa = mr_arquivo.cod_empresa
       AND ped_itens.cod_item = mr_pedido.cod_item
    
@@ -3101,6 +3120,9 @@ FUNCTION pol1420_atu_carteira()#
          LET m_qtd_planej = m_qtd_planej + (m_qtd_solic - m_qtd_atual)
       ELSE
          LET m_qtd_cancel = m_qtd_cancel +(m_qtd_atual - m_qtd_solic)
+         IF m_qtd_solic = 0 THEN
+            LET m_mensagem = 'CANCELOU SALDO'
+         END IF
       END IF
       IF NOT pol1420_atu_prog() THEN
          RETURN FALSE
@@ -3243,7 +3265,7 @@ FUNCTION pol1420_le_lista()#
         INTO m_pre_unit
         FROM desc_preco_item 
        WHERE cod_empresa = p_cod_empresa
-         AND cod_cliente = m_cod_cliente
+         #AND cod_cliente = m_cod_cliente
          AND num_transacao = l_transacao
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','desc_preco_item')

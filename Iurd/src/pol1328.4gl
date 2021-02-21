@@ -240,7 +240,7 @@ MAIN
    WHENEVER ANY ERROR CONTINUE
    SET ISOLATION TO DIRTY READ
    SET LOCK MODE TO WAIT 30
-   LET p_versao = "pol1328-12.00.135 "
+   LET p_versao = "pol1328-12.00.139 "
    CALL func002_versao_prg(p_versao)
 
    CALL log001_acessa_usuario("ESPEC999","")     
@@ -4557,20 +4557,19 @@ FUNCTION pol1328_insere_ap()#
         mr_gi_ap.num_agencia_fav IS NOT NULL AND          
         mr_gi_ap.num_conta_banco_fav IS NOT NULL THEN                                                           
         LET m_cod_banco = mr_gi_ap.cod_banco_fav              
-        LET m_cod_banco = mr_gi_ap.num_agencia_fav            
-        LET m_cod_banco = mr_gi_ap.num_conta_banco_fav         
+        LET m_num_agencia = mr_gi_ap.num_agencia_fav            
+        LET m_num_conta_banco = mr_gi_ap.num_conta_banco_fav                           
     ELSE                                          
        IF mr_gi_ap.cod_favorecido IS NULL THEN
           LET l_status = pol1328_le_conta(mr_gi_ap.cod_fornecedor)
        ELSE
           LET l_status = pol1328_le_conta(mr_gi_ap.cod_favorecido)
-       END IF    
+       END IF   
+       IF NOT l_status THEN
+         RETURN FALSE                                                                                      
+       END IF        
     END IF
     
-    IF NOT l_status THEN
-      RETURN FALSE                                                                                      
-    END IF
-
     LET mr_ap.cod_empresa       = mr_ad_mestre.cod_empresa
     LET mr_ap.num_ap            = m_num_ap
     LET mr_ap.num_versao        = 1
@@ -5722,3 +5721,8 @@ FUNCTION pol1328_del_ad_sem_ap()#
 
 END FUNCTION
 
+#-------------------------------#
+ FUNCTION pol1328_version_info()#
+#-------------------------------#
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/controle_despesa_viagem/programas/pol1328.4gl $|$Revision: 139 $|$Date: 17/02/21 15:56 $|$Modtime:  $" #Informações do controle de versão do SourceSafe - Não remover esta linha (FRAMEWORK)
+ END FUNCTION

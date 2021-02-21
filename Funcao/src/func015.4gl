@@ -298,6 +298,10 @@ FUNCTION func015_grava_reserva()#
       LET m_cod_local_estoq = m_cod_local
    END IF
    
+   IF NOT func015_ve_estoque() THEN
+      RETURN FALSE
+   END IF
+   
    LET l_a_reservar = m_qtd_romanear
    
    DECLARE cq_est_reser CURSOR FOR
@@ -308,6 +312,10 @@ FUNCTION func015_grava_reserva()#
        AND cod_local = m_cod_local_estoq
        AND ies_situa_qtd = 'L'
        AND qtd_saldo > 0       
+       AND NOT EXISTS (
+           SELECT 1 FROM motivo_remessa 
+            WHERE cod_empresa = p_cod_empresa
+            AND cod_local_remessa = m_cod_local_estoq) 
      ORDER BY num_transac
 
    FOREACH cq_est_reser INTO mr_ent_ender.*
@@ -316,14 +324,26 @@ FUNCTION func015_grava_reserva()#
          LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo dados na tabela estoque_lote_ender '
          RETURN FALSE
 	    END IF
-
-      SELECT SUM(qtd_reservada)
+      
+      IF mr_ent_ender.num_lote = ' ' THEN
+         LET mr_ent_ender.num_lote = NULL
+      END IF
+      
+      SELECT SUM(estoque_loc_reser.qtd_reservada)
         INTO l_reser_atu
-        FROM estoque_loc_reser
-       WHERE cod_empresa = p_cod_empresa
-         AND cod_item    = m_cod_item
-         AND cod_local   = m_cod_local_estoq
-         AND ies_situacao =  'L'
+        FROM estoque_loc_reser, sup_par_resv_est
+       WHERE estoque_loc_reser.cod_empresa = p_cod_empresa
+         AND estoque_loc_reser.cod_item   = m_cod_item
+         AND estoque_loc_reser.cod_local  = m_cod_local_estoq
+         AND ((estoque_loc_reser.num_lote = mr_ent_ender.num_lote AND 
+                  mr_ent_ender.num_lote IS NOT NULL) OR
+              (1=1 AND mr_ent_ender.num_lote IS NULL))
+         AND estoque_loc_reser.ies_origem =  'V'
+         AND estoque_loc_reser.qtd_reservada > 0
+         AND sup_par_resv_est.empresa = estoque_loc_reser.cod_empresa  
+         AND sup_par_resv_est.reserva = estoque_loc_reser.num_reserva  
+         AND sup_par_resv_est.parametro = 'sit_est_reservada'  
+         AND sup_par_resv_est.parametro_ind = 'L'               
       
       IF STATUS <> 0 THEN
          LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo dados na tabela estoque_loc_reser '
@@ -367,6 +387,134 @@ FUNCTION func015_grava_reserva()#
 
 END FUNCTION
 
+#----------------------------#
+FUNCTION func015_ve_estoque()#
+#----------------------------#
+   
+   DEFINE l_est_ender       DECIMAL(10,3),
+          l_est_lote        DECIMAL(10,3),
+          l_est_estoq       DECIMAL(10,3),
+          l_reser           DECIMAL(10,3),
+          l_liberada        DECIMAL(10,3), 
+          l_reservada       DECIMAL(10,3),
+          l_disponivel      DECIMAL(10,3)
+   
+   SELECT SUM(qtd_saldo) 
+     INTO l_est_ender
+     FROM estoque_lote_ender
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item = m_cod_item
+      AND cod_local = m_cod_local_estoq
+      AND ies_situa_qtd = 'L'
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo saldo da tabela estoque_lote_ender '
+      RETURN FALSE
+	 END IF
+   
+   IF l_est_ender IS NULL THEN
+      LET l_est_ender = 0
+   END IF
+
+   SELECT SUM(qtd_saldo) 
+     INTO l_est_lote
+     FROM estoque_lote
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item = m_cod_item
+      AND cod_local = m_cod_local_estoq
+      AND ies_situa_qtd = 'L'
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo saldo da tabela estoque_lote '
+      RETURN FALSE
+	 END IF
+   
+   IF l_est_lote IS NULL THEN
+      LET l_est_lote = 0
+   END IF
+   
+   IF l_est_lote <> l_est_ender THEN
+      LET m_msg = 'Estoque di item ', m_cod_item CLIPPED, ' está desbalanceado.'
+      RETURN FALSE
+   END IF
+   
+   SELECT SUM(qtd_reservada)
+     INTO l_reser
+     FROM estoque_loc_reser
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item    = m_cod_item
+      AND cod_local   = m_cod_local_estoq
+      AND ies_situacao =  'L'
+      
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo reserva na tabela estoque_loc_reser '
+      RETURN FALSE
+	 END IF
+   
+   IF l_reser IS NULL THEN
+      LET l_reser = 0
+   END IF
+
+   IF l_reser > l_est_ender THEN
+      LET m_msg = 'Item ', m_cod_item CLIPPED, ' tem mais reserva que estoque disponível'
+      RETURN FALSE
+   END IF
+   
+   LET l_disponivel = l_est_ender - l_reser
+   
+   IF m_qtd_romanear > l_disponivel THEN
+      LET m_msg = 'Item ', m_cod_item CLIPPED, ' sem estoque suficiente na tabela estoque_lote '
+      RETURN FALSE
+   END IF
+
+   SELECT SUM(qtd_saldo) 
+     INTO l_est_ender
+     FROM estoque_lote_ender
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item = m_cod_item
+      AND ies_situa_qtd = 'L'
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' somando saldo da tabela estoque_lote_ender '
+      RETURN FALSE
+	 END IF
+   
+   IF l_est_ender IS NULL THEN
+      LET l_est_ender = 0
+   END IF   
+   
+   SELECT qtd_liberada, qtd_reservada
+     INTO l_liberada, l_reservada
+     FROM estoque
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_item = m_cod_item
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' lendo saldo da tabela estoque '
+      RETURN FALSE
+	 END IF
+
+   IF l_liberada <> l_est_ender THEN
+      LET m_msg = 'Estoque di item ', m_cod_item CLIPPED, ' está desbalanceado.'
+      RETURN FALSE
+   END IF
+   
+   IF l_liberada < l_reservada THEN
+      LET m_msg = 'Há mais reserva que estoque na tabela estoque'
+      RETURN FALSE
+   END IF
+   
+   LET l_disponivel = l_liberada - l_reservada
+   
+   IF m_qtd_romanear > l_disponivel THEN
+      LET m_msg = 'Item ', m_cod_item CLIPPED, ' sem estoque suficiente na tabela estoque '
+      RETURN FALSE
+   END IF
+   
+   RETURN TRUE
+
+END FUNCTION   
+   
 #-----------------------------#
 FUNCTION func015_ins_reserva()#
 #-----------------------------#
@@ -563,6 +711,44 @@ FUNCTION func015_ins_reserva()#
       RETURN FALSE
    END IF
 
+   INSERT INTO sup_par_resv_est (
+       empresa, 
+       reserva, 
+       parametro, 
+       des_parametro, 
+       parametro_ind, 
+       parametro_texto) 
+    VALUES(p_cod_empresa, 
+           m_num_reserva, 
+           'efetiva_parcial', 
+           'Reserva de vendas que permite efetivação parcial', 
+           NULL, 
+           NULL)
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' inserindo dados na tabela sup_par_resv_est '
+      RETURN FALSE
+   END IF
+
+   INSERT INTO sup_par_resv_est (
+      empresa, 
+      reserva, 
+      parametro, 
+      des_parametro, 
+      parametro_ind, 
+      parametro_texto) 
+    VALUES(p_cod_empresa, 
+           m_num_reserva, 
+          'sit_est_reservada', 
+          'Situação do estoque que está sendo reservado', 
+          'L', 
+          NULL)        
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' inserindo dados na tabela sup_par_resv_est '
+      RETURN FALSE
+   END IF
+    
    INSERT INTO est_reser_area_lin
     VALUES(p_cod_empresa, m_num_reserva, 
            m_cod_lin_prod, m_cod_lin_recei, 
@@ -823,4 +1009,13 @@ FUNCTION func015_ins_ord_montag_mest()#
    RETURN TRUE
 
 END FUNCTION
+
+#LOG1700             
+#-------------------------------#
+ FUNCTION func015_version_info()
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/func015.4gl $|$Revision: 10 $|$Date: 19/02/2021 12:02 $|$Modtime: 09/12/2020 10:47 $"
+
+ END FUNCTION
    	             

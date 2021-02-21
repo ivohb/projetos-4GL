@@ -62,9 +62,10 @@ FUNCTION func003_deleta_reserva(p_parametro)#
       
    IF STATUS <> 0 THEN
       LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' atualizando tab estoque:func003 '
+      RETURN m_msg
    END IF
    
-   RETURN m_msg
+   RETURN NULL
 
 END FUNCTION
 
@@ -135,8 +136,25 @@ FUNCTION func003_deleta_tabelas()#
       RETURN FALSE
    END IF
 
+   DELETE FROM sup_par_resv_est
+    WHERE empresa = p_cod_empresa
+      AND reserva = p_num_reserva
+
+   IF STATUS <> 0 THEN
+      LET m_msg = 'Erro ', STATUS USING '<<<<<<', ' deletando registro tab sup_par_resv_est:func003 '
+      RETURN FALSE
+   END IF
+
    RETURN TRUE
 
 END FUNCTION         
 
 
+#LOG1700             
+#-------------------------------#
+ FUNCTION func003_version_info()
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/func003.4gl $|$Revision: 1 $|$Date: 19/02/2021 12:02 $|$Modtime: 09/12/2020 10:47 $"
+
+ END FUNCTION

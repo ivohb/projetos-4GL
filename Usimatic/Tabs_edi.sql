@@ -123,7 +123,7 @@ CREATE TABLE audit_komatsu (
    qtd_solic     DECIMAL(10,3),
    qtd_atual     DECIMAL(10,3),
    qtd_operacao  DECIMAL(10,3),
-   mensagem      VARCHAR(15),
+   mensagem      VARCHAR(20),
    usuario       VARCHAR(08),
    dat_operacao  DATE,
    hor_operacao  VARCHAR(08),
@@ -192,7 +192,7 @@ drop table prog_komatsu;
 create table prog_komatsu (
    id_arquivo            INTEGER,
    id_item               INTEGER,
-   item                  VARCHAR(15),
+   item_logix            VARCHAR(15),
    dat_prog              VARCHAR(10),
    qtd_prog              VARCHAR(12),
    tip_prog              VARCHAR(08),
@@ -206,4 +206,4 @@ create index ix1_prog_komatsu on
  prog_komatsu(id_arquivo, id_item);
 
 create index ix2_prog_komatsu on
- prog_komatsu(id_arquivo, item);
+ prog_komatsu(id_arquivo, item_logix);

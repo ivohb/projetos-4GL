@@ -20,7 +20,6 @@ DEFINE p_ind                INTEGER,
        p_erro               CHAR(10),
        m_msg                CHAR(500)
 
-
 #----------------------------------------#
 #      Grava auditoria na tabela         #
 #          audit_logix padrão            #
@@ -522,6 +521,10 @@ FUNCTION func002_le_estoque(l_parametro)#
 	    AND cod_item      = l_parametro.cod_item
 	    AND cod_local     = l_parametro.cod_local
       AND ies_situa_qtd = 'L'
+      AND NOT EXISTS (
+          SELECT 1 FROM motivo_remessa 
+           WHERE cod_empresa = l_parametro.cod_empresa
+           AND cod_local_remessa = l_parametro.cod_local) 
           
    IF STATUS <> 0 THEN
       LET p_erro = STATUS
@@ -534,12 +537,18 @@ FUNCTION func002_le_estoque(l_parametro)#
       RETURN p_msg, l_qtd_saldo
    END IF
 
-   SELECT SUM(qtd_reservada)
-     INTO l_qtd_reservada 
-     FROM estoque_loc_reser
-    WHERE cod_empresa = l_parametro.cod_empresa
-      AND cod_item    = l_parametro.cod_item
-      AND cod_local   = l_parametro.cod_local
+   SELECT SUM(estoque_loc_reser.qtd_reservada)                     
+     INTO l_qtd_reservada                                             
+     FROM estoque_loc_reser, sup_par_resv_est                         
+    WHERE estoque_loc_reser.cod_empresa = l_parametro.cod_empresa     
+      AND estoque_loc_reser.cod_item   = l_parametro.cod_item         
+      AND estoque_loc_reser.cod_local  = l_parametro.cod_local        
+      AND estoque_loc_reser.ies_origem =  'V'                         
+      AND estoque_loc_reser.qtd_reservada > 0                         
+      AND sup_par_resv_est.empresa = estoque_loc_reser.cod_empresa     
+      AND sup_par_resv_est.reserva = estoque_loc_reser.num_reserva     
+      AND sup_par_resv_est.parametro = 'sit_est_reservada'            
+      AND sup_par_resv_est.parametro_ind = 'L'                        
       
    IF STATUS <> 0 THEN
       LET p_erro = STATUS
@@ -1183,3 +1192,11 @@ FUNCTION func002_validaSenha(l_senha)
 
 END FUNCTION
 
+#LOG1700             
+#-------------------------------#
+ FUNCTION func002_version_info()
+#-------------------------------#
+
+  RETURN "$Archive: /Logix/Fontes_Doc/Customizacao/10R2/gps_logist_e_gerenc_de_riscos_ltda/financeiro/solicitacao de faturameto/programas/func002.4gl $|$Revision: 10 $|$Date: 19/02/2021 12:02 $|$Modtime: 09/12/2020 10:47 $"
+
+ END FUNCTION

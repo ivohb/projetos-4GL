@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------#
 # SISTEMA.: LOGIX                                                   #
 # PROGRAMA: pol1419                                                 #
-# OBJETIVO: CARGA E PROCESSAMENTO DO EDI FORECAST  - USIMATIC       #
+# OBJETIVO: CARGA DO EDI FORECAST  - USIMATIC (VDP6590/VDP1024)     #
 # AUTOR...: IVO                                                     #
 # DATA....: 27/01/21                                                #
 #-------------------------------------------------------------------#
@@ -82,7 +82,9 @@ DEFINE m_caminho         CHAR(80),
        m_pedido_comp     VARCHAR(17),
        m_dat_hor         VARCHAR(20),
        m_qtd_firme       INTEGER,
-       m_qtd_prev        INTEGER
+       m_qtd_prev        INTEGER,
+       m_quant_plano     DECIMAL(10,3),
+       m_preco_plano     DECIMAL(12,2)
        
 DEFINE m_dialog          VARCHAR(10),
        m_statusbar       VARCHAR(10),
@@ -125,7 +127,10 @@ DEFINE mr_arquivo        RECORD
        dat_carga         VARCHAR(10),
        hor_carga         CHAR(08),
        processado        CHAR(01),
-       tip_prog          CHAR(01)
+       tip_prog          CHAR(01),
+       cod_tip_carteira  CHAR(02),
+       mercado           CHAR(02),
+       pais              CHAR(03)
 END RECORD
 
 DEFINE ma_data            ARRAY[100] OF RECORD
@@ -159,14 +164,17 @@ DEFINE ma_prog            ARRAY[1000] OF RECORD
    ies_select             VARCHAR(01),
    id_arquivo             INTEGER,
    id_item                INTEGER,
-   item                   VARCHAR(15),
+   cod_item               VARCHAR(15),
    dat_prog               VARCHAR(10),
    qtd_prog               VARCHAR(12),
    tip_prog               VARCHAR(08),
    ano_plano              DECIMAL(4,0),
    mes_plano              DECIMAL(2,0),
-   qtd_plano              DECIMAL(10,3)
-   mensagem               VARCHAR(40)
+   qtd_plano              DECIMAL(10,3),
+   mensagem               VARCHAR(40),
+   operacao               VARCHAR(15),
+   qtd_plan_log           DECIMAL(10,3),
+   pre_unit_log           DECIMAL(12,2)
 END RECORD
 
 DEFINE mr_itens          RECORD
@@ -217,7 +225,9 @@ DEFINE m_den_arquivo      VARCHAR(10),
        m_programacao      VARCHAR(10)
 
 DEFINE m_num_lista        LIKE pedidos.num_list_preco,
-       m_pre_unit         LIKE ped_itens.pre_unit
+       m_pre_unit         LIKE ped_itens.pre_unit,
+       m_num_plano        LIKE num_plano_vendas.num_plano_vendas,
+       m_cod_moeda        LIKE num_plano_vendas.cod_moeda
 
 DEFINE mr_audit  RECORD
    id_registro   SERIAL,    
@@ -298,24 +308,23 @@ END FUNCTION
 FUNCTION pol1419_cria_tabs()#
 #---------------------------#
 
-   DROP TABLE w_prog_komatsi;
-   
-   CREATE TEMP TABLE w_prog_komatsi (
-    tip_prog              VARCHAR(08),
+   DROP TABLE w_prog_komatsu;
+
+   CREATE TEMP TABLE w_prog_komatsu (
+    plano_vendas          VARCHAR(15),
     ano_plano             DECIMAL(4,0),
-    mes_plano             DECIMAL(2,0),
-    qtd_plano             DECIMAL(10,3)      
+    mes_plano             DECIMAL(2,0)
    );
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('CREATE','tabele w_prog_komatsi')
+      CALL log003_err_sql('CREATE','tabele w_prog_komatsu')
       RETURN FALSE
    END IF
    
-   CREATE INDEX ix_w_prog_komatsi ON w_prog_komatsi(tip_prog)
+   CREATE INDEX ix_w_prog_komatsu ON w_prog_komatsu(plano_vendas)
 
    IF STATUS <> 0 THEN
-      CALL log003_err_sql('CREATE','indice ix_w_prog_komatsi')
+      CALL log003_err_sql('CREATE','indice ix_w_prog_komatsu')
       RETURN FALSE
    END IF
   
@@ -508,15 +517,28 @@ FUNCTION pol1419_planos(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","situacao")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_plano)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Cliente")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_cliente")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_plano)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Item ciente")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","item_cliente")
+    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_plano)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Item logix")
     CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",120)
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","cod_item")
     CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_plano)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Preço")
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","preco_plano")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_plano)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Mensagem")
@@ -549,7 +571,7 @@ FUNCTION pol1419_programacoes(l_container)#
     LET m_brz_prog = _ADVPL_create_component(NULL,"LBROWSEEX",l_layout)
     CALL _ADVPL_set_property(m_brz_prog,"ALIGN","CENTER")
 
-    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_panel_prog)
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_prog)
     CALL _ADVPL_set_property(l_tabcolumn,"IMAGE_HEADER","UNCHECKED")
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Sel")
     CALL _ADVPL_set_property(l_tabcolumn,"EDITABLE",TRUE)
@@ -562,25 +584,44 @@ FUNCTION pol1419_programacoes(l_container)#
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER_CLICK_EVENT","pol1419_marca_desmarca")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_prog)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Data")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",70)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","dat_prog")
-    CALL _ADVPL_set_property(l_tabcolumn,"ORDER",TRUE)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Ano")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",40)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","ano_plano")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_prog)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Quant")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Mês")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",40)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","mes_plano")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_prog)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Qtd EDI")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
     CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","qtd_plano")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_prog)
-    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Tipo")
-    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",80)
-    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","tip_prog")
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Qtd logix")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","qtd_plan_log")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_prog)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Preço logix")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",60)
+    CALL _ADVPL_set_property(l_tabcolumn,"EDIT_COMPONENT","LNUMERICFIELD")
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","pre_unit_log")
+
+    LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_prog)
+    CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Operação")
+    CALL _ADVPL_set_property(l_tabcolumn,"COLUMN_WIDTH",70)
+    CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","operacao")
 
     LET l_tabcolumn = _ADVPL_create_component(NULL,"LTABLECOLUMNEX",m_brz_prog)
     CALL _ADVPL_set_property(l_tabcolumn,"HEADER","Mensagem")
     CALL _ADVPL_set_property(l_tabcolumn,"VARIABLE","mensagem")
+
     CALL _ADVPL_set_property(m_brz_prog,"SET_ROWS",ma_prog,1)
     CALL _ADVPL_set_property(m_brz_prog,"CAN_ADD_ROW",FALSE)
     CALL _ADVPL_set_property(m_brz_prog,"CAN_REMOVE_ROW",FALSE)
@@ -607,7 +648,8 @@ FUNCTION pol1419_set_programacao()#
 #---------------------------------#
 
    LET m_id_item = ma_plano[m_lin_atu].id_item
-   LET m_item_cliente = ma_plano[m_lin_atu].item
+   LET m_cod_cliente = ma_plano[m_lin_atu].cod_cliente
+   LET m_item_cliente = ma_plano[m_lin_atu].item_cliente
    LET m_cod_item = ma_plano[m_lin_atu].cod_item
    LET m_ies_status = ma_plano[m_lin_atu].situacao
 
@@ -630,6 +672,9 @@ FUNCTION pol1419_carga()#
    CALL pol1419_limpa_campos()
    LET m_ies_info = 'N'
    LET mr_arquivo.cod_empresa = p_cod_empresa
+   LET mr_arquivo.cod_tip_carteira = '01'
+   LET mr_arquivo.mercado = 'IN'
+   LET mr_arquivo.pais = '001'
    
    IF NOT pol1419_ck_empresa() THEN
       RETURN FALSE
@@ -844,7 +889,7 @@ FUNCTION pol1419_carga_conf()#
       
    CALL LOG_transaction_commit()
 
-   LET p_status = pol1419_move_arquivo() 
+   #LET p_status = pol1419_move_arquivo() 
       
    LET m_car_plan = TRUE
 
@@ -1289,6 +1334,14 @@ FUNCTION pol1419_separar()#
          RETURN FALSE
       END IF
       
+      UPDATE prog_komatsu SET item_logix = mr_itens.item_logix
+       WHERE id_arquivo = m_id_arquivo AND id_item = m_id_item
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('UPDATE','prog_komatsu')
+         RETURN FALSE
+      END IF
+      
       LET l_ies_item = FALSE
       
    END FOREACH
@@ -1358,7 +1411,7 @@ END FUNCTION
 #------------------------------#
 FUNCTION pol1419_pega_cliente()#
 #------------------------------#
-{      
+      
    LET mr_itens.cliente = NULL
    LET mr_itens.item_logix = NULL
   
@@ -1415,7 +1468,7 @@ FUNCTION pol1419_pega_cliente()#
       CALL log003_err_sql('SELECT','cliente_item:02')
       RETURN FALSE
    END IF
-}      
+      
    RETURN TRUE
 
 END FUNCTION
@@ -1443,7 +1496,6 @@ FUNCTION pol1419_ins_prog()#
    INSERT INTO prog_komatsu(
       id_arquivo,
       id_item,
-      item,
       dat_prog, 
       tip_prog, 
       qtd_prog,
@@ -1453,7 +1505,6 @@ FUNCTION pol1419_ins_prog()#
       qtd_plano)
    VALUES(m_id_arquivo,
           m_id_item,
-          mr_itens.item,
           ma_data[m_ind].dat_prog, 
           ma_data[m_ind].tip_prog, 
           ma_data[m_ind].qtd_prog, 
@@ -1504,6 +1555,38 @@ FUNCTION pol1419_divide_texto()#
 END FUNCTION
 
 #------------------------------#
+FUNCTION pol1419_move_arquivo()#
+#------------------------------#
+   
+   DEFINE l_arq_dest       CHAR(100),
+          l_comando        CHAR(120),
+          l_tamanho        integer
+
+   LET l_tamanho = LENGTH(m_arq_origem CLIPPED) - 4
+   LET l_arq_dest = m_arq_origem[1, l_tamanho], '.pro'
+   
+   CALL log0030_mensagem(m_arq_origem, 'info')
+   CALL log0030_mensagem(l_arq_dest, 'info')
+   
+   IF m_ies_ambiente = 'W' THEN
+      LET l_comando = 'move ', m_arq_origem CLIPPED, ' ', l_arq_dest
+   ELSE
+      LET l_comando = 'mv ', m_arq_origem CLIPPED, ' ', l_arq_dest
+   END IF
+ 
+   RUN l_comando RETURNING p_status
+   
+   IF p_status = 1 THEN
+      LET m_msg = 'Não foi possivel renomear o arquivo de .csv para .csv-proces'
+      CALL log0030_mensagem(m_msg,'info')      
+      RETURN FALSE
+   END IF
+
+   RETURN TRUE
+
+END FUNCTION   
+
+#------------------------------#
 FUNCTION pol1419_monta_grades()#
 #------------------------------#
   
@@ -1541,10 +1624,10 @@ FUNCTION pol1419_monta_grades()#
            item,      
            item_logix,
            mensagem,  
-           situacao,  
+           situacao,
+           preco  
       FROM plano_komatsu 
-     WHERE cod_empresa = p_cod_empresa
-       AND id_arquivo = m_id_arquivo
+     WHERE id_arquivo = m_id_arquivo
        AND situacao <> 'P'
 
    FOREACH cq_monta INTO 
@@ -1553,7 +1636,8 @@ FUNCTION pol1419_monta_grades()#
       ma_plano[m_ind].item_cliente,
       ma_plano[m_ind].cod_item,
       ma_plano[m_ind].mensagem,
-      ma_plano[m_ind].situacao
+      ma_plano[m_ind].situacao,
+      ma_plano[m_ind].preco_plano
    
       IF STATUS <> 0 THEN
          CALL log003_err_sql('SELECT','cq_monta')
@@ -1613,11 +1697,12 @@ FUNCTION pol1419_le_programacao()#
       
    CALL LOG_progresspopup_set_total("PROCESS",m_count)
    
-   DELETE FROM w_prog_komatsi
-   SELECT COUNT(*) INTO l_count FROM w_prog_komatsi
+   DELETE FROM w_prog_komatsu
+   
+   SELECT COUNT(*) INTO l_count FROM w_prog_komatsu
    
    IF l_count > 0 THEN
-      LET m_msg = 'Erro limpando tabela temporária w_prog_komatsi'
+      LET m_msg = 'Erro limpando tabela temporária w_prog_komatsu'
       CALL log0030_mensagem(m_msg,'info')
       RETURN
    END IF      
@@ -1625,152 +1710,180 @@ FUNCTION pol1419_le_programacao()#
    LET m_ind = 1
    LET m_clik_cab = FALSE
 
-   IF m_ies_status = 'C' THEN
-   ELSE   
-      DECLARE cq_le_prog CURSOR FOR                                               
-       SELECT prz_entrega,
-              qtd_solic,  
-              operacao,   
-              mensagem,
-              situacao,
-              id_item,
-              num_pc, 
-              seq_pc        
-         FROM prog_komatsu    
-        WHERE id_arquivo = m_id_arquivo
-          AND id_item = m_id_item
-          AND situacao <> 'P'
-     FOREACH cq_le_prog INTO  
-        m_prz_entrega,
-        m_qtd_solic,  
-        m_operacao,   
-        m_mensagem,
-        m_ies_situa,
-        m_id_item,
-        m_num_pc, 
-        m_seq_pc  
-      
-        IF STATUS <> 0 THEN                               
-           CALL log003_err_sql('SELECT','prog_komatsu:cq_le_prog')     
-           RETURN                                   
-        END IF                                            
+   DECLARE cq_le_prog CURSOR FOR                                               
+     SELECT ano_plano,
+            mes_plano,
+            SUM(qtd_plano)
+       FROM prog_komatsu               
+      WHERE id_arquivo = m_id_arquivo  
+        AND id_item = m_id_item  
+        AND mensagem IS NULL  
+      GROUP BY ano_plano, mes_plano
+      ORDER BY ano_plano, mes_plano
+   FOREACH cq_le_prog INTO             
+      ma_prog[m_ind].ano_plano,
+      ma_prog[m_ind].mes_plano,          
+      ma_prog[m_ind].qtd_plano
+                                       
+      IF STATUS <> 0 THEN                               
+         CALL log003_err_sql('SELECT','prog_komatsu:cq_le_prog')     
+         RETURN                                   
+      END IF                                            
         
-        LET l_progres = LOG_progresspopup_increment("PROCESS")
-        
-        IF m_ies_situa = 'E' OR m_ies_status = 'E' THEN
-           LET m_qtd_atual = NULL
-           LET m_operacao = 'DESCARTAR'
-        ELSE
-           IF NOT pol1419_le_ped_itens() THEN                     
-              RETURN                                         
-           END IF           
-           IF m_ja_tem THEN
-              LET m_operacao = 'ATUALIZAR'
-           ELSE
-              LET m_operacao = 'INCLUIR'
-           END IF
-        END IF
-               
-        IF m_qtd_atual = m_qtd_solic THEN
-           CONTINUE FOREACH
-        END IF                           
-                
-        IF m_num_pc IS NULL THEN
-           LET m_mensagem = 'AMOSTRA'
-        END IF
-        
-        LET m_ies_origem = 'E'
-                                                   
-        IF NOT pol1419_ins_temp() THEN
-           RETURN
-        END IF
-                
-        LET m_ind = m_ind + 1
-
-        IF m_ind > 1000 THEN                                                                                  
-           LET m_msg = 'Limite de programações ultrapassou a 1000.'                                        
-           CALL log0030_mensagem(m_msg,'info')                                                                
-           EXIT FOREACH                                                                                       
-        END IF                                                                                                
-        
-      END FOREACH    
-                     
-      FREE cq_le_prog
-
-   END IF
-   
-   LET l_progres = LOG_progresspopup_increment("PROCESS")
-   
-   IF m_ind <= 1000 AND m_ies_status <> 'E' THEN
-      IF NOT pol1419_prog_nao_enviada() THEN
-         RETURN
-      END IF
-   END IF
-   
-   LET m_ind = 1
-   
-   DECLARE cq_prog_temp CURSOR FOR                                                                       
-    SELECT ies_origem, 
-           prz_entrega,
-           qtd_solic,  
-           qtd_atual,  
-           operacao,   
-           mensagem,
-           situacao,
-           id_item,
-           num_pc,
-           seq_pc                                                                                          
-      FROM w_prog_komatsi      
-     WHERE (num_pedido = m_num_pedido OR num_pedido IS NULL)                                                                             
-     ORDER BY prz_entrega                                                                                   
-                                                                                                            
-   FOREACH cq_prog_temp INTO 
-      ma_prog[m_ind].ies_origem,
-      ma_prog[m_ind].prz_entrega,
-      ma_prog[m_ind].qtd_solic, 
-      ma_prog[m_ind].qtd_atual, 
-      ma_prog[m_ind].operacao,  
-      ma_prog[m_ind].mensagem,
-      ma_prog[m_ind].situacao,
-      ma_prog[m_ind].id_item,
-      ma_prog[m_ind].num_pc, 
-      ma_prog[m_ind].seq_pc  
-                                                                                             
-      IF STATUS <> 0 THEN                                                                                
-         CALL log003_err_sql('SELECT','w_prog_komatsi:cq_prog_temp')                                           
-         EXIT FOREACH                                                                                       
-      END IF                                                                                                
-      
       LET l_progres = LOG_progresspopup_increment("PROCESS")
-
-      IF ma_prog[m_ind].situacao = 'E' THEN
-         CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,255,0,0)   
-      ELSE      
-         IF ma_prog[m_ind].prz_entrega <= mr_arquivo.dat_ate THEN                                                          
-            LET ma_prog[m_ind].mensagem = '(FIRME) ', ma_prog[m_ind].mensagem
-            CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,255,128,0)   
-         ELSE
-            LET ma_prog[m_ind].mensagem = '(PLANEJADA) ', ma_prog[m_ind].mensagem
-            CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,0,0,0)     
-         END IF
-      END IF
-
       LET ma_prog[m_ind].ies_select = 'N'                                                                                                                                                                                                        
-      LET m_ind = m_ind + 1                                                                              
-                                                                                                            
+      LET  ma_prog[m_ind].mensagem = NULL
+      
+      IF NOT pol1419_le_plano() THEN
+         RETURN 
+      END IF
+      
+      IF ma_prog[m_ind].mensagem IS NOT NULL THEN                               
+         CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,255,0,0)
+      ELSE
+         CALL _ADVPL_set_property(m_brz_prog,"LINE_FONT_COLOR",m_ind,0,0,0)   
+      END IF                                            
+      
+      INSERT INTO w_prog_komatsu(
+       plano_vendas,  
+       ano_plano,      
+       mes_plano) VALUES(
+            m_num_plano,
+            ma_prog[m_ind].ano_plano,
+            ma_prog[m_ind].mes_plano)         
+      
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('INSERT','w_prog_komatsu')
+         RETURN
+      END IF   
+
+      LET m_ind = m_ind + 1
+
       IF m_ind > 1000 THEN                                                                                  
-         LET m_msg = 'Limite de programações previstas\n ultrapassou a 1000'                                        
+         LET m_msg = 'Limite de programações ultrapassou a 1000.'                                        
          CALL log0030_mensagem(m_msg,'info')                                                                
          EXIT FOREACH                                                                                       
       END IF                                                                                                
-                                                                                                            
-   END FOREACH                                                                                              
-                                                                                                            
-   FREE cq_prog_temp                                                                                                    
+        
+   END FOREACH    
+                     
+   FREE cq_le_prog
+
+   DECLARE cq_nao_env CURSOR FOR
+    SELECT pve_plano_vendas.ano_plano_vendas,
+           pve_plano_vendas.mes_plano_vendas,
+           pve_plano_vendas.qtd_plano_vendas, 
+           pve_plano_vendas.pre_unit_pl_vendas  
+      FROM pve_plano_vendas                                                        
+     WHERE pve_plano_vendas.empresa = p_cod_empresa                                      
+       AND pve_plano_vendas.cliente = m_cod_cliente                           
+       AND pve_plano_vendas.item = m_cod_item                                
+       AND pve_plano_vendas.carteira = mr_arquivo.cod_tip_carteira                                      
+       AND pve_plano_vendas.mercado = mr_arquivo.mercado                 
+       AND pve_plano_vendas.pais = mr_arquivo.pais                           
+       AND pve_plano_vendas.plano_vendas NOT IN                                     
+     ( SELECT w_prog_komatsu.plano_vendas 
+         FROM w_prog_komatsu                      
+        WHERE w_prog_komatsu.ano_plano = pve_plano_vendas.ano_plano_vendas            
+          AND w_prog_komatsu.mes_plano = pve_plano_vendas.mes_plano_vendas)           
    
-   LET l_progres = LOG_progresspopup_increment("PROCESS")
-   
+   FOREACH cq_nao_env INTO
+      ma_prog[m_ind].ano_plano,
+      ma_prog[m_ind].mes_plano,          
+      ma_prog[m_ind].qtd_plan_log,
+      ma_prog[m_ind].pre_unit_log
+
+      IF STATUS <> 0 THEN
+         CALL log003_err_sql('FOREACH','pve_plano_vendas:cq_nao_env')
+         RETURN
+      END IF   
+
+      LET ma_prog[m_ind].qtd_plano = NULL
+      LET ma_prog[m_ind].operacao = 'CANCELAR'
+      LET ma_prog[m_ind].ies_select = 'N'
+      
+      LET l_progres = LOG_progresspopup_increment("PROCESS")
+
+      LET m_ind = m_ind + 1
+
+      IF m_ind > 1000 THEN                                                                                  
+         LET m_msg = 'Limite de programações ultrapassou a 1000.'                                        
+         CALL log0030_mensagem(m_msg,'info')                                                                
+         EXIT FOREACH                                                                                       
+      END IF                                                                                                
+        
+   END FOREACH    
+                     
+   FREE cq_nao_env
+                                                                                                            
    LET m_qtd_prog = m_ind - 1
    CALL _ADVPL_set_property(m_brz_prog,"ITEM_COUNT", m_qtd_prog)
          
 END FUNCTION
+
+#--------------------------#
+FUNCTION pol1419_le_plano()#
+#--------------------------#
+
+   LET ma_prog[m_ind].qtd_plan_log = NULL
+   LET ma_prog[m_ind].pre_unit_log = NULL
+
+   SELECT num_plano_vendas, 
+          cod_moeda
+     INTO m_num_plano,
+          m_cod_moeda     
+     FROM num_plano_vendas
+    WHERE cod_empresa = p_cod_empresa
+      AND cod_tip_carteira = mr_arquivo.cod_tip_carteira
+      AND ano_ini_plano <= ma_prog[m_ind].ano_plano
+      AND ano_fim_plano >= ma_prog[m_ind].ano_plano
+      AND mes_ini_plano <= ma_prog[m_ind].mes_plano
+      AND mes_fim_plano >= ma_prog[m_ind].mes_plano
+
+   IF STATUS = 100 THEN                               
+      LET ma_prog[m_ind].mensagem = 'Plano não cadastrado no Logix'
+      RETURN TRUE
+   ELSE
+      IF STATUS <> 0 THEN 
+         CALL log003_err_sql('SELECT','num_plano_vendas:cq_le_plano')     
+         RETURN FALSE
+      END IF
+   END IF                                            
+   
+   SELECT qtd_plano_vendas, 
+          pre_unit_pl_vendas  
+     INTO ma_prog[m_ind].qtd_plan_log,
+          ma_prog[m_ind].pre_unit_log
+     FROM pve_plano_vendas 
+    WHERE empresa = p_cod_empresa 
+      AND plano_vendas = m_num_plano
+      AND cliente = m_cod_cliente
+      AND item = m_cod_item 
+      AND ano_plano_vendas = ma_prog[m_ind].ano_plano 
+      AND mes_plano_vendas = ma_prog[m_ind].mes_plano
+      AND carteira = mr_arquivo.cod_tip_carteira
+      AND mercado = mr_arquivo.mercado 
+      AND pais = mr_arquivo.pais
+
+   IF STATUS = 100 THEN                               
+      LET ma_prog[m_ind].operacao = 'INCLUIR'
+   ELSE
+      IF STATUS = 0 THEN 
+         LET ma_prog[m_ind].operacao = 'ATUALIZAR'
+      ELSE
+         CALL log003_err_sql('SELECT','pve_plano_vendas:cq_le_plano')    
+         RETURN FALSE
+      END IF
+   END IF                                                  
+   
+   RETURN TRUE
+
+END FUNCTION
+
+{
+
+Forecast
+
+1-	Qual carteira usar?
+2-	Qual preço vamos usar na carga do Plano de vendas ?
+   
